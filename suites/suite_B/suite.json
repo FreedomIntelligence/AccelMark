@@ -1,0 +1,17 @@
+{
+  "suite_id": "suite_B",
+  "description": "8-chip inference, Llama-3-70B. Tests inter-chip communication overhead.",
+  "model_id": "meta-llama/Llama-3-70B-Instruct",
+  "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
+  "scenarios": ["offline", "online"],
+  "precision_required": "BF16",
+  "input_tokens": 512,
+  "output_tokens": 128,
+  "batch_sizes": [1, 8, 32, 128],
+  "online_qps_levels": [1, 5, 10, 25],
+  "online_sla_ttft_ms": 1000,
+  "num_runs": 3,
+  "warmup_runs": 2,
+  "accuracy_threshold_delta": 0.03,
+  "request_count": 1000
+}

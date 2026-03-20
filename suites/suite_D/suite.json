@@ -1,0 +1,17 @@
+{
+  "suite_id": "suite_D",
+  "description": "Single chip, long context inference. OOM results are expected and recorded.",
+  "model_id": "meta-llama/Llama-3-8B-Instruct",
+  "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
+  "scenarios": ["offline", "interactive"],
+  "precision_required": "BF16",
+  "input_tokens": 32768,
+  "output_tokens": 512,
+  "batch_sizes": [1, 4, 8],
+  "online_qps_levels": null,
+  "online_sla_ttft_ms": null,
+  "num_runs": 3,
+  "warmup_runs": 2,
+  "accuracy_threshold_delta": 0.03,
+  "request_count": 200
+}

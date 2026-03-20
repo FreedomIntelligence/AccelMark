@@ -1,0 +1,222 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "AccelMark Result",
+  "type": "object",
+  "required": [
+    "schema_version", "suite_id", "chip", "software",
+    "model", "task", "metrics", "accuracy", "meta"
+  ],
+  "additionalProperties": false,
+  "properties": {
+
+    "schema_version": { "type": "string", "const": "1.0" },
+
+    "suite_id": {
+      "type": "string",
+      "description": "Must match a suite in suites/. Use 'custom' for non-standard runs."
+    },
+
+    "chip": {
+      "type": "object",
+      "required": ["name", "vendor", "count", "memory_gb_per_chip", "interconnect_intra_node"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "vendor": {
+          "type": "string",
+          "enum": ["NVIDIA","AMD","Intel","Google","Huawei","Cambricon","Biren",
+                   "Enflame","MetaX","Iluvatar","Apple","Qualcomm","Other"]
+        },
+        "count": { "type": "integer", "minimum": 1 },
+        "memory_gb_per_chip": { "type": "number", "minimum": 0 },
+        "interconnect_intra_node": { "type": "string" },
+        "interconnect_inter_node": { "type": ["string", "null"] }
+      }
+    },
+
+    "software": {
+      "type": "object",
+      "required": ["framework","framework_version","driver_version","runtime_version","os","python_version"],
+      "additionalProperties": false,
+      "properties": {
+        "framework": { "type": "string" },
+        "framework_version": { "type": "string" },
+        "driver_version": { "type": "string" },
+        "runtime_version": { "type": "string" },
+        "os": { "type": "string" },
+        "python_version": { "type": "string" }
+      }
+    },
+
+    "model": {
+      "type": "object",
+      "required": ["model_id","model_revision","architecture","parameter_count_b","precision","model_format"],
+      "additionalProperties": false,
+      "properties": {
+        "model_id": { "type": "string" },
+        "model_revision": { "type": "string" },
+        "architecture": {
+          "type": "string",
+          "enum": ["dense","moe","vlm","linear_transformer","ttt","other"]
+        },
+        "parameter_count_b": { "type": "number", "minimum": 0 },
+        "precision": {
+          "type": "string",
+          "enum": ["FP32","BF16","FP16","FP8","INT8","INT4","mixed"]
+        },
+        "model_format": { "type": "string" }
+      }
+    },
+
+    "task": {
+      "type": "object",
+      "required": ["scenario","num_runs","warmup_runs","parallelism"],
+      "additionalProperties": false,
+      "properties": {
+        "scenario": { "type": "string", "enum": ["offline","online","interactive","training"] },
+        "num_runs": { "type": "integer", "minimum": 3 },
+        "warmup_runs": { "type": "integer", "minimum": 1 },
+        "parallelism": {
+          "type": "object",
+          "required": ["tensor_parallel_size","pipeline_parallel_size"],
+          "additionalProperties": false,
+          "properties": {
+            "tensor_parallel_size": { "type": "integer", "minimum": 1 },
+            "pipeline_parallel_size": { "type": "integer", "minimum": 1 },
+            "data_parallel_size": { "type": "integer", "minimum": 1, "default": 1 },
+            "expert_parallel_size": { "type": ["integer","null"] }
+          }
+        },
+        "extra_config": { "type": ["object","null"] }
+      }
+    },
+
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "offline": {
+          "type": ["object","null"],
+          "required": ["results_by_batch_size"],
+          "properties": {
+            "results_by_batch_size": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["batch_size","throughput_tokens_per_sec","peak_memory_gb","oom"],
+                "additionalProperties": false,
+                "properties": {
+                  "batch_size": { "type": "integer", "minimum": 1 },
+                  "throughput_tokens_per_sec": { "type": ["number","null"], "minimum": 0 },
+                  "peak_memory_gb": { "type": ["number","null"], "minimum": 0 },
+                  "power_watts_avg": { "type": ["number","null"] },
+                  "power_watts_peak": { "type": ["number","null"] },
+                  "oom": { "type": "boolean", "default": false }
+                }
+              }
+            }
+          }
+        },
+        "online": {
+          "type": ["object","null"],
+          "required": ["max_valid_qps","results_by_qps"],
+          "properties": {
+            "max_valid_qps": { "type": "number", "minimum": 0 },
+            "results_by_qps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "target_qps","achieved_qps",
+                  "ttft_ms_p50","ttft_ms_p90","ttft_ms_p99",
+                  "tpot_ms_p50","tpot_ms_p90","tpot_ms_p99",
+                  "sla_met"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "target_qps": { "type": "number" },
+                  "achieved_qps": { "type": "number" },
+                  "ttft_ms_p50": { "type": "number" },
+                  "ttft_ms_p90": { "type": "number" },
+                  "ttft_ms_p99": { "type": "number" },
+                  "tpot_ms_p50": { "type": "number" },
+                  "tpot_ms_p90": { "type": "number" },
+                  "tpot_ms_p99": { "type": "number" },
+                  "sla_met": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "interactive": {
+          "type": ["object","null"],
+          "required": [
+            "ttft_ms_p50","ttft_ms_p90","ttft_ms_p99",
+            "tpot_ms_p50","tpot_ms_p90","tpot_ms_p99",
+            "peak_memory_gb"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "ttft_ms_p50": { "type": "number" },
+            "ttft_ms_p90": { "type": "number" },
+            "ttft_ms_p99": { "type": "number" },
+            "tpot_ms_p50": { "type": "number" },
+            "tpot_ms_p90": { "type": "number" },
+            "tpot_ms_p99": { "type": "number" },
+            "peak_memory_gb": { "type": "number" }
+          }
+        },
+        "training": {
+          "type": ["object","null"],
+          "required": ["tokens_per_sec","tokens_per_sec_per_chip","peak_memory_gb_per_chip"],
+          "additionalProperties": false,
+          "properties": {
+            "tokens_per_sec": { "type": "number" },
+            "tokens_per_sec_per_chip": { "type": "number" },
+            "peak_memory_gb_per_chip": { "type": "number" },
+            "power_watts_avg_per_chip": { "type": ["number","null"] },
+            "mfu": { "type": ["number","null"], "minimum": 0, "maximum": 1 }
+          }
+        },
+        "derived": {
+          "type": "object",
+          "description": "Auto-computed by validate_submission.py. Do not fill manually.",
+          "additionalProperties": false,
+          "properties": {
+            "tokens_per_sec_per_watt": { "type": ["number","null"] },
+            "tokens_per_sec_per_chip": { "type": ["number","null"] }
+          }
+        }
+      }
+    },
+
+    "accuracy": {
+      "type": "object",
+      "required": ["subset_score","baseline_delta","valid"],
+      "additionalProperties": false,
+      "properties": {
+        "subset_score": { "type": ["number","null"], "minimum": 0, "maximum": 1 },
+        "baseline_delta": { "type": ["number","null"], "minimum": 0 },
+        "valid": { "type": "boolean" },
+        "notes": { "type": ["string","null"] }
+      }
+    },
+
+    "meta": {
+      "type": "object",
+      "required": ["submitted_by","submission_type","date","reproduce_script","env_info_file","log_file"],
+      "additionalProperties": false,
+      "properties": {
+        "submitted_by": { "type": "string" },
+        "submission_type": { "type": "string", "enum": ["individual","vendor","research"] },
+        "date": { "type": "string", "format": "date" },
+        "reproduce_script": { "type": "string" },
+        "env_info_file": { "type": "string" },
+        "log_file": { "type": "string" },
+        "samples_file": { "type": ["string","null"] },
+        "notes": { "type": ["string","null"] }
+      }
+    }
+
+  }
+}
