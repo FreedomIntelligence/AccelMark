@@ -165,6 +165,38 @@
     .cap-list { margin-top: 0.75rem; font-size: 0.8rem; }
     .cap-yes { color: #56d364; }
     .cap-no  { color: #f85149; }
+
+    .framework-standard { color: #56d364; }
+    .framework-custom    { color: #d29922; }
+    .framework-unknown   { color: #8b949e; }
+
+    .framework-cell {
+      cursor: pointer;
+      text-decoration: underline dotted;
+    }
+
+    .framework-tooltip {
+      display: none;
+      position: absolute;
+      background: #1c2128;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      color: #e6edf3;
+      z-index: 100;
+      max-width: 400px;
+      white-space: normal;
+    }
+
+    .framework-cell:hover .framework-tooltip {
+      display: block;
+    }
+
+    .framework-wrapper {
+      position: relative;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -380,6 +412,42 @@
     });
   }
 
+  // ── Framework formatter ──────────────────────────────────
+  function formatFramework(row) {
+    const fw = row.framework || '';
+    const fwVersion = row.framework_version || '';
+    const script = row.reproduce_script || '';
+    const notes = row.notes || '';
+
+    if (!fw || fw === 'unknown') {
+      return `<span class="framework-unknown">—</span>`;
+    }
+
+    const standardFrameworks = ['vllm', 'tensorrt-llm', 'trtllm', 'mindie', 'torchtitan', 'vllm-rocm'];
+    const isStandard = standardFrameworks.some(f => fw.toLowerCase().includes(f));
+    const isCustom = fw.toLowerCase().startsWith('custom') || !isStandard;
+
+    const colorClass = isCustom ? 'framework-custom' : 'framework-standard';
+    const badge = isCustom
+      ? `<span class="badge" style="background:#3d2b00;color:#d29922;margin-left:4px;font-size:0.7rem">custom</span>`
+      : '';
+
+    const tooltipLines = [];
+    if (fwVersion) tooltipLines.push(`Version: ${fwVersion}`);
+    if (script)    tooltipLines.push(`Script: ${script}`);
+    if (notes)     tooltipLines.push(`Notes: ${notes}`);
+    const tooltip = tooltipLines.length
+      ? `<div class="framework-tooltip">${tooltipLines.join('<br>')}</div>`
+      : '';
+
+    return `
+      <div class="framework-wrapper">
+        <span class="framework-cell ${colorClass}">${fw}${badge}</span>
+        ${tooltip}
+      </div>
+    `;
+  }
+
   // ── Pro View ─────────────────────────────────────────────
   function renderPro(rows) {
     const tbody = document.getElementById('pro-tbody');
@@ -406,7 +474,7 @@
         <td class="chip-name">${row.chip || '—'}</td>
         <td>${row.vendor || '—'}</td>
         <td>${row.chip_count || 1}</td>
-        <td>${row.framework || '—'}</td>
+        <td>${formatFramework(row)}</td>
         <td>${row.model || '—'}</td>
         <td>${row.precision || '—'}</td>
         <td>${row.suite || '—'}</td>
