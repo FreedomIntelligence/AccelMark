@@ -3,77 +3,431 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AccelMark Leaderboard</title>
-  <link rel="stylesheet" href="style.css">
+  <title>AccelMark — AI Accelerator Leaderboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 2rem 2rem 1rem;
+      border-bottom: 1px solid #21262d;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f0f6fc;
+    }
+
+    header p {
+      color: #8b949e;
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      padding: 1rem 2rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      border-bottom: 1px solid #21262d;
+    }
+
+    select, input {
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+
+    .view-toggle {
+      margin-left: auto;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .view-btn {
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    .view-btn.active {
+      background: #1f6feb;
+      border-color: #1f6feb;
+      color: #fff;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      padding: 1rem 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      color: #8b949e;
+      font-weight: 500;
+      border-bottom: 1px solid #21262d;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:hover { color: #e6edf3; }
+
+    th.sorted-asc::after  { content: " ↑"; }
+    th.sorted-desc::after { content: " ↓"; }
+
+    td {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #161b22;
+      white-space: nowrap;
+    }
+
+    tr:hover td { background: #161b22; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-verified  { background: #1a4a1a; color: #56d364; }
+    .badge-community { background: #1c2e4a; color: #58a6ff; }
+    .badge-vendor    { background: #3d2b00; color: #d29922; }
+    .badge-mini      { background: #2d1b69; color: #a78bfa; }
+
+    .metric-primary {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chip-name { font-weight: 500; }
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #8b949e;
+    }
+
+    .stat-bar {
+      padding: 1rem 2rem;
+      display: flex;
+      gap: 2rem;
+      border-bottom: 1px solid #21262d;
+      font-size: 0.875rem;
+      color: #8b949e;
+    }
+
+    .stat-bar span { color: #e6edf3; font-weight: 600; }
+
+    /* Consumer view cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      padding: 1rem 2rem;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .card-chip { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; }
+    .card-speed { font-size: 1.75rem; font-weight: 700; color: #58a6ff; }
+    .card-speed-label { font-size: 0.75rem; color: #8b949e; }
+    .card-model { font-size: 0.8rem; color: #8b949e; margin-top: 0.5rem; }
+
+    .cap-list { margin-top: 0.75rem; font-size: 0.8rem; }
+    .cap-yes { color: #56d364; }
+    .cap-no  { color: #f85149; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>AccelMark Leaderboard</h1>
-    <p>Open benchmark for AI accelerator performance on LLM workloads.</p>
-    <a href="https://github.com/accelmark/accelmark" class="btn">GitHub</a>
-    <a href="https://github.com/accelmark/accelmark/blob/main/CONTRIBUTING.md" class="btn">Submit a Result</a>
-  </header>
 
-  <main>
-    <section id="filters">
-      <label>Suite:
-        <select id="filter-suite">
-          <option value="">All</option>
-          <option value="suite_A">Suite A (Llama-3-8B, 1 chip)</option>
-          <option value="suite_B">Suite B (Llama-3-70B, 8 chips)</option>
-          <option value="suite_C">Suite C (Training)</option>
-          <option value="suite_D">Suite D (Long Context)</option>
-        </select>
-      </label>
-      <label>Scenario:
-        <select id="filter-scenario">
-          <option value="">All</option>
-          <option value="offline">Offline</option>
-          <option value="online">Online</option>
-          <option value="interactive">Interactive</option>
-          <option value="training">Training</option>
-        </select>
-      </label>
-      <label>Tier:
-        <select id="filter-tier">
-          <option value="">All</option>
-          <option value="verified">Verified</option>
-          <option value="community">Community</option>
-        </select>
-      </label>
-    </section>
+<header>
+  <h1>⚡ AccelMark Leaderboard</h1>
+  <p>Open benchmark for AI accelerators on LLM workloads · <a href="https://github.com/JuhaoLiang1997/AccelMark" style="color:#58a6ff">GitHub</a></p>
+</header>
 
-    <h2>Results</h2>
-    <div class="table-wrap">
-      <table id="leaderboard-table">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Chip</th>
-            <th>Vendor</th>
-            <th>#</th>
-            <th>Framework</th>
-            <th>Suite</th>
-            <th>Scenario</th>
-            <th>Primary Metric</th>
-            <th>Tok/W</th>
-            <th>Acc</th>
-            <th>Tier</th>
-            <th>Date</th>
-            <th>Submitted By</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard-body">
-        </tbody>
-      </table>
+<div class="stat-bar">
+  <div>Submissions: <span id="stat-total">—</span></div>
+  <div>Chips: <span id="stat-chips">—</span></div>
+  <div>Last updated: <span id="stat-date">—</span></div>
+</div>
+
+<div class="controls">
+  <select id="filter-vendor">
+    <option value="">All vendors</option>
+  </select>
+  <select id="filter-scenario">
+    <option value="">All scenarios</option>
+    <option value="offline">Offline</option>
+    <option value="online">Online</option>
+    <option value="interactive">Interactive</option>
+    <option value="training">Training</option>
+  </select>
+  <select id="filter-tier">
+    <option value="">Verified + Community</option>
+    <option value="verified">Verified only</option>
+    <option value="community">Community only</option>
+  </select>
+  <input id="search" type="text" placeholder="Search chip or model…" style="width:200px">
+  <div class="view-toggle">
+    <button class="view-btn active" id="btn-consumer" onclick="setView('consumer')">Community</button>
+    <button class="view-btn" id="btn-pro" onclick="setView('pro')">Pro</button>
+  </div>
+</div>
+
+<!-- Consumer view -->
+<div id="view-consumer">
+  <div class="cards" id="cards-container"></div>
+</div>
+
+<!-- Pro view -->
+<div id="view-pro" style="display:none">
+  <div class="table-wrap">
+    <table id="pro-table">
+      <thead>
+        <tr>
+          <th onclick="sortBy('chip')">Chip</th>
+          <th onclick="sortBy('vendor')">Vendor</th>
+          <th onclick="sortBy('chip_count')">Count</th>
+          <th onclick="sortBy('framework')">Framework</th>
+          <th onclick="sortBy('model')">Model</th>
+          <th onclick="sortBy('precision')">Precision</th>
+          <th onclick="sortBy('suite')">Suite</th>
+          <th onclick="sortBy('scenario')">Scenario</th>
+          <th onclick="sortBy('primary_metric')">Performance</th>
+          <th onclick="sortBy('tokens_per_watt')">tok/s/W</th>
+          <th onclick="sortBy('tier')">Tier</th>
+          <th onclick="sortBy('date')">Date</th>
+        </tr>
+      </thead>
+      <tbody id="pro-tbody"></tbody>
+    </table>
+    <div class="empty-state" id="pro-empty" style="display:none">
+      No results match the current filters.
     </div>
-  </main>
+  </div>
+</div>
 
-  <footer>
-    <p>AccelMark is open source under the Apache 2.0 License.</p>
-  </footer>
+<script src="leaderboard.js"></script>
+<script>
+  // ── State ────────────────────────────────────────────────
+  let currentView = 'consumer';
+  let sortKey = 'primary_metric';
+  let sortDir = -1; // -1 = desc, 1 = asc
 
-  <script src="leaderboard.js"></script>
-  <script src="app.js" defer></script>
+  // ── Init ─────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof LEADERBOARD_DATA === 'undefined' || !LEADERBOARD_DATA.length) {
+      document.getElementById('pro-empty').style.display = 'block';
+      document.getElementById('pro-empty').textContent = 'No submissions yet. Be the first!';
+      return;
+    }
+
+    populateVendorFilter();
+    updateStats();
+    render();
+  });
+
+  // ── Filters ──────────────────────────────────────────────
+  function getFiltered() {
+    const vendor   = document.getElementById('filter-vendor').value;
+    const scenario = document.getElementById('filter-scenario').value;
+    const tier     = document.getElementById('filter-tier').value;
+    const search   = document.getElementById('search').value.toLowerCase();
+
+    return LEADERBOARD_DATA.filter(row => {
+      if (vendor   && row.vendor   !== vendor)   return false;
+      if (scenario && row.scenario !== scenario) return false;
+      if (tier     && row.tier     !== tier)     return false;
+      if (search) {
+        const haystack = `${row.chip} ${row.model} ${row.framework}`.toLowerCase();
+        if (!haystack.includes(search)) return false;
+      }
+      return true;
+    });
+  }
+
+  function populateVendorFilter() {
+    const vendors = [...new Set(LEADERBOARD_DATA.map(r => r.vendor).filter(Boolean))].sort();
+    const sel = document.getElementById('filter-vendor');
+    vendors.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      sel.appendChild(opt);
+    });
+  }
+
+  ['filter-vendor','filter-scenario','filter-tier','search'].forEach(id => {
+    document.getElementById(id).addEventListener('change', render);
+    document.getElementById(id).addEventListener('input', render);
+  });
+
+  // ── Sorting ──────────────────────────────────────────────
+  function sortBy(key) {
+    if (sortKey === key) sortDir *= -1;
+    else { sortKey = key; sortDir = -1; }
+    render();
+  }
+
+  function getSorted(rows) {
+    return [...rows].sort((a, b) => {
+      const va = a[sortKey], vb = b[sortKey];
+      if (va === null || va === undefined) return 1;
+      if (vb === null || vb === undefined) return -1;
+      if (typeof va === 'number') return (va - vb) * sortDir;
+      return String(va).localeCompare(String(vb)) * sortDir;
+    });
+  }
+
+  // ── Render ───────────────────────────────────────────────
+  function render() {
+    const filtered = getFiltered();
+    const sorted   = getSorted(filtered);
+
+    updateStats(filtered);
+
+    if (currentView === 'consumer') renderConsumer(sorted);
+    else renderPro(sorted);
+  }
+
+  function setView(v) {
+    currentView = v;
+    document.getElementById('view-consumer').style.display = v === 'consumer' ? '' : 'none';
+    document.getElementById('view-pro').style.display      = v === 'pro'      ? '' : 'none';
+    document.getElementById('btn-consumer').classList.toggle('active', v === 'consumer');
+    document.getElementById('btn-pro').classList.toggle('active', v === 'pro');
+    render();
+  }
+
+  function updateStats(filtered) {
+    const rows = filtered || LEADERBOARD_DATA;
+    document.getElementById('stat-total').textContent = rows.length;
+    document.getElementById('stat-chips').textContent = new Set(rows.map(r => r.chip)).size;
+    const dates = rows.map(r => r.date).filter(Boolean).sort();
+    document.getElementById('stat-date').textContent = dates.length ? dates[dates.length - 1] : '—';
+  }
+
+  // ── Consumer View ────────────────────────────────────────
+  function renderConsumer(rows) {
+    const container = document.getElementById('cards-container');
+    container.innerHTML = '';
+
+    // Group by chip, take best result per chip
+    const byChip = {};
+    rows.forEach(row => {
+      if (!row.chip) return;
+      if (!byChip[row.chip] || (row.primary_metric || 0) > (byChip[row.chip].primary_metric || 0)) {
+        byChip[row.chip] = row;
+      }
+    });
+
+    const chips = Object.values(byChip).sort((a, b) =>
+      (b.primary_metric || 0) - (a.primary_metric || 0)
+    );
+
+    if (!chips.length) {
+      container.innerHTML = '<div class="empty-state">No results match the current filters.</div>';
+      return;
+    }
+
+    chips.forEach(row => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const speed = row.primary_metric ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 0}) : '—';
+      const isMini = (row.suite || '').startsWith('mini-');
+      card.innerHTML = `
+        <div class="card-chip">${row.chip || 'Unknown'}</div>
+        <div style="margin-top:0.5rem">
+          <div class="card-speed">${speed}</div>
+          <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
+        </div>
+        <div class="card-model">${row.model || ''} · ${row.framework || ''} · ${row.precision || ''}</div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap">
+          <span class="badge badge-${row.tier}">${row.tier}</span>
+          ${isMini ? '<span class="badge badge-mini">mini</span>' : ''}
+          ${row.tier === 'verified' ? '' : ''}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // ── Pro View ─────────────────────────────────────────────
+  function renderPro(rows) {
+    const tbody = document.getElementById('pro-tbody');
+    const empty = document.getElementById('pro-empty');
+    tbody.innerHTML = '';
+
+    if (!rows.length) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    // Update sort indicators
+    document.querySelectorAll('th').forEach(th => {
+      th.classList.remove('sorted-asc', 'sorted-desc');
+    });
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      const isMini  = (row.suite || '').startsWith('mini-');
+      const isVendor = row.submitted_by && row.submitted_by.includes('[vendor]');
+
+      tr.innerHTML = `
+        <td class="chip-name">${row.chip || '—'}</td>
+        <td>${row.vendor || '—'}</td>
+        <td>${row.chip_count || 1}</td>
+        <td>${row.framework || '—'}</td>
+        <td>${row.model || '—'}</td>
+        <td>${row.precision || '—'}</td>
+        <td>${row.suite || '—'}</td>
+        <td>${row.scenario || '—'}</td>
+        <td class="metric-primary">${
+          row.primary_metric
+            ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 1})
+            + ' <small style="color:#8b949e;font-weight:400">' + (row.primary_metric_label || '') + '</small>'
+            : '—'
+        }</td>
+        <td>${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
+        <td>
+          <span class="badge badge-${row.tier}">${row.tier}</span>
+          ${isMini   ? '<span class="badge badge-mini" style="margin-left:4px">mini</span>' : ''}
+          ${isVendor ? '<span class="badge badge-vendor" style="margin-left:4px">vendor</span>' : ''}
+        </td>
+        <td style="color:#8b949e">${row.date || '—'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+</script>
 </body>
 </html>
