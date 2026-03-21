@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AccelMark Leaderboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>AccelMark Leaderboard</h1>
+    <p>Open benchmark for AI accelerator performance on LLM workloads.</p>
+    <a href="https://github.com/accelmark/accelmark" class="btn">GitHub</a>
+    <a href="https://github.com/accelmark/accelmark/blob/main/CONTRIBUTING.md" class="btn">Submit a Result</a>
+  </header>
+
+  <main>
+    <section id="filters">
+      <label>Suite:
+        <select id="filter-suite">
+          <option value="">All</option>
+          <option value="suite_A">Suite A (Llama-3-8B, 1 chip)</option>
+          <option value="suite_B">Suite B (Llama-3-70B, 8 chips)</option>
+          <option value="suite_C">Suite C (Training)</option>
+          <option value="suite_D">Suite D (Long Context)</option>
+        </select>
+      </label>
+      <label>Scenario:
+        <select id="filter-scenario">
+          <option value="">All</option>
+          <option value="offline">Offline</option>
+          <option value="online">Online</option>
+          <option value="interactive">Interactive</option>
+          <option value="training">Training</option>
+        </select>
+      </label>
+      <label>Tier:
+        <select id="filter-tier">
+          <option value="">All</option>
+          <option value="verified">Verified</option>
+          <option value="community">Community</option>
+        </select>
+      </label>
+    </section>
+
+    <h2>Results</h2>
+    <div class="table-wrap">
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Chip</th>
+            <th>Vendor</th>
+            <th>#</th>
+            <th>Framework</th>
+            <th>Suite</th>
+            <th>Scenario</th>
+            <th>Primary Metric</th>
+            <th>Tok/W</th>
+            <th>Acc</th>
+            <th>Tier</th>
+            <th>Date</th>
+            <th>Submitted By</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <p>AccelMark is open source under the Apache 2.0 License.</p>
+  </footer>
+
+  <script src="leaderboard.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
