@@ -22,7 +22,7 @@ from pathlib import Path
 
 
 ACCELMARK_REPO = os.environ.get("ACCELMARK_PATH", "~/accelmark")
-LEADERBOARD_API = "https://accelmark.github.io/accelmark/api"
+LEADERBOARD_API = "https://juhaoliang1997.github.io/AccelMark/api"
 
 
 def ensure_accelmark_installed() -> Path:
@@ -32,7 +32,7 @@ def ensure_accelmark_installed() -> Path:
     if not repo_path.exists():
         yield_message("AccelMark not found locally. Cloning repository (~30 seconds)...")
         subprocess.run(
-            ["git", "clone", "https://github.com/accelmark/accelmark.git", str(repo_path)],
+            ["git", "clone", "https://github.com/JuhaoLiang1997/AccelMark.git", str(repo_path)],
             check=True
         )
 
@@ -120,7 +120,7 @@ def handle_submit(result: dict, username: str) -> str:
     }).encode()
 
     req = urllib.request.Request(
-        "https://api.github.com/repos/accelmark/accelmark/issues",
+        "https://api.github.com/repos/JuhaoLiang1997/AccelMark/issues",
         data=payload,
         headers={"Content-Type": "application/json"},
     )
@@ -215,7 +215,7 @@ def main(user_message: str, context: dict) -> str:
             "Common fixes:\n"
             "• Make sure you have a GPU with enough VRAM\n"
             "• Try: `pip install vllm`\n"
-            "• Check AccelMark docs: https://github.com/accelmark/accelmark"
+            "• Check AccelMark docs: https://github.com/JuhaoLiang1997/AccelMark"
         )
 
 

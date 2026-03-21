@@ -95,6 +95,71 @@ If you believe a submitted result is incorrect:
 
 ---
 
+## Using Local Models (Air-gapped / No Internet Access)
+
+AccelMark supports running benchmarks with locally stored model weights.
+This is common in air-gapped environments or private clusters.
+
+### How it works
+
+The `model_id` and `model_revision` fields in `result.json` are used for
+identification and comparison on the leaderboard — they do not need to match
+the actual loading path at runtime.
+
+### Steps
+
+**1. Download the model in advance** (on a machine with internet access):
+
+```bash
+pip install huggingface_hub
+huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
+    --local-dir /your/local/path/Meta-Llama-3-8B-Instruct
+```
+
+**2. Run the benchmark pointing to the local path:**
+
+```bash
+PYTHONPATH=. python scripts/nvidia/run_vllm.py \
+    --suite suite_A \
+    --scenario offline \
+    --output-dir ./my_submission/ \
+    --tensor-parallel-size 1 \
+    --model-path /your/local/path/Meta-Llama-3-8B-Instruct
+```
+
+**3. Keep the standard model identifier in result.json:**
+
+The script automatically fills `model_id` with the suite's standard HuggingFace
+identifier and `model_revision` with the locked hash. Do not change these fields
+even when loading from a local path — they exist for leaderboard comparability,
+not to describe where the model was loaded from.
+
+**4. If your local copy has a different revision hash:**
+
+HuggingFace repositories sometimes update non-weight files (README, metadata)
+which changes the commit hash without changing model weights. If your local copy
+was downloaded at a different point in time but has identical weight files
+(`*.safetensors`, `config.json`, `tokenizer.json`), add a note in `meta.notes`:
+
+```json
+"notes": "Local model copy, weights identical to locked revision 8afb486c"
+```
+
+### What counts as the "same model"
+
+| Changed file | Affects inference? | Need to re-download? |
+|---|---|---|
+| README.md | No | No |
+| .gitattributes | No | No |
+| config.json | Yes | Yes |
+| tokenizer.json | Yes | Yes |
+| model-*.safetensors | Yes | Yes |
+
+If only README or metadata changed, your local copy is considered equivalent
+to the locked revision for AccelMark purposes.
+
+---
+
 ## Code of Conduct
 
 - Be specific when challenging results — vague accusations are not actionable

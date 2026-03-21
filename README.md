@@ -12,12 +12,12 @@ Each platform implements its own inference backend. Anyone with a GPU can contri
 
 ## Live Leaderboard
 
-[accelmark.github.io/accelmark](https://accelmark.github.io/accelmark)
+[juhaoliang1997.github.io/AccelMark](https://juhaoliang1997.github.io/AccelMark)
 
 ## Quickstart — Run Suite A on NVIDIA
 
 ```bash
-git clone https://github.com/accelmark/accelmark
+git clone https://github.com/JuhaoLiang1997/AccelMark
 cd accelmark
 
 # Step 1: collect environment info

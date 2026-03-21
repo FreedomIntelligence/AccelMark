@@ -28,10 +28,15 @@ from loadgen.types import InferenceResult
 
 engine: AsyncLLMEngine = None
 sampling_params: SamplingParams = None
+_loop: asyncio.AbstractEventLoop = None
 
 
-def load_model(model_id: str, model_revision: str, tp_size: int, suite: dict) -> None:
-    global engine, sampling_params
+def load_model(model_id: str, model_revision: str, tp_size: int, suite: dict,
+               enforce_eager: bool = False) -> None:
+    global engine, sampling_params, _loop
+
+    _loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(_loop)
 
     engine_args = AsyncEngineArgs(
         model=model_id,
@@ -39,10 +44,11 @@ def load_model(model_id: str, model_revision: str, tp_size: int, suite: dict) ->
         tensor_parallel_size=tp_size,
         dtype="bfloat16",
         trust_remote_code=False,
+        enforce_eager=enforce_eager,
     )
     engine = AsyncLLMEngine.from_engine_args(engine_args)
     sampling_params = SamplingParams(
-        max_tokens=suite["output_tokens"],
+        max_tokens=suite["output_tokens_max"],
         temperature=0.0,   # greedy for reproducibility
     )
 
@@ -71,7 +77,7 @@ def inference_fn(prompts: list[str]) -> list[InferenceResult]:
     async def run_all():
         tasks = [_run_one_streaming(p) for p in prompts]
         return await asyncio.gather(*tasks)
-    return asyncio.run(run_all())
+    return _loop.run_until_complete(run_all())
 
 
 def get_peak_memory_gb() -> float:
@@ -85,6 +91,20 @@ def main():
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--tensor-parallel-size", type=int, default=1)
     parser.add_argument("--pipeline-parallel-size", type=int, default=1)
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        default=None,
+        help="Path to local model directory. If provided, overrides the model_id "
+             "from suite.json for loading purposes. The result.json will still "
+             "record the standard suite model_id for leaderboard comparability."
+    )
+    parser.add_argument(
+        "--enforce-eager",
+        action="store_true",
+        default=False,
+        help="Disable torch.compile (enforce eager execution). Use if compilation fails.",
+    )
     args = parser.parse_args()
 
     suite_path = Path(f"suites/{args.suite}/suite.json")
@@ -98,7 +118,8 @@ def main():
             requests.append(json.loads(line))
 
     print(f"Loading {suite['model_id']}...")
-    load_model(suite["model_id"], suite["model_revision"], args.tensor_parallel_size, suite)
+    effective_model_path = args.model_path if args.model_path else suite["model_id"]
+    load_model(effective_model_path, suite["model_revision"] if not args.model_path else None, args.tensor_parallel_size, suite, args.enforce_eager)
 
     loadgen = AccelMarkLoadGen(
         suite=suite,

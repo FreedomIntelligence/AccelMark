@@ -91,6 +91,9 @@ def extract_row(result: dict) -> dict:
         "tokens_per_watt": derived.get("tokens_per_sec_per_watt"),
         "date": meta.get("date"),
         "submitted_by": meta.get("submitted_by"),
+        "framework_version": software.get("framework_version"),
+        "reproduce_script": meta.get("reproduce_script"),
+        "notes": meta.get("notes"),
     }
 
 

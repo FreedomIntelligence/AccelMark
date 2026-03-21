@@ -249,7 +249,7 @@ class AccelMarkLoadGen:
                     if not is_warmup:
                         all_samples.append(SampleRecord(
                             request_id=i, batch_size=1, scenario="interactive",
-                            input_tokens=self.suite["input_tokens"],
+                            input_tokens=self.suite.get("input_tokens", self.suite.get("request_distribution", {}).get("input_tokens_p50")),
                             output_tokens=r.output_tokens,
                             ttft_ms=r.first_token_time_ms,
                             total_ms=r.total_time_ms, success=True
@@ -418,7 +418,7 @@ class AccelMarkLoadGen:
         for i, r in enumerate(sampled_results):
             records.append(SampleRecord(
                 request_id=i, batch_size=batch_size, scenario=scenario,
-                input_tokens=self.suite["input_tokens"],
+                input_tokens=self.suite.get("input_tokens", self.suite.get("request_distribution", {}).get("input_tokens_p50")),
                 output_tokens=r.output_tokens,
                 ttft_ms=r.first_token_time_ms,
                 total_ms=r.total_ms if hasattr(r, 'total_ms') else r.total_time_ms,

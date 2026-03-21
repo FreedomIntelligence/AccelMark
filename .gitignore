@@ -11,3 +11,5 @@ env/
 *.log
 my_submission/
 /tmp/
+leaderboard/site/leaderboard.js
+leaderboard/site/api/

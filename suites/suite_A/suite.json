@@ -1,8 +1,8 @@
 {
   "suite_id": "suite_A",
   "description": "Single chip inference, Llama-3-8B. Minimum required suite for leaderboard entry.",
-  "model_id": "meta-llama/Llama-3-8B-Instruct",
-  "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
+  "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
   "scenarios": ["offline", "online", "interactive"],
   "precision_required": "BF16",
   "request_distribution": {
