@@ -1,1 +1,6 @@
-{}
+{
+  "meta-llama/Meta-Llama-3-8B-Instruct": {
+    "revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "bf16_baseline_score": 0.6
+  }
+}

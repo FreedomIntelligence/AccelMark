@@ -11,7 +11,9 @@
     "test my gpu speed",
     "how fast is my gpu",
     "what can my machine run",
-    "accelmark"
+    "accelmark",
+    "what llm can i run locally",
+    "is my gpu good for llm"
   ],
   "permissions": [
     "shell",

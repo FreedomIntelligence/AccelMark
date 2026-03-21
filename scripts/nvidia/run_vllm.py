@@ -17,40 +17,100 @@ import asyncio
 import json
 import time
 from pathlib import Path
+from transformers import AutoTokenizer
 
 import torch
-from vllm import AsyncLLMEngine, AsyncEngineArgs, SamplingParams
+from vllm import AsyncLLMEngine, AsyncEngineArgs, LLM, SamplingParams
 from vllm.utils import random_uuid
 
 from loadgen.loadgen import AccelMarkLoadGen
 from loadgen.types import InferenceResult
 
 
+# Async engine — used for online and interactive scenarios (streaming, TTFT measurement)
 engine: AsyncLLMEngine = None
+# Sync engine — used for offline scenario (sends all requests at once, optimal scheduler use)
+llm: LLM = None
+
 sampling_params: SamplingParams = None
 _loop: asyncio.AbstractEventLoop = None
+tokenizer = None
 
 
 def load_model(model_id: str, model_revision: str, tp_size: int, suite: dict,
-               enforce_eager: bool = False) -> None:
-    global engine, sampling_params, _loop
+               scenario: str, enforce_eager: bool = False) -> None:
+    global engine, llm, sampling_params, _loop, tokenizer
 
-    _loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(_loop)
-
-    engine_args = AsyncEngineArgs(
-        model=model_id,
-        revision=model_revision,
-        tensor_parallel_size=tp_size,
-        dtype="bfloat16",
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_id,
         trust_remote_code=False,
-        enforce_eager=enforce_eager,
     )
-    engine = AsyncLLMEngine.from_engine_args(engine_args)
     sampling_params = SamplingParams(
         max_tokens=suite["output_tokens_max"],
         temperature=0.0,   # greedy for reproducibility
     )
+
+    if scenario == "offline":
+        # Sync LLM: sends all requests to vLLM at once.
+        # vLLM's internal scheduler handles batching optimally.
+        # max_num_seqs=512 ensures the scheduler is never client-side bottlenecked.
+        llm = LLM(
+            model=model_id,
+            revision=model_revision,
+            tensor_parallel_size=tp_size,
+            dtype="bfloat16",
+            trust_remote_code=False,
+            enforce_eager=enforce_eager,
+            max_num_seqs=512,
+        )
+    else:
+        # Async engine with streaming: required for TTFT measurement (online/interactive).
+        _loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(_loop)
+        engine_args = AsyncEngineArgs(
+            model=model_id,
+            revision=model_revision,
+            tensor_parallel_size=tp_size,
+            dtype="bfloat16",
+            trust_remote_code=False,
+            enforce_eager=enforce_eager,
+        )
+        engine = AsyncLLMEngine.from_engine_args(engine_args)
+
+
+def _apply_chat_template(prompt: str) -> str:
+    if tokenizer.chat_template:
+        return tokenizer.apply_chat_template(
+            [{"role": "user", "content": prompt}],
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+    return prompt
+
+
+def inference_fn_offline(prompts: list[str]) -> list[InferenceResult]:
+    """
+    Send ALL prompts to vLLM at once.
+    vLLM's internal scheduler handles batching — do NOT chunk client-side.
+    Throughput is measured as (input + output) tokens / elapsed to match vLLM's metric.
+    """
+    formatted = [_apply_chat_template(p) for p in prompts]
+
+    t_start = time.perf_counter()
+    outputs = llm.generate(formatted, sampling_params)
+    t_end = time.perf_counter()
+    total_time_ms = (t_end - t_start) * 1000
+
+    results = []
+    for output in outputs:
+        results.append(InferenceResult(
+            first_token_time_ms=None,  # not available from sync API
+            total_time_ms=total_time_ms,
+            output_tokens=len(output.outputs[0].token_ids),
+            input_tokens=len(output.prompt_token_ids),
+            success=True,
+        ))
+    return results
 
 
 async def _run_one_streaming(prompt: str) -> InferenceResult:
@@ -58,22 +118,27 @@ async def _run_one_streaming(prompt: str) -> InferenceResult:
     t_start = time.perf_counter()
     first_token_time_ms = None
     output_tokens = 0
+    input_tokens = 0
 
-    async for output in engine.generate(prompt, sampling_params, request_id):
+    formatted = _apply_chat_template(prompt)
+
+    async for output in engine.generate(formatted, sampling_params, request_id):
         if first_token_time_ms is None and len(output.outputs[0].token_ids) > 0:
             first_token_time_ms = (time.perf_counter() - t_start) * 1000
         output_tokens = len(output.outputs[0].token_ids)
+        input_tokens = len(output.prompt_token_ids)
 
     total_time_ms = (time.perf_counter() - t_start) * 1000
     return InferenceResult(
         first_token_time_ms=first_token_time_ms,
         total_time_ms=total_time_ms,
         output_tokens=output_tokens,
+        input_tokens=input_tokens,
         success=True,
     )
 
 
-def inference_fn(prompts: list[str]) -> list[InferenceResult]:
+def inference_fn_streaming(prompts: list[str]) -> list[InferenceResult]:
     async def run_all():
         tasks = [_run_one_streaming(p) for p in prompts]
         return await asyncio.gather(*tasks)
@@ -119,7 +184,21 @@ def main():
 
     print(f"Loading {suite['model_id']}...")
     effective_model_path = args.model_path if args.model_path else suite["model_id"]
-    load_model(effective_model_path, suite["model_revision"] if not args.model_path else None, args.tensor_parallel_size, suite, args.enforce_eager)
+    load_model(effective_model_path, suite["model_revision"] if not args.model_path else None,
+               args.tensor_parallel_size, suite, args.scenario, args.enforce_eager)
+
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+
+    # Auto-collect environment info
+    import subprocess
+    env_info_path = Path(args.output_dir) / "env_info.json"
+    if not env_info_path.exists():
+        print("Collecting environment info...")
+        subprocess.run(
+            ["python", "scripts/collect_env.py", "--output", str(env_info_path)],
+            check=True
+        )
+        print(f"Environment info saved to {env_info_path}")
 
     loadgen = AccelMarkLoadGen(
         suite=suite,
@@ -127,6 +206,8 @@ def main():
         scenario=args.scenario,
         output_dir=args.output_dir,
     )
+
+    inference_fn = inference_fn_offline if args.scenario == "offline" else inference_fn_streaming
 
     torch.cuda.reset_peak_memory_stats()
     metrics = loadgen.run(inference_fn)
@@ -193,9 +274,9 @@ def main():
             "submission_type": "individual",
             "date": time.strftime("%Y-%m-%d"),
             "reproduce_script": "scripts/nvidia/run_vllm.py",
-            "env_info_file": f"{args.output_dir}/env_info.json",
-            "log_file": f"{args.output_dir}/run.log",
-            "samples_file": f"{args.output_dir}/samples.jsonl",
+            "env_info_file": "env_info.json",
+            "log_file": "run.log",
+            "samples_file": "samples.jsonl",
             "notes": None,
         },
     }

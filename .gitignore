@@ -10,6 +10,7 @@ env/
 .DS_Store
 *.log
 my_submission/
+mini_result/
 /tmp/
 leaderboard/site/leaderboard.js
 leaderboard/site/api/

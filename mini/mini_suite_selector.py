@@ -15,13 +15,14 @@ class MiniSuiteConfig:
     """The selected test configuration for this hardware."""
 
     # Identity
-    tier: str                    # "nano" | "mini" | "standard" | "pro"
+    tier: str                    # "nano" | "mini-small" | "mini" | "standard" | "pro" | "pro-large"
     display_name: str            # Human-readable, shown to user
 
     # Model
     model_id: str                # HuggingFace model ID
     model_revision: str          # Locked revision
     quantization: Optional[str]  # None | "Q4_K_M" | "INT8" | "INT4"
+    framework: str               # "vllm" | "mlx-lm"
 
     # Test parameters
     input_tokens: int
@@ -40,40 +41,54 @@ class MiniSuiteConfig:
 
 # Locked model revisions — update at launch
 MODELS = {
-    "llama3-1b-q4":  ("bartowski/Llama-3.2-1B-Instruct-GGUF",    "PLACEHOLDER", "Q4_K_M"),
-    "llama3-8b-q4":  ("bartowski/Meta-Llama-3-8B-Instruct-GGUF",  "PLACEHOLDER", "Q4_K_M"),
-    "llama3-8b-bf16":("meta-llama/Meta-Llama-3-8B-Instruct",      "PLACEHOLDER", None),
-    "llama3-70b-q4": ("bartowski/Meta-Llama-3-70B-Instruct-GGUF", "PLACEHOLDER", "Q4_K_M"),
-    "llama3-70b-bf16":("meta-llama/Meta-Llama-3-70B-Instruct",    "PLACEHOLDER", None),
+    "llama3-1b-q4":   ("bartowski/Llama-3.2-1B-Instruct-GGUF",    "PLACEHOLDER", "Q4_K_M"),
+    "llama3-8b-q4":   ("bartowski/Meta-Llama-3-8B-Instruct-GGUF",  "PLACEHOLDER", "Q4_K_M"),
+    "llama3-8b-bf16": ("meta-llama/Meta-Llama-3-8B-Instruct",      "PLACEHOLDER", None),
+    "llama3-70b-q4":  ("bartowski/Meta-Llama-3-70B-Instruct-GGUF", "PLACEHOLDER", "Q4_K_M"),
+    "llama3-70b-bf16":("meta-llama/Meta-Llama-3-70B-Instruct",     "PLACEHOLDER", None),
 }
 
 
-def select_mini_suite(
-    memory_gb: float,
-    vendor: str,
-    chip_name: str,
-) -> MiniSuiteConfig:
+def select_mode(env: dict) -> str:
     """
-    Select the appropriate mini suite based on available memory.
-
-    Args:
-        memory_gb:  Total accelerator memory in GB (sum if multi-chip)
-        vendor:     Chip vendor string from env_info.json
-        chip_name:  Full chip name string from env_info.json
+    Determine which mode to run based on detected hardware.
 
     Returns:
-        MiniSuiteConfig with all parameters needed to run the test
+        "benchmark"   — Has accelerator (GPU or Apple Silicon), run mini suite
+        "assessment"  — CPU only or <4GB VRAM, do hardware analysis only
     """
+    accelerators = env.get("accelerators", [])
 
-    # Apple Silicon: use unified memory, different model format needed
-    if vendor == "Apple" or "Apple" in chip_name:
-        return _select_apple(memory_gb)
+    if not accelerators:
+        return "assessment"
 
-    # CPU-only fallback (no GPU detected)
-    if vendor == "CPU" or memory_gb == 0:
-        return _tier_nano()
+    total_memory = sum(a.get("memory_gb", 0) or 0 for a in accelerators)
 
-    # GPU tiers based on VRAM
+    if total_memory < 4:
+        return "assessment"
+
+    return "benchmark"
+
+
+def select_mini_suite(env: dict) -> MiniSuiteConfig:
+    """
+    Auto-select benchmark configuration based on available memory.
+    Apple Silicon and discrete GPUs use the same tier logic,
+    but different frameworks.
+    """
+    accelerators = env.get("accelerators", [])
+    total_memory = sum(a.get("memory_gb", 0) or 0 for a in accelerators)
+    chip_name = accelerators[0].get("name", "").lower() if accelerators else ""
+
+    is_apple = "apple" in chip_name
+
+    config = _select_tier_by_memory(total_memory)
+    config.framework = "mlx-lm" if is_apple else "vllm"
+
+    return config
+
+
+def _select_tier_by_memory(memory_gb: float) -> MiniSuiteConfig:
     if memory_gb < 6:
         return _tier_nano()
     elif memory_gb < 12:
@@ -96,6 +111,7 @@ def _tier_nano() -> MiniSuiteConfig:
         model_id=model_id,
         model_revision=revision,
         quantization=quant,
+        framework="vllm",
         input_tokens=256,
         output_tokens=64,
         batch_sizes=[1, 4],
@@ -115,6 +131,7 @@ def _tier_mini_small() -> MiniSuiteConfig:
         model_id=model_id,
         model_revision=revision,
         quantization=quant,
+        framework="vllm",
         input_tokens=512,
         output_tokens=128,
         batch_sizes=[1, 8],
@@ -134,6 +151,7 @@ def _tier_mini() -> MiniSuiteConfig:
         model_id=model_id,
         model_revision=revision,
         quantization=None,
+        framework="vllm",
         input_tokens=512,
         output_tokens=128,
         batch_sizes=[1, 8, 32],
@@ -153,6 +171,7 @@ def _tier_standard() -> MiniSuiteConfig:
         model_id=model_id,
         model_revision=revision,
         quantization=quant,
+        framework="vllm",
         input_tokens=512,
         output_tokens=128,
         batch_sizes=[1, 8, 32],
@@ -172,6 +191,7 @@ def _tier_pro() -> MiniSuiteConfig:
         model_id=model_id,
         model_revision=revision,
         quantization=None,
+        framework="vllm",
         input_tokens=512,
         output_tokens=128,
         batch_sizes=[1, 8, 32, 128],
@@ -184,23 +204,9 @@ def _tier_pro() -> MiniSuiteConfig:
 
 
 def _tier_pro_large() -> MiniSuiteConfig:
-    # Same as pro but with larger batch sizes for high-memory chips
     config = _tier_pro()
     config.tier = "pro-large"
     config.display_name = "Pro Large (70B full precision, large batches)"
     config.batch_sizes = [1, 8, 32, 128, 256]
     config.num_requests = 200
-    return config
-
-
-def _select_apple(memory_gb: float) -> MiniSuiteConfig:
-    # Apple Silicon uses MLX framework, different model format
-    # For now, map to similar tiers but note the difference
-    if memory_gb < 16:
-        config = _tier_mini_small()
-    elif memory_gb < 32:
-        config = _tier_mini()
-    else:
-        config = _tier_standard()
-    config.display_name = f"[Apple MLX] {config.display_name}"
     return config

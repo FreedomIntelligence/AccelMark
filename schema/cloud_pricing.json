@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "description": "Cloud rental prices for AI accelerators",
+    "last_updated": "2026-03",
+    "note": "Prices vary by region and commitment. Spot prices may differ."
+  },
+  "NVIDIA A100 SXM 80GB": {
+    "providers": [
+      {"name": "AWS p4d.24xlarge (per GPU)", "price_usd_per_hr": 3.20, "source": "aws.amazon.com/ec2/pricing"},
+      {"name": "GCP a2-highgpu-1g", "price_usd_per_hr": 3.67, "source": "cloud.google.com/compute/gpus-pricing"},
+      {"name": "Azure NC A100 v4 (per GPU)", "price_usd_per_hr": 3.40, "source": "azure.microsoft.com/pricing"}
+    ]
+  },
+  "NVIDIA H100 SXM 80GB": {
+    "providers": [
+      {"name": "AWS p5.48xlarge (per GPU)", "price_usd_per_hr": 4.90, "source": "aws.amazon.com/ec2/pricing"},
+      {"name": "GCP h3-highgpu-8g (per GPU)", "price_usd_per_hr": 5.10, "source": "cloud.google.com/compute/gpus-pricing"}
+    ]
+  },
+  "NVIDIA A800-SXM4-80GB": {
+    "providers": [
+      {"name": "阿里云 ecs.gn7i (per GPU)", "price_usd_per_hr": 2.80, "source": "aliyun.com/price"},
+      {"name": "腾讯云 GN10Xp (per GPU)", "price_usd_per_hr": 2.50, "source": "cloud.tencent.com/price"}
+    ]
+  },
+  "NVIDIA H800 SXM 80GB": {
+    "providers": [
+      {"name": "阿里云 (per GPU)", "price_usd_per_hr": 4.20, "source": "aliyun.com/price"}
+    ]
+  },
+  "AMD Instinct MI300X": {
+    "providers": [
+      {"name": "Azure ND MI300X v5 (per GPU)", "price_usd_per_hr": 4.80, "source": "azure.microsoft.com/pricing"}
+    ]
+  }
+}

@@ -107,7 +107,12 @@
                 "additionalProperties": false,
                 "properties": {
                   "batch_size": { "type": "integer", "minimum": 1 },
-                  "throughput_tokens_per_sec": { "type": ["number","null"], "minimum": 0 },
+                  "throughput_tokens_per_sec": {
+                    "type": ["number","null"],
+                    "minimum": 0,
+                    "description": "Total tokens per second including both input (prompt) and output tokens. Matches vLLM internal throughput metric."
+                  },
+                  "throughput_tokens_per_sec_per_chip": { "type": ["number","null"], "minimum": 0 },
                   "peak_memory_gb": { "type": ["number","null"], "minimum": 0 },
                   "power_watts_avg": { "type": ["number","null"] },
                   "power_watts_peak": { "type": ["number","null"] },

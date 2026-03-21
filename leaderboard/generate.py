@@ -14,6 +14,13 @@ import statistics
 from collections import defaultdict
 import numpy as np
 
+# Load cloud pricing table once at module level
+_pricing_cache: dict = {}
+_pricing_path = Path("schema/cloud_pricing.json")
+if _pricing_path.exists():
+    with open(_pricing_path) as _f:
+        _pricing_cache = json.load(_f)
+
 
 RESULTS_DIR = Path("results")
 SITE_DIR = Path("leaderboard/site")
@@ -54,7 +61,9 @@ def extract_row(result: dict) -> dict:
     scenario = task.get("scenario")
     primary_metric = None
     primary_metric_label = None
+    tokens_per_sec_per_chip = None
 
+    peak_memory_gb = None
     if scenario == "offline":
         offline = metrics.get("offline", {})
         rows = offline.get("results_by_batch_size", []) if offline else []
@@ -62,6 +71,12 @@ def extract_row(result: dict) -> dict:
         if valid:
             primary_metric = max(r.get("throughput_tokens_per_sec", 0) for r in valid)
             primary_metric_label = "tokens/sec (offline)"
+            chip_count = chip.get("count", 1) or 1
+            tokens_per_sec_per_chip = round(primary_metric / chip_count, 1)
+        valid_mem = [r for r in rows if not r.get("oom") and r.get("peak_memory_gb")]
+        if valid_mem:
+            best = max(valid_mem, key=lambda r: r.get("throughput_tokens_per_sec", 0))
+            peak_memory_gb = best.get("peak_memory_gb")
     elif scenario == "online":
         online = metrics.get("online", {})
         if online:
@@ -72,6 +87,22 @@ def extract_row(result: dict) -> dict:
         if training:
             primary_metric = training.get("tokens_per_sec")
             primary_metric_label = "tokens/sec (training)"
+
+    memory_gb_per_chip = chip.get("memory_gb_per_chip", 0)
+    memory_efficiency = None
+    if primary_metric and peak_memory_gb and peak_memory_gb > 0:
+        memory_efficiency = round(primary_metric / peak_memory_gb, 1)
+    memory_utilization_pct = None
+    if peak_memory_gb and memory_gb_per_chip:
+        memory_utilization_pct = round(peak_memory_gb / memory_gb_per_chip * 100, 1)
+
+    chip_full_name = chip.get("name", "")
+    pricing = _pricing_cache.get(chip_full_name, {})
+    providers = pricing.get("providers", [])
+    min_price = min((p["price_usd_per_hr"] for p in providers), default=None)
+    cost_efficiency = None
+    if primary_metric and min_price and min_price > 0:
+        cost_efficiency = round(primary_metric / min_price, 0)
 
     return {
         "submission": result.get("_submission_name"),
@@ -86,9 +117,16 @@ def extract_row(result: dict) -> dict:
         "scenario": scenario,
         "primary_metric": primary_metric,
         "primary_metric_label": primary_metric_label,
+        "tokens_per_sec_per_chip": tokens_per_sec_per_chip,
         "accuracy_valid": accuracy.get("valid"),
         "accuracy_score": accuracy.get("subset_score"),
         "tokens_per_watt": derived.get("tokens_per_sec_per_watt"),
+        "peak_memory_gb": peak_memory_gb,
+        "memory_gb_per_chip": memory_gb_per_chip,
+        "memory_utilization_pct": memory_utilization_pct,
+        "memory_efficiency_toks_per_gb": memory_efficiency,
+        "min_price_usd_per_hr": min_price,
+        "cost_efficiency_toks_per_dollar_hr": cost_efficiency,
         "date": meta.get("date"),
         "submitted_by": meta.get("submitted_by"),
         "framework_version": software.get("framework_version"),

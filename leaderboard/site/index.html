@@ -228,6 +228,13 @@
     <option value="verified">Verified only</option>
     <option value="community">Community only</option>
   </select>
+  <select id="filter-chips">
+    <option value="">All chip counts</option>
+    <option value="1">Single chip (1)</option>
+    <option value="2">2 chips</option>
+    <option value="4">4 chips</option>
+    <option value="8">8 chips</option>
+  </select>
   <input id="search" type="text" placeholder="Search chip or model…" style="width:200px">
   <div class="view-toggle">
     <button class="view-btn active" id="btn-consumer" onclick="setView('consumer')">Community</button>
@@ -256,6 +263,8 @@
           <th onclick="sortBy('scenario')">Scenario</th>
           <th onclick="sortBy('primary_metric')">Performance</th>
           <th onclick="sortBy('tokens_per_watt')">tok/s/W</th>
+          <th onclick="sortBy('memory_efficiency_toks_per_gb')">tok/s/GB</th>
+          <th onclick="sortBy('cost_efficiency_toks_per_dollar_hr')">tok/s/$/hr</th>
           <th onclick="sortBy('tier')">Tier</th>
           <th onclick="sortBy('date')">Date</th>
         </tr>
@@ -295,10 +304,13 @@
     const tier     = document.getElementById('filter-tier').value;
     const search   = document.getElementById('search').value.toLowerCase();
 
+    const chips = document.getElementById('filter-chips').value;
+
     return LEADERBOARD_DATA.filter(row => {
       if (vendor   && row.vendor   !== vendor)   return false;
       if (scenario && row.scenario !== scenario) return false;
       if (tier     && row.tier     !== tier)     return false;
+      if (chips && String(row.chip_count || 1) !== chips) return false;
       if (search) {
         const haystack = `${row.chip} ${row.model} ${row.framework}`.toLowerCase();
         if (!haystack.includes(search)) return false;
@@ -317,7 +329,7 @@
     });
   }
 
-  ['filter-vendor','filter-scenario','filter-tier','search'].forEach(id => {
+  ['filter-vendor','filter-scenario','filter-tier','filter-chips','search'].forEach(id => {
     document.getElementById(id).addEventListener('change', render);
     document.getElementById(id).addEventListener('input', render);
   });
@@ -396,7 +408,12 @@
       const speed = row.primary_metric ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 0}) : '—';
       const isMini = (row.suite || '').startsWith('mini-');
       card.innerHTML = `
-        <div class="card-chip">${row.chip || 'Unknown'}</div>
+        <div class="card-chip">
+          ${row.chip || 'Unknown'}
+          ${(row.chip_count || 1) > 1
+            ? `<span style="color:#8b949e;font-size:0.85rem;font-weight:400"> ×${row.chip_count}</span>`
+            : ''}
+        </div>
         <div style="margin-top:0.5rem">
           <div class="card-speed">${speed}</div>
           <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
@@ -473,7 +490,12 @@
       tr.innerHTML = `
         <td class="chip-name">${row.chip || '—'}</td>
         <td>${row.vendor || '—'}</td>
-        <td>${row.chip_count || 1}</td>
+        <td>
+          <span style="font-weight:500">${row.chip_count || 1}</span>
+          ${(row.chip_count || 1) > 1
+            ? `<span style="color:#8b949e;font-size:0.75rem;margin-left:4px">×${row.chip_count}</span>`
+            : ''}
+        </td>
         <td>${formatFramework(row)}</td>
         <td>${row.model || '—'}</td>
         <td>${row.precision || '—'}</td>
@@ -484,8 +506,14 @@
             ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 1})
             + ' <small style="color:#8b949e;font-weight:400">' + (row.primary_metric_label || '') + '</small>'
             : '—'
+        }${
+          row.tokens_per_sec_per_chip && (row.chip_count || 1) > 1
+            ? `<br><small style="color:#8b949e">${row.tokens_per_sec_per_chip.toLocaleString(undefined, {maximumFractionDigits:0})} tok/s per chip</small>`
+            : ''
         }</td>
         <td>${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
+        <td>${row.memory_efficiency_toks_per_gb != null ? row.memory_efficiency_toks_per_gb.toLocaleString(undefined, {maximumFractionDigits: 1}) : '—'}</td>
+        <td>${row.cost_efficiency_toks_per_dollar_hr != null ? row.cost_efficiency_toks_per_dollar_hr.toLocaleString(undefined, {maximumFractionDigits: 0}) : '—'}</td>
         <td>
           <span class="badge badge-${row.tier}">${row.tier}</span>
           ${isMini   ? '<span class="badge badge-mini" style="margin-left:4px">mini</span>' : ''}

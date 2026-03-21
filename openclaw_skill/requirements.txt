@@ -1,0 +1,12 @@
+# Auto-installed by skill on first run
+# GPU backend (NVIDIA/AMD)
+vllm>=0.6.6; platform_system != "Darwin"
+
+# Apple Silicon backend
+mlx-lm>=0.18.0; platform_system == "Darwin"
+
+# Common
+transformers>=4.40.0
+psutil>=5.9.0
+numpy>=1.24.0
+tqdm>=4.66.0

@@ -30,7 +30,6 @@ def ensure_accelmark_installed() -> Path:
     repo_path = Path(ACCELMARK_REPO).expanduser()
 
     if not repo_path.exists():
-        yield_message("AccelMark not found locally. Cloning repository (~30 seconds)...")
         subprocess.run(
             ["git", "clone", "https://github.com/JuhaoLiang1997/AccelMark.git", str(repo_path)],
             check=True
@@ -41,73 +40,82 @@ def ensure_accelmark_installed() -> Path:
 
 def ensure_dependencies(repo_path: Path) -> None:
     """Install required Python packages if not present."""
-    try:
-        import vllm
-    except ImportError:
-        yield_message("Installing vLLM (one-time setup, may take a few minutes)...")
+    import platform
+    req_path = Path(__file__).parent / "requirements.txt"
+    if req_path.exists():
         subprocess.run(
-            [sys.executable, "-m", "pip", "install", "vllm", "--quiet"],
+            [sys.executable, "-m", "pip", "install", "-r", str(req_path), "--quiet"],
             check=True
         )
 
 
-def run_benchmark(repo_path: Path, output_dir: Path) -> dict:
-    """Run mini/run_mini.py and return result.json contents."""
-    result = subprocess.run(
-        [sys.executable, "mini/run_mini.py", "--output-dir", str(output_dir)],
-        cwd=repo_path,
-        capture_output=True,
-        text=True,
+def collect_environment(repo_path: Path, output_dir: Path) -> dict:
+    """Run collect_env.py and return parsed env_info."""
+    env_path = output_dir / "env_info.json"
+    subprocess.run(
+        [sys.executable, "scripts/collect_env.py", "--output", str(env_path)],
+        cwd=repo_path, capture_output=True, text=True, check=True
     )
-
-    if result.returncode != 0:
-        raise RuntimeError(f"Benchmark failed:\n{result.stderr}")
-
-    result_path = output_dir / "result.json"
-    with open(result_path) as f:
+    with open(env_path) as f:
         return json.load(f)
 
 
-def query_leaderboard(result: dict) -> dict | None:
-    """Query the AccelMark leaderboard API for ranking data."""
+def _summarize_chips(env: dict) -> str:
+    accelerators = env.get("accelerators", [])
+    if not accelerators:
+        cpu = env.get("cpu", {})
+        return f"{cpu.get('model', 'Unknown CPU')} · {env.get('system_memory_gb', 0):.0f}GB RAM"
+    chip = accelerators[0]
+    mem = chip.get("memory_gb", 0)
+    return f"{chip.get('name', 'Unknown')} ({mem:.0f}GB)"
+
+
+def query_ranking(chip_name: str) -> dict | None:
+    """
+    Query the leaderboard for ranking data for this chip.
+    Returns None if chip not found or network unavailable.
+    """
     try:
         import urllib.request
-        import urllib.parse
-        chip_name = result["chip"]["name"]
-        encoded = urllib.parse.quote(chip_name)
-        url = f"{LEADERBOARD_API}/rank?chip={encoded}&suite=mini"
+        url = f"{LEADERBOARD_API}/index.json"
         with urllib.request.urlopen(url, timeout=5) as resp:
-            return json.loads(resp.read())
+            index = json.loads(resp.read())
+        return index.get(chip_name)
     except Exception:
         return None
 
 
-def submit_to_leaderboard(result: dict, repo_path: Path) -> bool:
-    """Submit result to AccelMark community leaderboard via GitHub API."""
-    # Implementation: POST to a GitHub Actions workflow dispatch endpoint
-    # that creates a PR with the result.json
-    # For now, guide the user to submit manually
-    return False
-
-
-def handle_submit(result: dict, username: str) -> str:
+def query_submission_rank(submission_name: str) -> dict | None:
     """
-    Called when user replies 'submit' after seeing benchmark results.
-    Creates a GitHub issue with the result data for maintainer review.
+    Query rank for a specific submission.
+    Used after submitting to show "you ranked #N".
     """
-    result["meta"]["submitted_by"] = username
-    result["meta"]["submission_type"] = "individual"
+    try:
+        import urllib.request
+        url = f"{LEADERBOARD_API}/rank.json"
+        with urllib.request.urlopen(url, timeout=5) as resp:
+            ranks = json.loads(resp.read())
+        return ranks.get(submission_name)
+    except Exception:
+        return None
 
-    # POST to GitHub Issues API (no auth required for public repo)
-    # Maintainers periodically process these into PRs
+
+def handle_submit(result: dict, openclaw_username: str) -> str:
+    """
+    Submit result to AccelMark leaderboard via GitHub Issue.
+    The issue is processed by the process_submissions.yml CI workflow
+    which validates and creates a PR automatically.
+    """
     import urllib.request
 
-    issue_body = f"""
-## AccelMark Community Submission
+    result["meta"]["submitted_by"] = openclaw_username
+
+    issue_body = f"""## AccelMark Community Submission
 
 **Chip**: {result['chip']['name']}
 **Suite**: {result['suite_id']}
 **Date**: {result['meta']['date']}
+**Submitted via**: OpenClaw AccelMark Skill
 
 ```json
 {json.dumps(result, indent=2)}
@@ -124,54 +132,76 @@ def handle_submit(result: dict, username: str) -> str:
         data=payload,
         headers={"Content-Type": "application/json"},
     )
-    urllib.request.urlopen(req)
-    return "✅ Submitted! Your result will appear on the leaderboard after review."
+
+    try:
+        urllib.request.urlopen(req, timeout=10)
+        return (
+            "✅ Submitted! Your result will appear on the leaderboard "
+            "after automated validation (usually within a few minutes).\n"
+            f"View leaderboard: {LEADERBOARD_API.replace('/api', '/')}"
+        )
+    except Exception as e:
+        return (
+            f"❌ Submission failed: {str(e)}\n"
+            "You can submit manually at: https://github.com/JuhaoLiang1997/AccelMark"
+        )
 
 
-def format_report(result: dict, ranking: dict | None) -> str:
-    """Format the benchmark results for chat display."""
-    chip = result["chip"]
-    model = result["model"]
+def format_details(result: dict) -> str:
+    """Format detailed benchmark results for 'details' follow-up."""
     rows = result["metrics"]["offline"]["results_by_batch_size"]
-    valid = [r for r in rows if not r.get("oom") and r["throughput_tokens_per_sec"]]
+    model = result["model"]
+    software = result["software"]
+    meta = result["meta"]
 
-    lines = ["✅ *AccelMark Benchmark Complete*\n"]
-    lines.append(f"🖥️  **{chip['name']}** ({chip['memory_gb_per_chip']:.0f}GB VRAM)")
-    lines.append(f"🤖 Model: `{model['model_id'].split('/')[-1]}`\n")
+    lines = [
+        "📊 Full benchmark results:\n",
+        f"{'Batch size':<12} {'Throughput':<16} {'Memory'}",
+    ]
 
-    if valid:
-        best = max(valid, key=lambda r: r["throughput_tokens_per_sec"])
-        lines.append(f"⚡ **{best['throughput_tokens_per_sec']:,.0f} tokens/sec**")
-        if best.get("peak_memory_gb"):
-            pct = best["peak_memory_gb"] / chip["memory_gb_per_chip"] * 100
-            lines.append(f"💾 Memory: {best['peak_memory_gb']:.1f}GB / {chip['memory_gb_per_chip']:.0f}GB ({pct:.0f}%)")
+    best_row = None
+    if rows:
+        valid = [r for r in rows if not r.get("oom") and r["throughput_tokens_per_sec"]]
+        best_row = max(valid, key=lambda r: r["throughput_tokens_per_sec"]) if valid else None
 
-    if ranking:
-        lines.append(f"\n📊 **Leaderboard ranking:**")
-        lines.append(f"   #{ranking['rank']} of {ranking['total']} · Better than {ranking['percentile']:.0f}%")
+    for row in rows:
+        bs = f"bs={row['batch_size']}"
+        tput = f"{row['throughput_tokens_per_sec']:,.0f} tok/s"
+        mem = f"{row['peak_memory_gb']:.1f}GB" if row.get("peak_memory_gb") else "N/A"
+        marker = "  ← best" if best_row and row["batch_size"] == best_row["batch_size"] else ""
+        lines.append(f"{bs:<12} {tput:<16} {mem}{marker}")
 
-    notes = result.get("meta", {}).get("notes", "")
-    if "tier:" in notes.lower():
-        tier = notes.split("Tier:")[-1].strip()
-        lines.append(f"\n🎯 Test tier: {tier}")
-
-    lines.append("\nReply **'submit'** to add your result to the community leaderboard.")
-    lines.append("Reply **'details'** to see full benchmark data.")
+    lines.append(
+        f"\nSuite: {result['suite_id']} (AccelMark)\n"
+        f"Framework: {software['framework']} {software['framework_version']}\n"
+        f"Model: {model['model_id'].split('/')[-1]} {model['precision']}\n"
+        f"Date: {meta['date']}"
+    )
 
     return "\n".join(lines)
 
 
 def main(user_message: str, context: dict) -> str:
     """
-    Main entry point called by OpenClaw.
-
-    Args:
-        user_message: The message that triggered this skill
-        context: OpenClaw context (user profile, previous messages, etc.)
-
-    Returns:
-        Response string to send back to the user
+    Called by OpenClaw when a trigger phrase is detected.
     """
+
+    # Handle follow-up messages
+    msg = user_message.lower().strip()
+    if msg == "submit":
+        pending = context.get("accelmark_pending_result")
+        if not pending:
+            return "No recent benchmark result to submit. Run 'benchmark my gpu' first."
+        username = context.get("user", {}).get("username", "anonymous")
+        return handle_submit(pending, username)
+
+    if msg == "details":
+        pending = context.get("accelmark_pending_result")
+        if not pending:
+            return "No recent benchmark result. Run 'benchmark my gpu' first."
+        return format_details(pending)
+
+    # Main benchmark flow
     try:
         repo_path = ensure_accelmark_installed()
         ensure_dependencies(repo_path)
@@ -179,43 +209,48 @@ def main(user_message: str, context: dict) -> str:
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir)
 
-            # Detect hardware first, report to user
-            env_result = subprocess.run(
-                [sys.executable, "scripts/collect_env.py", "--output",
-                 str(output_dir / "env_info.json")],
-                cwd=repo_path, capture_output=True, text=True
-            )
+            # Step 1: collect env
+            env = collect_environment(repo_path, output_dir)
+            chip_summary = _summarize_chips(env)
 
-            # Read detected hardware for early feedback
-            env_path = output_dir / "env_info.json"
-            if env_path.exists():
-                with open(env_path) as f:
-                    env = json.load(f)
-                accelerators = env.get("accelerators", [])
-                if accelerators:
-                    chip = accelerators[0]["name"]
-                    mem = accelerators[0]["memory_gb"]
-                    # Note: in real OpenClaw skill, you'd yield this message
-                    # before blocking on the benchmark
-                    print(f"Detected: {chip} ({mem:.0f}GB). Running benchmark...")
+            # Step 2: select mode
+            sys.path.insert(0, str(repo_path))
+            from mini.mini_suite_selector import select_mode, select_mini_suite
+            from mini.hardware_assessment import assess_hardware, format_assessment_report
 
-            result = run_benchmark(repo_path, output_dir)
-            ranking = query_leaderboard(result)
-            report = format_report(result, ranking)
+            mode = select_mode(env)
 
-            # Store result in context for follow-up "submit" message
-            # OpenClaw's context/memory system would handle this
+            if mode == "assessment":
+                result = assess_hardware(env)
+                return format_assessment_report(result)
+
+            # Step 3: select tier
+            config = select_mini_suite(env)
+
+            # Step 4: run benchmark
+            from mini.run_mini import run_benchmark, build_result_json, format_benchmark_report
+            benchmark_result = run_benchmark(config, env)
+
+            # Step 5: build full result.json
+            result = build_result_json(env, config, benchmark_result)
+
+            # Step 6: query leaderboard for ranking
+            chip_name = env["accelerators"][0]["name"]
+            ranking = query_ranking(chip_name)
+
+            # Step 7: store for follow-up
             context["accelmark_pending_result"] = result
 
-            return report
+            # Step 8: format and return
+            return format_benchmark_report(result, config, ranking)
 
     except Exception as e:
         return (
             f"❌ Benchmark failed: {str(e)}\n\n"
             "Common fixes:\n"
-            "• Make sure you have a GPU with enough VRAM\n"
-            "• Try: `pip install vllm`\n"
-            "• Check AccelMark docs: https://github.com/JuhaoLiang1997/AccelMark"
+            "• Make sure vLLM is installed: pip install vllm\n"
+            "• For Apple Silicon: pip install mlx-lm\n"
+            "• Check logs for details"
         )
 
 

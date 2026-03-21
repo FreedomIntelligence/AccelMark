@@ -28,6 +28,10 @@ class InferenceResult:
     # False if the request failed (OOM, timeout, error).
     # Failed requests are excluded from latency metrics but counted in throughput denominator.
 
+    input_tokens: int = 0
+    # Number of prompt tokens. Required for accurate offline throughput measurement
+    # (total throughput = input + output tokens / elapsed, matching vLLM's metric).
+
     error: Optional[str] = None
     # Error message if success=False.
 

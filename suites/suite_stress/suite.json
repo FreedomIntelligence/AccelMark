@@ -2,7 +2,7 @@
   "suite_id": "suite_stress",
   "description": "30-minute sustained load test. Detects thermal throttling and memory fragmentation.",
   "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
+  "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
   "scenarios": ["sustained"],
   "precision_required": "BF16",
   "target_qps": 10,
