@@ -1,0 +1,200 @@
+{"request_id": 0, "prompt": "Explain the concept of machine learning in simple terms.", "input_tokens_approx": 12}
+{"request_id": 1, "prompt": "Write a Python function that sorts a list of dictionaries by a given key.", "input_tokens_approx": 16}
+{"request_id": 2, "prompt": "What are the main differences between TCP and UDP protocols?", "input_tokens_approx": 14}
+{"request_id": 3, "prompt": "Summarize the key principles of object-oriented programming.", "input_tokens_approx": 12}
+{"request_id": 4, "prompt": "How does gradient descent work in neural network training?", "input_tokens_approx": 13}
+{"request_id": 5, "prompt": "Write a SQL query to find the top 5 customers by total purchase amount.", "input_tokens_approx": 17}
+{"request_id": 6, "prompt": "Explain the difference between supervised and unsupervised learning.", "input_tokens_approx": 13}
+{"request_id": 7, "prompt": "What is Docker and why is it useful for software development?", "input_tokens_approx": 15}
+{"request_id": 8, "prompt": "Describe the REST architectural style and its constraints.", "input_tokens_approx": 12}
+{"request_id": 9, "prompt": "How do transformers work in natural language processing?", "input_tokens_approx": 12}
+{"request_id": 10, "prompt": "Write a recursive function in Python to compute the Fibonacci sequence.", "input_tokens_approx": 15}
+{"request_id": 11, "prompt": "What is the CAP theorem and why does it matter for distributed systems?", "input_tokens_approx": 16}
+{"request_id": 12, "prompt": "Explain how attention mechanisms improve sequence-to-sequence models.", "input_tokens_approx": 13}
+{"request_id": 13, "prompt": "What are the SOLID principles in software engineering?", "input_tokens_approx": 12}
+{"request_id": 14, "prompt": "Write a bash script to monitor disk usage and send an alert when it exceeds 80%.", "input_tokens_approx": 18}
+{"request_id": 15, "prompt": "How does a convolutional neural network process images?", "input_tokens_approx": 12}
+{"request_id": 16, "prompt": "Explain the concept of transfer learning and when to use it.", "input_tokens_approx": 14}
+{"request_id": 17, "prompt": "What is Kubernetes and how does it differ from Docker Compose?", "input_tokens_approx": 15}
+{"request_id": 18, "prompt": "Describe the main types of NoSQL databases and their use cases.", "input_tokens_approx": 14}
+{"request_id": 19, "prompt": "How do you implement a binary search tree in Python?", "input_tokens_approx": 13}
+{"request_id": 20, "prompt": "What is the difference between a process and a thread?", "input_tokens_approx": 13}
+{"request_id": 21, "prompt": "Explain backpropagation in neural networks step by step.", "input_tokens_approx": 12}
+{"request_id": 22, "prompt": "Write a JavaScript function that debounces an event handler.", "input_tokens_approx": 13}
+{"request_id": 23, "prompt": "What are microservices and what are their advantages over monolithic architectures?", "input_tokens_approx": 14}
+{"request_id": 24, "prompt": "How does the PageRank algorithm work?", "input_tokens_approx": 10}
+{"request_id": 25, "prompt": "Explain the concept of overfitting and how to prevent it.", "input_tokens_approx": 13}
+{"request_id": 26, "prompt": "What is a graph neural network and where is it applied?", "input_tokens_approx": 14}
+{"request_id": 27, "prompt": "Write a Python class to implement a least recently used (LRU) cache.", "input_tokens_approx": 16}
+{"request_id": 28, "prompt": "How do hash tables work internally?", "input_tokens_approx": 9}
+{"request_id": 29, "prompt": "Describe the differences between BERT and GPT architectures.", "input_tokens_approx": 13}
+{"request_id": 30, "prompt": "What is zero-shot learning and how is it different from few-shot learning?", "input_tokens_approx": 15}
+{"request_id": 31, "prompt": "Explain how Git branching strategies like GitFlow work.", "input_tokens_approx": 12}
+{"request_id": 32, "prompt": "What is the purpose of a message queue in distributed systems?", "input_tokens_approx": 14}
+{"request_id": 33, "prompt": "Write a function to detect if a linked list has a cycle.", "input_tokens_approx": 14}
+{"request_id": 34, "prompt": "How does HTTPS ensure secure communication?", "input_tokens_approx": 10}
+{"request_id": 35, "prompt": "Explain the concept of eventual consistency in distributed databases.", "input_tokens_approx": 12}
+{"request_id": 36, "prompt": "What are the differences between L1 and L2 regularization?", "input_tokens_approx": 13}
+{"request_id": 37, "prompt": "Write a Python decorator that logs function calls with timing.", "input_tokens_approx": 13}
+{"request_id": 38, "prompt": "How does a bloom filter work and when would you use one?", "input_tokens_approx": 14}
+{"request_id": 39, "prompt": "Explain the difference between eager and lazy evaluation.", "input_tokens_approx": 12}
+{"request_id": 40, "prompt": "What is model quantization and why is it important for inference?", "input_tokens_approx": 14}
+{"request_id": 41, "prompt": "Describe how to implement rate limiting in an API.", "input_tokens_approx": 12}
+{"request_id": 42, "prompt": "What is the difference between stack and heap memory?", "input_tokens_approx": 12}
+{"request_id": 43, "prompt": "Explain how reinforcement learning differs from supervised learning.", "input_tokens_approx": 12}
+{"request_id": 44, "prompt": "Write a Python generator that yields prime numbers indefinitely.", "input_tokens_approx": 13}
+{"request_id": 45, "prompt": "What is a load balancer and what algorithms does it use?", "input_tokens_approx": 14}
+{"request_id": 46, "prompt": "Explain the concept of embedding spaces in NLP.", "input_tokens_approx": 11}
+{"request_id": 47, "prompt": "How does a B-tree index improve database query performance?", "input_tokens_approx": 13}
+{"request_id": 48, "prompt": "What is the difference between precision, recall, and F1 score?", "input_tokens_approx": 14}
+{"request_id": 49, "prompt": "Describe the builder design pattern and give an example in Python.", "input_tokens_approx": 14}
+{"request_id": 50, "prompt": "How does beam search differ from greedy decoding in language models?", "input_tokens_approx": 14}
+{"request_id": 51, "prompt": "Write a React component that fetches and displays a list of users.", "input_tokens_approx": 15}
+{"request_id": 52, "prompt": "What is the difference between a mutex and a semaphore?", "input_tokens_approx": 13}
+{"request_id": 53, "prompt": "Explain how word2vec learns word embeddings.", "input_tokens_approx": 11}
+{"request_id": 54, "prompt": "What are the main challenges in training large language models?", "input_tokens_approx": 13}
+{"request_id": 55, "prompt": "Write a function to serialize and deserialize a binary tree.", "input_tokens_approx": 13}
+{"request_id": 56, "prompt": "How does OAuth 2.0 work for API authentication?", "input_tokens_approx": 12}
+{"request_id": 57, "prompt": "Explain the concept of knowledge distillation in deep learning.", "input_tokens_approx": 12}
+{"request_id": 58, "prompt": "What is the difference between a view and a materialized view in SQL?", "input_tokens_approx": 15}
+{"request_id": 59, "prompt": "Describe how to implement a circuit breaker pattern in a microservice.", "input_tokens_approx": 14}
+{"request_id": 60, "prompt": "How does prefix caching improve LLM inference throughput?", "input_tokens_approx": 12}
+{"request_id": 61, "prompt": "Write a Python script that parses a YAML config file and validates it.", "input_tokens_approx": 16}
+{"request_id": 62, "prompt": "What is the difference between synchronous and asynchronous programming?", "input_tokens_approx": 13}
+{"request_id": 63, "prompt": "Explain how the attention mechanism computes query, key, and value.", "input_tokens_approx": 14}
+{"request_id": 64, "prompt": "What is a Dockerfile and how do you write one for a Python application?", "input_tokens_approx": 16}
+{"request_id": 65, "prompt": "Describe the MapReduce programming model and give an example.", "input_tokens_approx": 13}
+{"request_id": 66, "prompt": "How do you handle database migrations in a production environment?", "input_tokens_approx": 13}
+{"request_id": 67, "prompt": "What is multi-head attention and why is it more powerful than single-head?", "input_tokens_approx": 15}
+{"request_id": 68, "prompt": "Write a function to find the longest common subsequence of two strings.", "input_tokens_approx": 15}
+{"request_id": 69, "prompt": "Explain the concept of RLHF and how it improves language model alignment.", "input_tokens_approx": 14}
+{"request_id": 70, "prompt": "What is the difference between horizontal and vertical scaling?", "input_tokens_approx": 13}
+{"request_id": 71, "prompt": "Describe how continuous integration and continuous deployment (CI/CD) pipelines work.", "input_tokens_approx": 15}
+{"request_id": 72, "prompt": "How does paged attention reduce memory usage in LLM inference?", "input_tokens_approx": 13}
+{"request_id": 73, "prompt": "Write a Python implementation of the merge sort algorithm.", "input_tokens_approx": 12}
+{"request_id": 74, "prompt": "What are the main types of joins in SQL and when do you use each?", "input_tokens_approx": 16}
+{"request_id": 75, "prompt": "Explain the concept of sparse attention in transformer models.", "input_tokens_approx": 12}
+{"request_id": 76, "prompt": "What is a service mesh and how does Istio implement it?", "input_tokens_approx": 14}
+{"request_id": 77, "prompt": "Describe the difference between batch normalization and layer normalization.", "input_tokens_approx": 13}
+{"request_id": 78, "prompt": "How do you implement pagination in a REST API?", "input_tokens_approx": 12}
+{"request_id": 79, "prompt": "Explain the concept of speculative decoding in language model inference.", "input_tokens_approx": 13}
+{"request_id": 80, "prompt": "Write a function that implements the quicksort algorithm in-place.", "input_tokens_approx": 13}
+{"request_id": 81, "prompt": "What is the difference between a spinlock and a blocking mutex?", "input_tokens_approx": 14}
+{"request_id": 82, "prompt": "How does tensor parallelism work in distributed LLM inference?", "input_tokens_approx": 12}
+{"request_id": 83, "prompt": "Describe the main differences between PostgreSQL and MySQL.", "input_tokens_approx": 12}
+{"request_id": 84, "prompt": "What is a vector database and how is it used in RAG systems?", "input_tokens_approx": 15}
+{"request_id": 85, "prompt": "Write a Python context manager that handles database connections.", "input_tokens_approx": 13}
+{"request_id": 86, "prompt": "Explain the difference between model parallelism and data parallelism.", "input_tokens_approx": 13}
+{"request_id": 87, "prompt": "What is the purpose of temperature in language model sampling?", "input_tokens_approx": 13}
+{"request_id": 88, "prompt": "Describe how consistent hashing works in distributed systems.", "input_tokens_approx": 12}
+{"request_id": 89, "prompt": "Write a function to check if a string is a valid JSON without using eval.", "input_tokens_approx": 16}
+{"request_id": 90, "prompt": "What is the difference between compilation and interpretation?", "input_tokens_approx": 12}
+{"request_id": 91, "prompt": "Explain how FlashAttention reduces memory usage in transformer training.", "input_tokens_approx": 13}
+{"request_id": 92, "prompt": "What are the main differences between CNN and RNN architectures?", "input_tokens_approx": 13}
+{"request_id": 93, "prompt": "Describe how to design a URL shortener system like bit.ly.", "input_tokens_approx": 13}
+{"request_id": 94, "prompt": "How does the Adam optimizer differ from SGD?", "input_tokens_approx": 11}
+{"request_id": 95, "prompt": "Write a Python script to batch process images using PIL/Pillow.", "input_tokens_approx": 14}
+{"request_id": 96, "prompt": "What is a WAL (write-ahead log) and why is it important in databases?", "input_tokens_approx": 17}
+{"request_id": 97, "prompt": "Explain the concept of instruction tuning in large language models.", "input_tokens_approx": 13}
+{"request_id": 98, "prompt": "How do you implement a distributed rate limiter using Redis?", "input_tokens_approx": 13}
+{"request_id": 99, "prompt": "What is the difference between row-oriented and column-oriented databases?", "input_tokens_approx": 13}
+{"request_id": 100, "prompt": "Describe the key differences between PyTorch and TensorFlow.", "input_tokens_approx": 12}
+{"request_id": 101, "prompt": "Write a function to find all permutations of a given string.", "input_tokens_approx": 13}
+{"request_id": 102, "prompt": "How does pipeline parallelism work in large model training?", "input_tokens_approx": 12}
+{"request_id": 103, "prompt": "What is the purpose of a garbage collector in programming languages?", "input_tokens_approx": 14}
+{"request_id": 104, "prompt": "Explain the concept of token streaming in LLM inference APIs.", "input_tokens_approx": 12}
+{"request_id": 105, "prompt": "What is the difference between hard and soft links in Linux?", "input_tokens_approx": 14}
+{"request_id": 106, "prompt": "Describe how to build a recommendation system using collaborative filtering.", "input_tokens_approx": 14}
+{"request_id": 107, "prompt": "How does the LoRA fine-tuning method work?", "input_tokens_approx": 11}
+{"request_id": 108, "prompt": "Write a SQL query to calculate a running total over a time series.", "input_tokens_approx": 15}
+{"request_id": 109, "prompt": "What are the main types of neural network activation functions?", "input_tokens_approx": 13}
+{"request_id": 110, "prompt": "Explain how Retrieval-Augmented Generation (RAG) works.", "input_tokens_approx": 11}
+{"request_id": 111, "prompt": "Write a Python script to monitor a directory for file changes.", "input_tokens_approx": 13}
+{"request_id": 112, "prompt": "What is the difference between eager execution and graph execution in PyTorch?", "input_tokens_approx": 15}
+{"request_id": 113, "prompt": "How does the memory bandwidth bottleneck affect LLM inference speed?", "input_tokens_approx": 13}
+{"request_id": 114, "prompt": "Describe the event-driven architecture pattern and its benefits.", "input_tokens_approx": 13}
+{"request_id": 115, "prompt": "What is the purpose of the KV cache in transformer inference?", "input_tokens_approx": 14}
+{"request_id": 116, "prompt": "Write a function to implement the Levenshtein distance algorithm.", "input_tokens_approx": 12}
+{"request_id": 117, "prompt": "How does zero-copy I/O improve network performance?", "input_tokens_approx": 11}
+{"request_id": 118, "prompt": "Explain the concept of model compression and its main techniques.", "input_tokens_approx": 12}
+{"request_id": 119, "prompt": "What is the difference between a compiler and an interpreter?", "input_tokens_approx": 13}
+{"request_id": 120, "prompt": "Describe how to implement a pub/sub system using Redis.", "input_tokens_approx": 13}
+{"request_id": 121, "prompt": "How does continuous batching improve GPU utilization in LLM serving?", "input_tokens_approx": 13}
+{"request_id": 122, "prompt": "Write a Python script to extract and summarize data from a CSV file.", "input_tokens_approx": 15}
+{"request_id": 123, "prompt": "What are the tradeoffs between in-memory and on-disk storage?", "input_tokens_approx": 13}
+{"request_id": 124, "prompt": "Explain the concept of function calling in LLM APIs.", "input_tokens_approx": 11}
+{"request_id": 125, "prompt": "How do you handle eventual consistency in a distributed e-commerce system?", "input_tokens_approx": 14}
+{"request_id": 126, "prompt": "What is NUMA architecture and how does it affect performance?", "input_tokens_approx": 13}
+{"request_id": 127, "prompt": "Write a function to implement topological sort on a directed acyclic graph.", "input_tokens_approx": 14}
+{"request_id": 128, "prompt": "How does the transformer architecture handle variable-length sequences?", "input_tokens_approx": 13}
+{"request_id": 129, "prompt": "Describe the main differences between OLTP and OLAP databases.", "input_tokens_approx": 13}
+{"request_id": 130, "prompt": "What is the purpose of positional encoding in transformer models?", "input_tokens_approx": 13}
+{"request_id": 131, "prompt": "Write a Python function to parse command-line arguments with argparse.", "input_tokens_approx": 14}
+{"request_id": 132, "prompt": "How does sharding work in distributed databases?", "input_tokens_approx": 11}
+{"request_id": 133, "prompt": "Explain the concept of mixture of experts (MoE) in language models.", "input_tokens_approx": 14}
+{"request_id": 134, "prompt": "What is the difference between type checking and duck typing?", "input_tokens_approx": 13}
+{"request_id": 135, "prompt": "Describe how to implement an efficient sliding window algorithm.", "input_tokens_approx": 13}
+{"request_id": 136, "prompt": "How does in-flight batching work in LLM inference servers?", "input_tokens_approx": 12}
+{"request_id": 137, "prompt": "Write a function to find the median of a stream of numbers efficiently.", "input_tokens_approx": 15}
+{"request_id": 138, "prompt": "What are the main performance bottlenecks in large-scale distributed training?", "input_tokens_approx": 14}
+{"request_id": 139, "prompt": "Explain the difference between row and page locks in SQL databases.", "input_tokens_approx": 14}
+{"request_id": 140, "prompt": "How does speculative execution work in modern CPUs?", "input_tokens_approx": 12}
+{"request_id": 141, "prompt": "Write a Python script to scrape a website and store results in SQLite.", "input_tokens_approx": 15}
+{"request_id": 142, "prompt": "What is the difference between a byte and a token in LLM context windows?", "input_tokens_approx": 16}
+{"request_id": 143, "prompt": "Describe how the observer design pattern works in event-driven systems.", "input_tokens_approx": 14}
+{"request_id": 144, "prompt": "How does hardware prefetching improve cache performance?", "input_tokens_approx": 12}
+{"request_id": 145, "prompt": "What is the role of the feedforward network in a transformer layer?", "input_tokens_approx": 14}
+{"request_id": 146, "prompt": "Write a JavaScript async function to fetch data with retry logic.", "input_tokens_approx": 14}
+{"request_id": 147, "prompt": "How does ACID compliance work in database transactions?", "input_tokens_approx": 12}
+{"request_id": 148, "prompt": "Explain the concept of rotary position embeddings (RoPE).", "input_tokens_approx": 11}
+{"request_id": 149, "prompt": "What is the difference between a monorepo and a polyrepo?", "input_tokens_approx": 13}
+{"request_id": 150, "prompt": "Describe how to implement exponential backoff for API retries.", "input_tokens_approx": 13}
+{"request_id": 151, "prompt": "How does memory-mapped I/O work in operating systems?", "input_tokens_approx": 12}
+{"request_id": 152, "prompt": "Write a Python function to validate an email address using regex.", "input_tokens_approx": 13}
+{"request_id": 153, "prompt": "What are the key metrics for evaluating LLM performance in production?", "input_tokens_approx": 14}
+{"request_id": 154, "prompt": "Explain how distributed tracing helps debug microservices.", "input_tokens_approx": 12}
+{"request_id": 155, "prompt": "What is the difference between HBM and GDDR memory in GPUs?", "input_tokens_approx": 14}
+{"request_id": 156, "prompt": "Write a function to implement a thread-safe singleton in Python.", "input_tokens_approx": 13}
+{"request_id": 157, "prompt": "How does group query attention (GQA) reduce KV cache memory?", "input_tokens_approx": 13}
+{"request_id": 158, "prompt": "Describe the main differences between gRPC and REST APIs.", "input_tokens_approx": 12}
+{"request_id": 159, "prompt": "What is the purpose of a query planner in a SQL database engine?", "input_tokens_approx": 15}
+{"request_id": 160, "prompt": "Explain how chunked prefill works in LLM inference.", "input_tokens_approx": 11}
+{"request_id": 161, "prompt": "Write a Python function to implement a simple tokenizer.", "input_tokens_approx": 12}
+{"request_id": 162, "prompt": "What are the main differences between MPI and NCCL for distributed computing?", "input_tokens_approx": 15}
+{"request_id": 163, "prompt": "Describe how to design a distributed job scheduler.", "input_tokens_approx": 12}
+{"request_id": 164, "prompt": "How does inter-token latency affect the user experience of LLM chat apps?", "input_tokens_approx": 15}
+{"request_id": 165, "prompt": "Write a bash script to set up a Python virtual environment.", "input_tokens_approx": 13}
+{"request_id": 166, "prompt": "What is the difference between model inference and model training?", "input_tokens_approx": 13}
+{"request_id": 167, "prompt": "Explain the concept of autoregressive generation in language models.", "input_tokens_approx": 12}
+{"request_id": 168, "prompt": "How does the key-value store pattern differ from a relational database?", "input_tokens_approx": 15}
+{"request_id": 169, "prompt": "Write a Python function to implement consistent hashing with virtual nodes.", "input_tokens_approx": 14}
+{"request_id": 170, "prompt": "What are the main challenges in deploying LLMs to edge devices?", "input_tokens_approx": 14}
+{"request_id": 171, "prompt": "Describe how sparse matrix operations can speed up LLM inference.", "input_tokens_approx": 13}
+{"request_id": 172, "prompt": "How does connection pooling improve database performance?", "input_tokens_approx": 11}
+{"request_id": 173, "prompt": "Write a function to convert a flat list into a nested tree structure.", "input_tokens_approx": 14}
+{"request_id": 174, "prompt": "What is the difference between token-by-token and batch generation in LLMs?", "input_tokens_approx": 15}
+{"request_id": 175, "prompt": "Explain how GPU memory fragmentation affects LLM serving performance.", "input_tokens_approx": 13}
+{"request_id": 176, "prompt": "Describe the main advantages of using Rust over C++ for systems programming.", "input_tokens_approx": 14}
+{"request_id": 177, "prompt": "How does the first-token latency (TTFT) differ from total generation latency?", "input_tokens_approx": 14}
+{"request_id": 178, "prompt": "Write a Python class implementing a priority queue using a heap.", "input_tokens_approx": 13}
+{"request_id": 179, "prompt": "What is the difference between model architecture and model weights?", "input_tokens_approx": 13}
+{"request_id": 180, "prompt": "Explain how CUDA streams enable parallel execution on GPUs.", "input_tokens_approx": 12}
+{"request_id": 181, "prompt": "Describe how to implement a distributed cache with Redis Cluster.", "input_tokens_approx": 13}
+{"request_id": 182, "prompt": "What is the purpose of the softmax function in transformer attention?", "input_tokens_approx": 14}
+{"request_id": 183, "prompt": "Write a Python function to implement a simple state machine.", "input_tokens_approx": 12}
+{"request_id": 184, "prompt": "How does PCIe bandwidth affect GPU-to-GPU communication?", "input_tokens_approx": 12}
+{"request_id": 185, "prompt": "What are the tradeoffs between accuracy and speed in quantized models?", "input_tokens_approx": 14}
+{"request_id": 186, "prompt": "Explain the difference between structured and unstructured pruning in neural networks.", "input_tokens_approx": 14}
+{"request_id": 187, "prompt": "How do you implement a health check endpoint for a production service?", "input_tokens_approx": 14}
+{"request_id": 188, "prompt": "Write a SQL query to find duplicate records and keep only the most recent.", "input_tokens_approx": 16}
+{"request_id": 189, "prompt": "What is the difference between throughput and latency as performance metrics?", "input_tokens_approx": 14}
+{"request_id": 190, "prompt": "Explain how NVLink improves multi-GPU performance over PCIe.", "input_tokens_approx": 12}
+{"request_id": 191, "prompt": "Describe how to implement retry with jitter to avoid thundering herd.", "input_tokens_approx": 14}
+{"request_id": 192, "prompt": "What is the role of tokenization in LLM input processing?", "input_tokens_approx": 13}
+{"request_id": 193, "prompt": "Write a Python script to profile memory usage of a function.", "input_tokens_approx": 13}
+{"request_id": 194, "prompt": "How does Flash Decoding improve LLM inference on long contexts?", "input_tokens_approx": 12}
+{"request_id": 195, "prompt": "What are the main differences between GGUF and HuggingFace model formats?", "input_tokens_approx": 14}
+{"request_id": 196, "prompt": "Explain how dynamic batching improves GPU utilization in inference servers.", "input_tokens_approx": 13}
+{"request_id": 197, "prompt": "Describe the main differences between AMD ROCm and NVIDIA CUDA.", "input_tokens_approx": 13}
+{"request_id": 198, "prompt": "Write a function to implement a simple LRU cache using an ordered dict.", "input_tokens_approx": 15}
+{"request_id": 199, "prompt": "What is arithmetic intensity and why does it matter for GPU performance?", "input_tokens_approx": 14}

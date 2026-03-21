@@ -9,6 +9,11 @@ Usage:
 import json
 from pathlib import Path
 
+# Build ranking lookup per chip model per suite
+import statistics
+from collections import defaultdict
+import numpy as np
+
 
 RESULTS_DIR = Path("results")
 SITE_DIR = Path("leaderboard/site")
@@ -89,6 +94,108 @@ def extract_row(result: dict) -> dict:
     }
 
 
+def generate_api(results: list[dict], output_dir: Path) -> None:
+    """
+    Generate static JSON files that the OpenClaw Skill queries for rankings.
+    Written to leaderboard/site/api/ directory.
+
+    Files generated:
+      api/rank.json   — per-submission ranking: submission_name → {rank, total, percentile}
+      api/chips.json  — list of all chips with stats
+      api/index.json  — lightweight summary of all submissions (for Skill quick lookup)
+    """
+    api_dir = output_dir / "api"
+    api_dir.mkdir(exist_ok=True)
+
+    # ----------------------------------------------------------------
+    # Group best throughput per submission, keyed by chip model
+    # ----------------------------------------------------------------
+    # Structure: by_chip[chip_name] = list of (submission_name, throughput)
+    by_chip: dict[str, list[tuple[str, float]]] = defaultdict(list)
+
+    for r in results:
+        chip_name = r.get("chip", {}).get("name", "Unknown")
+        submission_name = r.get("_submission_name", "unknown")
+        offline = r.get("metrics", {}).get("offline")
+        if not offline:
+            continue
+        rows = offline.get("results_by_batch_size", [])
+        valid = [
+            row for row in rows
+            if not row.get("oom") and row.get("throughput_tokens_per_sec")
+        ]
+        if not valid:
+            continue
+        best_thr = max(row["throughput_tokens_per_sec"] for row in valid)
+        by_chip[chip_name].append((submission_name, best_thr))
+
+    # ----------------------------------------------------------------
+    # Build per-submission rank lookup
+    # ----------------------------------------------------------------
+    # rank_data[submission_name] = {rank, total, percentile, chip_name, best_throughput}
+    rank_data: dict[str, dict] = {}
+
+    for chip_name, entries in by_chip.items():
+        # Sort descending by throughput
+        sorted_entries = sorted(entries, key=lambda x: x[1], reverse=True)
+        total = len(sorted_entries)
+
+        for rank_idx, (submission_name, thr) in enumerate(sorted_entries):
+            rank = rank_idx + 1  # 1-based
+            # percentile: what fraction of same-chip submissions this beats
+            percentile = round((total - rank) / total * 100, 1) if total > 1 else 100.0
+            rank_data[submission_name] = {
+                "chip_name": chip_name,
+                "rank": rank,
+                "total": total,
+                "percentile": percentile,
+                "best_throughput_tokens_per_sec": thr,
+            }
+
+    with open(api_dir / "rank.json", "w") as f:
+        json.dump(rank_data, f, indent=2)
+
+    # ----------------------------------------------------------------
+    # Build chips summary index
+    # ----------------------------------------------------------------
+    chips = []
+    for chip_name, entries in by_chip.items():
+        throughputs = [thr for _, thr in entries]
+        chips.append({
+            "name": chip_name,
+            "submission_count": len(entries),
+            "best_throughput_tokens_per_sec": max(throughputs),
+            "median_throughput_tokens_per_sec": round(statistics.median(throughputs), 1),
+        })
+    chips.sort(key=lambda x: x["best_throughput_tokens_per_sec"], reverse=True)
+
+    with open(api_dir / "chips.json", "w") as f:
+        json.dump(chips, f, indent=2)
+
+    # ----------------------------------------------------------------
+    # Build lightweight index for Skill lookup (chip_name → best stats)
+    # ----------------------------------------------------------------
+    # OpenClaw Skill queries this to find "what's the best result for my chip"
+    chip_index: dict[str, dict] = {}
+    for chip_name, entries in by_chip.items():
+        throughputs = [thr for _, thr in entries]
+        chip_index[chip_name] = {
+            "submission_count": len(entries),
+            "best_throughput_tokens_per_sec": max(throughputs),
+            "median_throughput_tokens_per_sec": round(statistics.median(throughputs), 1),
+            "p25_throughput_tokens_per_sec": round(
+                sorted(throughputs)[len(throughputs) // 4], 1
+            ) if len(throughputs) >= 4 else None,
+        }
+
+    with open(api_dir / "index.json", "w") as f:
+        json.dump(chip_index, f, indent=2)
+
+    print(f"API files written to {api_dir}/")
+    print(f"  rank.json:  {len(rank_data)} submissions indexed")
+    print(f"  chips.json: {len(chips)} chips listed")
+    print(f"  index.json: {len(chip_index)} chips in lookup table")
+
 def main():
     results = load_results()
     print(f"Loaded {len(results)} results.")
@@ -102,6 +209,8 @@ def main():
         f.write(f"const LEADERBOARD_DATA = {json.dumps(rows, indent=2)};\n")
 
     print(f"Leaderboard data written to {out_path} ({len(rows)} rows).")
+
+    generate_api(results, SITE_DIR)
 
 
 if __name__ == "__main__":

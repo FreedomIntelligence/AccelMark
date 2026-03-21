@@ -1,0 +1,184 @@
+name: Process Community Submission
+
+# Triggered when an issue is labeled "community-submission"
+# (The OpenClaw Skill creates issues with this label)
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  process:
+    name: Extract and validate submission from issue
+    # Only run for the specific label
+    if: github.event.label.name == 'community-submission'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install jsonschema numpy --quiet
+
+      - name: Extract result JSON from issue body
+        id: extract
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body;
+            const issueNumber = context.payload.issue.number;
+
+            // Extract JSON from code block in issue body
+            const match = body.match(/```json\n([\s\S]*?)\n```/);
+            if (!match) {
+              core.setFailed('No JSON code block found in issue body');
+              return;
+            }
+
+            let result;
+            try {
+              result = JSON.parse(match[1]);
+            } catch (e) {
+              core.setFailed(`Invalid JSON in issue: ${e.message}`);
+              return;
+            }
+
+            // Build submission directory name
+            const chip = (result.chip?.name || 'unknown')
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '')
+              .slice(0, 30);
+            const suite = result.suite_id || 'unknown';
+            const scenario = result.task?.scenario || 'offline';
+            const date = result.meta?.date || new Date().toISOString().split('T')[0];
+            const dirName = `${chip}_${suite}_${scenario}_${date}`;
+
+            core.setOutput('dir_name', dirName);
+            core.setOutput('issue_number', issueNumber);
+            core.setOutput('result_json', JSON.stringify(result));
+
+            console.log(`Submission directory: ${dirName}`);
+
+      - name: Write result files
+        run: |
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+          mkdir -p "$DIR"
+
+          # Write result.json
+          echo '${{ steps.extract.outputs.result_json }}' | python -m json.tool > "$DIR/result.json"
+
+          # Create placeholder files that validate_submission.py requires
+          echo "Submitted via OpenClaw AccelMark Skill (Issue #${{ steps.extract.outputs.issue_number }})" > "$DIR/run.log"
+
+          # Create minimal env_info.json from chip data in result
+          python3 -c "
+          import json, sys
+
+          with open('$DIR/result.json') as f:
+              result = json.load(f)
+
+          chip = result.get('chip', {})
+          software = result.get('software', {})
+
+          env = {
+              'collected_at': result.get('meta', {}).get('date', '2026-01-01') + 'T00:00:00Z',
+              'accelerators': [{
+                  'index': 0,
+                  'name': chip.get('name', 'Unknown'),
+                  'memory_gb': chip.get('memory_gb_per_chip', 0),
+                  'driver_version': software.get('driver_version', 'unknown'),
+                  'firmware_version': None,
+              }],
+              'accelerator_topology': None,
+              'cpu': {
+                  'model': 'unknown',
+                  'physical_cores': 1,
+                  'logical_cores': 1,
+                  'numa_nodes': 1,
+              },
+              'system_memory_gb': 0,
+              'pcie_generation': 'unknown',
+              'cpu_accelerator_bandwidth_gbs': None,
+              'network_interfaces': None,
+              'kernel_version': 'unknown',
+              'runtime_version': software.get('runtime_version', 'unknown'),
+          }
+
+          with open('$DIR/env_info.json', 'w') as f:
+              json.dump(env, f, indent=2)
+
+          print('env_info.json created')
+          "
+
+      - name: Run validation
+        id: validate
+        run: |
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+          if python scripts/validate_submission.py --dir "$DIR"; then
+            echo "valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR if valid
+        if: steps.validate.outputs.valid == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const dirName = '${{ steps.extract.outputs.dir_name }}';
+            const issueNumber = '${{ steps.extract.outputs.issue_number }}';
+            const branchName = `submission/${dirName}`;
+
+            // Create branch
+            const { data: ref } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main',
+            });
+
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/heads/${branchName}`,
+              sha: ref.object.sha,
+            });
+
+            // Create PR
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[community] ${dirName}`,
+              body: `Auto-generated from Issue #${issueNumber}\n\nSubmitted via OpenClaw AccelMark Skill.\n\nCloses #${issueNumber}`,
+              head: branchName,
+              base: 'main',
+            });
+
+            // Comment on issue
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(issueNumber),
+              body: `✅ Validation passed! PR created: ${pr.html_url}\n\nYour result will appear on the leaderboard after review.`,
+            });
+
+      - name: Comment failure on issue
+        if: steps.validate.outputs.valid == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt('${{ steps.extract.outputs.issue_number }}'),
+              body: `❌ Validation failed. Your submission has schema errors.\n\nSee the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.\n\nCommon fixes:\n- Make sure \`num_runs >= 3\`\n- Make sure \`accuracy.valid\` is set\n- Check that all required fields are present`,
+            });

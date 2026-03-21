@@ -5,8 +5,16 @@
   "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
   "scenarios": ["offline", "online", "interactive"],
   "precision_required": "BF16",
-  "input_tokens": 512,
-  "output_tokens": 128,
+  "request_distribution": {
+    "input_tokens_p25": 120,
+    "input_tokens_p50": 280,
+    "input_tokens_p75": 580,
+    "input_tokens_p99": 2100,
+    "output_tokens_p50": 310,
+    "output_tokens_p99": 1200,
+    "source": "ShareGPT"
+  },
+  "output_tokens_max": 2048,
   "batch_sizes": [1, 8, 32, 128],
   "online_qps_levels": [1, 5, 10, 25, 50],
   "online_sla_ttft_ms": 500,

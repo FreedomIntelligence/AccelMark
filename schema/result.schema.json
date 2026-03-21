@@ -13,7 +13,7 @@
 
     "suite_id": {
       "type": "string",
-      "description": "Must match a suite in suites/. Use 'custom' for non-standard runs."
+      "description": "Suite identifier. Standard suites: suite_A through suite_D. Mini suites: mini-nano, mini-mini, mini-standard, mini-pro. Custom: 'custom'."
     },
 
     "chip": {

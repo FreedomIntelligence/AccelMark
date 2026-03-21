@@ -1,0 +1,24 @@
+{
+  "name": "AccelMark Benchmark",
+  "version": "1.0.0",
+  "description": "Benchmark your AI accelerator and see how you rank in the AccelMark community leaderboard",
+  "author": "AccelMark",
+  "repository": "https://github.com/accelmark/accelmark",
+  "triggers": [
+    "benchmark my gpu",
+    "benchmark my hardware",
+    "run accelmark",
+    "test my gpu speed",
+    "how fast is my gpu",
+    "what can my machine run",
+    "accelmark"
+  ],
+  "permissions": [
+    "shell",
+    "filesystem_read",
+    "filesystem_write",
+    "network"
+  ],
+  "estimated_duration_minutes": 5,
+  "tags": ["benchmark", "gpu", "hardware", "llm", "performance"]
+}

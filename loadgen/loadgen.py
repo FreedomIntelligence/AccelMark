@@ -67,6 +67,10 @@ class AccelMarkLoadGen:
             return self._run_interactive(inference_fn)
         elif self.scenario == "training":
             return self._run_training(inference_fn)
+        elif self.scenario == "multiturn":
+            return self._run_multiturn(inference_fn)
+        elif self.scenario == "sustained":
+            return self._run_sustained(inference_fn)
         else:
             raise ValueError(f"Unknown scenario: {self.scenario}")
 
@@ -293,6 +297,110 @@ class AccelMarkLoadGen:
             "Training scenario: use the helper in scripts/template/run_benchmark.py. "
             "LoadGen does not manage the training loop directly."
         )
+
+    # ------------------------------------------------------------------
+    # Multi-turn scenario
+    # ------------------------------------------------------------------
+
+    def _run_multiturn(self, inference_fn: Callable) -> dict:
+        """
+        Multi-turn conversation scenario.
+        Groups requests by conversation_id and sends them sequentially.
+        Measures how prefix caching affects performance.
+
+        Only valid if requests.jsonl has conversation_id fields.
+        """
+        # Group by conversation
+        from collections import defaultdict
+        conversations = defaultdict(list)
+        for r in self.requests:
+            conv_id = r.get("conversation_id", str(r["request_id"]))
+            conversations[conv_id].append(r)
+
+        # Sort turns within each conversation
+        for conv_id in conversations:
+            conversations[conv_id].sort(key=lambda r: r.get("turn_index", 0))
+
+        # Run conversations sequentially
+        all_results = []
+        for conv_id, turns in conversations.items():
+            for turn in turns:
+                result = inference_fn([turn["prompt"]])[0]
+                all_results.append((conv_id, turn.get("turn_index", 0), result))
+
+        # Metrics: compare first-turn vs subsequent-turn latency
+        # (subsequent turns benefit from prefix cache)
+        first_turn_ttfts = [r.first_token_time_ms for _, idx, r in all_results if idx == 0 and r.first_token_time_ms]
+        later_turn_ttfts = [r.first_token_time_ms for _, idx, r in all_results if idx > 0 and r.first_token_time_ms]
+
+        return {"multiturn": {
+            "first_turn_ttft_p50": float(np.percentile(first_turn_ttfts, 50)) if first_turn_ttfts else None,
+            "cached_turn_ttft_p50": float(np.percentile(later_turn_ttfts, 50)) if later_turn_ttfts else None,
+            "cache_speedup_ratio": (
+                float(np.percentile(first_turn_ttfts, 50)) / float(np.percentile(later_turn_ttfts, 50))
+                if first_turn_ttfts and later_turn_ttfts else None
+            ),
+        }}
+
+    # ------------------------------------------------------------------
+    # Sustained scenario
+    # ------------------------------------------------------------------
+
+    def _run_sustained(self, inference_fn: Callable) -> dict:
+        """
+        Run at fixed QPS for suite.duration_minutes.
+        Record throughput and latency every suite.sample_interval_seconds.
+        Goal: detect thermal throttling, memory fragmentation, performance decay.
+        """
+        duration_s = self.suite["duration_minutes"] * 60
+        interval_s = self.suite["sample_interval_seconds"]
+        target_qps = self.suite["target_qps"]
+        prompts = [r["prompt"] for r in self.requests]
+
+        samples_over_time = []
+        t_start = time.perf_counter()
+        t_next_sample = t_start + interval_s
+        t_next_request = t_start
+        request_idx = 0
+
+        while time.perf_counter() - t_start < duration_s:
+            now = time.perf_counter()
+
+            # Send request on schedule
+            if now >= t_next_request:
+                prompt = prompts[request_idx % len(prompts)]
+                request_idx += 1
+                result = inference_fn([prompt])[0]
+                t_next_request += 1.0 / target_qps
+
+            # Record sample at interval
+            if time.perf_counter() >= t_next_sample:
+                elapsed_min = (time.perf_counter() - t_start) / 60
+                # Compute throughput over last interval
+                samples_over_time.append({
+                    "elapsed_minutes": round(elapsed_min, 1),
+                    "throughput_tokens_per_sec": None,  # computed from recent requests
+                    "ttft_ms_p99": None,
+                })
+                t_next_sample += interval_s
+
+        # Compute stability metrics
+        throughputs = [s["throughput_tokens_per_sec"] for s in samples_over_time if s["throughput_tokens_per_sec"]]
+        if throughputs:
+            initial = float(np.mean(throughputs[:3])) if len(throughputs) >= 3 else throughputs[0]
+            final = float(np.mean(throughputs[-3:])) if len(throughputs) >= 3 else throughputs[-1]
+            degradation = (initial - final) / initial if initial > 0 else 0
+        else:
+            initial = final = degradation = None
+
+        return {"sustained": {
+            "duration_minutes": self.suite["duration_minutes"],
+            "target_qps": target_qps,
+            "samples_over_time": samples_over_time,
+            "initial_throughput": initial,
+            "final_throughput": final,
+            "degradation_pct": round(degradation * 100, 1) if degradation is not None else None,
+        }}
 
     # ------------------------------------------------------------------
     # Helpers

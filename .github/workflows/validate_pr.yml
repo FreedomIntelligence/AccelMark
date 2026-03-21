@@ -1,0 +1,109 @@
+name: Validate Submission
+
+# Triggers only when results/ directory is touched in a PR.
+# Schema changes, script changes, and doc changes do not trigger this.
+on:
+  pull_request:
+    paths:
+      - 'results/**'
+
+jobs:
+  validate:
+    name: Validate result submissions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          # Fetch base branch so we can diff against it
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install jsonschema numpy psutil --quiet
+
+      - name: Find changed submission directories
+        id: find_dirs
+        run: |
+          # Get list of changed files vs base branch
+          git fetch origin ${{ github.base_ref }} --quiet
+          CHANGED_DIRS=$(
+            git diff --name-only origin/${{ github.base_ref }}...HEAD \
+            | grep '^results/' \
+            | awk -F'/' 'NF>=3 {print $1"/"$2"/"$3}' \
+            | sort -u
+          )
+          echo "Found changed directories:"
+          echo "$CHANGED_DIRS"
+          # Write to file to handle spaces/newlines safely
+          echo "$CHANGED_DIRS" > /tmp/changed_dirs.txt
+          # Also export count
+          COUNT=$(echo "$CHANGED_DIRS" | grep -c . || true)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Validate each submission
+        run: |
+          FAILED=0
+          PASSED=0
+          SKIPPED=0
+
+          while IFS= read -r DIR; do
+            # Skip empty lines
+            [ -z "$DIR" ] && continue
+
+            # Skip .gitkeep and non-directories
+            if [ ! -d "$DIR" ]; then
+              echo "Skipping non-directory: $DIR"
+              SKIPPED=$((SKIPPED + 1))
+              continue
+            fi
+
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Validating: $DIR"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+            if python scripts/validate_submission.py --dir "$DIR"; then
+              echo "✓ PASSED: $DIR"
+              PASSED=$((PASSED + 1))
+            else
+              echo "✗ FAILED: $DIR"
+              FAILED=$((FAILED + 1))
+            fi
+
+          done < /tmp/changed_dirs.txt
+
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Summary: $PASSED passed, $FAILED failed, $SKIPPED skipped"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+          if [ "$FAILED" -gt 0 ]; then
+            echo ""
+            echo "PR blocked: $FAILED submission(s) failed validation."
+            echo "Fix the errors listed above before merging."
+            exit 1
+          fi
+
+      - name: Comment on PR with validation summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const outcome = '${{ job.status }}';
+            const icon = outcome === 'success' ? '✅' : '❌';
+            const status = outcome === 'success' ? 'All submissions valid' : 'Validation failed';
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ${icon} AccelMark Validation: ${status}\n\nSee the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+            });
