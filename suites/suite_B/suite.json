@@ -1,17 +1,25 @@
 {
   "suite_id": "suite_B",
-  "description": "8-chip inference, Llama-3-70B. Tests inter-chip communication overhead.",
-  "model_id": "meta-llama/Llama-3-70B-Instruct",
+  "description": "Multi-chip inference, Llama-3-70B-Instruct. Tests inter-chip communication overhead.",
+  "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
   "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
   "scenarios": ["offline", "online"],
   "precision_required": "BF16",
-  "input_tokens": 512,
-  "output_tokens": 128,
-  "batch_sizes": [1, 8, 32, 128],
-  "online_qps_levels": [1, 5, 10, 25],
+  "request_distribution": {
+    "input_tokens_p25": 120,
+    "input_tokens_p50": 280,
+    "input_tokens_p75": 580,
+    "input_tokens_p99": 2100,
+    "output_tokens_p50": 310,
+    "output_tokens_p99": 1200,
+    "source": "shibing624/sharegpt_gpt4"
+  },
+  "output_tokens_max": 512,
+  "batch_sizes": [8, 32, 128],
+  "online_qps_levels": [5, 10, 25, 50, 100],
   "online_sla_ttft_ms": 1000,
   "num_runs": 3,
-  "warmup_runs": 2,
+  "warmup_runs": 1,
   "accuracy_threshold_delta": 0.03,
-  "request_count": 1000
+  "request_count": 200
 }

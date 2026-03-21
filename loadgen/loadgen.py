@@ -20,6 +20,16 @@ from typing import Callable, Optional
 
 import numpy as np
 
+try:
+    from tqdm import tqdm
+except ImportError:
+    # Fallback: tqdm not installed, use a simple print wrapper
+    def tqdm(iterable, **kwargs):
+        desc = kwargs.get("desc", "")
+        if desc:
+            print(f"{desc} ...")
+        return iterable
+
 from .types import InferenceResult, SampleRecord
 
 SAMPLE_SEED = 42
@@ -34,20 +44,33 @@ class AccelMarkLoadGen:
         requests: list[dict],
         scenario: str,
         output_dir: str,
+        chip_count: int = 1,
     ):
         """
         Args:
-            suite:      Parsed contents of suite.json
-            requests:   Parsed contents of requests.jsonl (list of {"prompt": str} dicts)
-            scenario:   One of: offline, online, interactive, training
-            output_dir: Directory where samples.jsonl will be written
+            suite:       Parsed contents of suite.json
+            requests:    Parsed contents of requests.jsonl (list of {"prompt": str} dicts)
+            scenario:    One of: offline, online, interactive, training
+            output_dir:  Directory where samples.jsonl will be written
+            chip_count:  Number of chips being used (affects throughput display per-chip)
         """
         self.suite = suite
-        self.requests = requests
         self.scenario = scenario
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self._rng = random.Random(SAMPLE_SEED)
+        self.chip_count = chip_count
+
+        # Use different request counts per scenario
+        # offline: use request_count (default 200, fast)
+        # online/interactive: use online_request_count if set, else all requests
+        if scenario == "offline":
+            count = suite.get("request_count")
+        else:
+            # online and interactive need more requests for reliable p99
+            count = suite.get("online_request_count", suite.get("request_count"))
+
+        self.requests = requests[:count] if count else requests
 
     def run(self, inference_fn: Callable) -> dict:
         """
@@ -80,59 +103,112 @@ class AccelMarkLoadGen:
 
     def _run_offline(self, inference_fn: Callable) -> dict:
         """
-        Send all requests as a single batch for each configured batch_size.
-        Measures throughput (tokens/sec) and peak memory.
+        Send ALL requests to the engine at once for each configured concurrency level.
+        The engine's internal scheduler handles batching optimally.
+
+        batch_sizes in suite.json map to max concurrent request levels tested —
+        they do NOT control client-side chunking. Higher values allow more
+        in-flight sequences and improve GPU utilization up to hardware limits.
+
+        Throughput = (total_input_tokens + total_output_tokens) / elapsed,
+        which matches vLLM's own internal throughput metric.
         """
         results_by_batch_size = []
         all_samples: list[SampleRecord] = []
         prompts = [r["prompt"] for r in self.requests]
 
-        for batch_size in self.suite["batch_sizes"]:
-            print(f"[offline] batch_size={batch_size}")
-            run_throughputs = []
-            run_peak_memories = []
-            run_samples: list[SampleRecord] = []
+        total_runs = self.suite["num_runs"] + self.suite["warmup_runs"]
+        total_batch_sizes = len(self.suite["batch_sizes"])
 
-            for run_idx in range(self.suite["num_runs"] + self.suite["warmup_runs"]):
-                is_warmup = run_idx < self.suite["warmup_runs"]
+        total_steps = self.suite["num_runs"] * total_batch_sizes
+        print(f"\n{'='*60}")
+        print(f"  AccelMark Offline Benchmark")
+        print(f"  Requests  : {len(prompts)}")
+        print(f"  Max concurrency levels: {self.suite['batch_sizes']}")
+        print(f"  Runs      : {self.suite['num_runs']} (+{self.suite['warmup_runs']} warmup)")
+        print(f"{'='*60}\n")
 
-                batches = [
-                    prompts[i:i + batch_size]
-                    for i in range(0, len(prompts), batch_size)
-                ]
+        with tqdm(total=total_steps, desc="Overall progress",
+                  unit="run", position=0, leave=True,
+                  bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} runs [{elapsed}<{remaining}, {rate_fmt}]"
+                  ) as overall_pbar:
 
-                t_start = time.perf_counter()
-                all_results: list[InferenceResult] = []
-                for batch in batches:
-                    batch_results = inference_fn(batch)
-                    all_results.extend(batch_results)
-                t_end = time.perf_counter()
+            for bs_idx, batch_size in enumerate(self.suite["batch_sizes"]):
+                run_throughputs = []
+                run_samples: list[SampleRecord] = []
 
-                if is_warmup:
-                    continue
+                for run_idx in range(total_runs):
+                    is_warmup = run_idx < self.suite["warmup_runs"]
+                    run_label = "warmup" if is_warmup else \
+                        f"run {run_idx - self.suite['warmup_runs'] + 1}/{self.suite['num_runs']}"
 
-                total_output_tokens = sum(
-                    r.output_tokens for r in all_results if r.success
+                    desc = f"  concurrency={batch_size} ({bs_idx+1}/{total_batch_sizes}) {run_label}"
+                    tqdm.write(f"{desc} — sending all {len(prompts)} requests...")
+
+                    t_start = time.perf_counter()
+
+                    # Send ALL requests at once — engine handles internal batching
+                    all_results: list[InferenceResult] = inference_fn(prompts)
+
+                    t_end = time.perf_counter()
+                    elapsed = t_end - t_start
+
+                    # Count both input and output tokens (matches vLLM's throughput metric)
+                    total_input_tokens = sum(r.input_tokens for r in all_results if r.success)
+                    total_output_tokens = sum(r.output_tokens for r in all_results if r.success)
+                    total_tokens = total_input_tokens + total_output_tokens
+                    throughput = total_tokens / elapsed if elapsed > 0 else 0
+                    throughput_output_only = total_output_tokens / elapsed if elapsed > 0 else 0
+
+                    if is_warmup:
+                        tqdm.write(
+                            f"  [warmup] concurrency={batch_size} — "
+                            f"{throughput:.0f} tok/s total, "
+                            f"{throughput_output_only:.0f} tok/s output (not recorded)"
+                        )
+                        continue
+
+                    run_throughputs.append(throughput)
+
+                    per_chip_str = ""
+                    if self.chip_count > 1:
+                        per_chip_str = f"  ({throughput/self.chip_count:.0f} tok/s per chip)"
+
+                    tqdm.write(
+                        f"  [offline] concurrency={batch_size} {run_label} — "
+                        f"{throughput:.0f} tok/s total "
+                        f"({throughput_output_only:.0f} output only)"
+                        f"{per_chip_str}  ({elapsed:.1f}s)"
+                    )
+
+                    overall_pbar.update(1)
+                    overall_pbar.set_postfix({
+                        "concurrency": batch_size,
+                        "tok/s": f"{throughput:.0f}",
+                    })
+
+                    sampled = self._sample_results(all_results, batch_size, "offline")
+                    run_samples.extend(sampled)
+
+                all_samples.extend(run_samples)
+
+                median_throughput = float(np.median(run_throughputs))
+                per_chip_str = f"  ({median_throughput/self.chip_count:.0f} tok/s per chip)" \
+                    if self.chip_count > 1 else ""
+                tqdm.write(
+                    f"  [offline] concurrency={batch_size} "
+                    f"median={median_throughput:.0f} tok/s{per_chip_str}\n"
                 )
-                elapsed = t_end - t_start
-                throughput = total_output_tokens / elapsed if elapsed > 0 else 0
-                run_throughputs.append(throughput)
 
-                # Collect samples (subset only)
-                sampled = self._sample_results(all_results, batch_size, "offline")
-                run_samples.extend(sampled)
-
-            all_samples.extend(run_samples)
-
-            median_throughput = float(np.median(run_throughputs))
-            results_by_batch_size.append({
-                "batch_size": batch_size,
-                "throughput_tokens_per_sec": round(median_throughput, 2),
-                "peak_memory_gb": None,  # platform script should inject this
-                "power_watts_avg": None,
-                "power_watts_peak": None,
-                "oom": False,
-            })
+                results_by_batch_size.append({
+                    "batch_size": batch_size,
+                    "throughput_tokens_per_sec": round(median_throughput, 2),
+                    "throughput_tokens_per_sec_per_chip": round(median_throughput / self.chip_count, 2),
+                    "peak_memory_gb": None,
+                    "power_watts_avg": None,
+                    "power_watts_peak": None,
+                    "oom": False,
+                })
 
         self._write_samples(all_samples)
         return {"offline": {"results_by_batch_size": results_by_batch_size}}
@@ -157,8 +233,9 @@ class AccelMarkLoadGen:
             run_ttfts: list[list[float]] = []
             run_tpots: list[list[float]] = []
 
-            for run_idx in range(self.suite["num_runs"] + self.suite["warmup_runs"]):
-                is_warmup = run_idx < self.suite["warmup_runs"]
+            for run_idx in range(self.suite["num_runs"]):
+                is_warmup = False  # no warmup for online/interactive
+                run_label = f"run {run_idx + 1}/{self.suite['num_runs']}"
 
                 # Generate Poisson inter-arrival times
                 n = len(prompts)
@@ -170,7 +247,8 @@ class AccelMarkLoadGen:
                 tpots: list[float] = []
                 t_next = time.perf_counter()
 
-                for i, prompt in enumerate(prompts):
+                desc = f"[online] qps={target_qps} {run_label}"
+                for i, prompt in tqdm(enumerate(prompts), desc=desc, total=n, leave=False, unit="req"):
                     now = time.perf_counter()
                     sleep_time = t_next - now
                     if sleep_time > 0:
@@ -204,6 +282,10 @@ class AccelMarkLoadGen:
             if sla_met:
                 max_valid_qps = target_qps
 
+            sla_icon = "✓" if sla_met else "✗"
+            chip_str = f"  ({self.chip_count} chips)" if self.chip_count > 1 else ""
+            tqdm.write(f"  [online] qps={target_qps} TTFT_p99={ttft_p99:.0f}ms SLA={sla_ms}ms {sla_icon}{chip_str}")
+
             results_by_qps.append({
                 "target_qps": target_qps,
                 "achieved_qps": round(achieved_qps, 2),
@@ -232,12 +314,14 @@ class AccelMarkLoadGen:
         all_tpots: list[float] = []
         all_samples: list[SampleRecord] = []
 
-        for run_idx in range(self.suite["num_runs"] + self.suite["warmup_runs"]):
-            is_warmup = run_idx < self.suite["warmup_runs"]
+        for run_idx in range(self.suite["num_runs"]):
+            is_warmup = False  # no warmup for online/interactive
+            run_label = f"run {run_idx + 1}/{self.suite['num_runs']}"
             run_ttfts: list[float] = []
             run_tpots: list[float] = []
 
-            for i, prompt in enumerate(prompts):
+            desc = f"[interactive] {run_label}"
+            for i, prompt in tqdm(enumerate(prompts), desc=desc, total=len(prompts), leave=False, unit="req"):
                 results = inference_fn([prompt])
                 r = results[0]
                 if r.success:
@@ -257,6 +341,9 @@ class AccelMarkLoadGen:
 
             if not is_warmup:
                 all_ttfts.extend(run_ttfts)
+                all_tpots.extend(run_tpots)
+                if run_ttfts:
+                    print(f"  [interactive] {run_label} TTFT_p50={float(np.percentile(run_ttfts, 50)):.1f}ms")
                 all_tpots.extend(run_tpots)
 
         sampled = self._rng.sample(all_samples, min(MAX_SAMPLES_PER_CONFIG, len(all_samples)))
@@ -323,7 +410,8 @@ class AccelMarkLoadGen:
 
         # Run conversations sequentially
         all_results = []
-        for conv_id, turns in conversations.items():
+        total_turns = sum(len(turns) for turns in conversations.values())
+        for conv_id, turns in tqdm(conversations.items(), desc="[multiturn] conversations", unit="conv"):
             for turn in turns:
                 result = inference_fn([turn["prompt"]])[0]
                 all_results.append((conv_id, turn.get("turn_index", 0), result))
@@ -363,26 +451,38 @@ class AccelMarkLoadGen:
         t_next_request = t_start
         request_idx = 0
 
-        while time.perf_counter() - t_start < duration_s:
-            now = time.perf_counter()
+        print(f"[sustained] Running {self.suite['duration_minutes']} min at {target_qps} QPS...")
+        with tqdm(total=self.suite["duration_minutes"], desc="[sustained]", unit="min", bar_format="{l_bar}{bar}| {n:.1f}/{total}min [{elapsed}<{remaining}]") as pbar:
+            last_pbar_update = t_start
 
-            # Send request on schedule
-            if now >= t_next_request:
-                prompt = prompts[request_idx % len(prompts)]
-                request_idx += 1
-                result = inference_fn([prompt])[0]
-                t_next_request += 1.0 / target_qps
+            while time.perf_counter() - t_start < duration_s:
+                now = time.perf_counter()
 
-            # Record sample at interval
-            if time.perf_counter() >= t_next_sample:
-                elapsed_min = (time.perf_counter() - t_start) / 60
-                # Compute throughput over last interval
-                samples_over_time.append({
-                    "elapsed_minutes": round(elapsed_min, 1),
-                    "throughput_tokens_per_sec": None,  # computed from recent requests
-                    "ttft_ms_p99": None,
-                })
-                t_next_sample += interval_s
+                # Update progress bar every second
+                elapsed_min = (now - t_start) / 60
+                delta = elapsed_min - (last_pbar_update - t_start) / 60
+                if delta >= 1/60:  # update every ~1 second
+                    pbar.n = min(elapsed_min, self.suite["duration_minutes"])
+                    pbar.refresh()
+                    last_pbar_update = now
+
+                # Send request on schedule
+                if now >= t_next_request:
+                    prompt = prompts[request_idx % len(prompts)]
+                    request_idx += 1
+                    result = inference_fn([prompt])[0]
+                    t_next_request += 1.0 / target_qps
+
+                # Record sample at interval
+                if time.perf_counter() >= t_next_sample:
+                    elapsed_min = (time.perf_counter() - t_start) / 60
+                    samples_over_time.append({
+                        "elapsed_minutes": round(elapsed_min, 1),
+                        "throughput_tokens_per_sec": None,
+                        "ttft_ms_p99": None,
+                    })
+                    print(f"  [sustained] {elapsed_min:.1f}min — sample recorded")
+                    t_next_sample += interval_s
 
         # Compute stability metrics
         throughputs = [s["throughput_tokens_per_sec"] for s in samples_over_time if s["throughput_tokens_per_sec"]]

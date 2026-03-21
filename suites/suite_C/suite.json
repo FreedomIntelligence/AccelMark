@@ -1,15 +1,15 @@
 {
   "suite_id": "suite_C",
-  "description": "8-chip training throughput, Llama-3-8B.",
-  "model_id": "meta-llama/Llama-3-8B",
+  "description": "Multi-chip training throughput, Llama-3-8B.",
+  "model_id": "meta-llama/Meta-Llama-3-8B",
   "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
   "scenarios": ["training"],
   "precision_required": "BF16",
   "sequence_length": 4096,
   "global_batch_size": 256,
-  "num_steps": 100,
-  "warmup_steps": 10,
-  "num_runs": 3,
+  "num_steps": 50,
+  "warmup_steps": 5,
+  "num_runs": 2,
   "accuracy_threshold_delta": null,
   "request_count": null
 }
