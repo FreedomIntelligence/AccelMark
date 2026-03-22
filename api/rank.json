@@ -2,21 +2,28 @@
   "a100sxm480gbx1_llama-3.1-8b_suite-D_2026-03-22": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "rank": 1,
-    "total": 3,
-    "percentile": 66.7,
+    "total": 4,
+    "percentile": 75.0,
     "best_throughput_tokens_per_sec": 7025.24
+  },
+  "a100sxm480gbx4_llama3-8b_suite-E_2026-03-22": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "rank": 2,
+    "total": 4,
+    "percentile": 50.0,
+    "best_throughput_tokens_per_sec": 6018.79
   },
   "a100sxm480gbx1_llama3-8b_suite-A_2026-03-22": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
-    "rank": 2,
-    "total": 3,
-    "percentile": 33.3,
+    "rank": 3,
+    "total": 4,
+    "percentile": 25.0,
     "best_throughput_tokens_per_sec": 5321.05
   },
   "a100sxm480gbx4_llama3-70b_suite-B_2026-03-22": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
-    "rank": 3,
-    "total": 3,
+    "rank": 4,
+    "total": 4,
     "percentile": 0.0,
     "best_throughput_tokens_per_sec": 2686.74
   }

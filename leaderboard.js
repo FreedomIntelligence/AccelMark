@@ -87,6 +87,31 @@ const LEADERBOARD_DATA = [
       "meta_model_load_sec": 42.9,
       "meta_start_time": "2026-03-22T10:50:04.077040+00:00",
       "meta_notes": "Migrated: batch_size \u2192 client_concurrency (2026-03-22)."
+    },
+    "viz": {
+      "type": "suite_D",
+      "offline": {
+        "labels": [
+          "1",
+          "4"
+        ],
+        "throughput": [
+          7025.24,
+          7019.06
+        ],
+        "memory_gb": [
+          69.25,
+          69.25
+        ]
+      },
+      "interactive": {
+        "ttft_p50": 3858.68,
+        "ttft_p90": 4006.97,
+        "ttft_p99": 4153.9,
+        "tpot_p50": 15.73,
+        "tpot_p90": 15.81,
+        "tpot_p99": 15.91
+      }
     }
   },
   {
@@ -177,6 +202,72 @@ const LEADERBOARD_DATA = [
       "meta_model_load_sec": 54.6,
       "meta_start_time": "2026-03-22T10:41:03.867378+00:00",
       "meta_notes": "INVESTIGATE: Offline 'batch_size' values (8, 32, 128) are client-side concurrency (concurrent requests), not vLLM max_num_seqs. run.log confirms label 'concurrency=N'. vLLM schedules internally by token budget, so client concurrency changes do not significantly affect throughput \u2014 explains observed ~1.4% flatness. Human review needed: confirm whether vLLM max_num_seqs was varied per batch_size or was fixed. Online scenario has no samples.jsonl on disk; percentile ordering (p50<=p90<=p99) verified from result.json values only. Migrated: batch_size \u2192 client_concurrency (2026-03-22)."
+    },
+    "viz": {
+      "type": "suite_A",
+      "offline": {
+        "labels": [
+          "8",
+          "32",
+          "128"
+        ],
+        "throughput": [
+          5321.05,
+          5263.77,
+          5248.24
+        ],
+        "memory_gb": [
+          69.83,
+          69.83,
+          69.83
+        ]
+      },
+      "online": {
+        "labels": [
+          "5",
+          "10",
+          "25",
+          "50",
+          "100"
+        ],
+        "ttft_p50": [
+          87.74,
+          203.7,
+          602.66,
+          8304.08,
+          10154.27
+        ],
+        "ttft_p90": [
+          150.29,
+          16629.39,
+          39543.85,
+          46183.93,
+          46966.51
+        ],
+        "tpot_p50": [
+          34.87,
+          106.26,
+          109.26,
+          97.55,
+          93.23
+        ],
+        "sla_met": [
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "max_valid_qps": 5
+      },
+      "interactive": {
+        "ttft_p50": 47.99,
+        "ttft_p90": 58.64,
+        "ttft_p99": 69.23,
+        "tpot_p50": 12.44,
+        "tpot_p90": 13.3,
+        "tpot_p99": 13.39
+      }
     }
   },
   {
@@ -266,6 +357,69 @@ const LEADERBOARD_DATA = [
       "meta_model_load_sec": 449.1,
       "meta_start_time": "2026-03-22T11:27:42.618692+00:00",
       "meta_notes": "Migrated: batch_size \u2192 client_concurrency (2026-03-22)."
+    },
+    "viz": {
+      "type": "suite_B",
+      "offline": {
+        "labels": [
+          "8",
+          "32",
+          "128"
+        ],
+        "throughput": [
+          2672.77,
+          2686.74,
+          2655.48
+        ],
+        "throughput_per_chip": [
+          668.19,
+          671.68,
+          663.87
+        ],
+        "memory_gb": [
+          67.42,
+          67.42,
+          67.42
+        ]
+      },
+      "online": {
+        "labels": [
+          "1",
+          "2",
+          "5",
+          "10",
+          "25"
+        ],
+        "ttft_p50": [
+          114.87,
+          133.03,
+          276.72,
+          730.62,
+          5262.64
+        ],
+        "ttft_p90": [
+          175.23,
+          225.01,
+          8609.41,
+          46103.45,
+          66928.46
+        ],
+        "tpot_p50": [
+          36.95,
+          47.43,
+          147.62,
+          165.93,
+          164.8
+        ],
+        "sla_met": [
+          true,
+          true,
+          false,
+          false,
+          false
+        ],
+        "max_valid_qps": 2
+      }
     }
   },
   {
@@ -358,6 +512,29 @@ const LEADERBOARD_DATA = [
       "meta_model_load_sec": 65.6,
       "meta_start_time": "2026-03-22T11:56:51.038154+00:00",
       "meta_notes": null
+    },
+    "viz": {
+      "type": "suite_E",
+      "chip_counts": [
+        1,
+        2,
+        4
+      ],
+      "throughput": [
+        6018.79,
+        7860.25,
+        9485.87
+      ],
+      "efficiency_pct": [
+        100.0,
+        65.3,
+        39.4
+      ],
+      "throughput_per_chip": [
+        6018.79,
+        3930.12,
+        2371.47
+      ]
     }
   }
 ];
