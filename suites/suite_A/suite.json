@@ -19,10 +19,14 @@
   "_batch_sizes_note": "For offline scenario: max concurrent requests. Maps to max_num_seqs in vLLM.",
   "online_qps_levels": [5, 10, 25, 50, 100],
   "online_sla_ttft_ms": 500,
+  "online_sla_ttft_ms_relaxed": 2000,
   "num_runs": 3,
   "warmup_runs": 1,
+  "online_warmup_runs": 0,
+  "interactive_warmup_runs": 0 ,
   "accuracy_threshold_delta": 0.03,
   "request_count": 200,
   "_request_count_note": "offline uses 200, online/interactive uses 500 (controlled in loadgen)",
-  "online_request_count": 500
+  "online_request_count": 500,
+  "interactive_request_count": 100
 }

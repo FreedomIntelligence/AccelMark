@@ -8,8 +8,8 @@ ROCm 6.x required.
 Usage:
     python scripts/amd/run_vllm_rocm.py \
         --suite suite_A \
-        --scenario offline \
-        --output-dir ./my_submission/ \
+        --scenario all \
+        --output-dir ./results/community/mi300xx1_llama3-8b_suite-A_2026-03-22 \
         --tensor-parallel-size 1
 """
 

@@ -1,0 +1,6 @@
+{
+  "subset_score": 0.6,
+  "baseline_delta": 0.02,
+  "valid": true,
+  "notes": "Reused from meta-llama-3-8b-instruct_BF16_2026-03-22.json \u2014 same model and precision (BF16)"
+}

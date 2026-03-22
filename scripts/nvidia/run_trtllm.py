@@ -11,8 +11,8 @@ See TensorRT-LLM documentation for model compilation steps.
 Usage:
     python scripts/nvidia/run_trtllm.py \
         --suite suite_A \
-        --scenario offline \
-        --output-dir ./my_submission/ \
+        --scenario all \
+        --output-dir ./results/community/a100x1_llama3-8b_suite-A_2026-03-22 \
         --engine-dir /path/to/compiled/engine/ \
         --tensor-parallel-size 1
 """

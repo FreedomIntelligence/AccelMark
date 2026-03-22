@@ -11,8 +11,8 @@ For training scenario, see the training section at the bottom.
 Usage:
     python scripts/your_platform/run_benchmark.py \
         --suite suite_A \
-        --scenario offline \
-        --output-dir ./my_submission/ \
+        --scenario all \
+        --output-dir ./results/community/chipx1_llama3-8b_suite-A_2026-03-22 \
         --tensor-parallel-size 1
 """
 

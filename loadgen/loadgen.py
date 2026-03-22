@@ -11,6 +11,8 @@ Scenarios:
   training    — step-based measurement, measures training throughput
 """
 
+import asyncio
+import itertools
 import json
 import math
 import random
@@ -66,9 +68,17 @@ class AccelMarkLoadGen:
         # online/interactive: use online_request_count if set, else all requests
         if scenario == "offline":
             count = suite.get("request_count")
-        else:
+            self.warmup_runs = suite.get("warmup_runs", 1)
+        elif scenario == "online":
             # online and interactive need more requests for reliable p99
             count = suite.get("online_request_count", suite.get("request_count"))
+            self.warmup_runs = suite.get("online_warmup_runs", 0)
+        elif scenario == "interactive":
+            count = suite.get("interactive_request_count", suite.get("request_count"))
+            self.warmup_runs = suite.get("interactive_warmup_runs", 0)
+        else:
+            count = suite.get("request_count")
+            self.warmup_runs = suite.get("warmup_runs", 1)
 
         self.requests = requests[:count] if count else requests
 
@@ -87,7 +97,13 @@ class AccelMarkLoadGen:
         elif self.scenario == "online":
             return self._run_online(inference_fn)
         elif self.scenario == "interactive":
-            return self._run_interactive(inference_fn)
+            if not asyncio.iscoroutinefunction(inference_fn):
+                raise TypeError(
+                    "_run_interactive requires an async inference_fn(prompt: str) -> InferenceResult. "
+                    "Pass an async coroutine (e.g. _run_one_streaming from run_vllm.py)."
+                )
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(self._run_interactive_async(inference_fn))
         elif self.scenario == "training":
             return self._run_training(inference_fn)
         elif self.scenario == "multiturn":
@@ -117,7 +133,7 @@ class AccelMarkLoadGen:
         all_samples: list[SampleRecord] = []
         prompts = [r["prompt"] for r in self.requests]
 
-        total_runs = self.suite["num_runs"] + self.suite["warmup_runs"]
+        total_runs = self.suite["num_runs"] + self.warmup_runs
         total_batch_sizes = len(self.suite["batch_sizes"])
 
         total_steps = self.suite["num_runs"] * total_batch_sizes
@@ -125,7 +141,7 @@ class AccelMarkLoadGen:
         print(f"  AccelMark Offline Benchmark")
         print(f"  Requests  : {len(prompts)}")
         print(f"  Max concurrency levels: {self.suite['batch_sizes']}")
-        print(f"  Runs      : {self.suite['num_runs']} (+{self.suite['warmup_runs']} warmup)")
+        print(f"  Runs      : {self.suite['num_runs']} (+{self.warmup_runs} warmup)")
         print(f"{'='*60}\n")
 
         with tqdm(total=total_steps, desc="Overall progress",
@@ -135,12 +151,13 @@ class AccelMarkLoadGen:
 
             for bs_idx, batch_size in enumerate(self.suite["batch_sizes"]):
                 run_throughputs = []
+                run_elapsed_times = []
                 run_samples: list[SampleRecord] = []
 
                 for run_idx in range(total_runs):
-                    is_warmup = run_idx < self.suite["warmup_runs"]
+                    is_warmup = run_idx < self.warmup_runs
                     run_label = "warmup" if is_warmup else \
-                        f"run {run_idx - self.suite['warmup_runs'] + 1}/{self.suite['num_runs']}"
+                        f"run {run_idx - self.warmup_runs + 1}/{self.suite['num_runs']}"
 
                     desc = f"  concurrency={batch_size} ({bs_idx+1}/{total_batch_sizes}) {run_label}"
                     tqdm.write(f"{desc} — sending all {len(prompts)} requests...")
@@ -169,6 +186,7 @@ class AccelMarkLoadGen:
                         continue
 
                     run_throughputs.append(throughput)
+                    run_elapsed_times.append(elapsed)
 
                     per_chip_str = ""
                     if self.chip_count > 1:
@@ -204,6 +222,7 @@ class AccelMarkLoadGen:
                     "batch_size": batch_size,
                     "throughput_tokens_per_sec": round(median_throughput, 2),
                     "throughput_tokens_per_sec_per_chip": round(median_throughput / self.chip_count, 2),
+                    "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1),
                     "peak_memory_gb": None,
                     "power_watts_avg": None,
                     "power_watts_peak": None,
@@ -221,7 +240,27 @@ class AccelMarkLoadGen:
         """
         Poisson arrival at each target QPS level.
         Identifies max QPS where p99 TTFT < suite SLA.
+
+        inference_fn must be an async coroutine: async def fn(prompt: str) -> InferenceResult
+        Requests are dispatched concurrently according to Poisson arrival times so that
+        the engine experiences realistic queueing pressure.
         """
+        if not asyncio.iscoroutinefunction(inference_fn):
+            raise TypeError(
+                "_run_online requires an async inference_fn(prompt: str) -> InferenceResult. "
+                "Pass an async coroutine (e.g. _run_one_streaming from run_vllm.py), "
+                "not a sync wrapper."
+            )
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(self._run_online_async(inference_fn))
+
+    async def _run_online_async(self, async_inference_fn) -> dict:
+        """
+        Async implementation of the online scenario.
+        Generates Poisson arrival times upfront, then fires all requests
+        concurrently via asyncio.gather so the engine sees real concurrent load.
+        """
+        loop = asyncio.get_event_loop()
         sla_ms = self.suite["online_sla_ttft_ms"]
         results_by_qps = []
         all_samples: list[SampleRecord] = []
@@ -232,40 +271,50 @@ class AccelMarkLoadGen:
             print(f"[online] target_qps={target_qps}")
             run_ttfts: list[list[float]] = []
             run_tpots: list[list[float]] = []
+            run_elapsed_times: list[float] = []
 
             for run_idx in range(self.suite["num_runs"]):
-                is_warmup = False  # no warmup for online/interactive
                 run_label = f"run {run_idx + 1}/{self.suite['num_runs']}"
-
-                # Generate Poisson inter-arrival times
                 n = len(prompts)
-                inter_arrivals = [
-                    self._rng.expovariate(target_qps) for _ in range(n)
-                ]
+
+                # Generate all Poisson inter-arrival times upfront
+                inter_arrivals = [self._rng.expovariate(target_qps) for _ in range(n)]
+                arrival_times = list(itertools.accumulate(inter_arrivals))
+
+                t_start = loop.time()
+
+                async def send_request(p: str, t_arrival: float) -> InferenceResult:
+                    delay = t_arrival - (loop.time() - t_start)
+                    if delay > 0:
+                        await asyncio.sleep(delay)
+                    return await async_inference_fn(p)
+
+                tqdm.write(
+                    f"[online] qps={target_qps} {run_label} "
+                    f"— dispatching {n} requests with Poisson arrivals..."
+                )
+
+                # Run all requests concurrently; each sleeps until its arrival time
+                all_results: list[InferenceResult] = list(
+                    await asyncio.gather(
+                        *[send_request(p, t) for p, t in zip(prompts, arrival_times)]
+                    )
+                )
+
+                t_run_end = loop.time()
+                run_elapsed_times.append(t_run_end - t_start)
 
                 ttfts: list[float] = []
                 tpots: list[float] = []
-                t_next = time.perf_counter()
-
-                desc = f"[online] qps={target_qps} {run_label}"
-                for i, prompt in tqdm(enumerate(prompts), desc=desc, total=n, leave=False, unit="req"):
-                    now = time.perf_counter()
-                    sleep_time = t_next - now
-                    if sleep_time > 0:
-                        time.sleep(sleep_time)
-                    t_next += inter_arrivals[i]
-
-                    results = inference_fn([prompt])
-                    r = results[0]
+                for r in all_results:
                     if r.success:
                         if r.first_token_time_ms is not None:
                             ttfts.append(r.first_token_time_ms)
                         tpot = (r.total_time_ms - (r.first_token_time_ms or 0)) / max(r.output_tokens - 1, 1)
                         tpots.append(tpot)
 
-                if not is_warmup:
-                    run_ttfts.append(ttfts)
-                    run_tpots.append(tpots)
+                run_ttfts.append(ttfts)
+                run_tpots.append(tpots)
 
             all_ttfts = [v for run in run_ttfts for v in run]
             all_tpots = [v for run in run_tpots for v in run]
@@ -295,6 +344,7 @@ class AccelMarkLoadGen:
                 "tpot_ms_p50": round(tpot_p50, 2),
                 "tpot_ms_p90": round(tpot_p90, 2),
                 "tpot_ms_p99": round(tpot_p99, 2),
+                "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1),
                 "sla_met": sla_met,
             })
 
@@ -305,25 +355,33 @@ class AccelMarkLoadGen:
     # Interactive scenario
     # ------------------------------------------------------------------
 
-    def _run_interactive(self, inference_fn: Callable) -> dict:
+    async def _run_interactive_async(self, async_inference_fn) -> dict:
         """
-        One request at a time. Measures single-request latency distribution.
+        Send one request at a time, waiting for completion before sending the next.
+        Measures single-request latency in isolation (no queueing pressure).
+        Uses the same async engine as online to ensure consistent TTFT measurement.
         """
         prompts = [r["prompt"] for r in self.requests]
         all_ttfts: list[float] = []
         all_tpots: list[float] = []
         all_samples: list[SampleRecord] = []
+        run_elapsed_times: list[float] = []
 
-        for run_idx in range(self.suite["num_runs"]):
-            is_warmup = False  # no warmup for online/interactive
-            run_label = f"run {run_idx + 1}/{self.suite['num_runs']}"
+        total_runs = self.warmup_runs + self.suite["num_runs"]
+
+        for run_idx in range(total_runs):
+            is_warmup = run_idx < self.warmup_runs
+            run_label = "warmup" if is_warmup else \
+                f"run {run_idx - self.warmup_runs + 1}/{self.suite['num_runs']}"
+
             run_ttfts: list[float] = []
             run_tpots: list[float] = []
+            t_run_start = time.perf_counter()
 
-            desc = f"[interactive] {run_label}"
-            for i, prompt in tqdm(enumerate(prompts), desc=desc, total=len(prompts), leave=False, unit="req"):
-                results = inference_fn([prompt])
-                r = results[0]
+            for i, prompt in enumerate(prompts):
+                # Send one request, await completion before next — true serial
+                r = await async_inference_fn(prompt)
+
                 if r.success:
                     if r.first_token_time_ms is not None:
                         run_ttfts.append(r.first_token_time_ms)
@@ -333,23 +391,42 @@ class AccelMarkLoadGen:
                     if not is_warmup:
                         all_samples.append(SampleRecord(
                             request_id=i, batch_size=1, scenario="interactive",
-                            input_tokens=self.suite.get("input_tokens", self.suite.get("request_distribution", {}).get("input_tokens_p50")),
+                            input_tokens=self.suite.get("input_tokens",
+                                self.suite.get("request_distribution", {}).get("input_tokens_p50")),
                             output_tokens=r.output_tokens,
                             ttft_ms=r.first_token_time_ms,
-                            total_ms=r.total_time_ms, success=True
+                            total_ms=r.total_time_ms,
+                            success=True,
                         ))
 
-            if not is_warmup:
-                all_ttfts.extend(run_ttfts)
-                all_tpots.extend(run_tpots)
-                if run_ttfts:
-                    print(f"  [interactive] {run_label} TTFT_p50={float(np.percentile(run_ttfts, 50)):.1f}ms")
-                all_tpots.extend(run_tpots)
+                # Print progress every 10 requests
+                if (i + 1) % 10 == 0:
+                    tqdm.write(
+                        f"  [interactive] {run_label} {i+1}/{len(prompts)} "
+                        f"— last TTFT: {r.first_token_time_ms:.0f}ms" if r.first_token_time_ms else ""
+                    )
+
+            t_run_end = time.perf_counter()
+            run_elapsed = t_run_end - t_run_start
+
+            if is_warmup:
+                tqdm.write(f"  [warmup] interactive done ({run_elapsed:.0f}s, not recorded)")
+                continue
+
+            all_ttfts.extend(run_ttfts)
+            all_tpots.extend(run_tpots)
+            run_elapsed_times.append(run_elapsed)
+
+            if run_ttfts:
+                tqdm.write(
+                    f"  [interactive] {run_label} — "
+                    f"TTFT p50={float(np.percentile(run_ttfts, 50)):.0f}ms "
+                    f"p99={float(np.percentile(run_ttfts, 99)):.0f}ms "
+                    f"({run_elapsed:.0f}s)"
+                )
 
         sampled = self._rng.sample(all_samples, min(MAX_SAMPLES_PER_CONFIG, len(all_samples)))
         self._write_samples(sampled)
-
-        peak_memory = None  # platform script injects this
 
         return {"interactive": {
             "ttft_ms_p50": round(float(np.percentile(all_ttfts, 50)), 2) if all_ttfts else None,
@@ -358,7 +435,8 @@ class AccelMarkLoadGen:
             "tpot_ms_p50": round(float(np.percentile(all_tpots, 50)), 2) if all_tpots else None,
             "tpot_ms_p90": round(float(np.percentile(all_tpots, 90)), 2) if all_tpots else None,
             "tpot_ms_p99": round(float(np.percentile(all_tpots, 99)), 2) if all_tpots else None,
-            "peak_memory_gb": peak_memory,
+            "peak_memory_gb": None,
+            "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1) if run_elapsed_times else None,
         }}
 
     # ------------------------------------------------------------------

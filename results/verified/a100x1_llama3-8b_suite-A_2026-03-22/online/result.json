@@ -1,0 +1,128 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb_per_chip": 79.3,
+    "interconnect_intra_node": "NVLink",
+    "interconnect_inter_node": null
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Linux-5.15.0-60-generic-x86_64-with-glibc2.35",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_size": 1,
+      "expert_parallel_size": null
+    },
+    "extra_config": null
+  },
+  "metrics": {
+    "online": {
+      "max_valid_qps": 10,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 56.52,
+          "ttft_ms_p90": 80.43,
+          "ttft_ms_p99": 104.37,
+          "tpot_ms_p50": 22.38,
+          "tpot_ms_p90": 29.04,
+          "tpot_ms_p99": 32.95,
+          "elapsed_seconds_median": 111.5,
+          "sla_met": true
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 86.15,
+          "ttft_ms_p90": 128.86,
+          "ttft_ms_p99": 202.24,
+          "tpot_ms_p50": 60.9,
+          "tpot_ms_p90": 73.85,
+          "tpot_ms_p99": 87.8,
+          "elapsed_seconds_median": 68.7,
+          "sla_met": true
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 157.72,
+          "ttft_ms_p90": 24715.52,
+          "ttft_ms_p99": 27325.37,
+          "tpot_ms_p50": 81.72,
+          "tpot_ms_p90": 88.81,
+          "tpot_ms_p99": 121.29,
+          "elapsed_seconds_median": 62.5,
+          "sla_met": false
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 1165.32,
+          "ttft_ms_p90": 35194.1,
+          "ttft_ms_p99": 46616.5,
+          "tpot_ms_p50": 85.31,
+          "tpot_ms_p90": 109.9,
+          "tpot_ms_p99": 573.26,
+          "elapsed_seconds_median": 62.6,
+          "sla_met": false
+        },
+        {
+          "target_qps": 100,
+          "achieved_qps": 100.0,
+          "ttft_ms_p50": 2446.73,
+          "ttft_ms_p90": 44700.3,
+          "ttft_ms_p99": 51364.39,
+          "tpot_ms_p50": 98.78,
+          "tpot_ms_p90": 109.48,
+          "tpot_ms_p99": 863.75,
+          "elapsed_seconds_median": 72.6,
+          "sla_met": false
+        }
+      ]
+    },
+    "derived": {}
+  },
+  "accuracy": {
+    "subset_score": 0.6,
+    "baseline_delta": 0.02,
+    "valid": true,
+    "notes": "Reused from meta-llama-3-8b-instruct_BF16_2026-03-22.json \u2014 same model and precision (BF16)"
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-03-22",
+    "reproduce_script": "scripts/nvidia/run_vllm.py",
+    "env_info_file": "env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-03-22T03:09:54.352764+00:00",
+    "benchmark_end_time": "2026-03-22T03:28:56.976232+00:00",
+    "benchmark_elapsed_minutes": 19.0,
+    "model_load_seconds": 38.5
+  }
+}

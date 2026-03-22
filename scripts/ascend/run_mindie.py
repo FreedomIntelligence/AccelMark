@@ -8,8 +8,8 @@ CANN toolkit with MindIE required.
 Usage:
     python scripts/ascend/run_mindie.py \
         --suite suite_A \
-        --scenario offline \
-        --output-dir ./my_submission/ \
+        --scenario all \
+        --output-dir ./results/community/ascend910bx8_llama3-8b_suite-A_2026-03-22 \
         --npu-ids 0
 """
 

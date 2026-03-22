@@ -3,10 +3,16 @@ AccelMark Accuracy Validator
 Runs the fixed accuracy subset against a model and validates against BF16 baseline.
 
 Usage:
+    # Result is auto-saved to results/accuracy/{model}_{precision}_{date}.json
+    python scripts/run_accuracy.py \
+        --model-path /path/to/Meta-Llama-3-8B-Instruct \
+        --suite suite_A
+
+    # Override output path:
     python scripts/run_accuracy.py \
         --model-path /path/to/model \
-        --output ./my_submission/accuracy.json \
-        [--suite suite_A]
+        --suite suite_A \
+        --output custom/path/accuracy.json \
         [--tensor-parallel-size 1]
 """
 
@@ -23,8 +29,33 @@ BASELINES_FILE = Path("schema/accuracy_baselines.json")
 SUITE_MODEL_MAP = {
     "suite_A": "meta-llama/Meta-Llama-3-8B-Instruct",
     "suite_B": "meta-llama/Meta-Llama-3-70B-Instruct",
-    "suite_D": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "suite_D": "meta-llama/Llama-3.1-8B-Instruct",
 }
+
+
+def _generate_accuracy_path(model_id: str, precision: str) -> Path:
+    """
+    Auto-generate a standardized path for storing accuracy results.
+
+    Format: results/accuracy/{model_short}_{precision}_{date}.json
+
+    Examples:
+        meta-llama/Meta-Llama-3-8B-Instruct + BF16
+        -> results/accuracy/meta-llama-3-8b-instruct_BF16_2026-03-22.json
+    """
+    from datetime import date
+
+    model_short = model_id.split("/")[-1].lower()
+    model_short = re.sub(r"[^a-z0-9\-\.]", "-", model_short)
+    model_short = re.sub(r"-(instruct|chat|hf|base|v\d[\d\.]*)$", "", model_short)
+    model_short = model_short.strip("-")[:40]
+    # "Llama-3.1-8B-Instruct" -> "llama-3.1-8b"
+    # "Meta-Llama-3-8B-Instruct" -> "meta-llama-3-8b"
+
+    date_str = date.today().strftime("%Y-%m-%d")
+    filename = f"{model_short}_{precision}_{date_str}.json"
+
+    return Path("results") / "accuracy" / filename
 
 
 def load_questions() -> list[dict]:
@@ -124,14 +155,38 @@ def run_accuracy(model_path: str, tp_size: int) -> tuple[float, int]:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-path", required=True)
-    parser.add_argument("--output", required=True)
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help=(
+            "Path to write accuracy result. "
+            "If not specified, auto-saved to "
+            "results/accuracy/{model}_{precision}_{date}.json"
+        ),
+    )
     parser.add_argument("--suite", default="suite_A")
     parser.add_argument("--tensor-parallel-size", type=int, default=1)
     args = parser.parse_args()
 
+    # Resolve output path
+    model_id = SUITE_MODEL_MAP.get(args.suite, "unknown")
+    if args.output is None:
+        suite_path = Path(f"suites/{args.suite}/suite.json")
+        precision = "BF16"
+        if suite_path.exists():
+            with open(suite_path) as f:
+                suite = json.load(f)
+            precision = suite.get("precision_required", "BF16")
+        output_path = _generate_accuracy_path(model_id, precision)
+    else:
+        output_path = Path(args.output)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Accuracy result will be saved to: {output_path}")
+
     score, n_questions = run_accuracy(args.model_path, args.tensor_parallel_size)
 
-    model_id = SUITE_MODEL_MAP.get(args.suite)
     baseline_score = None
     baseline_delta = None
     valid = True
@@ -161,11 +216,9 @@ def main():
         "notes": None if valid else f"Score {score:.4f} deviates from baseline {baseline_score:.4f} by {baseline_delta:.4f}",
     }
 
-    out_path = Path(args.output)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_path, "w") as f:
+    with open(output_path, "w") as f:
         json.dump(accuracy, f, indent=2)
-    print(f"Accuracy results written to {out_path}")
+    print(f"Saved to: {output_path}")
 
     if not valid:
         print("WARNING: Accuracy below threshold — submission will be flagged")

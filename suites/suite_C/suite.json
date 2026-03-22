@@ -1,8 +1,8 @@
 {
   "suite_id": "suite_C",
   "description": "Multi-chip training throughput, Llama-3-8B.",
-  "model_id": "meta-llama/Meta-Llama-3-8B",
-  "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
+  "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
   "scenarios": ["training"],
   "precision_required": "BF16",
   "sequence_length": 4096,

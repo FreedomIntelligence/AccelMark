@@ -1,10 +1,10 @@
 """
 AccelMark Environment Collector
 Automatically collects hardware and software environment information.
-Run this before every benchmark submission.
+Called automatically by the benchmark script — no need to run manually.
 
 Usage:
-    python scripts/collect_env.py --output ./my_submission/env_info.json
+    python scripts/collect_env.py --output ./results/community/<dir>/env_info.json
 """
 
 import argparse

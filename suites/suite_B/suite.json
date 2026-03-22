@@ -2,7 +2,7 @@
   "suite_id": "suite_B",
   "description": "Multi-chip inference, Llama-3-70B-Instruct. Tests inter-chip communication overhead.",
   "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
-  "model_revision": "TO_BE_LOCKED_AT_LAUNCH",
+  "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
   "scenarios": ["offline", "online"],
   "precision_required": "BF16",
   "request_distribution": {

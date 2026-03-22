@@ -3,7 +3,7 @@ AccelMark Submission Validator
 Validates all files in a submission directory before opening a PR.
 
 Usage:
-    python scripts/validate_submission.py --dir ./my_submission/
+    python scripts/validate_submission.py --dir results/community/a100x1_llama3-8b_suite-A_2026-03-22
     Exit code 0 = ready to submit. Exit code 1 = fix required.
 """
 
@@ -57,10 +57,17 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
 
     # referenced files must exist
     meta = result.get("meta", {})
+    scenario_subdirs = ["offline", "online", "interactive", "training"]
     for field in ["reproduce_script", "env_info_file", "log_file"]:
         ref = meta.get(field)
-        if ref and not Path(ref).exists() and not (result_dir / Path(ref).name).exists():
-            failures.append(f"meta.{field} references '{ref}' which does not exist")
+        if not ref:
+            continue
+        ref_name = Path(ref).name
+        if (Path(ref).exists()
+                or (result_dir / ref_name).exists()
+                or any((result_dir / s / ref_name).exists() for s in scenario_subdirs)):
+            continue
+        failures.append(f"meta.{field} references '{ref}' which does not exist")
 
     # model_revision must not be placeholder
     model_revision = result.get("model", {}).get("model_revision", "")
@@ -123,6 +130,67 @@ def compute_derived(result: dict) -> dict:
     return result
 
 
+def check_env_info(submission_dir: Path) -> list[str]:
+    errors = []
+
+    # Check top-level first
+    env_info_path = submission_dir / "env_info.json"
+    if env_info_path.exists():
+        return errors  # found at top level, OK
+
+    # For suite-level submissions, check inside scenario subdirs
+    for scenario in ["offline", "online", "interactive", "training"]:
+        scenario_env = submission_dir / scenario / "env_info.json"
+        if scenario_env.exists():
+            return errors  # found in scenario subdir, OK
+
+    errors.append(
+        "env_info.json not found — run scripts/collect_env.py first, "
+        "or ensure it exists in a scenario subdirectory"
+    )
+    return errors
+
+
+def find_env_info(submission_dir: Path) -> Path | None:
+    """Return path to env_info.json, checking top-level then scenario subdirs."""
+    top = submission_dir / "env_info.json"
+    if top.exists():
+        return top
+    for scenario in ["offline", "online", "interactive", "training"]:
+        candidate = submission_dir / scenario / "env_info.json"
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def check_accuracy(submission_dir: Path, result: dict) -> list[str]:
+    errors = []
+
+    # Check top-level first
+    acc_path = submission_dir / "accuracy.json"
+    if not acc_path.exists():
+        # For suite-level, check scenario subdirs
+        for scenario in ["offline", "online", "interactive"]:
+            scenario_acc = submission_dir / scenario / "accuracy.json"
+            if scenario_acc.exists():
+                acc_path = scenario_acc
+                break
+
+    if not acc_path.exists():
+        errors.append("accuracy.json not found — run scripts/run_accuracy.py first")
+        return errors
+
+    with open(acc_path) as f:
+        acc = json.load(f)
+
+    if not acc.get("valid"):
+        errors.append(
+            f"accuracy.valid is false (score={acc.get('subset_score')}) "
+            f"— model output quality check failed"
+        )
+    return errors
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dir", required=True)
@@ -130,7 +198,6 @@ def main():
 
     result_dir = Path(args.dir)
     result_path = result_dir / "result.json"
-    env_path = result_dir / "env_info.json"
 
     all_errors = []
     all_warnings = []
@@ -154,12 +221,16 @@ def main():
         print("Derived metrics computed and written to result.json")
 
     # --- Validate env_info.json ---
-    if not env_path.exists():
-        all_errors.append("env_info.json not found — run scripts/collect_env.py first")
-    else:
+    env_errors = check_env_info(result_dir)
+    all_errors.extend(env_errors)
+    if not env_errors:
+        env_path = find_env_info(result_dir)
         env = load_json(env_path)
         env_schema = load_schema("env.schema.json")
         all_errors.extend(validate_schema(env, env_schema, "env_info.json"))
+
+    # --- Validate accuracy.json ---
+    all_errors.extend(check_accuracy(result_dir, result))
 
     # --- Report ---
     if all_warnings:
