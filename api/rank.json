@@ -1,1 +1,9 @@
-{}
+{
+  "a100x1_llama3-8b_suite-A_2026-03-22": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "best_throughput_tokens_per_sec": 6123.26
+  }
+}
