@@ -883,7 +883,7 @@
       </div>`;
   }
 
-  function openModal(row) {
+  function _fillModal(row) {
     const d = row.detail || {};
 
     document.getElementById('modal-title').textContent =
@@ -1007,8 +1007,7 @@
     _activeCharts = [];
   }
 
-  // ── Override openModal to also set up viz ─────────────────
-  const _origOpenModal = openModal;
+  // ── openModal: reset viz state, then populate details ────
   function openModal(row) {
     destroyCharts();
     _activeTab = 'details';
@@ -1027,7 +1026,7 @@
     }
 
     _pendingViz = row;
-    _origOpenModal(row);
+    _fillModal(row);
   }
 
   // ── Chart helpers ─────────────────────────────────────────
@@ -1044,17 +1043,21 @@
     white:  '#e6edf3',
   };
 
-  function baseOpts(yLabel, yFormat) {
+  function baseOpts(yLabel, yFormat, xLabel) {
     return {
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+        x: {
+          ticks: { color: C.text, font: { size: 11 } },
+          grid:  { color: C.grid },
+          title: { display: !!xLabel, text: xLabel || '', color: C.text, font: { size: 11 } },
+        },
         y: {
           ticks: { color: C.text, font: { size: 11 }, callback: yFormat || (v => v) },
-          grid: { color: C.grid },
-          title: { display: !!yLabel, text: yLabel || '', color: C.text, font: { size: 11 } }
+          grid:  { color: C.grid },
+          title: { display: !!yLabel, text: yLabel || '', color: C.text, font: { size: 11 } },
         }
       }
     };
@@ -1133,7 +1136,7 @@
             borderRadius: 3,
           }]
         },
-        options: { ...baseOpts('tokens / sec', v => v.toLocaleString()), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } } }
+        options: baseOpts('tokens / sec', v => v.toLocaleString(), 'concurrency')
       }));
     }
 
@@ -1166,9 +1169,7 @@
             { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal, backgroundColor: C.teal+'33', tension: 0.3, pointRadius: 4, fill: false },
           ]
         },
-        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
-        }
+        options: baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms', 'target QPS')
       }));
       // custom legend
       const leg = document.createElement('div');
@@ -1269,9 +1270,7 @@
             { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal,  backgroundColor: C.teal+'33',  tension: 0.3, pointRadius: 4, fill: false },
           ]
         },
-        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
-        }
+        options: baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms', 'target QPS')
       }));
       const leg = document.createElement('div');
       leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
@@ -1361,10 +1360,7 @@
             borderRadius: 3,
           }]
         },
-        options: {
-          ...baseOpts('tokens / sec', v => v.toLocaleString()),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } }
-        }
+        options: baseOpts('tokens / sec', v => v.toLocaleString(), 'concurrency')
       }));
     }
   }
@@ -1435,11 +1431,12 @@
             }]
           },
           options: {
-            ...baseOpts('quality efficiency', v => v != null ? (v * 100).toFixed(0) + '%' : ''),
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
             scales: {
-              ...baseOpts().scales,
-              y: { ...baseOpts().scales.y, min: 0, max: 1.1,
-                   ticks: { color: C.text, font: { size: 11 }, callback: v => (v * 100).toFixed(0) + '%' } },
+              x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+              y: { min: 0, max: 1.1, ticks: { color: C.text, font: { size: 11 }, callback: v => (v * 100).toFixed(0) + '%' }, grid: { color: C.grid }, title: { display: true, text: 'quality efficiency', color: C.text, font: { size: 11 } } },
             }
           }
         }));
@@ -1497,10 +1494,12 @@
         ]
       },
       options: {
-        ...baseOpts('efficiency %', v => v + '%'),
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-          y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: v => v + '%' }, grid: { color: C.grid } }
+          y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: v => v + '%' }, grid: { color: C.grid }, title: { display: true, text: 'efficiency %', color: C.text, font: { size: 11 } } },
         }
       }
     }));
