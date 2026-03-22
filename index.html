@@ -355,6 +355,18 @@
   <div>Last updated: <span id="stat-date">—</span></div>
 </div>
 
+<details style="padding:0.75rem 2rem;border-bottom:1px solid #21262d;font-size:0.82rem;color:#8b949e;cursor:pointer">
+  <summary style="color:#e6edf3;font-weight:500;list-style:none;display:flex;align-items:center;gap:0.5rem">
+    <span style="font-size:0.75rem;background:#21262d;padding:0.15rem 0.5rem;border-radius:4px">?</span> Suite descriptions
+  </summary>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem 2rem;margin-top:0.75rem">
+    <div><span style="color:#58a6ff;font-weight:500">Suite A</span> — Single chip, Llama-3-8B. How fast is this chip at inference? Primary metric: offline tokens/sec.</div>
+    <div><span style="color:#58a6ff;font-weight:500">Suite B</span> — Flexible chips, Llama-3-70B. Can this chip serve large models? Tests multi-chip setups required for 70B.</div>
+    <div><span style="color:#58a6ff;font-weight:500">Suite C</span> — Single chip, Llama-3-8B. Quantization speed/quality tradeoff across BF16, INT8, INT4.</div>
+    <div><span style="color:#58a6ff;font-weight:500">Suite D</span> — Single chip, Llama-3.1-8B. How does this chip handle 32K-token long-context inputs?</div>
+    <div><span style="color:#58a6ff;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
+  </div>
+</details>
 <div class="controls">
   <select id="filter-vendor">
     <option value="">All vendors</option>
@@ -378,6 +390,14 @@
     <option value="2">2 chips</option>
     <option value="4">4 chips</option>
     <option value="8">8 chips</option>
+  </select>
+  <select id="filter-suite">
+    <option value="">All suites</option>
+    <option value="suite_A">Suite A — single chip inference speed</option>
+    <option value="suite_B">Suite B — large model serving</option>
+    <option value="suite_C">Suite C — quantization tradeoff</option>
+    <option value="suite_D">Suite D — long context (32K)</option>
+    <option value="suite_E">Suite E — multi-chip scaling</option>
   </select>
   <input id="search" type="text" placeholder="Search chip or model…" style="width:200px">
   <div class="view-toggle">
@@ -470,12 +490,14 @@
     const tier     = document.getElementById('filter-tier').value;
     const search   = document.getElementById('search').value.toLowerCase();
     const chips    = document.getElementById('filter-chips').value;
+    const suite    = document.getElementById('filter-suite').value;
 
     return LEADERBOARD_DATA.filter(row => {
       if (vendor   && row.vendor   !== vendor)   return false;
       if (scenario && row.scenario !== scenario) return false;
       if (tier     && row.tier     !== tier)     return false;
       if (chips && String(row.chip_count || 1) !== chips) return false;
+      if (suite    && row.suite    !== suite)    return false;
       if (search) {
         const haystack = `${row.chip} ${row.model} ${row.framework}`.toLowerCase();
         if (!haystack.includes(search)) return false;
@@ -494,7 +516,7 @@
     });
   }
 
-  ['filter-vendor','filter-scenario','filter-tier','filter-chips','search'].forEach(id => {
+  ['filter-vendor','filter-scenario','filter-tier','filter-chips','filter-suite','search'].forEach(id => {
     document.getElementById(id).addEventListener('change', render);
     document.getElementById(id).addEventListener('input', render);
   });
@@ -549,12 +571,13 @@
     const container = document.getElementById('cards-container');
     container.innerHTML = '';
 
-    // Group by chip, take best result per chip
+    // Group by chip+suite, take best result per group
     const byChip = {};
     rows.forEach(row => {
       if (!row.chip) return;
-      if (!byChip[row.chip] || (row.primary_metric || 0) > (byChip[row.chip].primary_metric || 0)) {
-        byChip[row.chip] = row;
+      const key = (row.chip || '') + '||' + (row.suite || '');
+      if (!byChip[key] || (row.primary_metric || 0) > (byChip[key].primary_metric || 0)) {
+        byChip[key] = row;
       }
     });
 
@@ -595,6 +618,7 @@
             <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
           `}
         </div>
+        <div style="font-size:0.75rem;color:#388bfd;font-weight:500;margin-bottom:0.25rem">${row.suite || ''}</div>
         <div class="card-model">${row.model || ''} · ${row.framework || ''} · ${row.precision || ''}</div>
         ${row.suite === 'suite_E' ? `
             <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
