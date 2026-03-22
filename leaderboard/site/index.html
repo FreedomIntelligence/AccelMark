@@ -340,6 +340,81 @@
     }
 
     .modal-footer a:hover { text-decoration: underline; }
+
+    .modal-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #21262d;
+      padding: 0 1.5rem;
+      background: #161b22;
+    }
+
+    .modal-tab {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #8b949e;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-bottom: -1px;
+    }
+
+    .modal-tab.active {
+      color: #e6edf3;
+      border-bottom-color: #1f6feb;
+    }
+
+    .modal-tab:hover:not(.active) { color: #c9d1d9; }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .chart-section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8b949e;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .chart-section-title:first-child { margin-top: 0; }
+
+    .stat-chips {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .stat-chip {
+      background: #0d1117;
+      border-radius: 6px;
+      padding: 8px 12px;
+    }
+
+    .stat-chip-label { font-size: 11px; color: #8b949e; margin: 0 0 2px; }
+    .stat-chip-value { font-size: 16px; font-weight: 600; color: #e6edf3; margin: 0; }
+    .stat-chip-value.blue  { color: #58a6ff; }
+    .stat-chip-value.green { color: #56d364; }
+    .stat-chip-value.teal  { color: #1D9E75; }
+    .stat-chip-value.amber { color: #d29922; }
+    .stat-chip-value.coral { color: #D85A30; }
+
+    .sla-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .sla-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sla-dot.pass { background: #56d364; }
+    .sla-dot.fail { background: #f85149; }
   </style>
 </head>
 <body>
@@ -455,7 +530,12 @@
       </div>
       <button class="modal-close" onclick="closeModalDirect()">✕</button>
     </div>
+    <div class="modal-tabs" id="modal-tabs">
+      <button class="modal-tab active" id="tab-details" onclick="switchTab('details')">Details</button>
+      <button class="modal-tab" id="tab-viz" onclick="switchTab('viz')">Visualize</button>
+    </div>
     <div class="modal-body" id="modal-body"></div>
+    <div class="modal-body" id="modal-viz" style="display:none"></div>
     <div class="modal-footer">
       <span id="modal-submission">—</span>
       <a id="modal-script-link" href="#" target="_blank" style="display:none">View reproduce script ↗</a>
@@ -464,6 +544,7 @@
 </div>
 
 <script src="leaderboard.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
   // ── State ────────────────────────────────────────────────
   let currentView = 'consumer';
@@ -901,6 +982,558 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModalDirect();
   });
+
+  // ── Tab switching ─────────────────────────────────────────
+  let _activeTab = 'details';
+  let _activeCharts = [];
+
+  function switchTab(tab) {
+    _activeTab = tab;
+    document.getElementById('modal-body').style.display  = tab === 'details' ? '' : 'none';
+    document.getElementById('modal-viz').style.display   = tab === 'viz'     ? '' : 'none';
+    document.getElementById('tab-details').classList.toggle('active', tab === 'details');
+    document.getElementById('tab-viz').classList.toggle('active', tab === 'viz');
+    if (tab === 'viz' && _pendingViz) {
+      renderViz(_pendingViz);
+      _pendingViz = null;
+    }
+  }
+
+  let _pendingViz = null;
+
+  // ── Destroy existing charts ───────────────────────────────
+  function destroyCharts() {
+    _activeCharts.forEach(c => { try { c.destroy(); } catch(e) {} });
+    _activeCharts = [];
+  }
+
+  // ── Override openModal to also set up viz ─────────────────
+  const _origOpenModal = openModal;
+  function openModal(row) {
+    destroyCharts();
+    _activeTab = 'details';
+    document.getElementById('modal-body').style.display = '';
+    document.getElementById('modal-viz').style.display  = 'none';
+    document.getElementById('tab-details').classList.add('active');
+    document.getElementById('tab-viz').classList.remove('active');
+
+    const suite = row.suite || '';
+    const tabBtn = document.getElementById('tab-viz');
+    if (row.viz && row.viz.type !== 'none') {
+      tabBtn.style.display = '';
+      tabBtn.textContent = 'Visualize';
+    } else {
+      tabBtn.style.display = 'none';
+    }
+
+    _pendingViz = row;
+    _origOpenModal(row);
+  }
+
+  // ── Chart helpers ─────────────────────────────────────────
+  const C = {
+    blue:   '#378ADD',
+    teal:   '#1D9E75',
+    amber:  '#EF9F27',
+    coral:  '#D85A30',
+    gray:   '#888780',
+    green:  '#56d364',
+    red:    '#f85149',
+    grid:   '#21262d',
+    text:   '#8b949e',
+    white:  '#e6edf3',
+  };
+
+  function baseOpts(yLabel, yFormat) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+        y: {
+          ticks: { color: C.text, font: { size: 11 }, callback: yFormat || (v => v) },
+          grid: { color: C.grid },
+          title: { display: !!yLabel, text: yLabel || '', color: C.text, font: { size: 11 } }
+        }
+      }
+    };
+  }
+
+  function mkCanvas(id, height) {
+    const wrap = document.createElement('div');
+    wrap.className = 'chart-wrap';
+    wrap.style.height = height + 'px';
+    const c = document.createElement('canvas');
+    c.id = id;
+    wrap.appendChild(c);
+    return { wrap, canvas: c };
+  }
+
+  function sectionTitle(text) {
+    const d = document.createElement('div');
+    d.className = 'chart-section-title';
+    d.textContent = text;
+    return d;
+  }
+
+  function statChips(items) {
+    const grid = document.createElement('div');
+    grid.className = 'stat-chips';
+    items.forEach(({ label, value, cls }) => {
+      grid.innerHTML += `<div class="stat-chip">
+        <p class="stat-chip-label">${label}</p>
+        <p class="stat-chip-value ${cls||''}">${value != null ? value : '—'}</p>
+      </div>`;
+    });
+    return grid;
+  }
+
+  // ── Viz renderers ─────────────────────────────────────────
+  function renderViz(row) {
+    const viz = row.viz || {};
+    const container = document.getElementById('modal-viz');
+    container.innerHTML = '';
+
+    if (!viz || viz.type === 'none') {
+      container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">No visualization available for this suite.</div>';
+      return;
+    }
+
+    if (viz.type === 'suite_A') renderSuiteA(container, viz, row);
+    else if (viz.type === 'suite_B') renderSuiteB(container, viz, row);
+    else if (viz.type === 'suite_C') renderSuiteC(container, viz, row);
+    else if (viz.type === 'suite_D') renderSuiteD(container, viz, row);
+    else if (viz.type === 'suite_E') renderSuiteE(container, viz, row);
+    else container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">Visualization coming soon.</div>';
+  }
+
+  // Suite A ─────────────────────────────────────────────────
+  function renderSuiteA(el, viz, row) {
+    // ── Offline throughput ──
+    if (viz.offline && viz.offline.labels.length) {
+      el.appendChild(sectionTitle('Offline — throughput by concurrency'));
+      el.appendChild(statChips([
+        { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'blue' },
+        { label: 'Peak memory', value: row.peak_memory_gb ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
+        { label: 'Memory util.', value: row.memory_utilization_pct ? row.memory_utilization_pct.toFixed(1) + '%' : null },
+      ]));
+      const { wrap, canvas } = mkCanvas('viz-offline', 180);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: viz.offline.labels,
+          datasets: [{
+            label: 'Throughput (tok/s)',
+            data: viz.offline.throughput,
+            backgroundColor: C.blue + '99',
+            borderColor: C.blue,
+            borderWidth: 1,
+            borderRadius: 3,
+          }]
+        },
+        options: { ...baseOpts('tokens / sec', v => v.toLocaleString()), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } } }
+      }));
+    }
+
+    // ── Online latency ──
+    if (viz.online && viz.online.labels.length) {
+      el.appendChild(sectionTitle('Online — TTFT & TPOT by QPS'));
+
+      // SLA summary
+      const slaDiv = document.createElement('div');
+      slaDiv.style.cssText = 'margin-bottom:10px;font-size:12px;';
+      viz.online.labels.forEach((qps, i) => {
+        const pass = viz.online.sla_met[i];
+        slaDiv.innerHTML += `<span class="sla-row" style="display:inline-flex;margin-right:12px">
+          <span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>
+          <span style="color:#8b949e">${qps} QPS</span>
+          <span style="color:${pass ? C.green : C.red}">${pass ? 'SLA met' : 'SLA fail'}</span>
+        </span>`;
+      });
+      el.appendChild(slaDiv);
+
+      const { wrap, canvas } = mkCanvas('viz-online', 200);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: viz.online.labels,
+          datasets: [
+            { label: 'TTFT p50', data: viz.online.ttft_p50, borderColor: C.blue, backgroundColor: C.blue+'33', tension: 0.3, pointRadius: 4, fill: false },
+            { label: 'TTFT p90', data: viz.online.ttft_p90, borderColor: C.coral, backgroundColor: C.coral+'33', tension: 0.3, pointRadius: 4, fill: false, borderDash: [4,3] },
+            { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal, backgroundColor: C.teal+'33', tension: 0.3, pointRadius: 4, fill: false },
+          ]
+        },
+        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
+          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
+        }
+      }));
+      // custom legend
+      const leg = document.createElement('div');
+      leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
+      leg.innerHTML = `
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.blue};display:inline-block"></span>TTFT p50</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.coral};display:inline-block"></span>TTFT p90</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>TPOT p50</span>`;
+      el.appendChild(leg);
+    }
+
+    // ── Interactive ──
+    if (viz.interactive && viz.interactive.ttft_p50 != null) {
+      el.appendChild(sectionTitle('Interactive — single request latency'));
+      el.appendChild(statChips([
+        { label: 'TTFT p50',  value: viz.interactive.ttft_p50  != null ? viz.interactive.ttft_p50.toFixed(1)  + ' ms' : null, cls: 'blue' },
+        { label: 'TTFT p90',  value: viz.interactive.ttft_p90  != null ? viz.interactive.ttft_p90.toFixed(1)  + ' ms' : null },
+        { label: 'TTFT p99',  value: viz.interactive.ttft_p99  != null ? viz.interactive.ttft_p99.toFixed(1)  + ' ms' : null },
+        { label: 'TPOT p50',  value: viz.interactive.tpot_p50  != null ? viz.interactive.tpot_p50.toFixed(1)  + ' ms' : null, cls: 'green' },
+        { label: 'TPOT p99',  value: viz.interactive.tpot_p99  != null ? viz.interactive.tpot_p99.toFixed(1)  + ' ms' : null },
+      ]));
+    }
+  }
+
+  // Suite B ─────────────────────────────────────────────────
+  function renderSuiteB(el, viz, row) {
+    // ── Offline: total + per-chip throughput grouped bars ──
+    if (viz.offline && viz.offline.labels.length) {
+      el.appendChild(sectionTitle('Offline — throughput by concurrency'));
+      el.appendChild(statChips([
+        { label: 'Peak total',   value: row.offline_throughput      ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s' : null, cls: 'blue' },
+        { label: 'Per chip',     value: row.tokens_per_sec_per_chip ? row.tokens_per_sec_per_chip.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s' : null, cls: 'teal' },
+        { label: 'Peak memory',  value: row.peak_memory_gb          ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
+        { label: 'Memory util.', value: row.memory_utilization_pct  ? row.memory_utilization_pct.toFixed(1) + '%' : null },
+      ]));
+      const { wrap, canvas } = mkCanvas('viz-b-offline', 200);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: viz.offline.labels,
+          datasets: [
+            {
+              label: 'Total (tok/s)',
+              data: viz.offline.throughput,
+              backgroundColor: C.blue + '99',
+              borderColor: C.blue,
+              borderWidth: 1,
+              borderRadius: 3,
+            },
+            {
+              label: 'Per chip (tok/s)',
+              data: viz.offline.throughput_per_chip,
+              backgroundColor: C.teal + '99',
+              borderColor: C.teal,
+              borderWidth: 1,
+              borderRadius: 3,
+            },
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true, labels: { color: C.text, font: { size: 11 } } } },
+          scales: {
+            x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid },
+                 title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } },
+            y: { ticks: { color: C.text, font: { size: 11 }, callback: v => v.toLocaleString() }, grid: { color: C.grid },
+                 title: { display: true, text: 'tokens / sec', color: C.text, font: { size: 11 } } },
+          }
+        }
+      }));
+    }
+
+    // ── Online latency ──
+    if (viz.online && viz.online.labels.length) {
+      el.appendChild(sectionTitle('Online — TTFT & TPOT by QPS'));
+      const slaDiv = document.createElement('div');
+      slaDiv.style.cssText = 'margin-bottom:10px;font-size:12px;';
+      viz.online.labels.forEach((qps, i) => {
+        const pass = viz.online.sla_met[i];
+        slaDiv.innerHTML += `<span class="sla-row" style="display:inline-flex;margin-right:12px">
+          <span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>
+          <span style="color:#8b949e">${qps} QPS</span>
+          <span style="color:${pass ? C.green : C.red}">${pass ? 'SLA met' : 'SLA fail'}</span>
+        </span>`;
+      });
+      el.appendChild(slaDiv);
+      const { wrap, canvas } = mkCanvas('viz-b-online', 200);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: viz.online.labels,
+          datasets: [
+            { label: 'TTFT p50', data: viz.online.ttft_p50, borderColor: C.blue,  backgroundColor: C.blue+'33',  tension: 0.3, pointRadius: 4, fill: false },
+            { label: 'TTFT p90', data: viz.online.ttft_p90, borderColor: C.coral, backgroundColor: C.coral+'33', tension: 0.3, pointRadius: 4, fill: false, borderDash: [4,3] },
+            { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal,  backgroundColor: C.teal+'33',  tension: 0.3, pointRadius: 4, fill: false },
+          ]
+        },
+        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
+          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
+        }
+      }));
+      const leg = document.createElement('div');
+      leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
+      leg.innerHTML = `
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.blue};display:inline-block"></span>TTFT p50</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.coral};display:inline-block"></span>TTFT p90</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>TPOT p50</span>`;
+      el.appendChild(leg);
+    }
+  }
+
+  // Suite D ─────────────────────────────────────────────────
+  function renderSuiteD(el, viz, row) {
+    // ── Interactive latency — prominent (32K prefill story) ──
+    if (viz.interactive && viz.interactive.ttft_p50 != null) {
+      el.appendChild(sectionTitle('Long-context latency (32K input tokens)'));
+      el.appendChild(statChips([
+        { label: 'TTFT p50', value: viz.interactive.ttft_p50 != null ? viz.interactive.ttft_p50.toFixed(0) + ' ms' : null, cls: 'blue' },
+        { label: 'TTFT p90', value: viz.interactive.ttft_p90 != null ? viz.interactive.ttft_p90.toFixed(0) + ' ms' : null, cls: 'blue' },
+        { label: 'TTFT p99', value: viz.interactive.ttft_p99 != null ? viz.interactive.ttft_p99.toFixed(0) + ' ms' : null, cls: 'blue' },
+        { label: 'TPOT p50', value: viz.interactive.tpot_p50 != null ? viz.interactive.tpot_p50.toFixed(1) + ' ms' : null, cls: 'teal' },
+        { label: 'TPOT p90', value: viz.interactive.tpot_p90 != null ? viz.interactive.tpot_p90.toFixed(1) + ' ms' : null, cls: 'teal' },
+        { label: 'TPOT p99', value: viz.interactive.tpot_p99 != null ? viz.interactive.tpot_p99.toFixed(1) + ' ms' : null, cls: 'teal' },
+      ]));
+      // Horizontal bar: TTFT p50/p90/p99 (blue) · TPOT p50/p90/p99 (teal)
+      const iv = viz.interactive;
+      const { wrap, canvas } = mkCanvas('viz-d-latency', 240);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: ['TTFT p50', 'TTFT p90', 'TTFT p99', 'TPOT p50', 'TPOT p90', 'TPOT p99'],
+          datasets: [
+            {
+              label: 'TTFT — prefill',
+              data: [iv.ttft_p50, iv.ttft_p90, iv.ttft_p99, null, null, null],
+              backgroundColor: C.blue + '99',
+              borderColor: C.blue,
+              borderWidth: 1,
+              borderRadius: 3,
+            },
+            {
+              label: 'TPOT — decode',
+              data: [null, null, null, iv.tpot_p50, iv.tpot_p90, iv.tpot_p99],
+              backgroundColor: C.teal + '99',
+              borderColor: C.teal,
+              borderWidth: 1,
+              borderRadius: 3,
+            },
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true, labels: { color: C.text, font: { size: 11 } } } },
+          scales: {
+            x: {
+              ticks: { color: C.text, font: { size: 11 }, callback: v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms' },
+              grid: { color: C.grid },
+              title: { display: true, text: 'latency', color: C.text, font: { size: 11 } },
+            },
+            y: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+          }
+        }
+      }));
+    }
+
+    // ── Offline throughput (secondary) ──
+    if (viz.offline && viz.offline.labels.length) {
+      el.appendChild(sectionTitle('Offline throughput (32K context)'));
+      el.appendChild(statChips([
+        { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s' : null, cls: 'blue' },
+        { label: 'Peak memory',     value: row.peak_memory_gb    ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
+      ]));
+      const { wrap, canvas } = mkCanvas('viz-d-offline', 160);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: viz.offline.labels,
+          datasets: [{
+            data: viz.offline.throughput,
+            backgroundColor: C.blue + '99',
+            borderColor: C.blue,
+            borderWidth: 1,
+            borderRadius: 3,
+          }]
+        },
+        options: {
+          ...baseOpts('tokens / sec', v => v.toLocaleString()),
+          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } }
+        }
+      }));
+    }
+  }
+
+  // Suite C ─────────────────────────────────────────────────
+  function renderSuiteC(el, viz, row) {
+    el.appendChild(sectionTitle('Throughput by precision'));
+    el.appendChild(statChips([
+      { label: 'BF16 baseline', value: row.quant_bf16_throughput ? row.quant_bf16_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null },
+      { label: 'INT8 speedup',  value: row.quant_int8_speedup  != null ? row.quant_int8_speedup.toFixed(2)  + '×' : null, cls: 'blue' },
+      { label: 'INT4 speedup',  value: row.quant_int4_speedup  != null ? row.quant_int4_speedup.toFixed(2)  + '×' : null, cls: 'amber' },
+      { label: 'INT8 quality eff.', value: row.quant_int8_quality_eff != null ? (row.quant_int8_quality_eff*100).toFixed(1) + '%' : null },
+      { label: 'INT4 quality eff.', value: row.quant_int4_quality_eff != null ? (row.quant_int4_quality_eff*100).toFixed(1) + '%' : null },
+    ]));
+
+    if (viz.labels && viz.labels.length) {
+      const { wrap, canvas } = mkCanvas('viz-quant-thr', 180);
+      el.appendChild(wrap);
+      const colors = { BF16: C.gray, INT8: C.blue, INT4: C.amber };
+      _activeCharts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: viz.labels,
+          datasets: [{
+            data: viz.throughput,
+            backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
+            borderColor: viz.labels.map(l => colors[l] || C.gray),
+            borderWidth: 1, borderRadius: 3,
+          }]
+        },
+        options: baseOpts('tokens / sec', v => v ? v.toLocaleString() : '')
+      }));
+
+      if (viz.speedup && viz.speedup.some(v => v != null)) {
+        el.appendChild(sectionTitle('Speedup vs BF16'));
+        const { wrap: w2, canvas: c2 } = mkCanvas('viz-quant-spd', 150);
+        el.appendChild(w2);
+        _activeCharts.push(new Chart(c2, {
+          type: 'bar',
+          data: {
+            labels: viz.labels,
+            datasets: [{
+              data: viz.speedup,
+              backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
+              borderColor: viz.labels.map(l => colors[l] || C.gray),
+              borderWidth: 1, borderRadius: 3,
+            }]
+          },
+          options: baseOpts('speedup ×', v => v != null ? v.toFixed(2) + '×' : '')
+        }));
+      }
+
+      if (viz.quality_efficiency && viz.quality_efficiency.some(v => v != null)) {
+        el.appendChild(sectionTitle('Quality efficiency vs BF16'));
+        const { wrap: w3, canvas: c3 } = mkCanvas('viz-quant-qeff', 150);
+        el.appendChild(w3);
+        // BF16 is the 1.0 baseline; show it as 100% for reference
+        const qeffData = viz.labels.map((l, i) => l === 'BF16' ? 1.0 : viz.quality_efficiency[i]);
+        _activeCharts.push(new Chart(c3, {
+          type: 'bar',
+          data: {
+            labels: viz.labels,
+            datasets: [{
+              data: qeffData,
+              backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
+              borderColor: viz.labels.map(l => colors[l] || C.gray),
+              borderWidth: 1, borderRadius: 3,
+            }]
+          },
+          options: {
+            ...baseOpts('quality efficiency', v => v != null ? (v * 100).toFixed(0) + '%' : ''),
+            scales: {
+              ...baseOpts().scales,
+              y: { ...baseOpts().scales.y, min: 0, max: 1.1,
+                   ticks: { color: C.text, font: { size: 11 }, callback: v => (v * 100).toFixed(0) + '%' } },
+            }
+          }
+        }));
+      }
+    }
+  }
+
+  // Suite E ─────────────────────────────────────────────────
+  function renderSuiteE(el, viz, row) {
+    el.appendChild(sectionTitle('Multi-chip scaling'));
+    el.appendChild(statChips([
+      { label: '1× baseline',      value: viz.throughput[0] ? viz.throughput[0].toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'blue' },
+      { label: '2× throughput',    value: viz.throughput[1] ? viz.throughput[1].toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null },
+      { label: '4× throughput',    value: viz.throughput[2] ? viz.throughput[2].toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null },
+      { label: '2× efficiency',    value: row.scaling_efficiency_2x != null ? (row.scaling_efficiency_2x*100).toFixed(1) + '%' : null, cls: row.scaling_efficiency_2x >= 0.8 ? 'green' : 'amber' },
+      { label: '4× efficiency',    value: row.scaling_efficiency_4x != null ? (row.scaling_efficiency_4x*100).toFixed(1) + '%' : null, cls: row.scaling_efficiency_4x >= 0.8 ? 'green' : row.scaling_efficiency_4x >= 0.5 ? 'amber' : 'coral' },
+    ]));
+
+    // Throughput chart
+    const labels = (viz.chip_counts || []).map(c => c + '× GPU');
+    const { wrap, canvas } = mkCanvas('viz-scale-thr', 180);
+    el.appendChild(wrap);
+    _activeCharts.push(new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Throughput',
+          data: viz.throughput,
+          backgroundColor: C.blue + '99',
+          borderColor: C.blue,
+          borderWidth: 1,
+          borderRadius: 3,
+        }]
+      },
+      options: baseOpts('tokens / sec', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '')
+    }));
+
+    // Efficiency line chart vs ideal
+    el.appendChild(sectionTitle('Scaling efficiency vs ideal'));
+    const maxCount = Math.max(...(viz.chip_counts || [1]));
+    const idealLine = (viz.chip_counts || []).map(() => 100);
+    const targetLine = (viz.chip_counts || []).map(() => 80);
+
+    const { wrap: w2, canvas: c2 } = mkCanvas('viz-scale-eff', 200);
+    el.appendChild(w2);
+    _activeCharts.push(new Chart(c2, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Actual', data: viz.efficiency_pct, borderColor: C.blue, backgroundColor: C.blue+'33', tension: 0.3, pointRadius: 5, pointBackgroundColor: C.blue, fill: true },
+          { label: 'Linear ideal', data: idealLine, borderColor: C.gray, borderDash: [6,4], tension: 0, pointRadius: 0, fill: false },
+          { label: 'Good target (80%)', data: targetLine, borderColor: C.teal, borderDash: [3,3], tension: 0, pointRadius: 0, fill: false },
+        ]
+      },
+      options: {
+        ...baseOpts('efficiency %', v => v + '%'),
+        scales: {
+          x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+          y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: v => v + '%' }, grid: { color: C.grid } }
+        }
+      }
+    }));
+
+    const leg = document.createElement('div');
+    leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
+    leg.innerHTML = `
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.blue};display:inline-block"></span>Actual</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.gray};display:inline-block"></span>Linear ideal</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>Good target (80%)</span>`;
+    el.appendChild(leg);
+
+    // Per-chip throughput
+    if (viz.throughput_per_chip && viz.throughput_per_chip.some(v => v != null)) {
+      el.appendChild(sectionTitle('Throughput per chip'));
+      const { wrap: w3, canvas: c3 } = mkCanvas('viz-scale-perchip', 150);
+      el.appendChild(w3);
+      _activeCharts.push(new Chart(c3, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            data: viz.throughput_per_chip,
+            backgroundColor: C.teal + '99',
+            borderColor: C.teal,
+            borderWidth: 1,
+            borderRadius: 3,
+          }]
+        },
+        options: baseOpts('tok/s per chip', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '')
+      }));
+    }
+  }
 </script>
 </body>
 </html>

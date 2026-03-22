@@ -156,6 +156,125 @@ def extract_detail(result: dict) -> dict:
     }
 
 
+
+def extract_viz(result: dict, metrics: dict) -> dict:
+    """
+    Extract chart-ready data for per-suite visualization panel.
+    All values are plain Python types safe for JSON serialization.
+    """
+    suite = result.get("suite_id", "")
+
+    # ── Shared helpers ────────────────────────────────────────────────────────
+    def _offline_rows():
+        off = metrics.get("offline", {})
+        return off.get("results_by_concurrency") or off.get("results_by_batch_size") or []
+
+    def _concurrency_labels(rows):
+        return [str(r.get("client_concurrency") or r.get("concurrency") or r.get("batch_size", "")) for r in rows]
+
+    def _online_block():
+        online = metrics.get("online", {})
+        qps_rows = online.get("results_by_qps", [])
+        return {
+            "labels":        [str(r.get("target_qps", "")) for r in qps_rows],
+            "ttft_p50":      [r.get("ttft_ms_p50")  for r in qps_rows],
+            "ttft_p90":      [r.get("ttft_ms_p90")  for r in qps_rows],
+            "tpot_p50":      [r.get("tpot_ms_p50")  for r in qps_rows],
+            "sla_met":       [r.get("sla_met")       for r in qps_rows],
+            "max_valid_qps": online.get("max_valid_qps"),
+        }
+
+    def _interactive_block():
+        iv = metrics.get("interactive", {})
+        return {
+            "ttft_p50": iv.get("ttft_ms_p50"),
+            "ttft_p90": iv.get("ttft_ms_p90"),
+            "ttft_p99": iv.get("ttft_ms_p99"),
+            "tpot_p50": iv.get("tpot_ms_p50"),
+            "tpot_p90": iv.get("tpot_ms_p90"),
+            "tpot_p99": iv.get("tpot_ms_p99"),
+        }
+
+    # Suite A — single chip: offline concurrency sweep + online TTFT/TPOT + interactive
+    if suite == "suite_A":
+        rows = _offline_rows()
+        return {
+            "type": "suite_A",
+            "offline": {
+                "labels":    _concurrency_labels(rows),
+                "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
+                "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+            },
+            "online":      _online_block(),
+            "interactive": _interactive_block(),
+        }
+
+    # Suite B — multi-chip: total + per-chip throughput + memory + online
+    if suite == "suite_B":
+        rows = _offline_rows()
+        return {
+            "type": "suite_B",
+            "offline": {
+                "labels":              _concurrency_labels(rows),
+                "throughput":          [r.get("throughput_tokens_per_sec")           for r in rows],
+                "throughput_per_chip": [r.get("throughput_tokens_per_sec_per_chip")  for r in rows],
+                "memory_gb":           [r.get("peak_memory_gb")                      for r in rows],
+            },
+            "online": _online_block(),
+        }
+
+    # Suite D — long context 32K: interactive latency prominent + offline secondary
+    if suite == "suite_D":
+        rows = _offline_rows()
+        return {
+            "type": "suite_D",
+            "offline": {
+                "labels":    _concurrency_labels(rows),
+                "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
+                "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+            },
+            "interactive": _interactive_block(),
+        }
+
+    # Suite C — quantization tradeoff
+    if suite == "suite_C":
+        quantization = metrics.get("quantization", {})
+        entries = quantization.get("results_by_precision", [])
+        labels, throughputs, speedups, quality_effs = [], [], [], []
+        for e in entries:
+            labels.append(e.get("precision", ""))
+            throughputs.append(e.get("best_throughput_tokens_per_sec"))
+            speedups.append(e.get("speedup_vs_bf16"))
+            quality_effs.append(e.get("quality_efficiency"))
+        return {
+            "type": "suite_C",
+            "labels": labels,
+            "throughput": throughputs,
+            "speedup": speedups,
+            "quality_efficiency": quality_effs,
+        }
+
+    # Suite E — multi-chip scaling
+    if suite == "suite_E":
+        scaling = metrics.get("scaling", {})
+        entries = scaling.get("results_by_chip_count", [])
+        chip_counts, throughputs, efficiencies, per_chip = [], [], [], []
+        for e in sorted(entries, key=lambda x: x.get("chip_count", 0)):
+            chip_counts.append(e.get("chip_count"))
+            throughputs.append(e.get("best_throughput_tokens_per_sec"))
+            efficiencies.append(round((e.get("scaling_efficiency") or 0) * 100, 1))
+            per_chip.append(e.get("throughput_tokens_per_sec_per_chip"))
+        return {
+            "type": "suite_E",
+            "chip_counts": chip_counts,
+            "throughput": throughputs,
+            "efficiency_pct": efficiencies,
+            "throughput_per_chip": per_chip,
+        }
+
+    return {"type": "none"}
+
+
 def extract_row(result: dict) -> dict:
     chip = result.get("chip", {})
     software = result.get("software", {})
@@ -337,6 +456,8 @@ def extract_row(result: dict) -> dict:
         "quant_int4_quality_eff": quant_int4_quality_eff,
         # Full detail object for click-through panel
         "detail": extract_detail(result),
+        # Suite-specific visualization data for charts
+        "viz": extract_viz(result, metrics),
     }
 
 
@@ -362,17 +483,31 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
     for r in results:
         chip_name = r.get("chip", {}).get("name", "Unknown")
         submission_name = r.get("_submission_name", "unknown")
+        best_thr = None
+
         offline = r.get("metrics", {}).get("offline")
-        if not offline:
+        if offline:
+            rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])
+            valid = [
+                row for row in rows
+                if not row.get("oom") and row.get("throughput_tokens_per_sec")
+            ]
+            if valid:
+                best_thr = max(row["throughput_tokens_per_sec"] for row in valid)
+
+        # Suite E: no offline key — fall back to 1× baseline from scaling metrics
+        if best_thr is None:
+            scaling = r.get("metrics", {}).get("scaling", {})
+            if scaling:
+                best_thr = scaling.get("base_throughput_tokens_per_sec") or scaling.get("base_throughput_1x")
+                if not best_thr:
+                    for entry in scaling.get("results_by_chip_count", []):
+                        if entry.get("chip_count") == 1:
+                            best_thr = entry.get("best_throughput_tokens_per_sec")
+                            break
+
+        if not best_thr:
             continue
-        rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])
-        valid = [
-            row for row in rows
-            if not row.get("oom") and row.get("throughput_tokens_per_sec")
-        ]
-        if not valid:
-            continue
-        best_thr = max(row["throughput_tokens_per_sec"] for row in valid)
         by_chip[chip_name].append((submission_name, best_thr))
 
     # ----------------------------------------------------------------
