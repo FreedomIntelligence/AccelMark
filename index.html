@@ -883,7 +883,7 @@
       </div>`;
   }
 
-  function openModal(row) {
+  function _fillModal(row) {
     const d = row.detail || {};
 
     document.getElementById('modal-title').textContent =
@@ -1007,8 +1007,7 @@
     _activeCharts = [];
   }
 
-  // ── Override openModal to also set up viz ─────────────────
-  const _origOpenModal = openModal;
+  // ── openModal: reset viz state, then populate details ────
   function openModal(row) {
     destroyCharts();
     _activeTab = 'details';
@@ -1027,7 +1026,7 @@
     }
 
     _pendingViz = row;
-    _origOpenModal(row);
+    _fillModal(row);
   }
 
   // ── Chart helpers ─────────────────────────────────────────
