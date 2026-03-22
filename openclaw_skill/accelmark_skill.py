@@ -149,14 +149,15 @@ def handle_submit(result: dict, openclaw_username: str) -> str:
 
 def format_details(result: dict) -> str:
     """Format detailed benchmark results for 'details' follow-up."""
-    rows = result["metrics"]["offline"]["results_by_batch_size"]
+    rows = (result["metrics"]["offline"].get("results_by_concurrency")
+            or result["metrics"]["offline"].get("results_by_batch_size", []))
     model = result["model"]
     software = result["software"]
     meta = result["meta"]
 
     lines = [
         "📊 Full benchmark results:\n",
-        f"{'Batch size':<12} {'Throughput':<16} {'Memory'}",
+        f"{'Concurrency':<12} {'Throughput':<16} {'Memory'}",
     ]
 
     best_row = None
@@ -165,10 +166,11 @@ def format_details(result: dict) -> str:
         best_row = max(valid, key=lambda r: r["throughput_tokens_per_sec"]) if valid else None
 
     for row in rows:
-        bs = f"bs={row['batch_size']}"
+        cc = row.get("client_concurrency") or row.get("batch_size")
+        bs = f"cc={cc}"
         tput = f"{row['throughput_tokens_per_sec']:,.0f} tok/s"
         mem = f"{row['peak_memory_gb']:.1f}GB" if row.get("peak_memory_gb") else "N/A"
-        marker = "  ← best" if best_row and row["batch_size"] == best_row["batch_size"] else ""
+        marker = "  ← best" if best_row and cc == (best_row.get("client_concurrency") or best_row.get("batch_size")) else ""
         lines.append(f"{bs:<12} {tput:<16} {mem}{marker}")
 
     lines.append(

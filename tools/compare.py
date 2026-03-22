@@ -32,19 +32,23 @@ def pct_delta(a, b):
 
 def compare_offline(a_metrics: dict, b_metrics: dict) -> list[dict]:
     rows = []
-    a_rows = {r["batch_size"]: r for r in a_metrics.get("results_by_batch_size", [])}
-    b_rows = {r["batch_size"]: r for r in b_metrics.get("results_by_batch_size", [])}
+    _key = "client_concurrency"
+    _a_list = a_metrics.get("results_by_concurrency") or a_metrics.get("results_by_batch_size", [])
+    _b_list = b_metrics.get("results_by_concurrency") or b_metrics.get("results_by_batch_size", [])
+    # Support both old (batch_size) and new (client_concurrency) field names
+    a_rows = {r.get(_key) or r.get("batch_size"): r for r in _a_list}
+    b_rows = {r.get(_key) or r.get("batch_size"): r for r in _b_list}
 
-    for bs in sorted(set(a_rows) | set(b_rows)):
-        a = a_rows.get(bs, {})
-        b = b_rows.get(bs, {})
+    for cc in sorted(set(a_rows) | set(b_rows)):
+        a = a_rows.get(cc, {})
+        b = b_rows.get(cc, {})
 
         thr_a = a.get("throughput_tokens_per_sec")
         thr_b = b.get("throughput_tokens_per_sec")
         delta = pct_delta(thr_a, thr_b)
 
         rows.append({
-            "metric": f"offline.bs={bs}.throughput_tokens_per_sec",
+            "metric": f"offline.client_concurrency={cc}.throughput_tokens_per_sec",
             "submitted": thr_a,
             "reproduced": thr_b,
             "delta_pct": delta,

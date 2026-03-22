@@ -21,20 +21,12 @@ pip install -r scripts/nvidia/requirements.txt
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name or GitHub username
 
-# 3. Run accuracy check (one-time per model, ~5-10 min)
-#    Result is auto-saved to results/accuracy/ and reused on future runs
-python scripts/run_accuracy.py \
-    --model-path /path/to/Meta-Llama-3-8B-Instruct \
-    --suite suite_A
-# Saved to: results/accuracy/meta-llama-3-8b-instruct_BF16_2026-03-22.json
-# Expected: Score ~0.62, Valid: True
-
-# 4. Run the benchmark (~27 min on A100)
+# 3. Run the benchmark (~27 min on A100)
+#    Accuracy gate runs automatically before the benchmark starts.
 #    Output directory is auto-named: results/community/a100x1_llama3-8b_suite-A_YYYY-MM-DD
-#    Accuracy is reused automatically on future runs
 python scripts/nvidia/run_vllm.py --suite suite_A --scenario all
 
-# 5. Submit
+# 4. Submit
 # Find your auto-generated directory name
 ls results/community/
 python scripts/validate_submission.py --dir results/community/<your_submission_dir>
@@ -120,8 +112,9 @@ python scripts/nvidia/run_vllm.py \
     --output-dir ./results/verified/a100x1_llama3-8b_suite-A_2026-03-22
 ```
 
-This runs offline → online → interactive in sequence (~27 min on A100)
+This runs accuracy gate first, then offline → online → interactive in sequence (~27 min on A100)
 and produces a single merged `result.json` for leaderboard submission.
+If the accuracy gate fails, the benchmark is aborted (use `--skip-accuracy-gate` to override).
 
 ### Run a single scenario
 
@@ -129,14 +122,32 @@ and produces a single merged `result.json` for leaderboard submission.
 python scripts/nvidia/run_vllm.py --suite suite_A --scenario offline
 ```
 
-### Multi-chip
+### Multi-chip (Suite B and above)
+
+For large models that require multiple chips, set `--tensor-parallel-size`:
 
 ```bash
+# Suite B: Llama-3-70B on 4 chips
 python scripts/nvidia/run_vllm.py \
-    --suite suite_A \
+    --suite suite_B \
     --scenario all \
-    --tensor-parallel-size 2
+    --tensor-parallel-size 4
+
+# Suite B on 8 chips
+python scripts/nvidia/run_vllm.py \
+    --suite suite_B \
+    --scenario all \
+    --tensor-parallel-size 8
 ```
+
+Suite B does not require a specific chip count — use however many chips
+your hardware needs to fit the 70B model. The result records the actual
+chip count and leaderboard groups results by chip count for fair comparison.
+
+> **Note:** Running Suite A (8B) on multiple chips is not recommended.
+> The 8B model fits comfortably on a single chip, so multi-chip adds
+> communication overhead without a meaningful use case. Use Suite B for
+> multi-chip benchmarking.
 
 ### With a local model path
 
@@ -174,37 +185,93 @@ Faster hardware completes proportionally quicker. Slower hardware takes longer.
 
 ## Submitting Your Results
 
-### Step 0: Run accuracy check (first time only)
+### Accuracy gate (automatic)
 
-The accuracy check verifies your model weights produce correct outputs.
-Run it **once per model + precision combination** — the result is saved
-to `results/accuracy/` and reused automatically on all future runs.
+When you run `--scenario all`, accuracy runs automatically as the **first step**
+before any benchmark scenarios start. If accuracy fails, the benchmark is aborted.
 
-```bash
-python scripts/run_accuracy.py \
-    --model-path /path/to/model \
-    --suite suite_A
 ```
+============================================================
+  Step 1: Accuracy Gate
+  Must pass before benchmark runs.
+============================================================
 
-The result is auto-saved to `results/accuracy/` with a standardized name:
-```
-results/accuracy/meta-llama-3-8b-instruct_BF16_2026-03-22.json
-```
-
-Expected output for Suite A (Llama-3-8B BF16):
-```
-Score: ~0.62   (baseline: 0.62, threshold: ±0.03)
+Score: 62/100 = 0.6200
+Baseline: 0.6000
+Delta: +0.0200 (min allowed: -0.03)
 Valid: True
-Saved to: results/accuracy/meta-llama-3-8b-instruct_BF16_2026-03-22.json
+
+  ✓ Accuracy gate passed: 0.62 (delta=0.02, valid=True)
 ```
 
-On subsequent runs the benchmark script finds this file automatically:
+The accuracy check uses the **same model instance** as the benchmark — same
+framework, same precision, same inference stack. This ensures the accuracy
+result reflects exactly what the benchmark measured.
+
+The result is saved to `accuracy/accuracy.json` inside the output directory and
+injected into `result.json` automatically.
+
+**If accuracy fails:**
 ```
-Reusing accuracy from: results/accuracy/meta-llama-3-8b-instruct_BF16_2026-03-22.json
+  ✗ ACCURACY GATE FAILED
+  Score:     0.45
+  Delta:     0.1500
+  Threshold: 0.03
+
+  Fix model weights before submitting.
+  To run anyway: --skip-accuracy-gate
 ```
 
-If your score falls outside the ±0.03 threshold, your submission will be
-flagged. This usually means your model weights differ from the locked revision.
+The benchmark is aborted. Common causes:
+- Wrong model revision (update `model_revision` in suite.json)
+- Quantized weights with too much quality loss
+- Model loaded with wrong precision
+
+**`--skip-accuracy-gate`** — run benchmark even if accuracy fails:
+```bash
+python scripts/nvidia/run_vllm.py \
+    --suite suite_A \
+    --scenario all \
+    --skip-accuracy-gate
+```
+
+Results submitted with a failed accuracy gate are flagged on the leaderboard.
+This flag is permanent — it cannot be removed by re-running. Only use
+`--skip-accuracy-gate` for debugging or stress testing.
+
+**Running accuracy standalone** (optional):
+
+If you want to check accuracy before committing to a full benchmark run,
+you can run accuracy as its own scenario:
+```bash
+python scripts/nvidia/run_vllm.py --suite suite_A --scenario accuracy
+```
+
+**Per-question outputs** (`accuracy_outputs.jsonl`):
+
+Every accuracy run writes `accuracy_outputs.jsonl` alongside `accuracy.json`.
+Each line records one question — the model's raw output, extracted answer,
+ground truth, and whether it was correct. Useful for validating answer
+extraction or debugging low scores.
+
+This file is gitignored and only needed locally. It is **not** required for
+submission.
+
+**Resuming an interrupted run:**
+
+If a run is interrupted, re-running the same command resumes from where it
+stopped. Completed steps are detected by the presence of their output files
+and skipped automatically:
+
+- Accuracy gate: skipped if `accuracy/accuracy.json` already exists
+- Each scenario: skipped if `<scenario>/result.json` already exists
+
+```
+  [○] accuracy     -- SKIPPED (already done)
+  [○] offline      -- SKIPPED (already done)
+  [✓] online       -- SUCCESS
+  [✓] interactive  -- SUCCESS
+```
 
 ### Step 1: Validate
 
@@ -222,6 +289,25 @@ The validator checks:
 - Accuracy check passed
 - `submitted_by` is not empty
 - Throughput values are non-zero and not anomalously high
+
+**Files required for submission** (the rest are gitignored and stay local):
+
+```
+<submission_dir>/
+  result.json                  # merged suite result — required
+  env_info.json                # hardware environment — required
+  accuracy/
+    accuracy.json              # accuracy gate result — required
+  offline/
+    result.json
+  online/
+    result.json
+  interactive/
+    result.json
+```
+
+`run.log`, `samples.jsonl`, and `accuracy_outputs.jsonl` are gitignored and
+stay on your machine — they are not part of the submission.
 
 Fix any errors before submitting. If validate exits with no errors, you're ready.
 
@@ -302,31 +388,59 @@ weight files, add a note in `meta.notes`:
 
 ## Adding Support for a New Platform
 
-If your hardware isn't NVIDIA (e.g. AMD, Ascend, Apple Silicon), you can
-add a new platform script.
+Create a new platform script by subclassing `BenchmarkRunner`:
 
-1. Copy the template:
-   ```bash
-   cp scripts/template/run_benchmark.py scripts/your_platform/run_your_framework.py
-   ```
+```python
+# scripts/your_platform/run_your_framework.py
+from scripts.benchmark_runner import BenchmarkRunner
+from loadgen.types import InferenceResult
 
-2. Implement `inference_fn` for your platform. The function signature depends on scenario:
-   ```python
-   # For offline scenario (sync):
-   def inference_fn(prompts: list[str]) -> list[InferenceResult]
+class MyFrameworkRunner(BenchmarkRunner):
 
-   # For online and interactive scenarios (async):
-   async def inference_fn(prompt: str) -> InferenceResult
-   ```
+    # Declare platform capabilities
+    SUPPORTS_STREAMING = True    # set False if no streaming API
+    SUPPORTS_BATCHING = True     # set False if serial only (e.g. mlx-lm)
+    SUPPORTS_MULTI_CHIP = True   # set False if no tensor parallelism
 
-3. Add `scripts/your_platform/requirements.txt`
+    def load_model(self, model_path: str, suite: dict, tp_size: int) -> None:
+        # Load your model here
+        self.model = MyFramework.load(model_path, tp=tp_size)
 
-4. Add `scripts/your_platform/README.md` with setup instructions
+    def inference_fn_offline(self, prompts: list[str]) -> list[InferenceResult]:
+        # Batch inference — send all prompts at once
+        outputs = self.model.generate(prompts)
+        return [InferenceResult(
+            first_token_time_ms=None,
+            total_time_ms=o.elapsed_ms,
+            output_tokens=o.num_tokens,
+            input_tokens=o.num_input_tokens,
+            success=True,
+        ) for o in outputs]
 
-5. Submit a result using your new script as proof it works
+    async def inference_fn_streaming(self, prompt: str) -> InferenceResult:
+        # Async streaming — required for TTFT measurement
+        # Only needed if SUPPORTS_STREAMING = True
+        ...
 
-The core `loadgen/loadgen.py` handles all timing and measurement logic —
-your script only needs to implement inference. Do not write your own timing code.
+    def release_resources(self) -> None:
+        del self.model
+        self.model = None
+
+    def _get_framework_name(self) -> str:
+        return "MyFramework"
+
+    def _get_framework_version(self) -> str:
+        import myframework
+        return myframework.__version__
+
+if __name__ == "__main__":
+    MyFrameworkRunner().main()
+```
+
+All orchestration (result building, accuracy reuse, Suite E, etc.) is
+inherited from `BenchmarkRunner` automatically.
+
+Add `scripts/your_platform/requirements.txt` and submit a result as proof.
 
 ---
 

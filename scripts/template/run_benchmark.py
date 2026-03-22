@@ -168,7 +168,7 @@ def main():
     # Inject peak memory (platform-specific)
     if args.scenario == "offline" and "offline" in metrics:
         peak_mem = get_peak_memory_gb()
-        for row in metrics["offline"]["results_by_batch_size"]:
+        for row in (metrics["offline"].get("results_by_concurrency") or metrics["offline"].get("results_by_batch_size", [])):
             if not row["oom"]:
                 row["peak_memory_gb"] = peak_mem
 
@@ -219,7 +219,7 @@ def main():
             "subset_score": None,
             "baseline_delta": None,
             "valid": False,
-            "notes": "Run scripts/run_accuracy.py to populate this field.",
+            "notes": "Run --scenario accuracy to check model accuracy.",
         },
         "meta": {
             "submitted_by": "YOUR_GITHUB_USERNAME",
@@ -237,8 +237,7 @@ def main():
     with open(output_path, "w") as f:
         json.dump(result, f, indent=2)
     print(f"Result written to {output_path}")
-    print("Next step: python scripts/run_accuracy.py ...")
-    print("Then:      python scripts/validate_submission.py --dir", args.output_dir)
+    print("Next step: python scripts/validate_submission.py --dir", args.output_dir)
 
 
 if __name__ == "__main__":

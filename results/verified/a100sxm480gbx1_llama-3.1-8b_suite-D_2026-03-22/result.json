@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_D",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb_per_chip": 80.0,
+    "interconnect_intra_node": "N/A",
+    "interconnect_inter_node": null
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "interactive"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_size": 1,
+      "expert_parallel_size": null
+    },
+    "num_runs": 2
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "throughput_tokens_per_sec": 7025.24,
+          "throughput_tokens_per_sec_per_chip": 7025.24,
+          "elapsed_seconds_median": 469.5,
+          "peak_memory_gb": 69.25,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "client_concurrency": 1,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally."
+        },
+        {
+          "throughput_tokens_per_sec": 7019.06,
+          "throughput_tokens_per_sec_per_chip": 7019.06,
+          "elapsed_seconds_median": 469.9,
+          "peak_memory_gb": 69.25,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "client_concurrency": 4,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally."
+        }
+      ]
+    },
+    "interactive": {
+      "ttft_ms_p50": 3858.68,
+      "ttft_ms_p90": 4006.97,
+      "ttft_ms_p99": 4153.9,
+      "tpot_ms_p50": 15.73,
+      "tpot_ms_p90": 15.81,
+      "tpot_ms_p99": 15.91,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 394.8
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.57,
+    "baseline_delta": 0.04,
+    "valid": true,
+    "framework": "vLLM",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-03-22",
+    "reproduce_script": "scripts/nvidia/run_vllm.py",
+    "env_info_file": "env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": "Migrated: batch_size \u2192 client_concurrency (2026-03-22).",
+    "benchmark_start_time": "2026-03-22T10:50:04.077040+00:00",
+    "benchmark_end_time": "2026-03-22T11:37:01.192709+00:00",
+    "benchmark_elapsed_minutes": 60.2,
+    "model_load_seconds": 42.9,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'interactive'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/verified/a100sxm480gbx1_llama-3.1-8b_suite-D_2026-03-22/offline",
+      "interactive": "results/verified/a100sxm480gbx1_llama-3.1-8b_suite-D_2026-03-22/interactive"
+    }
+  }
+}

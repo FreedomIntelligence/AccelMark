@@ -1,0 +1,185 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb_per_chip": 80.0,
+    "interconnect_intra_node": "N/A",
+    "interconnect_inter_node": null
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online",
+      "interactive"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_size": 1,
+      "expert_parallel_size": null
+    },
+    "num_runs": 3
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "throughput_tokens_per_sec": 5321.05,
+          "throughput_tokens_per_sec_per_chip": 5321.05,
+          "elapsed_seconds_median": 22.3,
+          "peak_memory_gb": 69.83,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "client_concurrency": 8,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally."
+        },
+        {
+          "throughput_tokens_per_sec": 5263.77,
+          "throughput_tokens_per_sec_per_chip": 5263.77,
+          "elapsed_seconds_median": 22.5,
+          "peak_memory_gb": 69.83,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "client_concurrency": 32,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally."
+        },
+        {
+          "throughput_tokens_per_sec": 5248.24,
+          "throughput_tokens_per_sec_per_chip": 5248.24,
+          "elapsed_seconds_median": 22.6,
+          "peak_memory_gb": 69.83,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "client_concurrency": 128,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally."
+        }
+      ]
+    },
+    "online": {
+      "max_valid_qps": 5,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 87.74,
+          "ttft_ms_p90": 150.29,
+          "ttft_ms_p99": 239.35,
+          "tpot_ms_p50": 34.87,
+          "tpot_ms_p90": 62.18,
+          "tpot_ms_p99": 68.15,
+          "elapsed_seconds_median": 113.1,
+          "sla_met": true
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 203.7,
+          "ttft_ms_p90": 16629.39,
+          "ttft_ms_p99": 18535.64,
+          "tpot_ms_p50": 106.26,
+          "tpot_ms_p90": 127.99,
+          "tpot_ms_p99": 139.29,
+          "elapsed_seconds_median": 89.7,
+          "sla_met": false
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 602.66,
+          "ttft_ms_p90": 39543.85,
+          "ttft_ms_p99": 45106.61,
+          "tpot_ms_p50": 109.26,
+          "tpot_ms_p90": 146.32,
+          "tpot_ms_p99": 394.69,
+          "elapsed_seconds_median": 81.9,
+          "sla_met": false
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 8304.08,
+          "ttft_ms_p90": 46183.93,
+          "ttft_ms_p99": 52097.07,
+          "tpot_ms_p50": 97.55,
+          "tpot_ms_p90": 112.36,
+          "tpot_ms_p99": 702.88,
+          "elapsed_seconds_median": 78.8,
+          "sla_met": false
+        },
+        {
+          "target_qps": 100,
+          "achieved_qps": 100.0,
+          "ttft_ms_p50": 10154.27,
+          "ttft_ms_p90": 46966.51,
+          "ttft_ms_p99": 53076.71,
+          "tpot_ms_p50": 93.23,
+          "tpot_ms_p90": 100.53,
+          "tpot_ms_p99": 470.77,
+          "elapsed_seconds_median": 78.0,
+          "sla_met": false
+        }
+      ]
+    },
+    "interactive": {
+      "ttft_ms_p50": 47.99,
+      "ttft_ms_p90": 58.64,
+      "ttft_ms_p99": 69.23,
+      "tpot_ms_p50": 12.44,
+      "tpot_ms_p90": 13.3,
+      "tpot_ms_p99": 13.39,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 447.7
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.59,
+    "baseline_delta": 0.0,
+    "valid": true,
+    "framework": "vLLM",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-03-22",
+    "reproduce_script": "scripts/nvidia/run_vllm.py",
+    "env_info_file": "env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": "INVESTIGATE: Offline 'batch_size' values (8, 32, 128) are client-side concurrency (concurrent requests), not vLLM max_num_seqs. run.log confirms label 'concurrency=N'. vLLM schedules internally by token budget, so client concurrency changes do not significantly affect throughput \u2014 explains observed ~1.4% flatness. Human review needed: confirm whether vLLM max_num_seqs was varied per batch_size or was fixed. Online scenario has no samples.jsonl on disk; percentile ordering (p50<=p90<=p99) verified from result.json values only. Migrated: batch_size \u2192 client_concurrency (2026-03-22).",
+    "benchmark_start_time": "2026-03-22T10:41:03.867378+00:00",
+    "benchmark_end_time": "2026-03-22T10:45:32.235788+00:00",
+    "benchmark_elapsed_minutes": 52.6,
+    "model_load_seconds": 54.6,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'interactive'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/verified/a100sxm480gbx1_llama3-8b_suite-A_2026-03-22/offline",
+      "online": "results/verified/a100sxm480gbx1_llama3-8b_suite-A_2026-03-22/online",
+      "interactive": "results/verified/a100sxm480gbx1_llama3-8b_suite-A_2026-03-22/interactive"
+    }
+  }
+}

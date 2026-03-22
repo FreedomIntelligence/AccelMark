@@ -1,9 +1,9 @@
 {
   "suite_id": "suite_B",
-  "description": "Multi-chip inference, Llama-3-70B-Instruct. Tests inter-chip communication overhead.",
+  "description": "Large model inference, Llama-3-70B-Instruct. Chip count is flexible — use however many chips your hardware needs. Leaderboard groups results by chip count.",
   "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
   "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
-  "scenarios": ["offline", "online"],
+  "scenarios": ["accuracy", "offline", "online"],
   "precision_required": "BF16",
   "request_distribution": {
     "input_tokens_p25": 120,
@@ -15,11 +15,18 @@
     "source": "shibing624/sharegpt_gpt4"
   },
   "output_tokens_max": 512,
-  "batch_sizes": [8, 32, 128],
-  "online_qps_levels": [5, 10, 25, 50, 100],
+  "concurrency_levels": [8, 32, 128],
+  "_concurrency_levels_note": "Client-side concurrency. See suite_A note.",
+  "online_qps_levels": [1, 2, 5, 10, 25],
   "online_sla_ttft_ms": 1000,
+  "online_sla_ttft_ms_relaxed": 3000,
   "num_runs": 3,
   "warmup_runs": 1,
+  "online_warmup_runs": 0,
+  "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.03,
-  "request_count": 200
+  "request_count": 200,
+  "online_request_count": 500,
+  "interactive_request_count": null,
+  "_request_count_note": "offline uses 200, online uses 500."
 }

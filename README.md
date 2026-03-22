@@ -1,70 +1,101 @@
-# AccelMark
+# ⚡ AccelMark
 
-Open benchmark framework for evaluating AI accelerators on LLM workloads.
+**Open benchmark leaderboard for AI accelerators on LLM workloads.**
 
-**Why AccelMark?**
-- MLPerf is powerful but complex to contribute to and slow to update
-- Vendor whitepapers are not comparable with each other
-- No existing benchmark covers non-NVIDIA chips, MoE models, and long-context together
+[**→ Live Leaderboard**](https://juhaoliang1997.github.io/AccelMark) · [Contributing](docs/CONTRIBUTING.md) · [Suites](suites/README.md) · [Development](docs/DEVELOPMENT.md)
 
-AccelMark defines a strict result schema and shared LoadGen component.
-Each platform implements its own inference backend. Anyone with a GPU can contribute.
+---
 
-## Live Leaderboard
+## Why AccelMark?
 
-[juhaoliang1997.github.io/AccelMark](https://juhaoliang1997.github.io/AccelMark)
+- **MLPerf** is rigorous but slow to update — only large vendors participate
+- **Vendor whitepapers** use different setups, making cross-vendor comparison impossible
+- **Most benchmarks** cover only NVIDIA and only throughput
 
-## Quickstart — Run Suite A on NVIDIA
+AccelMark is different: anyone with a GPU can run a benchmark and submit results in under an hour. A fixed schema and shared LoadGen ensure all results are directly comparable across NVIDIA, AMD, Huawei Ascend, Apple Silicon, and more.
+
+---
+
+## Quick Start
 
 ```bash
-git clone https://github.com/JuhaoLiang1997/AccelMark
-cd accelmark
-
-# Step 1: collect environment info
-python scripts/collect_env.py --output my_submission/env_info.json
-
-# Step 2: install dependencies
+# 1. Clone and install
+git clone https://github.com/JuhaoLiang1997/AccelMark.git
+cd AccelMark
+pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
 pip install -r scripts/nvidia/requirements.txt
 
-# Step 3: run benchmark
-python scripts/nvidia/run_vllm.py \
-  --suite suite_A \
-  --scenario offline \
-  --output-dir my_submission/
+# 2. One-time setup
+cp configs/submitter.yaml.example configs/submitter.yaml
+# Edit configs/submitter.yaml — add your name
 
-# Step 4: run accuracy check
-python scripts/run_accuracy.py \
-  --suite suite_A \
-  --script scripts/nvidia/run_vllm.py \
-  --output my_submission/accuracy.json
+# 3. Run the full benchmark (~46 min on A100)
+python scripts/nvidia/run_vllm.py --suite suite_A --scenario all
 
-# Step 5: validate before submitting
-python scripts/validate_submission.py --dir my_submission/
-
-# Step 6: submit PR
-# Copy my_submission/ to results/community/{name}/
-# Open a pull request
+# 4. Validate and submit
+python scripts/validate_submission.py --dir results/community/<your_dir>
+# Open a GitHub Issue with the "Community Submission" template
 ```
+
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full guide.
+
+---
 
 ## Suites
 
-| Suite | Model | Chips | Scenarios | Primary Metric |
-|-------|-------|-------|-----------|----------------|
-| A | Llama-3-8B | 1 | offline, online, interactive | throughput / max valid QPS |
-| B | Llama-3-70B | 8 | offline, online | throughput / max valid QPS |
-| C | Llama-3-8B | 8 | training | tokens/sec |
-| D | Llama-3-8B | 1 | offline, interactive | throughput (long context) |
+| Suite | Model | Chips | Primary question |
+|-------|-------|-------|-----------------|
+| A | Llama-3-8B | 1 | How fast is this chip at inference? |
+| B | Llama-3-70B | flexible | Can this chip serve large models? |
+| C | Llama-3-8B | 1 | Quantization speed/quality tradeoff? |
+| D | Llama-3.1-8B | 1 | How does this chip handle 32K-token inputs? |
+| E | Llama-3-8B | 1×/2×/4×/8× | How well does this chip scale? |
+
+See [suites/README.md](suites/README.md) for full specs, time budgets, and metrics.
+
+---
 
 ## Supported Platforms
 
-| Platform | Framework | Suite A | Suite B | Suite C | Suite D |
-|----------|-----------|---------|---------|---------|---------|
-| NVIDIA (H100/A100) | vLLM | ✓ | ✓ | — | ✓ |
-| NVIDIA (H100/A100) | TensorRT-LLM | ✓ | — | — | — |
-| NVIDIA | torchtitan | — | — | ✓ | — |
-| AMD (MI300X) | vLLM ROCm | ✓ | — | — | — |
-| Huawei Ascend | MindIE | ✓ | — | — | — |
+| Platform | Framework | A | B | C | D | E |
+|----------|-----------|---|---|---|---|---|
+| NVIDIA (H100/A100/A800) | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ |
+| NVIDIA (H100/A100) | TensorRT-LLM | ✓ | — | — | — | — |
+| AMD (MI300X) | vLLM ROCm | ✓ | — | — | — | — |
+| Huawei Ascend | MindIE | ✓ | — | — | — | — |
+| Apple Silicon | mlx-lm | ✓ | — | — | — | — |
 
-## Contributing
+Adding a new platform? See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md#adding-support-for-a-new-platform).
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+---
+
+## Leaderboard Tiers
+
+| Tier | How | Where |
+|------|-----|-------|
+| **community** | Submit via GitHub Issue, passes CI validation | Community tab |
+| **verified** | Independently reproduced by maintainer within 5% | Main leaderboard |
+
+---
+
+## Repository Structure
+
+```
+AccelMark/
+├── suites/              # Suite definitions — see suites/README.md
+├── scripts/             # Platform benchmark runners
+│   ├── benchmark_runner.py   # Shared base class
+│   ├── nvidia/          # vLLM (NVIDIA)
+│   ├── amd/             # vLLM ROCm (AMD)
+│   └── ascend/          # MindIE (Huawei Ascend)
+├── loadgen/             # Shared request sending and timing logic
+├── schema/              # JSON schemas, accuracy subset, cloud pricing
+├── results/             # Benchmark results — see results/README.md
+│   ├── verified/
+│   └── community/
+├── leaderboard/         # Static leaderboard site (GitHub Pages)
+├── docs/                # Documentation
+│   ├── CONTRIBUTING.md
+│   └── DEVELOPMENT.md
+└── configs/             # Local config (gitignored)
+```

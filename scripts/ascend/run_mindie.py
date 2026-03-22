@@ -149,7 +149,7 @@ def main():
 
     if args.scenario == "offline":
         peak_mem = get_peak_memory_gb()
-        for row in metrics["offline"]["results_by_batch_size"]:
+        for row in (metrics["offline"].get("results_by_concurrency") or metrics["offline"].get("results_by_batch_size", [])):
             if not row["oom"]:
                 row["peak_memory_gb"] = round(peak_mem, 2)
 
@@ -210,7 +210,7 @@ def main():
             "subset_score": None,
             "baseline_delta": None,
             "valid": False,
-            "notes": "Run scripts/run_accuracy.py to populate this field.",
+            "notes": "Run --scenario accuracy to check model accuracy.",
         },
         "meta": {
             "submitted_by": "",

@@ -29,6 +29,7 @@ def collect_nvidia() -> list[dict]:
             accelerators.append({
                 "index": int(idx),
                 "name": name,
+                "vendor": "NVIDIA",
                 "memory_gb": round(float(mem) / 1024, 1),
                 "driver_version": driver,
                 "firmware_version": None,
@@ -74,6 +75,7 @@ def collect_amd() -> list[dict]:
             accelerators.append({
                 "index": idx,
                 "name": name,
+                "vendor": "AMD",
                 "memory_gb": round(mem_bytes / (1024**3), 1),
                 "driver_version": driver,
                 "firmware_version": None,
@@ -103,6 +105,7 @@ def collect_ascend() -> list[dict]:
                 current_npu = {
                     "index": int(npu_match.group(1)),
                     "name": "Huawei Ascend NPU",
+                    "vendor": "Huawei",
                     "memory_gb": None,
                     "driver_version": _get_cann_version(),
                     "firmware_version": None,
@@ -139,6 +142,7 @@ def collect_ascend() -> list[dict]:
         return [{
             "index": 0,
             "name": "Huawei Ascend NPU",
+            "vendor": "Huawei",
             "memory_gb": None,
             "driver_version": _get_cann_version(),
             "firmware_version": None,
@@ -196,6 +200,7 @@ def collect_apple() -> list[dict]:
         return [{
             "index": 0,
             "name": chip,           # e.g. "Apple M2 Ultra"
+            "vendor": "Apple",
             "memory_gb": round(mem_bytes / (1024**3), 1),
             "driver_version": os_version,
             "firmware_version": None,
@@ -403,6 +408,62 @@ def collect_network_interfaces() -> list[dict] | None:
     return interfaces if interfaces else None
 
 
+def detect_os_version() -> str:
+    # Try /etc/os-release first (Linux standard)
+    try:
+        with open("/etc/os-release") as f:
+            info = {}
+            for line in f:
+                if "=" in line:
+                    k, v = line.strip().split("=", 1)
+                    info[k] = v.strip('"')
+            if "PRETTY_NAME" in info:
+                return info["PRETTY_NAME"]
+    except Exception:
+        pass
+    # macOS fallback
+    mac_ver = platform.mac_ver()[0]
+    if mac_ver:
+        return f"macOS {mac_ver}"
+    return platform.platform()
+
+
+def detect_python_version() -> str:
+    return platform.python_version()
+
+
+def detect_intra_node_interconnect() -> str | None:
+    """Detect intra-node GPU interconnect type from nvidia-smi topology output.
+
+    Returns e.g. 'NVLink' if NVLink connections exist between GPUs, None otherwise.
+    The topology is already collected by collect_topology(), but we re-query here
+    to keep this function self-contained and callable independently.
+    """
+    try:
+        import re
+        out = subprocess.check_output(
+            ["nvidia-smi", "topo", "-m", "--no-color"],
+            text=True, stderr=subprocess.DEVNULL,
+        )
+        # NV# entries (e.g. NV12, NV18) in the topology matrix indicate NVLink
+        if re.search(r'\bNV\d+\b', out):
+            return "NVLink"
+    except Exception:
+        pass
+    # Fallback: try without --no-color
+    try:
+        import re
+        out = subprocess.check_output(
+            ["nvidia-smi", "topo", "-m"],
+            text=True, stderr=subprocess.DEVNULL,
+        )
+        if re.search(r'\bNV\d+\b', out):
+            return "NVLink"
+    except Exception:
+        pass
+    return None
+
+
 def detect_pytorch_version() -> str:
     try:
         import torch
@@ -433,11 +494,14 @@ def main():
         "collected_at": datetime.now(timezone.utc).isoformat(),
         "accelerators": accelerators,
         "accelerator_topology": collect_topology(),
+        "intra_node_interconnect": detect_intra_node_interconnect(),
         "cpu": collect_cpu(),
         "system_memory_gb": collect_memory_gb(),
         "pcie_generation": detect_pcie_gen(),
         "cpu_accelerator_bandwidth_gbs": None,
         "network_interfaces": collect_network_interfaces(),
+        "os": detect_os_version(),
+        "python_version": detect_python_version(),
         "kernel_version": platform.release(),
         "runtime_version": detect_runtime_version(),
         "pytorch_version": detect_pytorch_version(),

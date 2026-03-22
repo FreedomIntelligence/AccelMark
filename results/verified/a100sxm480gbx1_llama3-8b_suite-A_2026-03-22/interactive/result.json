@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb_per_chip": 80.0,
+    "interconnect_intra_node": "N/A",
+    "interconnect_inter_node": null
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "interactive",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_size": 1,
+      "expert_parallel_size": null
+    },
+    "extra_config": null
+  },
+  "metrics": {
+    "interactive": {
+      "ttft_ms_p50": 47.99,
+      "ttft_ms_p90": 58.64,
+      "ttft_ms_p99": 69.23,
+      "tpot_ms_p50": 12.44,
+      "tpot_ms_p90": 13.3,
+      "tpot_ms_p99": 13.39,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 447.7
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.59,
+    "baseline_delta": 0.0,
+    "valid": true,
+    "framework": "vLLM",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-03-22",
+    "reproduce_script": "scripts/nvidia/run_vllm.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-03-22T11:08:53.048865+00:00",
+    "benchmark_end_time": "2026-03-22T11:31:23.347941+00:00",
+    "benchmark_elapsed_minutes": 22.5,
+    "model_load_seconds": 39.9
+  }
+}

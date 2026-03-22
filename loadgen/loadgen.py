@@ -122,25 +122,34 @@ class AccelMarkLoadGen:
         Send ALL requests to the engine at once for each configured concurrency level.
         The engine's internal scheduler handles batching optimally.
 
-        batch_sizes in suite.json map to max concurrent request levels tested —
-        they do NOT control client-side chunking. Higher values allow more
-        in-flight sequences and improve GPU utilization up to hardware limits.
+        concurrency_levels in suite.json define how many requests are sent simultaneously.
+        They do NOT control client-side chunking or the engine's internal max_num_seqs.
+        Higher client concurrency allows the engine to form larger internal batches,
+        which may improve throughput up to the engine's scheduling limits.
 
         Throughput = (total_input_tokens + total_output_tokens) / elapsed,
         which matches vLLM's own internal throughput metric.
+
+        NOTE — total_ms in samples.jsonl for offline:
+        Each InferenceResult.total_time_ms is set by the runner to the wall-clock
+        elapsed time of the entire batch (the time from sending all requests until
+        the last one completes). Because LLM.generate() is a blocking call, all
+        requests in a single run share the same total_ms value. This is by design —
+        offline measures batch throughput, not per-request latency. Do not interpret
+        offline total_ms as individual request completion times.
         """
-        results_by_batch_size = []
+        results_by_concurrency = []
         all_samples: list[SampleRecord] = []
         prompts = [r["prompt"] for r in self.requests]
 
         total_runs = self.suite["num_runs"] + self.warmup_runs
-        total_batch_sizes = len(self.suite["batch_sizes"])
+        total_concurrency_levels = len(self.suite["concurrency_levels"])
 
-        total_steps = self.suite["num_runs"] * total_batch_sizes
+        total_steps = self.suite["num_runs"] * total_concurrency_levels
         print(f"\n{'='*60}")
         print(f"  AccelMark Offline Benchmark")
         print(f"  Requests  : {len(prompts)}")
-        print(f"  Max concurrency levels: {self.suite['batch_sizes']}")
+        print(f"  Client concurrency levels: {self.suite['concurrency_levels']}")
         print(f"  Runs      : {self.suite['num_runs']} (+{self.warmup_runs} warmup)")
         print(f"{'='*60}\n")
 
@@ -149,7 +158,7 @@ class AccelMarkLoadGen:
                   bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} runs [{elapsed}<{remaining}, {rate_fmt}]"
                   ) as overall_pbar:
 
-            for bs_idx, batch_size in enumerate(self.suite["batch_sizes"]):
+            for cc_idx, client_concurrency in enumerate(self.suite["concurrency_levels"]):
                 run_throughputs = []
                 run_elapsed_times = []
                 run_samples: list[SampleRecord] = []
@@ -159,16 +168,46 @@ class AccelMarkLoadGen:
                     run_label = "warmup" if is_warmup else \
                         f"run {run_idx - self.warmup_runs + 1}/{self.suite['num_runs']}"
 
-                    desc = f"  concurrency={batch_size} ({bs_idx+1}/{total_batch_sizes}) {run_label}"
+                    desc = f"  client_concurrency={client_concurrency} ({cc_idx+1}/{total_concurrency_levels}) {run_label}"
                     tqdm.write(f"{desc} — sending all {len(prompts)} requests...")
 
                     t_start = time.perf_counter()
 
                     # Send ALL requests at once — engine handles internal batching
-                    all_results: list[InferenceResult] = inference_fn(prompts)
+                    all_results: list[InferenceResult] = []
+                    oom_occurred = False
+                    try:
+                        all_results = inference_fn(prompts)
+                    except Exception as e:
+                        err_str = str(e).lower()
+                        if "out of memory" in err_str or "cuda" in err_str:
+                            tqdm.write(
+                                f"  [offline] client_concurrency={client_concurrency} OOM — recording and continuing"
+                            )
+                            oom_occurred = True
+                        else:
+                            raise
 
                     t_end = time.perf_counter()
                     elapsed = t_end - t_start
+
+                    if oom_occurred:
+                        results_by_concurrency.append({
+                            "client_concurrency": client_concurrency,
+                            "throughput_tokens_per_sec": None,
+                            "throughput_tokens_per_sec_per_chip": None,
+                            "elapsed_seconds_median": None,
+                            "peak_memory_gb": None,
+                            "power_watts_avg": None,
+                            "power_watts_peak": None,
+                            "oom": True,
+                        })
+                        try:
+                            import torch as _torch
+                            _torch.cuda.empty_cache()
+                        except Exception:
+                            pass
+                        break  # skip remaining runs for this client_concurrency
 
                     # Count both input and output tokens (matches vLLM's throughput metric)
                     total_input_tokens = sum(r.input_tokens for r in all_results if r.success)
@@ -179,7 +218,7 @@ class AccelMarkLoadGen:
 
                     if is_warmup:
                         tqdm.write(
-                            f"  [warmup] concurrency={batch_size} — "
+                            f"  [warmup] client_concurrency={client_concurrency} — "
                             f"{throughput:.0f} tok/s total, "
                             f"{throughput_output_only:.0f} tok/s output (not recorded)"
                         )
@@ -193,7 +232,7 @@ class AccelMarkLoadGen:
                         per_chip_str = f"  ({throughput/self.chip_count:.0f} tok/s per chip)"
 
                     tqdm.write(
-                        f"  [offline] concurrency={batch_size} {run_label} — "
+                        f"  [offline] client_concurrency={client_concurrency} {run_label} — "
                         f"{throughput:.0f} tok/s total "
                         f"({throughput_output_only:.0f} output only)"
                         f"{per_chip_str}  ({elapsed:.1f}s)"
@@ -201,25 +240,29 @@ class AccelMarkLoadGen:
 
                     overall_pbar.update(1)
                     overall_pbar.set_postfix({
-                        "concurrency": batch_size,
+                        "client_concurrency": client_concurrency,
                         "tok/s": f"{throughput:.0f}",
                     })
 
-                    sampled = self._sample_results(all_results, batch_size, "offline")
+                    sampled = self._sample_results(all_results, client_concurrency, "offline")
                     run_samples.extend(sampled)
 
                 all_samples.extend(run_samples)
+
+                # Skip summary if OOM caused an early break (result already appended)
+                if not run_throughputs:
+                    continue
 
                 median_throughput = float(np.median(run_throughputs))
                 per_chip_str = f"  ({median_throughput/self.chip_count:.0f} tok/s per chip)" \
                     if self.chip_count > 1 else ""
                 tqdm.write(
-                    f"  [offline] concurrency={batch_size} "
+                    f"  [offline] client_concurrency={client_concurrency} "
                     f"median={median_throughput:.0f} tok/s{per_chip_str}\n"
                 )
 
-                results_by_batch_size.append({
-                    "batch_size": batch_size,
+                results_by_concurrency.append({
+                    "client_concurrency": client_concurrency,
                     "throughput_tokens_per_sec": round(median_throughput, 2),
                     "throughput_tokens_per_sec_per_chip": round(median_throughput / self.chip_count, 2),
                     "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1),
@@ -227,10 +270,15 @@ class AccelMarkLoadGen:
                     "power_watts_avg": None,
                     "power_watts_peak": None,
                     "oom": False,
+                    "_concurrency_note": (
+                        "client_concurrency is the number of requests sent simultaneously. "
+                        "The inference engine batches internally; this does not directly "
+                        "set engine parameters like max_num_seqs."
+                    ),
                 })
 
         self._write_samples(all_samples)
-        return {"offline": {"results_by_batch_size": results_by_batch_size}}
+        return {"offline": {"results_by_concurrency": results_by_concurrency}}
 
     # ------------------------------------------------------------------
     # Online scenario
@@ -445,22 +493,13 @@ class AccelMarkLoadGen:
 
     def _run_training(self, inference_fn: Callable) -> dict:
         """
-        Training throughput measurement.
-        inference_fn here is a training step function, not inference.
-
-        Training step function signature:
-            def training_step_fn(step: int) -> TrainingStepResult
-        where TrainingStepResult has: tokens_processed, step_time_ms, peak_memory_gb
+        Training scenario is not supported in AccelMark inference benchmarks.
+        Training benchmarks require a separate infrastructure (e.g. torchtitan).
         """
-        # Training scenario is simpler: call the step function N times
-        # LoadGen just handles timing aggregation
-        # Platform script controls the actual training loop
-
-        # This method is intentionally left for platform scripts to call directly.
-        # See scripts/template/run_benchmark.py for the training scenario example.
         raise NotImplementedError(
-            "Training scenario: use the helper in scripts/template/run_benchmark.py. "
-            "LoadGen does not manage the training loop directly."
+            "Training scenario is not implemented. "
+            "AccelMark focuses on inference benchmarks. "
+            "For training benchmarks, see AccelMark-Train (planned)."
         )
 
     # ------------------------------------------------------------------

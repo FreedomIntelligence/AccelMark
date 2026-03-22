@@ -16,3 +16,8 @@ leaderboard/site/leaderboard.js
 leaderboard/site/api/
 configs/models_local.yaml
 configs/submitter.yaml
+
+# Local-only benchmark artifacts (not needed for submission)
+accuracy_outputs.jsonl
+run.log
+samples.jsonl

@@ -43,11 +43,117 @@ def load_results() -> list[dict]:
                     data = json.load(f)
                 data["_tier"] = tier
                 data["_submission_name"] = submission_dir.name
-                data["_is_suite_level"] = "scenarios_run" in data.get("task", {})
+                data["_is_suite_level"] = "scenarios_run" in data.get("task", {}) or "chip_counts_run" in data.get("task", {})
+
+                # Load env_info.json if present (optional, best-effort)
+                env_path = submission_dir / "env_info.json"
+                if env_path.exists():
+                    try:
+                        with open(env_path) as ef:
+                            data["_env_info"] = json.load(ef)
+                    except Exception as ee:
+                        print(f"Warning: could not load {env_path}: {ee}")
+                        data["_env_info"] = {}
+                else:
+                    data["_env_info"] = {}
+
                 results.append(data)
             except Exception as e:
                 print(f"Warning: could not load {result_path}: {e}")
     return results
+
+
+def extract_detail(result: dict) -> dict:
+    """
+    Extract the full detail object shown in the click-through panel.
+    Keeps all useful fields from result.json, grouped by category.
+    """
+    chip        = result.get("chip", {})
+    software    = result.get("software", {})
+    model       = result.get("model", {})
+    task        = result.get("task", {})
+    accuracy    = result.get("accuracy", {})
+    meta        = result.get("meta", {})
+    parallelism = task.get("parallelism", {})
+    env         = result.get("_env_info", {})
+
+    # Parse env_info fields
+    cpu_info    = env.get("cpu", {})
+    cpu_str     = None
+    if cpu_info.get("model"):
+        cores = cpu_info.get("physical_cores")
+        cpu_str = cpu_info["model"] + (f", {cores} cores" if cores else "")
+
+    nics        = env.get("network_interfaces", [])
+    nic_types   = list(dict.fromkeys(n.get("type", "") for n in nics if n.get("type")))
+    nic_names   = [n.get("name") for n in nics if n.get("name")]
+    nic_str     = None
+    if nics:
+        count   = len(nics)
+        type_str = nic_types[0] if nic_types else "unknown"
+        names   = ", ".join(nic_names) if nic_names else ""
+        nic_str = f"{count}× {type_str}" + (f" ({names})" if names else "")
+
+    # Intra-node interconnect: prefer result.json field, fall back to topology parse
+    intra = chip.get("interconnect_intra_node")
+    if not intra and env.get("accelerator_topology"):
+        topo = env["accelerator_topology"]
+        # Look for highest NVLink bond count mentioned (e.g. NV12)
+        import re
+        nv_matches = re.findall(r'NV(\d+)', topo)
+        if nv_matches:
+            max_nv = max(int(x) for x in nv_matches)
+            intra = f"NVLink {max_nv} (full mesh)"
+
+    return {
+        # Hardware
+        "hw_chip":               chip.get("name"),
+        "hw_vendor":             chip.get("vendor"),
+        "hw_count":              chip.get("count"),
+        "hw_memory_gb":          chip.get("memory_gb_per_chip"),
+        "hw_interconnect_intra": intra,
+        "hw_interconnect_inter": chip.get("interconnect_inter_node"),
+        "hw_cpu":                cpu_str,
+        "hw_system_memory_gb":   env.get("system_memory_gb"),
+        "hw_pcie":               env.get("pcie_generation"),
+        "hw_network":            nic_str,
+        # Software
+        "sw_framework":          software.get("framework"),
+        "sw_framework_version":  software.get("framework_version"),
+        "sw_driver":             software.get("driver_version"),
+        "sw_runtime":            software.get("runtime_version"),
+        "sw_os":                 software.get("os"),
+        "sw_python":             software.get("python_version"),
+        "sw_pytorch":            env.get("pytorch_version"),
+        # Model
+        "model_id":              model.get("model_id"),
+        "model_revision":        model.get("model_revision"),
+        "model_arch":            model.get("architecture"),
+        "model_params_b":        model.get("parameter_count_b"),
+        "model_precision":       model.get("precision"),
+        "model_format":          model.get("model_format"),
+        # Run settings
+        "run_scenarios":         task.get("scenarios_run"),
+        "run_chip_counts":       task.get("chip_counts_run"),
+        "run_num_runs":          task.get("num_runs"),
+        "run_tp":                parallelism.get("tensor_parallel_size"),
+        "run_pp":                parallelism.get("pipeline_parallel_size"),
+        "run_dp":                parallelism.get("data_parallel_size"),
+        # Accuracy
+        "acc_score":             accuracy.get("subset_score"),
+        "acc_baseline_delta":    accuracy.get("baseline_delta"),
+        "acc_valid":             accuracy.get("valid"),
+        "acc_notes":             accuracy.get("notes"),
+        # Metadata
+        "meta_submitted_by":     meta.get("submitted_by"),
+        "meta_submission_type":  meta.get("submission_type"),
+        "meta_date":             meta.get("date"),
+        "meta_reproduce_script": meta.get("reproduce_script"),
+        "meta_elapsed_min":      meta.get("benchmark_elapsed_minutes"),
+        "meta_model_load_sec":   meta.get("model_load_seconds"),
+        "meta_start_time":       meta.get("benchmark_start_time"),
+        "meta_notes":            meta.get("notes"),
+    }
 
 
 def extract_row(result: dict) -> dict:
@@ -70,7 +176,7 @@ def extract_row(result: dict) -> dict:
 
     offline = metrics.get("offline")
     if offline:
-        rows = offline.get("results_by_batch_size", []) if offline else []
+        rows = (offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])) if offline else []
         valid = [r for r in rows if not r.get("oom") and r.get("throughput_tokens_per_sec")]
         if valid:
             offline_throughput = max(r["throughput_tokens_per_sec"] for r in valid)
@@ -91,7 +197,8 @@ def extract_row(result: dict) -> dict:
 
     # Primary metric depends on scenario / suite-level
     scenario = task.get("scenario", "offline")
-    if is_suite_level:
+    suite_id = result.get("suite_id", "")
+    if is_suite_level and suite_id != "suite_E":
         primary_metric = offline_throughput
         primary_metric_label = "tokens/sec (offline)"
     elif scenario == "offline":
@@ -107,6 +214,62 @@ def extract_row(result: dict) -> dict:
     else:
         primary_metric = None
         primary_metric_label = None
+
+    # Suite E scaling metrics
+    scaling_efficiency_2x = None
+    scaling_efficiency_4x = None
+    scaling_base_throughput = None
+
+    scaling = metrics.get("scaling")
+    if scaling:
+        # Try explicit base field first, then fall back to the 1x chip count entry
+        scaling_base_throughput = scaling.get("base_throughput_tokens_per_sec") or scaling.get("base_throughput_1x")
+        for entry in scaling.get("results_by_chip_count", []):
+            count = entry.get("chip_count")
+            eff = entry.get("scaling_efficiency")
+            thr = entry.get("best_throughput_tokens_per_sec")
+            if count == 1 and not scaling_base_throughput and thr:
+                scaling_base_throughput = thr
+            elif count == 2:
+                scaling_efficiency_2x = eff
+            elif count == 4:
+                scaling_efficiency_4x = eff
+
+        # For Suite E, primary metric is 1x throughput
+        # (for fair cross-suite comparison)
+        if not offline_throughput and scaling_base_throughput:
+            offline_throughput = scaling_base_throughput
+            primary_metric = scaling_base_throughput
+            primary_metric_label = "tokens/sec (1x baseline)"
+
+    # Suite C quantization metrics
+    quant_bf16_throughput = None
+    quant_int8_throughput = None
+    quant_int4_throughput = None
+    quant_int8_speedup = None
+    quant_int4_speedup = None
+    quant_int8_quality_eff = None
+    quant_int4_quality_eff = None
+
+    quantization = metrics.get("quantization")
+    if quantization:
+        for entry in quantization.get("results_by_precision", []):
+            p = entry.get("precision")
+            thr = entry.get("best_throughput_tokens_per_sec")
+            spd = entry.get("speedup_vs_bf16")
+            qe = entry.get("quality_efficiency")
+            if p == "BF16":
+                quant_bf16_throughput = thr
+                primary_metric = thr
+                primary_metric_label = "tokens/sec (BF16 baseline)"
+            elif p == "INT8":
+                quant_int8_throughput = thr
+                quant_int8_speedup = spd
+                quant_int8_quality_eff = qe
+            elif p == "INT4":
+                quant_int4_throughput = thr
+                quant_int4_speedup = spd
+                quant_int4_quality_eff = qe
 
     memory_gb_per_chip = chip.get("memory_gb_per_chip", 0)
     memory_efficiency = None
@@ -160,6 +323,20 @@ def extract_row(result: dict) -> dict:
         "submitted_by": meta.get("submitted_by"),
         "reproduce_script": meta.get("reproduce_script"),
         "notes": meta.get("notes"),
+        # Suite E scaling metrics
+        "scaling_efficiency_2x": scaling_efficiency_2x,
+        "scaling_efficiency_4x": scaling_efficiency_4x,
+        "scaling_base_throughput": scaling_base_throughput,
+        # Suite C quantization metrics
+        "quant_bf16_throughput": quant_bf16_throughput,
+        "quant_int8_throughput": quant_int8_throughput,
+        "quant_int4_throughput": quant_int4_throughput,
+        "quant_int8_speedup": quant_int8_speedup,
+        "quant_int4_speedup": quant_int4_speedup,
+        "quant_int8_quality_eff": quant_int8_quality_eff,
+        "quant_int4_quality_eff": quant_int4_quality_eff,
+        # Full detail object for click-through panel
+        "detail": extract_detail(result),
     }
 
 
@@ -188,7 +365,7 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
         offline = r.get("metrics", {}).get("offline")
         if not offline:
             continue
-        rows = offline.get("results_by_batch_size", [])
+        rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])
         valid = [
             row for row in rows
             if not row.get("oom") and row.get("throughput_tokens_per_sec")
@@ -282,6 +459,17 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
                 current_best = chip_index[chip_name].get("best_interactive_ttft_p99_ms")
                 if current_best is None or ttft < current_best:
                     chip_index[chip_name]["best_interactive_ttft_p99_ms"] = round(ttft, 1)
+
+        # Suite E scaling efficiency
+        scaling = r.get("metrics", {}).get("scaling")
+        if scaling:
+            for entry in scaling.get("results_by_chip_count", []):
+                count = entry.get("chip_count")
+                eff = entry.get("scaling_efficiency")
+                if count == 2 and eff:
+                    chip_index[chip_name]["best_scaling_efficiency_2x"] = eff
+                elif count == 4 and eff:
+                    chip_index[chip_name]["best_scaling_efficiency_4x"] = eff
 
     # Ensure all chips have the new fields (even if no data)
     for chip_name in chip_index:

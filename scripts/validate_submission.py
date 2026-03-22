@@ -42,8 +42,16 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
     failures = []
 
     # num_runs >= 3
-    if result.get("task", {}).get("num_runs", 0) < 3:
-        failures.append("task.num_runs must be >= 3")
+    suite_id = result.get("suite_id")
+    suite_path = Path(f"suites/{suite_id}/suite.json")
+    min_runs = 3
+    if suite_path.exists():
+        with open(suite_path) as f:
+            suite_config = json.load(f)
+        min_runs = suite_config.get("num_runs", 3)
+
+    if result.get("task", {}).get("num_runs", 0) < min_runs:
+        failures.append(f"task.num_runs must be >= {min_runs} (required by {suite_id})")
 
     # accuracy.valid for inference suites
     scenario = result.get("task", {}).get("scenario")
@@ -90,7 +98,7 @@ def check_soft_warnings(result: dict) -> list[str]:
     if offline:
         has_power = any(
             row.get("power_watts_avg") is not None
-            for row in offline.get("results_by_batch_size", [])
+            for row in (offline.get("results_by_concurrency") or offline.get("results_by_batch_size", []))
         )
         if not has_power:
             warnings.append(
@@ -110,7 +118,7 @@ def compute_derived(result: dict) -> dict:
     # tokens_per_sec_per_watt from offline metrics
     offline = metrics.get("offline")
     if offline:
-        rows = offline.get("results_by_batch_size", [])
+        rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])
         valid_rows = [r for r in rows if not r.get("oom") and r.get("power_watts_avg")]
         if valid_rows:
             best = max(valid_rows, key=lambda r: r.get("throughput_tokens_per_sec", 0))
@@ -132,35 +140,61 @@ def compute_derived(result: dict) -> dict:
 
 def check_env_info(submission_dir: Path) -> list[str]:
     errors = []
-
-    # Check top-level first
     env_info_path = submission_dir / "env_info.json"
-    if env_info_path.exists():
-        return errors  # found at top level, OK
+    if not env_info_path.exists():
+        errors.append(
+            "env_info.json not found — it must be in the task root directory"
+        )
+    return errors
 
-    # For suite-level submissions, check inside scenario subdirs
-    for scenario in ["offline", "online", "interactive", "training"]:
-        scenario_env = submission_dir / scenario / "env_info.json"
-        if scenario_env.exists():
-            return errors  # found in scenario subdir, OK
 
-    errors.append(
-        "env_info.json not found — run scripts/collect_env.py first, "
-        "or ensure it exists in a scenario subdirectory"
-    )
+def check_suite_e(submission_dir: Path, result: dict) -> list[str]:
+    """Check Suite E specific requirements."""
+    errors = []
+
+    if result.get("suite_id") != "suite_E":
+        return errors
+
+    # Load suite config to get required counts
+    suite_path = Path("suites/suite_E/suite.json")
+    if not suite_path.exists():
+        return errors
+
+    with open(suite_path) as f:
+        suite = json.load(f)
+
+    required_counts = suite.get("chip_counts_required", [1, 2])
+
+    # Check chip_counts_run in task
+    counts_run = result.get("task", {}).get("chip_counts_run", [])
+    missing = [c for c in required_counts if c not in counts_run]
+    if missing:
+        errors.append(
+            f"Suite E: required chip counts {missing} not found in task.chip_counts_run. "
+            f"Re-run with at least --max-chips {max(required_counts)}."
+        )
+
+    # Check subdirectories exist
+    for count in counts_run:
+        count_dir = submission_dir / f"{count}x"
+        if not count_dir.exists():
+            errors.append(
+                f"Suite E: expected subdirectory '{count}x/' not found in submission."
+            )
+        else:
+            result_path = count_dir / "result.json"
+            if not result_path.exists():
+                errors.append(
+                    f"Suite E: {count}x/result.json not found."
+                )
+
     return errors
 
 
 def find_env_info(submission_dir: Path) -> Path | None:
-    """Return path to env_info.json, checking top-level then scenario subdirs."""
+    """Return path to env_info.json at the task root, or None if not found."""
     top = submission_dir / "env_info.json"
-    if top.exists():
-        return top
-    for scenario in ["offline", "online", "interactive", "training"]:
-        candidate = submission_dir / scenario / "env_info.json"
-        if candidate.exists():
-            return candidate
-    return None
+    return top if top.exists() else None
 
 
 def check_accuracy(submission_dir: Path, result: dict) -> list[str]:
@@ -169,7 +203,10 @@ def check_accuracy(submission_dir: Path, result: dict) -> list[str]:
     # Check top-level first
     acc_path = submission_dir / "accuracy.json"
     if not acc_path.exists():
-        # For suite-level, check scenario subdirs
+        # For suite-level runs, check accuracy/ subdirectory (--scenario all)
+        acc_path = submission_dir / "accuracy" / "accuracy.json"
+    if not acc_path.exists():
+        # Legacy: check scenario subdirs
         for scenario in ["offline", "online", "interactive"]:
             scenario_acc = submission_dir / scenario / "accuracy.json"
             if scenario_acc.exists():
@@ -177,7 +214,7 @@ def check_accuracy(submission_dir: Path, result: dict) -> list[str]:
                 break
 
     if not acc_path.exists():
-        errors.append("accuracy.json not found — run scripts/run_accuracy.py first")
+        errors.append("accuracy.json not found — run --scenario accuracy first")
         return errors
 
     with open(acc_path) as f:
@@ -214,6 +251,7 @@ def main():
     if not all_errors:
         all_errors.extend(check_hard_failures(result, result_dir))
         all_warnings.extend(check_soft_warnings(result))
+        all_errors.extend(check_suite_e(result_dir, result))
         result = compute_derived(result)
         # Write back computed fields
         with open(result_path, "w") as f:

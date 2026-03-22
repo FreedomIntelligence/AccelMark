@@ -1,12 +1,17 @@
 {
   "meta-llama/Meta-Llama-3-8B-Instruct": {
     "revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
-    "bf16_baseline_score": 0.62,
+    "bf16_baseline_score": 0.59,
     "notes": "Measured on A100 SXM4 80GB, vLLM 0.6.6.post1, CUDA 12.1"
   },
   "meta-llama/Llama-3.1-8B-Instruct": {
     "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
     "bf16_baseline_score": 0.53,
     "notes": "Measured on A100 SXM4 80GB, vLLM 0.6.6.post1, CUDA 12.1"
+  },
+  "meta-llama/Meta-Llama-3-70B-Instruct": {
+    "revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "bf16_baseline_score": 0.75,
+    "notes": "Measured on A100x4, vLLM 0.6.6.post1, CUDA 12.1"
   }
 }
