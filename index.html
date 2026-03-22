@@ -104,7 +104,8 @@
       white-space: nowrap;
     }
 
-    tr:hover td { background: #161b22; }
+    tr.clickable { cursor: pointer; }
+    tr.clickable:hover td { background: #1c2128; }
 
     .badge {
       display: inline-block;
@@ -155,6 +156,13 @@
       border: 1px solid #21262d;
       border-radius: 8px;
       padding: 1rem;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .card:hover {
+      border-color: #388bfd;
+      background: #1c2128;
     }
 
     .card-chip { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; }
@@ -197,6 +205,141 @@
       position: relative;
       display: inline-block;
     }
+
+    /* ── Detail modal ─────────────────────────────────────── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid #21262d;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      background: #161b22;
+      z-index: 1;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      line-height: 1.4;
+    }
+
+    .modal-subtitle {
+      font-size: 0.8rem;
+      color: #8b949e;
+      margin-top: 0.2rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 0.25rem 0.6rem;
+      font-size: 1rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover { color: #e6edf3; border-color: #8b949e; }
+
+    .modal-body {
+      padding: 1rem 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .detail-section { display: flex; flex-direction: column; gap: 0; }
+
+    .detail-section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8b949e;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid #21262d;
+      font-size: 0.85rem;
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-label {
+      color: #8b949e;
+      min-width: 160px;
+      flex-shrink: 0;
+    }
+
+    .detail-value {
+      color: #e6edf3;
+      word-break: break-all;
+    }
+
+    .detail-value.mono {
+      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+      font-size: 0.8rem;
+      color: #a5d6ff;
+    }
+
+    .detail-value.good { color: #56d364; }
+    .detail-value.warn { color: #d29922; }
+    .detail-value.null { color: #484f58; font-style: italic; }
+
+    .modal-footer {
+      padding: 0.75rem 1.5rem;
+      border-top: 1px solid #21262d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #8b949e;
+    }
+
+    .modal-footer a {
+      color: #58a6ff;
+      text-decoration: none;
+    }
+
+    .modal-footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -263,6 +406,10 @@
           <th onclick="sortBy('suite')">Suite</th>
           <th onclick="sortBy('scenario')">Scenario</th>
           <th onclick="sortBy('primary_metric')">Performance</th>
+          <th onclick="sortBy('quant_int8_speedup')">INT8 speedup</th>
+          <th onclick="sortBy('quant_int4_speedup')">INT4 speedup</th>
+          <th onclick="sortBy('scaling_efficiency_2x')">2× eff.</th>
+          <th onclick="sortBy('scaling_efficiency_4x')">4× eff.</th>
           <th onclick="sortBy('tokens_per_watt')">tok/s/W</th>
           <th onclick="sortBy('memory_efficiency_toks_per_gb')">tok/s/GB</th>
           <th onclick="sortBy('cost_efficiency_toks_per_dollar_hr')">tok/s/$/hr</th>
@@ -274,6 +421,24 @@
     </table>
     <div class="empty-state" id="pro-empty" style="display:none">
       No results match the current filters.
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">—</div>
+        <div class="modal-subtitle" id="modal-subtitle">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <span id="modal-submission">—</span>
+      <a id="modal-script-link" href="#" target="_blank" style="display:none">View reproduce script ↗</a>
     </div>
   </div>
 </div>
@@ -304,8 +469,7 @@
     const scenario = document.getElementById('filter-scenario').value;
     const tier     = document.getElementById('filter-tier').value;
     const search   = document.getElementById('search').value.toLowerCase();
-
-    const chips = document.getElementById('filter-chips').value;
+    const chips    = document.getElementById('filter-chips').value;
 
     return LEADERBOARD_DATA.filter(row => {
       if (vendor   && row.vendor   !== vendor)   return false;
@@ -432,12 +596,33 @@
           `}
         </div>
         <div class="card-model">${row.model || ''} · ${row.framework || ''} · ${row.precision || ''}</div>
-        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap">
+        ${row.suite === 'suite_E' ? `
+            <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
+                ${row.scaling_efficiency_2x != null
+                    ? '2× eff: ' + (row.scaling_efficiency_2x * 100).toFixed(1) + '%'
+                    : ''}
+                ${row.scaling_efficiency_4x != null
+                    ? ' · 4× eff: ' + (row.scaling_efficiency_4x * 100).toFixed(1) + '%'
+                    : ''}
+            </div>
+        ` : ''}
+        ${row.suite === 'suite_C' ? `
+            <div class="card-speed">${row.quant_bf16_throughput
+                ? row.quant_bf16_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
+                : '—'}</div>
+            <div class="card-speed-label">tokens/sec (BF16 baseline)</div>
+            <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
+                ${row.quant_int8_speedup ? 'INT8: ' + row.quant_int8_speedup.toFixed(2) + '× faster' : ''}
+                ${row.quant_int4_speedup ? ' · INT4: ' + row.quant_int4_speedup.toFixed(2) + '× faster' : ''}
+            </div>
+        ` : ''}
+        <div style="margin-top:0.75rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">
           <span class="badge badge-${row.tier}">${row.tier}</span>
           ${isMini ? '<span class="badge badge-mini">mini</span>' : ''}
-          ${row.tier === 'verified' ? '' : ''}
+          <span style="margin-left:auto;font-size:0.75rem;color:#484f58">click for details</span>
         </div>
       `;
+      card.addEventListener('click', () => openModal(row));
       container.appendChild(card);
     });
   }
@@ -490,13 +675,13 @@
     }
     empty.style.display = 'none';
 
-    // Update sort indicators
     document.querySelectorAll('th').forEach(th => {
       th.classList.remove('sorted-asc', 'sorted-desc');
     });
 
     rows.forEach(row => {
       const tr = document.createElement('tr');
+      tr.className = 'clickable';
       const isMini  = (row.suite || '').startsWith('mini-');
       const isVendor = row.submitted_by && row.submitted_by.includes('[vendor]');
 
@@ -535,6 +720,18 @@
             ? `<br><small style="color:#8b949e">${row.tokens_per_sec_per_chip.toLocaleString(undefined, {maximumFractionDigits:0})} tok/s per chip</small>`
             : ''
         }</td>
+        <td>${row.quant_int8_speedup != null
+            ? row.quant_int8_speedup.toFixed(2) + '×'
+            : '—'}</td>
+        <td>${row.quant_int4_speedup != null
+            ? row.quant_int4_speedup.toFixed(2) + '×'
+            : '—'}</td>
+        <td>${row.scaling_efficiency_2x != null
+            ? (row.scaling_efficiency_2x * 100).toFixed(1) + '%'
+            : '—'}</td>
+        <td>${row.scaling_efficiency_4x != null
+            ? (row.scaling_efficiency_4x * 100).toFixed(1) + '%'
+            : '—'}</td>
         <td>${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
         <td>${row.memory_efficiency_toks_per_gb != null ? row.memory_efficiency_toks_per_gb.toLocaleString(undefined, {maximumFractionDigits: 1}) : '—'}</td>
         <td>${row.cost_efficiency_toks_per_dollar_hr != null ? row.cost_efficiency_toks_per_dollar_hr.toLocaleString(undefined, {maximumFractionDigits: 0}) : '—'}</td>
@@ -545,9 +742,141 @@
         </td>
         <td style="color:#8b949e">${row.date || '—'}</td>
       `;
+
+      tr.addEventListener('click', (e) => {
+        // Don't open modal when clicking framework tooltip area
+        if (e.target.closest('.framework-wrapper')) return;
+        openModal(row);
+      });
+
       tbody.appendChild(tr);
     });
   }
+
+  // ── Detail modal ─────────────────────────────────────────
+  function fmt(v, opts = {}) {
+    if (v === null || v === undefined || v === '' || v === 'unknown' || v === 'Unknown') {
+      return '<span class="detail-value null">—</span>';
+    }
+    const cls = opts.cls || '';
+    const mono = opts.mono ? ' mono' : '';
+    const display = opts.format ? opts.format(v) : String(v);
+    return `<span class="detail-value${mono}${cls ? ' ' + cls : ''}">${display}</span>`;
+  }
+
+  function detailRow(label, v, opts = {}) {
+    return `<div class="detail-row"><span class="detail-label">${label}</span>${fmt(v, opts)}</div>`;
+  }
+
+  function detailSection(title, rows) {
+    const content = rows.filter(Boolean).join('');
+    if (!content) return '';
+    return `
+      <div class="detail-section">
+        <div class="detail-section-title">${title}</div>
+        ${content}
+      </div>`;
+  }
+
+  function openModal(row) {
+    const d = row.detail || {};
+
+    document.getElementById('modal-title').textContent =
+      (d.hw_chip || row.chip || '—') +
+      (d.hw_count > 1 ? ` ×${d.hw_count}` : '');
+
+    document.getElementById('modal-subtitle').textContent =
+      [row.suite, row.scenario, row.date].filter(Boolean).join(' · ');
+
+    // Footer
+    document.getElementById('modal-submission').textContent =
+      `Submission: ${row.submission || '—'} · by ${d.meta_submitted_by || '—'}`;
+
+    const scriptLink = document.getElementById('modal-script-link');
+    if (d.meta_reproduce_script) {
+      scriptLink.href = `https://github.com/JuhaoLiang1997/AccelMark/blob/main/${d.meta_reproduce_script}`;
+      scriptLink.style.display = '';
+    } else {
+      scriptLink.style.display = 'none';
+    }
+
+    const body = document.getElementById('modal-body');
+    body.innerHTML = [
+      detailSection('Hardware', [
+        detailRow('Chip', d.hw_chip),
+        detailRow('Vendor', d.hw_vendor),
+        detailRow('Count', d.hw_count),
+        detailRow('Memory per chip', d.hw_memory_gb, { format: v => v + ' GB' }),
+        detailRow('Intra-node interconnect', d.hw_interconnect_intra),
+        detailRow('Inter-node interconnect', d.hw_interconnect_inter),
+        detailRow('CPU', d.hw_cpu),
+        detailRow('System memory', d.hw_system_memory_gb, { format: v => v.toFixed(0) + ' GB' }),
+        detailRow('PCIe generation', d.hw_pcie),
+        detailRow('Network', d.hw_network),
+      ]),
+      detailSection('Software', [
+        detailRow('Framework', d.sw_framework
+          ? (d.sw_framework + (d.sw_framework_version ? ' ' + d.sw_framework_version : ''))
+          : null),
+        detailRow('PyTorch', d.sw_pytorch, { mono: true }),
+        detailRow('Driver version', d.sw_driver, { mono: true }),
+        detailRow('Runtime', d.sw_runtime, { mono: true }),
+        detailRow('OS', d.sw_os),
+        detailRow('Python', d.sw_python, { mono: true }),
+      ]),
+      detailSection('Model', [
+        detailRow('Model ID', d.model_id, { mono: true }),
+        detailRow('Revision', d.model_revision, { mono: true }),
+        detailRow('Architecture', d.model_arch),
+        detailRow('Parameters', d.model_params_b, { format: v => v + 'B' }),
+        detailRow('Precision', d.model_precision),
+        detailRow('Format', d.model_format),
+      ]),
+      detailSection('Run settings', [
+        d.run_scenarios ? detailRow('Scenarios', d.run_scenarios.join(', ')) : null,
+        d.run_chip_counts ? detailRow('Chip counts tested', d.run_chip_counts.join(', ')) : null,
+        detailRow('Runs per config', d.run_num_runs),
+        d.run_tp != null ? detailRow('Tensor parallel size', d.run_tp) : null,
+        d.run_pp != null ? detailRow('Pipeline parallel size', d.run_pp) : null,
+        d.run_dp != null ? detailRow('Data parallel size', d.run_dp) : null,
+      ]),
+      detailSection('Accuracy', [
+        detailRow('Subset score', d.acc_score, {
+          format: v => v.toFixed(2),
+          cls: d.acc_valid ? 'good' : 'warn'
+        }),
+        detailRow('Baseline delta', d.acc_baseline_delta, { format: v => (v >= 0 ? '+' : '') + v.toFixed(3) }),
+        detailRow('Valid', d.acc_valid != null
+          ? (d.acc_valid ? '<span class="detail-value good">Yes</span>' : '<span class="detail-value warn">No</span>')
+          : null),
+        d.acc_notes ? detailRow('Notes', d.acc_notes) : null,
+      ]),
+      detailSection('Metadata', [
+        detailRow('Submitted by', d.meta_submitted_by),
+        detailRow('Submission type', d.meta_submission_type),
+        detailRow('Date', d.meta_date),
+        detailRow('Benchmark duration', d.meta_elapsed_min, { format: v => v.toFixed(1) + ' min' }),
+        detailRow('Model load time', d.meta_model_load_sec, { format: v => v.toFixed(1) + ' s' }),
+        d.meta_notes ? detailRow('Notes', d.meta_notes) : null,
+      ]),
+    ].join('');
+
+    document.getElementById('modal-backdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(e) {
+    if (e.target === document.getElementById('modal-backdrop')) closeModalDirect();
+  }
+
+  function closeModalDirect() {
+    document.getElementById('modal-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModalDirect();
+  });
 </script>
 </body>
 </html>
