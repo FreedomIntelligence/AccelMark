@@ -5,447 +5,493 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AccelMark — AI Accelerator Leaderboard</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d1117;
+      --bg2:      #161b22;
+      --bg3:      #1c2128;
+      --border:   #21262d;
+      --border2:  #30363d;
+      --text:     #e6edf3;
+      --text2:    #8b949e;
+      --text3:    #484f58;
+      --blue:     #58a6ff;
+      --green:    #56d364;
+      --amber:    #d29922;
+      --red:      #f85149;
+      --purple:   #a78bfa;
+      --teal:     #1D9E75;
+      --accent:   #1f6feb;
+
+      /* per-suite accent colors */
+      --suite-a: #58a6ff;
+      --suite-b: #56d364;
+      --suite-c: #d29922;
+      --suite-d: #a78bfa;
+      --suite-e: #1D9E75;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
+      font-size: 0.875rem;
     }
 
+    /* ── Header ──────────────────────────────────────────────── */
     header {
-      padding: 2rem 2rem 1rem;
-      border-bottom: 1px solid #21262d;
-    }
-
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #f0f6fc;
-    }
-
-    header p {
-      color: #8b949e;
-      margin-top: 0.25rem;
-      font-size: 0.9rem;
-    }
-
-    .controls {
-      padding: 1rem 2rem;
+      padding: 1.5rem 2rem 1rem;
+      border-bottom: 1px solid var(--border);
       display: flex;
-      gap: 0.75rem;
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    header h1 { font-size: 1.25rem; font-weight: 700; color: #f0f6fc; }
+    header p  { color: var(--text2); font-size: 0.85rem; }
+    header a  { color: var(--blue); text-decoration: none; }
+    header a:hover { text-decoration: underline; }
+
+    /* ── Stat bar ────────────────────────────────────────────── */
+    .stat-bar {
+      padding: 0.6rem 2rem;
+      display: flex;
+      gap: 2rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text2);
+    }
+    .stat-bar strong { color: var(--text); font-weight: 600; }
+
+    /* ── Suite legend ────────────────────────────────────────── */
+    details.suite-legend {
+      border-bottom: 1px solid var(--border);
+    }
+    details.suite-legend summary {
+      padding: 0.6rem 2rem;
+      cursor: pointer;
+      color: var(--text2);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      user-select: none;
+    }
+    details.suite-legend summary:hover { color: var(--text); }
+    details.suite-legend summary .icon {
+      font-size: 0.7rem;
+      background: var(--border2);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      color: var(--text2);
+    }
+    details.suite-legend .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.4rem 2rem;
+      padding: 0.75rem 2rem 1rem;
+    }
+    details.suite-legend .legend-grid div { color: var(--text2); line-height: 1.5; }
+
+    /* ── Controls ────────────────────────────────────────────── */
+    .controls {
+      padding: 0.75rem 2rem;
+      display: flex;
+      gap: 0.6rem;
       flex-wrap: wrap;
       align-items: center;
-      border-bottom: 1px solid #21262d;
+      border-bottom: 1px solid var(--border);
     }
 
-    select, input {
-      background: #161b22;
-      border: 1px solid #30363d;
-      color: #e6edf3;
-      padding: 0.4rem 0.75rem;
+    select, input[type="text"] {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 0.35rem 0.7rem;
       border-radius: 6px;
-      font-size: 0.875rem;
+      font-size: 0.82rem;
+      height: 32px;
     }
+    select:focus, input:focus { outline: none; border-color: var(--accent); }
 
-    .view-toggle {
-      margin-left: auto;
-      display: flex;
-      gap: 0.5rem;
-    }
-
+    .view-toggle { margin-left: auto; display: flex; gap: 0.4rem; }
     .view-btn {
-      background: #161b22;
-      border: 1px solid #30363d;
-      color: #8b949e;
-      padding: 0.4rem 0.9rem;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      padding: 0.35rem 0.8rem;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.875rem;
+      font-size: 0.82rem;
+      height: 32px;
     }
+    .view-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .view-btn:hover:not(.active) { color: var(--text); }
 
-    .view-btn.active {
-      background: #1f6feb;
-      border-color: #1f6feb;
-      color: #fff;
+    /* ── Suite pill ──────────────────────────────────────────── */
+    .suite-pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.1rem 0.45rem;
+      border-radius: 10px;
+      letter-spacing: 0.02em;
     }
+    .suite-pill.suite_A { background: #0c2d4a; color: var(--suite-a); }
+    .suite-pill.suite_B { background: #0f2d14; color: var(--suite-b); }
+    .suite-pill.suite_C { background: #2d1f00; color: var(--suite-c); }
+    .suite-pill.suite_D { background: #1e1040; color: var(--suite-d); }
+    .suite-pill.suite_E { background: #062d1e; color: var(--suite-e); }
 
-    .table-wrap {
-      overflow-x: auto;
-      padding: 1rem 2rem;
-    }
+    /* ── Tables ──────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; padding: 1rem 2rem; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
+    table { width: 100%; border-collapse: collapse; }
 
     th {
       text-align: left;
-      padding: 0.6rem 0.75rem;
-      color: #8b949e;
+      padding: 0.5rem 0.75rem;
+      color: var(--text2);
       font-weight: 500;
-      border-bottom: 1px solid #21262d;
+      border-bottom: 1px solid var(--border);
       white-space: nowrap;
       cursor: pointer;
       user-select: none;
     }
-
-    th:hover { color: #e6edf3; }
-
-    th.sorted-asc::after  { content: " ↑"; }
-    th.sorted-desc::after { content: " ↓"; }
+    th:hover { color: var(--text); }
+    th.sorted-asc::after  { content: " ↑"; color: var(--blue); }
+    th.sorted-desc::after { content: " ↓"; color: var(--blue); }
 
     td {
-      padding: 0.6rem 0.75rem;
-      border-bottom: 1px solid #161b22;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--bg2);
       white-space: nowrap;
+      vertical-align: middle;
     }
 
     tr.clickable { cursor: pointer; }
-    tr.clickable:hover td { background: #1c2128; }
+    tr.clickable:hover td { background: var(--bg3); }
 
+    .metric-primary { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .chip-name      { font-weight: 500; }
+
+    /* inline performance bar */
+    .perf-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .perf-bar-bg {
+      flex: 1;
+      min-width: 60px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .perf-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* ── Badges ──────────────────────────────────────────────── */
     .badge {
       display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 10px;
+      font-size: 0.7rem;
       font-weight: 500;
     }
+    .badge-verified  { background: #1a4a1a; color: var(--green); }
+    .badge-community { background: #1c2e4a; color: var(--blue);  }
+    .badge-vendor    { background: #3d2b00; color: var(--amber); }
+    .badge-mini      { background: #2d1b69; color: var(--purple);}
 
-    .badge-verified  { background: #1a4a1a; color: #56d364; }
-    .badge-community { background: #1c2e4a; color: #58a6ff; }
-    .badge-vendor    { background: #3d2b00; color: #d29922; }
-    .badge-mini      { background: #2d1b69; color: #a78bfa; }
-
-    .metric-primary {
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
+    /* ── Framework cell ──────────────────────────────────────── */
+    .framework-standard { color: var(--green); }
+    .framework-custom   { color: var(--amber); }
+    .framework-unknown  { color: var(--text2); }
+    .framework-wrapper  { position: relative; display: inline-block; }
+    .framework-cell     { cursor: pointer; text-decoration: underline dotted; }
+    .framework-tooltip  {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--text);
+      z-index: 200;
+      max-width: 360px;
+      white-space: normal;
+      line-height: 1.5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
+    .framework-cell:hover .framework-tooltip { display: block; }
 
-    .chip-name { font-weight: 500; }
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: #8b949e;
-    }
-
-    .stat-bar {
-      padding: 1rem 2rem;
-      display: flex;
-      gap: 2rem;
-      border-bottom: 1px solid #21262d;
-      font-size: 0.875rem;
-      color: #8b949e;
-    }
-
-    .stat-bar span { color: #e6edf3; font-weight: 600; }
-
-    /* Consumer view cards */
+    /* ── Consumer cards ──────────────────────────────────────── */
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 1rem;
       padding: 1rem 2rem;
     }
 
     .card {
-      background: #161b22;
-      border: 1px solid #21262d;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--border);
       border-radius: 8px;
       padding: 1rem;
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
-    }
-
-    .card:hover {
-      border-color: #388bfd;
-      background: #1c2128;
-    }
-
-    .card-chip { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; }
-    .card-speed { font-size: 1.75rem; font-weight: 700; color: #58a6ff; }
-    .card-speed-label { font-size: 0.75rem; color: #8b949e; }
-    .card-model { font-size: 0.8rem; color: #8b949e; margin-top: 0.5rem; }
-
-    .cap-list { margin-top: 0.75rem; font-size: 0.8rem; }
-    .cap-yes { color: #56d364; }
-    .cap-no  { color: #f85149; }
-
-    .framework-standard { color: #56d364; }
-    .framework-custom    { color: #d29922; }
-    .framework-unknown   { color: #8b949e; }
-
-    .framework-cell {
-      cursor: pointer;
-      text-decoration: underline dotted;
-    }
-
-    .framework-tooltip {
-      display: none;
-      position: absolute;
-      background: #1c2128;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8rem;
-      color: #e6edf3;
-      z-index: 100;
-      max-width: 400px;
-      white-space: normal;
-    }
-
-    .framework-cell:hover .framework-tooltip {
-      display: block;
-    }
-
-    .framework-wrapper {
       position: relative;
-      display: inline-block;
     }
+    .card:hover { background: var(--bg3); }
+    .card.suite_A { border-top-color: var(--suite-a); }
+    .card.suite_B { border-top-color: var(--suite-b); }
+    .card.suite_C { border-top-color: var(--suite-c); }
+    .card.suite_D { border-top-color: var(--suite-d); }
+    .card.suite_E { border-top-color: var(--suite-e); }
 
-    /* ── Detail modal ─────────────────────────────────────── */
+    .card-chip       { font-weight: 600; font-size: 0.95rem; }
+    .card-speed      { font-size: 1.6rem; font-weight: 700; color: var(--blue); line-height: 1.1; margin: 0.4rem 0 0; }
+    .card-speed-label{ font-size: 0.72rem; color: var(--text2); }
+    .card-meta       { font-size: 0.78rem; color: var(--text2); margin-top: 0.5rem; }
+    .card-footer     { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .card-hint       { margin-left: auto; font-size: 0.7rem; color: var(--text3); }
+
+    /* ── Empty state ─────────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text2);
+    }
+    .empty-state p   { margin-top: 0.5rem; font-size: 0.85rem; }
+
+    /* ── Modal ───────────────────────────────────────────────── */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.65);
+      background: rgba(0,0,0,0.7);
       z-index: 1000;
       align-items: center;
       justify-content: center;
       padding: 1rem;
     }
-
-    .modal-backdrop.open {
-      display: flex;
-    }
+    .modal-backdrop.open { display: flex; }
 
     .modal {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-top: 3px solid var(--accent);
+      border-radius: 10px;
       width: 100%;
-      max-width: 640px;
+      max-width: 660px;
       max-height: 90vh;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
     }
+    /* suite-specific modal accent */
+    .modal.suite_A { border-top-color: var(--suite-a); }
+    .modal.suite_B { border-top-color: var(--suite-b); }
+    .modal.suite_C { border-top-color: var(--suite-c); }
+    .modal.suite_D { border-top-color: var(--suite-d); }
+    .modal.suite_E { border-top-color: var(--suite-e); }
 
     .modal-header {
-      padding: 1.25rem 1.5rem 1rem;
-      border-bottom: 1px solid #21262d;
+      padding: 1.1rem 1.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 1rem;
       position: sticky;
       top: 0;
-      background: #161b22;
+      background: var(--bg2);
       z-index: 1;
     }
-
-    .modal-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #f0f6fc;
-      line-height: 1.4;
-    }
-
-    .modal-subtitle {
-      font-size: 0.8rem;
-      color: #8b949e;
-      margin-top: 0.2rem;
-    }
+    .modal-title    { font-size: 1rem; font-weight: 600; color: #f0f6fc; line-height: 1.4; }
+    .modal-subtitle { font-size: 0.78rem; color: var(--text2); margin-top: 0.2rem; display: flex; align-items: center; gap: 0.4rem; }
 
     .modal-close {
       background: none;
-      border: 1px solid #30363d;
-      color: #8b949e;
+      border: 1px solid var(--border2);
+      color: var(--text2);
       border-radius: 6px;
       cursor: pointer;
-      padding: 0.25rem 0.6rem;
-      font-size: 1rem;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.95rem;
       line-height: 1;
       flex-shrink: 0;
     }
+    .modal-close:hover { color: var(--text); border-color: var(--text2); }
 
-    .modal-close:hover { color: #e6edf3; border-color: #8b949e; }
-
-    .modal-body {
-      padding: 1rem 1.5rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .detail-section { display: flex; flex-direction: column; gap: 0; }
-
-    .detail-section-title {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #8b949e;
-      margin-bottom: 0.5rem;
-    }
-
-    .detail-row {
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      padding: 0.35rem 0;
-      border-bottom: 1px solid #21262d;
-      font-size: 0.85rem;
-    }
-
-    .detail-row:last-child { border-bottom: none; }
-
-    .detail-label {
-      color: #8b949e;
-      min-width: 160px;
-      flex-shrink: 0;
-    }
-
-    .detail-value {
-      color: #e6edf3;
-      word-break: break-all;
-    }
-
-    .detail-value.mono {
-      font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-      font-size: 0.8rem;
-      color: #a5d6ff;
-    }
-
-    .detail-value.good { color: #56d364; }
-    .detail-value.warn { color: #d29922; }
-    .detail-value.null { color: #484f58; font-style: italic; }
-
-    .modal-footer {
-      padding: 0.75rem 1.5rem;
-      border-top: 1px solid #21262d;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #8b949e;
-    }
-
-    .modal-footer a {
-      color: #58a6ff;
-      text-decoration: none;
-    }
-
-    .modal-footer a:hover { text-decoration: underline; }
-
+    /* tabs */
     .modal-tabs {
       display: flex;
-      gap: 0;
-      border-bottom: 1px solid #21262d;
+      border-bottom: 1px solid var(--border);
       padding: 0 1.5rem;
-      background: #161b22;
+      background: var(--bg2);
+      position: sticky;
+      top: 57px;
+      z-index: 1;
     }
-
     .modal-tab {
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
-      color: #8b949e;
-      padding: 0.6rem 1rem;
+      color: var(--text2);
+      padding: 0.55rem 1rem;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       margin-bottom: -1px;
     }
+    .modal-tab.active        { color: var(--text); border-bottom-color: var(--accent); }
+    .modal-tab:hover:not(.active) { color: var(--text2); opacity: 0.8; }
 
-    .modal-tab.active {
-      color: #e6edf3;
-      border-bottom-color: #1f6feb;
+    /* body */
+    .modal-body {
+      padding: 1rem 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
     }
 
-    .modal-tab:hover:not(.active) { color: #c9d1d9; }
-
-    .chart-wrap {
-      position: relative;
-      width: 100%;
-    }
-
-    .chart-section-title {
-      font-size: 0.7rem;
+    /* detail rows */
+    .detail-section { display: flex; flex-direction: column; }
+    .detail-section-title {
+      font-size: 0.65rem;
       font-weight: 600;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
-      color: #8b949e;
+      color: var(--text2);
+      margin-bottom: 0.4rem;
+    }
+    .detail-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: var(--text2); min-width: 155px; flex-shrink: 0; }
+    .detail-value { color: var(--text); word-break: break-all; }
+    .detail-value.mono { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; font-size: 0.78rem; color: #a5d6ff; }
+    .detail-value.good { color: var(--green); }
+    .detail-value.warn { color: var(--amber); }
+    .detail-value.null { color: var(--text3); font-style: italic; }
+
+    /* footer */
+    .modal-footer {
+      padding: 0.65rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text2);
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .modal-footer a { color: var(--blue); text-decoration: none; }
+    .modal-footer a:hover { text-decoration: underline; }
+
+    /* ── Viz panel ───────────────────────────────────────────── */
+    .chart-section-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--text2);
       margin: 1rem 0 0.5rem;
     }
-
     .chart-section-title:first-child { margin-top: 0; }
+
+    .chart-wrap { position: relative; width: 100%; }
 
     .stat-chips {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 8px;
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 6px;
+      margin-bottom: 0.75rem;
     }
-
-    .stat-chip {
-      background: #0d1117;
-      border-radius: 6px;
-      padding: 8px 12px;
-    }
-
-    .stat-chip-label { font-size: 11px; color: #8b949e; margin: 0 0 2px; }
-    .stat-chip-value { font-size: 16px; font-weight: 600; color: #e6edf3; margin: 0; }
-    .stat-chip-value.blue  { color: #58a6ff; }
-    .stat-chip-value.green { color: #56d364; }
-    .stat-chip-value.teal  { color: #1D9E75; }
-    .stat-chip-value.amber { color: #d29922; }
+    .stat-chip        { background: var(--bg); border-radius: 6px; padding: 7px 10px; }
+    .stat-chip-label  { font-size: 10px; color: var(--text2); margin: 0 0 2px; }
+    .stat-chip-value  { font-size: 15px; font-weight: 600; color: var(--text); margin: 0; }
+    .stat-chip-value.blue  { color: var(--blue); }
+    .stat-chip-value.green { color: var(--green); }
+    .stat-chip-value.teal  { color: var(--teal); }
+    .stat-chip-value.amber { color: var(--amber); }
     .stat-chip-value.coral { color: #D85A30; }
 
-    .sla-row {
+    .chart-legend {
+      display: flex;
+      gap: 14px;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text2);
+      flex-wrap: wrap;
+    }
+    .chart-legend span { display: flex; align-items: center; gap: 4px; }
+    .chart-legend-dot  { width: 10px; height: 2px; border-radius: 1px; display: inline-block; }
+
+    .sla-indicators { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .sla-chip {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      margin-bottom: 4px;
+      gap: 5px;
+      font-size: 11px;
+      background: var(--bg);
+      padding: 3px 8px;
+      border-radius: 10px;
+      color: var(--text2);
     }
-
-    .sla-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .sla-dot.pass { background: #56d364; }
-    .sla-dot.fail { background: #f85149; }
+    .sla-dot        { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .sla-dot.pass   { background: var(--green); }
+    .sla-dot.fail   { background: var(--red);   }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>⚡ AccelMark Leaderboard</h1>
-  <p>Open benchmark for AI accelerators on LLM workloads · <a href="https://github.com/JuhaoLiang1997/AccelMark" style="color:#58a6ff">GitHub</a></p>
+  <h1>⚡ AccelMark</h1>
+  <p>Open benchmark leaderboard for AI accelerators on LLM workloads ·
+    <a href="https://github.com/JuhaoLiang1997/AccelMark">GitHub</a></p>
 </header>
 
 <div class="stat-bar">
-  <div>Submissions: <span id="stat-total">—</span></div>
-  <div>Chips: <span id="stat-chips">—</span></div>
-  <div>Last updated: <span id="stat-date">—</span></div>
+  <div>Submissions: <strong id="stat-total">—</strong></div>
+  <div>Chips: <strong id="stat-chips">—</strong></div>
+  <div>Last updated: <strong id="stat-date">—</strong></div>
 </div>
 
-<details style="padding:0.75rem 2rem;border-bottom:1px solid #21262d;font-size:0.82rem;color:#8b949e;cursor:pointer">
-  <summary style="color:#e6edf3;font-weight:500;list-style:none;display:flex;align-items:center;gap:0.5rem">
-    <span style="font-size:0.75rem;background:#21262d;padding:0.15rem 0.5rem;border-radius:4px">?</span> Suite descriptions
+<details class="suite-legend">
+  <summary>
+    <span class="icon">?</span> Suite guide
   </summary>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem 2rem;margin-top:0.75rem">
-    <div><span style="color:#58a6ff;font-weight:500">Suite A</span> — Single chip, Llama-3-8B. How fast is this chip at inference? Primary metric: offline tokens/sec.</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite B</span> — Flexible chips, Llama-3-70B. Can this chip serve large models? Tests multi-chip setups required for 70B.</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite C</span> — Single chip, Llama-3-8B. Quantization speed/quality tradeoff across BF16, INT8, INT4.</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite D</span> — Single chip, Llama-3.1-8B. How does this chip handle 32K-token long-context inputs?</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
+  <div class="legend-grid">
+    <div><span style="color:var(--suite-a);font-weight:600">Suite A</span> — Single chip, Llama-3-8B. Raw single-chip inference speed. Primary: offline tokens/sec.</div>
+    <div><span style="color:var(--suite-b);font-weight:600">Suite B</span> — Flexible chips, Llama-3-70B. Can this chip serve large models that require multiple GPUs?</div>
+    <div><span style="color:var(--suite-c);font-weight:600">Suite C</span> — Single chip, Llama-3-8B. Quantization speed/quality tradeoff: BF16 vs INT8 vs INT4.</div>
+    <div><span style="color:var(--suite-d);font-weight:600">Suite D</span> — Single chip, Llama-3.1-8B. Long-context (32K token) throughput and latency.</div>
+    <div><span style="color:var(--suite-e);font-weight:600">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary: 1× baseline tokens/sec.</div>
   </div>
 </details>
+
 <div class="controls">
-  <select id="filter-vendor">
-    <option value="">All vendors</option>
-  </select>
+  <select id="filter-vendor"><option value="">All vendors</option></select>
   <select id="filter-scenario">
     <option value="">All scenarios</option>
     <option value="offline">Offline</option>
@@ -468,25 +514,25 @@
   </select>
   <select id="filter-suite">
     <option value="">All suites</option>
-    <option value="suite_A">Suite A — single chip inference speed</option>
-    <option value="suite_B">Suite B — large model serving</option>
-    <option value="suite_C">Suite C — quantization tradeoff</option>
-    <option value="suite_D">Suite D — long context (32K)</option>
-    <option value="suite_E">Suite E — multi-chip scaling</option>
+    <option value="suite_A">Suite A — inference speed</option>
+    <option value="suite_B">Suite B — large model</option>
+    <option value="suite_C">Suite C — quantization</option>
+    <option value="suite_D">Suite D — long context</option>
+    <option value="suite_E">Suite E — scaling</option>
   </select>
-  <input id="search" type="text" placeholder="Search chip or model…" style="width:200px">
+  <input id="search" type="text" placeholder="Search chip or model…" style="width:180px">
   <div class="view-toggle">
-    <button class="view-btn active" id="btn-consumer" onclick="setView('consumer')">Community</button>
-    <button class="view-btn" id="btn-pro" onclick="setView('pro')">Pro</button>
+    <button class="view-btn active" id="btn-consumer" onclick="setView('consumer')">Cards</button>
+    <button class="view-btn" id="btn-pro" onclick="setView('pro')">Table</button>
   </div>
 </div>
 
-<!-- Consumer view -->
+<!-- Cards view -->
 <div id="view-consumer">
   <div class="cards" id="cards-container"></div>
 </div>
 
-<!-- Pro view -->
+<!-- Table view -->
 <div id="view-pro" style="display:none">
   <div class="table-wrap">
     <table id="pro-table">
@@ -501,8 +547,8 @@
           <th onclick="sortBy('suite')">Suite</th>
           <th onclick="sortBy('scenario')">Scenario</th>
           <th onclick="sortBy('primary_metric')">Performance</th>
-          <th onclick="sortBy('quant_int8_speedup')">INT8 speedup</th>
-          <th onclick="sortBy('quant_int4_speedup')">INT4 speedup</th>
+          <th onclick="sortBy('quant_int8_speedup')">INT8×</th>
+          <th onclick="sortBy('quant_int4_speedup')">INT4×</th>
           <th onclick="sortBy('scaling_efficiency_2x')">2× eff.</th>
           <th onclick="sortBy('scaling_efficiency_4x')">4× eff.</th>
           <th onclick="sortBy('tokens_per_watt')">tok/s/W</th>
@@ -515,20 +561,21 @@
       <tbody id="pro-tbody"></tbody>
     </table>
     <div class="empty-state" id="pro-empty" style="display:none">
-      No results match the current filters.
+      <div style="font-size:2rem">📭</div>
+      <p>No results match the current filters.</p>
     </div>
   </div>
 </div>
 
 <!-- Detail modal -->
-<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal(event)">
+<div class="modal-backdrop" id="modal-backdrop" onclick="onBackdropClick(event)">
   <div class="modal" id="modal">
     <div class="modal-header">
       <div>
         <div class="modal-title" id="modal-title">—</div>
         <div class="modal-subtitle" id="modal-subtitle">—</div>
       </div>
-      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-tabs" id="modal-tabs">
       <button class="modal-tab active" id="tab-details" onclick="switchTab('details')">Details</button>
@@ -546,993 +593,729 @@
 <script src="leaderboard.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-  // ── State ────────────────────────────────────────────────
-  let currentView = 'consumer';
-  let sortKey = 'primary_metric';
-  let sortDir = -1; // -1 = desc, 1 = asc
+'use strict';
 
-  // ── Init ─────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof LEADERBOARD_DATA === 'undefined' || !LEADERBOARD_DATA.length) {
-      document.getElementById('pro-empty').style.display = 'block';
-      document.getElementById('pro-empty').textContent = 'No submissions yet. Be the first!';
-      return;
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentView = 'consumer';
+let sortKey     = 'primary_metric';
+let sortDir     = -1;
+let _activeCharts = [];
+let _pendingVizRow = null;
+
+// ── Computed max throughput for bar scaling ───────────────────────────────────
+let _maxPrimary = 1;
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof LEADERBOARD_DATA === 'undefined' || !LEADERBOARD_DATA.length) {
+    document.getElementById('pro-empty').style.display = 'block';
+    document.getElementById('pro-empty').innerHTML = '<div style="font-size:2rem">📭</div><p>No submissions yet. <a href="https://github.com/JuhaoLiang1997/AccelMark/blob/main/docs/CONTRIBUTING.md" style="color:var(--blue)">Be the first to submit ↗</a></p>';
+    return;
+  }
+  _maxPrimary = Math.max(...LEADERBOARD_DATA.map(r => r.primary_metric || 0));
+  populateVendorFilter();
+  updateStats();
+  render();
+});
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function getFiltered() {
+  const vendor   = document.getElementById('filter-vendor').value;
+  const scenario = document.getElementById('filter-scenario').value;
+  const tier     = document.getElementById('filter-tier').value;
+  const chips    = document.getElementById('filter-chips').value;
+  const suite    = document.getElementById('filter-suite').value;
+  const search   = document.getElementById('search').value.toLowerCase();
+
+  return LEADERBOARD_DATA.filter(row => {
+    if (vendor   && row.vendor   !== vendor)   return false;
+    if (scenario && row.scenario !== scenario) return false;
+    if (tier     && row.tier     !== tier)     return false;
+    if (chips    && String(row.chip_count || 1) !== chips) return false;
+    if (suite    && row.suite    !== suite)    return false;
+    if (search) {
+      const hay = `${row.chip} ${row.model} ${row.framework} ${row.suite}`.toLowerCase();
+      if (!hay.includes(search)) return false;
     }
+    return true;
+  });
+}
 
-    populateVendorFilter();
-    updateStats();
-    render();
+function populateVendorFilter() {
+  const vendors = [...new Set(LEADERBOARD_DATA.map(r => r.vendor).filter(Boolean))].sort();
+  const sel = document.getElementById('filter-vendor');
+  vendors.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    sel.appendChild(opt);
+  });
+}
+
+['filter-vendor','filter-scenario','filter-tier','filter-chips','filter-suite','search'].forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener('change', render);
+  el.addEventListener('input',  render);
+});
+
+// ── Sorting ───────────────────────────────────────────────────────────────────
+function sortBy(key) {
+  sortDir = sortKey === key ? sortDir * -1 : -1;
+  sortKey = key;
+  render();
+}
+
+function getSorted(rows) {
+  return [...rows].sort((a, b) => {
+    const va = a[sortKey], vb = b[sortKey];
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * sortDir;
+  });
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const filtered = getFiltered();
+  const sorted   = getSorted(filtered);
+  _maxPrimary    = Math.max(...sorted.map(r => r.primary_metric || 0), 1);
+  updateStats(filtered);
+  currentView === 'consumer' ? renderConsumer(sorted) : renderPro(sorted);
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('view-consumer').style.display = v === 'consumer' ? '' : 'none';
+  document.getElementById('view-pro').style.display      = v === 'pro'      ? '' : 'none';
+  document.getElementById('btn-consumer').classList.toggle('active', v === 'consumer');
+  document.getElementById('btn-pro').classList.toggle('active', v === 'pro');
+  render();
+}
+
+function updateStats(filtered) {
+  const rows = filtered || LEADERBOARD_DATA;
+  document.getElementById('stat-total').textContent = rows.length;
+  document.getElementById('stat-chips').textContent = new Set(rows.map(r => r.chip)).size;
+  const dates = rows.map(r => r.date).filter(Boolean).sort();
+  document.getElementById('stat-date').textContent  = dates.length ? dates[dates.length - 1] : '—';
+}
+
+// ── Suite pill helper ─────────────────────────────────────────────────────────
+function suitePill(suite) {
+  if (!suite) return '';
+  return `<span class="suite-pill ${suite}">${suite.replace('_', ' ').toUpperCase()}</span>`;
+}
+
+// ── Consumer cards ────────────────────────────────────────────────────────────
+function renderConsumer(rows) {
+  const container = document.getElementById('cards-container');
+  container.innerHTML = '';
+
+  // Group by chip+suite, best metric per group
+  const byKey = {};
+  rows.forEach(row => {
+    if (!row.chip) return;
+    const key = row.chip + '||' + (row.suite || '');
+    if (!byKey[key] || (row.primary_metric || 0) > (byKey[key].primary_metric || 0)) {
+      byKey[key] = row;
+    }
   });
 
-  // ── Filters ──────────────────────────────────────────────
-  function getFiltered() {
-    const vendor   = document.getElementById('filter-vendor').value;
-    const scenario = document.getElementById('filter-scenario').value;
-    const tier     = document.getElementById('filter-tier').value;
-    const search   = document.getElementById('search').value.toLowerCase();
-    const chips    = document.getElementById('filter-chips').value;
-    const suite    = document.getElementById('filter-suite').value;
+  const cards = Object.values(byKey).sort((a, b) => (b.primary_metric || 0) - (a.primary_metric || 0));
 
-    return LEADERBOARD_DATA.filter(row => {
-      if (vendor   && row.vendor   !== vendor)   return false;
-      if (scenario && row.scenario !== scenario) return false;
-      if (tier     && row.tier     !== tier)     return false;
-      if (chips && String(row.chip_count || 1) !== chips) return false;
-      if (suite    && row.suite    !== suite)    return false;
-      if (search) {
-        const haystack = `${row.chip} ${row.model} ${row.framework}`.toLowerCase();
-        if (!haystack.includes(search)) return false;
-      }
-      return true;
-    });
+  if (!cards.length) {
+    container.innerHTML = '<div class="empty-state"><div style="font-size:2rem">🔍</div><p>No results match the current filters.</p></div>';
+    return;
   }
 
-  function populateVendorFilter() {
-    const vendors = [...new Set(LEADERBOARD_DATA.map(r => r.vendor).filter(Boolean))].sort();
-    const sel = document.getElementById('filter-vendor');
-    vendors.forEach(v => {
-      const opt = document.createElement('option');
-      opt.value = v; opt.textContent = v;
-      sel.appendChild(opt);
-    });
-  }
-
-  ['filter-vendor','filter-scenario','filter-tier','filter-chips','filter-suite','search'].forEach(id => {
-    document.getElementById(id).addEventListener('change', render);
-    document.getElementById(id).addEventListener('input', render);
-  });
-
-  // ── Sorting ──────────────────────────────────────────────
-  function sortBy(key) {
-    if (sortKey === key) sortDir *= -1;
-    else { sortKey = key; sortDir = -1; }
-    render();
-  }
-
-  function getSorted(rows) {
-    return [...rows].sort((a, b) => {
-      const va = a[sortKey], vb = b[sortKey];
-      if (va === null || va === undefined) return 1;
-      if (vb === null || vb === undefined) return -1;
-      if (typeof va === 'number') return (va - vb) * sortDir;
-      return String(va).localeCompare(String(vb)) * sortDir;
-    });
-  }
-
-  // ── Render ───────────────────────────────────────────────
-  function render() {
-    const filtered = getFiltered();
-    const sorted   = getSorted(filtered);
-
-    updateStats(filtered);
-
-    if (currentView === 'consumer') renderConsumer(sorted);
-    else renderPro(sorted);
-  }
-
-  function setView(v) {
-    currentView = v;
-    document.getElementById('view-consumer').style.display = v === 'consumer' ? '' : 'none';
-    document.getElementById('view-pro').style.display      = v === 'pro'      ? '' : 'none';
-    document.getElementById('btn-consumer').classList.toggle('active', v === 'consumer');
-    document.getElementById('btn-pro').classList.toggle('active', v === 'pro');
-    render();
-  }
-
-  function updateStats(filtered) {
-    const rows = filtered || LEADERBOARD_DATA;
-    document.getElementById('stat-total').textContent = rows.length;
-    document.getElementById('stat-chips').textContent = new Set(rows.map(r => r.chip)).size;
-    const dates = rows.map(r => r.date).filter(Boolean).sort();
-    document.getElementById('stat-date').textContent = dates.length ? dates[dates.length - 1] : '—';
-  }
-
-  // ── Consumer View ────────────────────────────────────────
-  function renderConsumer(rows) {
-    const container = document.getElementById('cards-container');
-    container.innerHTML = '';
-
-    // Group by chip+suite, take best result per group
-    const byChip = {};
-    rows.forEach(row => {
-      if (!row.chip) return;
-      const key = (row.chip || '') + '||' + (row.suite || '');
-      if (!byChip[key] || (row.primary_metric || 0) > (byChip[key].primary_metric || 0)) {
-        byChip[key] = row;
-      }
-    });
-
-    const chips = Object.values(byChip).sort((a, b) =>
-      (b.primary_metric || 0) - (a.primary_metric || 0)
-    );
-
-    if (!chips.length) {
-      container.innerHTML = '<div class="empty-state">No results match the current filters.</div>';
-      return;
-    }
-
-    chips.forEach(row => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      const isMini = (row.suite || '').startsWith('mini-');
-      card.innerHTML = `
-        <div class="card-chip">
-          ${row.chip || 'Unknown'}
-          ${(row.chip_count || 1) > 1
-            ? `<span style="color:#8b949e;font-size:0.85rem;font-weight:400"> ×${row.chip_count}</span>`
-            : ''}
-        </div>
-        <div style="margin-top:0.5rem">
-          ${row.is_suite_level ? `
-            <div class="card-speed">${row.offline_throughput
-              ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
-              : '—'}</div>
-            <div class="card-speed-label">tokens/sec offline</div>
-            <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
-              ${row.online_max_qps ? '&bull; ' + row.online_max_qps + ' max QPS' : ''}
-              ${row.interactive_ttft_p99 ? ' &bull; ' + row.interactive_ttft_p99.toFixed(0) + 'ms TTFT p99' : ''}
-            </div>
-          ` : `
-            <div class="card-speed">${row.primary_metric
-              ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 0})
-              : '—'}</div>
-            <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
-          `}
-        </div>
-        <div style="font-size:0.75rem;color:#388bfd;font-weight:500;margin-bottom:0.25rem">${row.suite || ''}</div>
-        <div class="card-model">${row.model || ''} · ${row.framework || ''} · ${row.precision || ''}</div>
-        ${row.suite === 'suite_E' ? `
-            <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
-                ${row.scaling_efficiency_2x != null
-                    ? '2× eff: ' + (row.scaling_efficiency_2x * 100).toFixed(1) + '%'
-                    : ''}
-                ${row.scaling_efficiency_4x != null
-                    ? ' · 4× eff: ' + (row.scaling_efficiency_4x * 100).toFixed(1) + '%'
-                    : ''}
-            </div>
-        ` : ''}
-        ${row.suite === 'suite_C' ? `
-            <div class="card-speed">${row.quant_bf16_throughput
-                ? row.quant_bf16_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
-                : '—'}</div>
-            <div class="card-speed-label">tokens/sec (BF16 baseline)</div>
-            <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
-                ${row.quant_int8_speedup ? 'INT8: ' + row.quant_int8_speedup.toFixed(2) + '× faster' : ''}
-                ${row.quant_int4_speedup ? ' · INT4: ' + row.quant_int4_speedup.toFixed(2) + '× faster' : ''}
-            </div>
-        ` : ''}
-        <div style="margin-top:0.75rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">
-          <span class="badge badge-${row.tier}">${row.tier}</span>
-          ${isMini ? '<span class="badge badge-mini">mini</span>' : ''}
-          <span style="margin-left:auto;font-size:0.75rem;color:#484f58">click for details</span>
-        </div>
-      `;
-      card.addEventListener('click', () => openModal(row));
-      container.appendChild(card);
-    });
-  }
-
-  // ── Framework formatter ──────────────────────────────────
-  function formatFramework(row) {
-    const fw = row.framework || '';
-    const fwVersion = row.framework_version || '';
-    const script = row.reproduce_script || '';
-    const notes = row.notes || '';
-
-    if (!fw || fw === 'unknown') {
-      return `<span class="framework-unknown">—</span>`;
-    }
-
-    const standardFrameworks = ['vllm', 'tensorrt-llm', 'trtllm', 'mindie', 'torchtitan', 'vllm-rocm'];
-    const isStandard = standardFrameworks.some(f => fw.toLowerCase().includes(f));
-    const isCustom = fw.toLowerCase().startsWith('custom') || !isStandard;
-
-    const colorClass = isCustom ? 'framework-custom' : 'framework-standard';
-    const badge = isCustom
-      ? `<span class="badge" style="background:#3d2b00;color:#d29922;margin-left:4px;font-size:0.7rem">custom</span>`
-      : '';
-
-    const tooltipLines = [];
-    if (fwVersion) tooltipLines.push(`Version: ${fwVersion}`);
-    if (script)    tooltipLines.push(`Script: ${script}`);
-    if (notes)     tooltipLines.push(`Notes: ${notes}`);
-    const tooltip = tooltipLines.length
-      ? `<div class="framework-tooltip">${tooltipLines.join('<br>')}</div>`
-      : '';
-
-    return `
-      <div class="framework-wrapper">
-        <span class="framework-cell ${colorClass}">${fw}${badge}</span>
-        ${tooltip}
-      </div>
-    `;
-  }
-
-  // ── Pro View ─────────────────────────────────────────────
-  function renderPro(rows) {
-    const tbody = document.getElementById('pro-tbody');
-    const empty = document.getElementById('pro-empty');
-    tbody.innerHTML = '';
-
-    if (!rows.length) {
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-
-    document.querySelectorAll('th').forEach(th => {
-      th.classList.remove('sorted-asc', 'sorted-desc');
-    });
-
-    rows.forEach(row => {
-      const tr = document.createElement('tr');
-      tr.className = 'clickable';
-      const isMini  = (row.suite || '').startsWith('mini-');
-      const isVendor = row.submitted_by && row.submitted_by.includes('[vendor]');
-
-      tr.innerHTML = `
-        <td class="chip-name">${row.chip || '—'}</td>
-        <td>${row.vendor || '—'}</td>
-        <td>
-          <span style="font-weight:500">${row.chip_count || 1}</span>
-          ${(row.chip_count || 1) > 1
-            ? `<span style="color:#8b949e;font-size:0.75rem;margin-left:4px">×${row.chip_count}</span>`
-            : ''}
-        </td>
-        <td>${formatFramework(row)}</td>
-        <td>${row.model || '—'}</td>
-        <td>${row.precision || '—'}</td>
-        <td>${row.suite || '—'}</td>
-        <td>${row.scenario || '—'}</td>
-        <td class="metric-primary">${
-          row.is_suite_level
-            ? `<div>${row.offline_throughput
-                ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
-                  + ' <small style="color:#8b949e">tok/s</small>'
-                : '—'}</div>
-               <div style="font-size:0.8rem;color:#8b949e;font-weight:400;margin-top:2px">${
-                 [
-                   row.online_max_qps ? row.online_max_qps + ' max QPS' : '',
-                   row.interactive_ttft_p99 ? row.interactive_ttft_p99.toFixed(0) + 'ms TTFT p99' : '',
-                 ].filter(Boolean).join(' · ')
-               }</div>`
-            : row.primary_metric
-              ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 1})
-                + ' <small style="color:#8b949e;font-weight:400">' + (row.primary_metric_label || '') + '</small>'
-              : '—'
-        }${
-          row.tokens_per_sec_per_chip && (row.chip_count || 1) > 1
-            ? `<br><small style="color:#8b949e">${row.tokens_per_sec_per_chip.toLocaleString(undefined, {maximumFractionDigits:0})} tok/s per chip</small>`
-            : ''
-        }</td>
-        <td>${row.quant_int8_speedup != null
-            ? row.quant_int8_speedup.toFixed(2) + '×'
-            : '—'}</td>
-        <td>${row.quant_int4_speedup != null
-            ? row.quant_int4_speedup.toFixed(2) + '×'
-            : '—'}</td>
-        <td>${row.scaling_efficiency_2x != null
-            ? (row.scaling_efficiency_2x * 100).toFixed(1) + '%'
-            : '—'}</td>
-        <td>${row.scaling_efficiency_4x != null
-            ? (row.scaling_efficiency_4x * 100).toFixed(1) + '%'
-            : '—'}</td>
-        <td>${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
-        <td>${row.memory_efficiency_toks_per_gb != null ? row.memory_efficiency_toks_per_gb.toLocaleString(undefined, {maximumFractionDigits: 1}) : '—'}</td>
-        <td>${row.cost_efficiency_toks_per_dollar_hr != null ? row.cost_efficiency_toks_per_dollar_hr.toLocaleString(undefined, {maximumFractionDigits: 0}) : '—'}</td>
-        <td>
-          <span class="badge badge-${row.tier}">${row.tier}</span>
-          ${isMini   ? '<span class="badge badge-mini" style="margin-left:4px">mini</span>' : ''}
-          ${isVendor ? '<span class="badge badge-vendor" style="margin-left:4px">vendor</span>' : ''}
-        </td>
-        <td style="color:#8b949e">${row.date || '—'}</td>
-      `;
-
-      tr.addEventListener('click', (e) => {
-        // Don't open modal when clicking framework tooltip area
-        if (e.target.closest('.framework-wrapper')) return;
-        openModal(row);
-      });
-
-      tbody.appendChild(tr);
-    });
-  }
-
-  // ── Detail modal ─────────────────────────────────────────
-  function fmt(v, opts = {}) {
-    if (v === null || v === undefined || v === '' || v === 'unknown' || v === 'Unknown') {
-      return '<span class="detail-value null">—</span>';
-    }
-    const cls = opts.cls || '';
-    const mono = opts.mono ? ' mono' : '';
-    const display = opts.format ? opts.format(v) : String(v);
-    return `<span class="detail-value${mono}${cls ? ' ' + cls : ''}">${display}</span>`;
-  }
-
-  function detailRow(label, v, opts = {}) {
-    return `<div class="detail-row"><span class="detail-label">${label}</span>${fmt(v, opts)}</div>`;
-  }
-
-  function detailSection(title, rows) {
-    const content = rows.filter(Boolean).join('');
-    if (!content) return '';
-    return `
-      <div class="detail-section">
-        <div class="detail-section-title">${title}</div>
-        ${content}
-      </div>`;
-  }
-
-  function _fillModal(row) {
-    const d = row.detail || {};
-
-    document.getElementById('modal-title').textContent =
-      (d.hw_chip || row.chip || '—') +
-      (d.hw_count > 1 ? ` ×${d.hw_count}` : '');
-
-    document.getElementById('modal-subtitle').textContent =
-      [row.suite, row.scenario, row.date].filter(Boolean).join(' · ');
-
-    // Footer
-    document.getElementById('modal-submission').textContent =
-      `Submission: ${row.submission || '—'} · by ${d.meta_submitted_by || '—'}`;
-
-    const scriptLink = document.getElementById('modal-script-link');
-    if (d.meta_reproduce_script) {
-      scriptLink.href = `https://github.com/JuhaoLiang1997/AccelMark/blob/main/${d.meta_reproduce_script}`;
-      scriptLink.style.display = '';
-    } else {
-      scriptLink.style.display = 'none';
-    }
-
-    const body = document.getElementById('modal-body');
-    body.innerHTML = [
-      detailSection('Hardware', [
-        detailRow('Chip', d.hw_chip),
-        detailRow('Vendor', d.hw_vendor),
-        detailRow('Count', d.hw_count),
-        detailRow('Memory per chip', d.hw_memory_gb, { format: v => v + ' GB' }),
-        detailRow('Intra-node interconnect', d.hw_interconnect_intra),
-        detailRow('Inter-node interconnect', d.hw_interconnect_inter),
-        detailRow('CPU', d.hw_cpu),
-        detailRow('System memory', d.hw_system_memory_gb, { format: v => v.toFixed(0) + ' GB' }),
-        detailRow('PCIe generation', d.hw_pcie),
-        detailRow('Network', d.hw_network),
-      ]),
-      detailSection('Software', [
-        detailRow('Framework', d.sw_framework
-          ? (d.sw_framework + (d.sw_framework_version ? ' ' + d.sw_framework_version : ''))
-          : null),
-        detailRow('PyTorch', d.sw_pytorch, { mono: true }),
-        detailRow('Driver version', d.sw_driver, { mono: true }),
-        detailRow('Runtime', d.sw_runtime, { mono: true }),
-        detailRow('OS', d.sw_os),
-        detailRow('Python', d.sw_python, { mono: true }),
-      ]),
-      detailSection('Model', [
-        detailRow('Model ID', d.model_id, { mono: true }),
-        detailRow('Revision', d.model_revision, { mono: true }),
-        detailRow('Architecture', d.model_arch),
-        detailRow('Parameters', d.model_params_b, { format: v => v + 'B' }),
-        detailRow('Precision', d.model_precision),
-        detailRow('Format', d.model_format),
-      ]),
-      detailSection('Run settings', [
-        d.run_scenarios ? detailRow('Scenarios', d.run_scenarios.join(', ')) : null,
-        d.run_chip_counts ? detailRow('Chip counts tested', d.run_chip_counts.join(', ')) : null,
-        detailRow('Runs per config', d.run_num_runs),
-        d.run_tp != null ? detailRow('Tensor parallel size', d.run_tp) : null,
-        d.run_pp != null ? detailRow('Pipeline parallel size', d.run_pp) : null,
-        d.run_dp != null ? detailRow('Data parallel size', d.run_dp) : null,
-      ]),
-      detailSection('Accuracy', [
-        detailRow('Subset score', d.acc_score, {
-          format: v => v.toFixed(2),
-          cls: d.acc_valid ? 'good' : 'warn'
-        }),
-        detailRow('Baseline delta', d.acc_baseline_delta, { format: v => (v >= 0 ? '+' : '') + v.toFixed(3) }),
-        detailRow('Valid', d.acc_valid != null
-          ? (d.acc_valid ? '<span class="detail-value good">Yes</span>' : '<span class="detail-value warn">No</span>')
-          : null),
-        d.acc_notes ? detailRow('Notes', d.acc_notes) : null,
-      ]),
-      detailSection('Metadata', [
-        detailRow('Submitted by', d.meta_submitted_by),
-        detailRow('Submission type', d.meta_submission_type),
-        detailRow('Date', d.meta_date),
-        detailRow('Benchmark duration', d.meta_elapsed_min, { format: v => v.toFixed(1) + ' min' }),
-        detailRow('Model load time', d.meta_model_load_sec, { format: v => v.toFixed(1) + ' s' }),
-        d.meta_notes ? detailRow('Notes', d.meta_notes) : null,
-      ]),
-    ].join('');
-
-    document.getElementById('modal-backdrop').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal(e) {
-    if (e.target === document.getElementById('modal-backdrop')) closeModalDirect();
-  }
-
-  function closeModalDirect() {
-    document.getElementById('modal-backdrop').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModalDirect();
-  });
-
-  // ── Tab switching ─────────────────────────────────────────
-  let _activeTab = 'details';
-  let _activeCharts = [];
-
-  function switchTab(tab) {
-    _activeTab = tab;
-    document.getElementById('modal-body').style.display  = tab === 'details' ? '' : 'none';
-    document.getElementById('modal-viz').style.display   = tab === 'viz'     ? '' : 'none';
-    document.getElementById('tab-details').classList.toggle('active', tab === 'details');
-    document.getElementById('tab-viz').classList.toggle('active', tab === 'viz');
-    if (tab === 'viz' && _pendingViz) {
-      renderViz(_pendingViz);
-      _pendingViz = null;
-    }
-  }
-
-  let _pendingViz = null;
-
-  // ── Destroy existing charts ───────────────────────────────
-  function destroyCharts() {
-    _activeCharts.forEach(c => { try { c.destroy(); } catch(e) {} });
-    _activeCharts = [];
-  }
-
-  // ── openModal: reset viz state, then populate details ────
-  function openModal(row) {
-    destroyCharts();
-    _activeTab = 'details';
-    document.getElementById('modal-body').style.display = '';
-    document.getElementById('modal-viz').style.display  = 'none';
-    document.getElementById('tab-details').classList.add('active');
-    document.getElementById('tab-viz').classList.remove('active');
-
+  cards.forEach(row => {
+    const card  = document.createElement('div');
     const suite = row.suite || '';
-    const tabBtn = document.getElementById('tab-viz');
-    if (row.viz && row.viz.type !== 'none') {
-      tabBtn.style.display = '';
-      tabBtn.textContent = 'Visualize';
-    } else {
-      tabBtn.style.display = 'none';
+    card.className = `card ${suite}`;
+
+    const metricStr = row.primary_metric
+      ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 0})
+      : '—';
+
+    let extras = '';
+    if (suite === 'suite_A' || suite === 'suite_D') {
+      const parts = [
+        row.online_max_qps       ? `${row.online_max_qps} max QPS` : '',
+        row.interactive_ttft_p99 ? `${Math.round(row.interactive_ttft_p99)}ms TTFT p99` : '',
+      ].filter(Boolean);
+      if (parts.length) extras = `<div class="card-meta">${parts.join(' · ')}</div>`;
+    }
+    if (suite === 'suite_E') {
+      const parts = [
+        row.scaling_efficiency_2x != null ? `2×: ${(row.scaling_efficiency_2x*100).toFixed(0)}%` : '',
+        row.scaling_efficiency_4x != null ? `4×: ${(row.scaling_efficiency_4x*100).toFixed(0)}%` : '',
+      ].filter(Boolean);
+      if (parts.length) extras = `<div class="card-meta">Scaling efficiency — ${parts.join(' · ')}</div>`;
+    }
+    if (suite === 'suite_C') {
+      const parts = [
+        row.quant_int8_speedup ? `INT8 ${row.quant_int8_speedup.toFixed(2)}×` : '',
+        row.quant_int4_speedup ? `INT4 ${row.quant_int4_speedup.toFixed(2)}×` : '',
+      ].filter(Boolean);
+      if (parts.length) extras = `<div class="card-meta">Speedup vs BF16 — ${parts.join(' · ')}</div>`;
     }
 
-    _pendingViz = row;
-    _fillModal(row);
-  }
+    const countLabel = (row.chip_count || 1) > 1
+      ? ` <span style="color:var(--text2);font-weight:400;font-size:0.82rem">×${row.chip_count}</span>` : '';
 
-  // ── Chart helpers ─────────────────────────────────────────
-  const C = {
-    blue:   '#378ADD',
-    teal:   '#1D9E75',
-    amber:  '#EF9F27',
-    coral:  '#D85A30',
-    gray:   '#888780',
-    green:  '#56d364',
-    red:    '#f85149',
-    grid:   '#21262d',
-    text:   '#8b949e',
-    white:  '#e6edf3',
-  };
-
-  function baseOpts(yLabel, yFormat) {
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-        y: {
-          ticks: { color: C.text, font: { size: 11 }, callback: yFormat || (v => v) },
-          grid: { color: C.grid },
-          title: { display: !!yLabel, text: yLabel || '', color: C.text, font: { size: 11 } }
-        }
-      }
-    };
-  }
-
-  function mkCanvas(id, height) {
-    const wrap = document.createElement('div');
-    wrap.className = 'chart-wrap';
-    wrap.style.height = height + 'px';
-    const c = document.createElement('canvas');
-    c.id = id;
-    wrap.appendChild(c);
-    return { wrap, canvas: c };
-  }
-
-  function sectionTitle(text) {
-    const d = document.createElement('div');
-    d.className = 'chart-section-title';
-    d.textContent = text;
-    return d;
-  }
-
-  function statChips(items) {
-    const grid = document.createElement('div');
-    grid.className = 'stat-chips';
-    items.forEach(({ label, value, cls }) => {
-      grid.innerHTML += `<div class="stat-chip">
-        <p class="stat-chip-label">${label}</p>
-        <p class="stat-chip-value ${cls||''}">${value != null ? value : '—'}</p>
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem">
+        <div class="card-chip">${row.chip || 'Unknown'}${countLabel}</div>
+        ${suitePill(suite)}
+      </div>
+      <div class="card-speed">${metricStr}</div>
+      <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
+      ${extras}
+      <div class="card-meta" style="margin-top:0.4rem">${[row.model, row.framework, row.precision].filter(Boolean).join(' · ')}</div>
+      <div class="card-footer">
+        <span class="badge badge-${row.tier}">${row.tier}</span>
+        <span class="card-hint">click for details</span>
       </div>`;
+
+    card.addEventListener('click', () => openModal(row));
+    container.appendChild(card);
+  });
+}
+
+// ── Framework cell ────────────────────────────────────────────────────────────
+function formatFramework(row) {
+  const fw = row.framework || '';
+  if (!fw || fw === 'unknown') return `<span style="color:var(--text2)">—</span>`;
+
+  const standard = ['vllm','tensorrt-llm','trtllm','mindie','torchtitan','vllm-rocm'];
+  const isCustom  = !standard.some(f => fw.toLowerCase().includes(f));
+  const cls       = isCustom ? 'framework-custom' : 'framework-standard';
+  const custBadge = isCustom
+    ? `<span class="badge badge-vendor" style="margin-left:3px;font-size:0.65rem">custom</span>` : '';
+
+  const lines = [
+    row.framework_version ? `Version: ${row.framework_version}` : '',
+    row.reproduce_script  ? `Script: ${row.reproduce_script}`   : '',
+    row.notes             ? `Notes: ${row.notes}`               : '',
+  ].filter(Boolean);
+
+  const tip = lines.length
+    ? `<div class="framework-tooltip">${lines.join('<br>')}</div>` : '';
+
+  return `<div class="framework-wrapper">
+    <span class="framework-cell ${cls}">${fw}${custBadge}</span>${tip}
+  </div>`;
+}
+
+// ── Pro table ─────────────────────────────────────────────────────────────────
+function renderPro(rows) {
+  const tbody = document.getElementById('pro-tbody');
+  const empty = document.getElementById('pro-empty');
+  tbody.innerHTML = '';
+
+  if (!rows.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  rows.forEach(row => {
+    const tr       = document.createElement('tr');
+    tr.className   = 'clickable';
+    const isVendor = row.submitted_by && row.submitted_by.includes('[vendor]');
+    const isMini   = (row.suite || '').startsWith('mini-');
+
+    const pct = _maxPrimary > 0 && row.primary_metric
+      ? Math.round(row.primary_metric / _maxPrimary * 100) : 0;
+
+    const perfCell = row.primary_metric
+      ? `<div class="perf-bar-wrap">
+           <span class="metric-primary">${row.primary_metric.toLocaleString(undefined,{maximumFractionDigits:1})}</span>
+           <div class="perf-bar-bg"><div class="perf-bar-fill" style="width:${pct}%"></div></div>
+         </div>
+         <div style="font-size:0.75rem;color:var(--text2);margin-top:1px">${row.primary_metric_label || ''}</div>
+         ${row.tokens_per_sec_per_chip && (row.chip_count||1)>1 ? `<div style="font-size:0.72rem;color:var(--text2)">${row.tokens_per_sec_per_chip.toLocaleString(undefined,{maximumFractionDigits:0})} tok/s/chip</div>` : ''}`
+      : '—';
+
+    tr.innerHTML = `
+      <td class="chip-name">${row.chip || '—'}</td>
+      <td>${row.vendor || '—'}</td>
+      <td>${row.chip_count || 1}${(row.chip_count||1)>1 ? `<span style="color:var(--text2);font-size:0.72rem;margin-left:3px">×</span>` : ''}</td>
+      <td>${formatFramework(row)}</td>
+      <td>${row.model || '—'}</td>
+      <td>${row.precision || '—'}</td>
+      <td>${suitePill(row.suite)}</td>
+      <td style="color:var(--text2)">${row.scenario || '—'}</td>
+      <td>${perfCell}</td>
+      <td>${row.quant_int8_speedup != null ? row.quant_int8_speedup.toFixed(2)+'×' : '—'}</td>
+      <td>${row.quant_int4_speedup != null ? row.quant_int4_speedup.toFixed(2)+'×' : '—'}</td>
+      <td>${row.scaling_efficiency_2x != null ? (row.scaling_efficiency_2x*100).toFixed(1)+'%' : '—'}</td>
+      <td>${row.scaling_efficiency_4x != null ? (row.scaling_efficiency_4x*100).toFixed(1)+'%' : '—'}</td>
+      <td>${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
+      <td>${row.memory_efficiency_toks_per_gb != null ? row.memory_efficiency_toks_per_gb.toLocaleString(undefined,{maximumFractionDigits:1}) : '—'}</td>
+      <td>${row.cost_efficiency_toks_per_dollar_hr != null ? row.cost_efficiency_toks_per_dollar_hr.toLocaleString(undefined,{maximumFractionDigits:0}) : '—'}</td>
+      <td>
+        <span class="badge badge-${row.tier}">${row.tier}</span>
+        ${isMini   ? '<span class="badge badge-mini" style="margin-left:3px">mini</span>' : ''}
+        ${isVendor ? '<span class="badge badge-vendor" style="margin-left:3px">vendor</span>' : ''}
+      </td>
+      <td style="color:var(--text2)">${row.date || '—'}</td>`;
+
+    tr.addEventListener('click', e => {
+      if (e.target.closest('.framework-wrapper')) return;
+      openModal(row);
     });
-    return grid;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Modal: detail helpers ─────────────────────────────────────────────────────
+function fmtVal(v, opts = {}) {
+  if (v == null || v === '' || v === 'unknown' || v === 'Unknown') {
+    return '<span class="detail-value null">—</span>';
+  }
+  const mono    = opts.mono ? ' mono' : '';
+  const cls     = opts.cls  ? ` ${opts.cls}` : '';
+  const display = opts.format ? opts.format(v) : String(v);
+  return `<span class="detail-value${mono}${cls}">${display}</span>`;
+}
+
+function dRow(label, v, opts = {}) {
+  return `<div class="detail-row"><span class="detail-label">${label}</span>${fmtVal(v, opts)}</div>`;
+}
+
+function dRowHtml(label, html) {
+  if (!html) return '';
+  return `<div class="detail-row"><span class="detail-label">${label}</span>${html}</div>`;
+}
+
+function dSection(title, rows) {
+  const content = rows.filter(Boolean).join('');
+  if (!content) return '';
+  return `<div class="detail-section"><div class="detail-section-title">${title}</div>${content}</div>`;
+}
+
+// ── Modal: open / close ───────────────────────────────────────────────────────
+function openModal(row) {
+  destroyCharts();
+  _pendingVizRow = row;
+
+  // Header
+  const d = row.detail || {};
+  document.getElementById('modal-title').textContent =
+    (d.hw_chip || row.chip || '—') + (d.hw_count > 1 ? ` ×${d.hw_count}` : '');
+
+  const subtitleEl = document.getElementById('modal-subtitle');
+  subtitleEl.innerHTML = [suitePill(row.suite), row.scenario, row.date].filter(Boolean).join(' <span style="color:var(--text3)">·</span> ');
+
+  // Footer
+  document.getElementById('modal-submission').textContent =
+    `Submission: ${row.submission || '—'} · by ${d.meta_submitted_by || '—'}`;
+  const scriptLink = document.getElementById('modal-script-link');
+  if (d.meta_reproduce_script) {
+    scriptLink.href = `https://github.com/JuhaoLiang1997/AccelMark/blob/main/${d.meta_reproduce_script}`;
+    scriptLink.style.display = '';
+  } else {
+    scriptLink.style.display = 'none';
   }
 
-  // ── Viz renderers ─────────────────────────────────────────
-  function renderViz(row) {
-    const viz = row.viz || {};
-    const container = document.getElementById('modal-viz');
-    container.innerHTML = '';
+  // Suite accent on modal
+  const modal = document.getElementById('modal');
+  modal.className = `modal ${row.suite || ''}`;
 
-    if (!viz || viz.type === 'none') {
-      container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">No visualization available for this suite.</div>';
-      return;
-    }
+  // Viz tab visibility
+  const vizBtn = document.getElementById('tab-viz');
+  vizBtn.style.display = (row.viz && row.viz.type !== 'none') ? '' : 'none';
 
-    if (viz.type === 'suite_A') renderSuiteA(container, viz, row);
-    else if (viz.type === 'suite_B') renderSuiteB(container, viz, row);
-    else if (viz.type === 'suite_C') renderSuiteC(container, viz, row);
-    else if (viz.type === 'suite_D') renderSuiteD(container, viz, row);
-    else if (viz.type === 'suite_E') renderSuiteE(container, viz, row);
-    else container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">Visualization coming soon.</div>';
+  // Reset to details tab
+  switchTab('details');
+
+  // Details body
+  document.getElementById('modal-body').innerHTML = [
+    dSection('Hardware', [
+      dRow('Chip',                  d.hw_chip),
+      dRow('Vendor',                d.hw_vendor),
+      dRow('Count',                 d.hw_count),
+      dRow('Memory per chip',       d.hw_memory_gb,         { format: v => v + ' GB' }),
+      dRow('Intra-node interconnect', d.hw_interconnect_intra),
+      dRow('Inter-node interconnect', d.hw_interconnect_inter),
+      dRow('CPU',                   d.hw_cpu),
+      dRow('System memory',         d.hw_system_memory_gb,  { format: v => v.toFixed(0) + ' GB' }),
+      dRow('PCIe generation',       d.hw_pcie),
+      dRow('Network',               d.hw_network),
+    ]),
+    dSection('Software', [
+      dRow('Framework', d.sw_framework
+        ? d.sw_framework + (d.sw_framework_version ? ' ' + d.sw_framework_version : '')
+        : null),
+      dRow('PyTorch',       d.sw_pytorch, { mono: true }),
+      dRow('Driver',        d.sw_driver,  { mono: true }),
+      dRow('Runtime',       d.sw_runtime, { mono: true }),
+      dRow('OS',            d.sw_os),
+      dRow('Python',        d.sw_python,  { mono: true }),
+    ]),
+    dSection('Model', [
+      dRow('Model ID',    d.model_id,       { mono: true }),
+      dRow('Revision',    d.model_revision, { mono: true }),
+      dRow('Architecture', d.model_arch),
+      dRow('Parameters',  d.model_params_b, { format: v => v + 'B' }),
+      dRow('Precision',   d.model_precision),
+      dRow('Format',      d.model_format),
+    ]),
+    dSection('Run settings', [
+      d.run_scenarios   ? dRow('Scenarios',         d.run_scenarios.join(', '))   : null,
+      d.run_chip_counts ? dRow('Chip counts tested', d.run_chip_counts.join(', ')) : null,
+      dRow('Runs per config',       d.run_num_runs),
+      d.run_tp != null  ? dRow('Tensor parallel',   d.run_tp) : null,
+      d.run_pp != null  ? dRow('Pipeline parallel', d.run_pp) : null,
+      d.run_dp != null  ? dRow('Data parallel',     d.run_dp) : null,
+    ]),
+    dSection('Accuracy', [
+      dRow('Subset score',    d.acc_score,          { format: v => v.toFixed(2), cls: d.acc_valid ? 'good' : 'warn' }),
+      dRow('Baseline delta',  d.acc_baseline_delta, { format: v => (v >= 0 ? '+' : '') + v.toFixed(3) }),
+      // Bug fix: acc_valid is boolean — inject HTML directly instead of through fmtVal
+      dRowHtml('Valid', d.acc_valid != null
+        ? (d.acc_valid
+            ? '<span class="detail-value good">Yes</span>'
+            : '<span class="detail-value warn">No</span>')
+        : null),
+      d.acc_notes ? dRow('Notes', d.acc_notes) : null,
+    ]),
+    dSection('Metadata', [
+      dRow('Submitted by',       d.meta_submitted_by),
+      dRow('Submission type',    d.meta_submission_type),
+      dRow('Date',               d.meta_date),
+      dRow('Benchmark duration', d.meta_elapsed_min,      { format: v => v.toFixed(1) + ' min' }),
+      dRow('Model load time',    d.meta_model_load_sec,   { format: v => v.toFixed(1) + ' s' }),
+      d.meta_notes ? dRow('Notes', d.meta_notes) : null,
+    ]),
+  ].join('');
+
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+  destroyCharts();
+}
+
+function onBackdropClick(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('modal-body').style.display = tab === 'details' ? '' : 'none';
+  document.getElementById('modal-viz').style.display  = tab === 'viz'     ? '' : 'none';
+  document.getElementById('tab-details').classList.toggle('active', tab === 'details');
+  document.getElementById('tab-viz').classList.toggle('active', tab === 'viz');
+  if (tab === 'viz' && _pendingVizRow) {
+    renderViz(_pendingVizRow);
+    _pendingVizRow = null;
   }
+}
 
-  // Suite A ─────────────────────────────────────────────────
-  function renderSuiteA(el, viz, row) {
-    // ── Offline throughput ──
-    if (viz.offline && viz.offline.labels.length) {
-      el.appendChild(sectionTitle('Offline — throughput by concurrency'));
-      el.appendChild(statChips([
-        { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'blue' },
-        { label: 'Peak memory', value: row.peak_memory_gb ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
-        { label: 'Memory util.', value: row.memory_utilization_pct ? row.memory_utilization_pct.toFixed(1) + '%' : null },
-      ]));
-      const { wrap, canvas } = mkCanvas('viz-offline', 180);
-      el.appendChild(wrap);
-      _activeCharts.push(new Chart(canvas, {
-        type: 'bar',
-        data: {
-          labels: viz.offline.labels,
-          datasets: [{
-            label: 'Throughput (tok/s)',
-            data: viz.offline.throughput,
-            backgroundColor: C.blue + '99',
-            borderColor: C.blue,
-            borderWidth: 1,
-            borderRadius: 3,
-          }]
-        },
-        options: { ...baseOpts('tokens / sec', v => v.toLocaleString()), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } } }
-      }));
-    }
+// ── Chart helpers ─────────────────────────────────────────────────────────────
+const C = {
+  blue: '#378ADD', teal: '#1D9E75', amber: '#EF9F27',
+  coral: '#D85A30', gray: '#888780', green: '#56d364',
+  red: '#f85149', grid: '#21262d', text: '#8b949e',
+};
 
-    // ── Online latency ──
-    if (viz.online && viz.online.labels.length) {
-      el.appendChild(sectionTitle('Online — TTFT & TPOT by QPS'));
+function destroyCharts() {
+  _activeCharts.forEach(c => { try { c.destroy(); } catch(e) {} });
+  _activeCharts = [];
+}
 
-      // SLA summary
-      const slaDiv = document.createElement('div');
-      slaDiv.style.cssText = 'margin-bottom:10px;font-size:12px;';
-      viz.online.labels.forEach((qps, i) => {
-        const pass = viz.online.sla_met[i];
-        slaDiv.innerHTML += `<span class="sla-row" style="display:inline-flex;margin-right:12px">
-          <span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>
-          <span style="color:#8b949e">${qps} QPS</span>
-          <span style="color:${pass ? C.green : C.red}">${pass ? 'SLA met' : 'SLA fail'}</span>
-        </span>`;
-      });
-      el.appendChild(slaDiv);
+function baseOpts(yLabel, yFmt) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+      y: {
+        ticks: { color: C.text, font: { size: 11 }, callback: yFmt || (v => v) },
+        grid:  { color: C.grid },
+        title: { display: !!yLabel, text: yLabel || '', color: C.text, font: { size: 11 } },
+      },
+    },
+  };
+}
 
-      const { wrap, canvas } = mkCanvas('viz-online', 200);
-      el.appendChild(wrap);
-      _activeCharts.push(new Chart(canvas, {
-        type: 'line',
-        data: {
-          labels: viz.online.labels,
-          datasets: [
-            { label: 'TTFT p50', data: viz.online.ttft_p50, borderColor: C.blue, backgroundColor: C.blue+'33', tension: 0.3, pointRadius: 4, fill: false },
-            { label: 'TTFT p90', data: viz.online.ttft_p90, borderColor: C.coral, backgroundColor: C.coral+'33', tension: 0.3, pointRadius: 4, fill: false, borderDash: [4,3] },
-            { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal, backgroundColor: C.teal+'33', tension: 0.3, pointRadius: 4, fill: false },
-          ]
-        },
-        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
-        }
-      }));
-      // custom legend
-      const leg = document.createElement('div');
-      leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
-      leg.innerHTML = `
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.blue};display:inline-block"></span>TTFT p50</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.coral};display:inline-block"></span>TTFT p90</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>TPOT p50</span>`;
-      el.appendChild(leg);
-    }
+function mkCanvas(id, height) {
+  const wrap = document.createElement('div');
+  wrap.className    = 'chart-wrap';
+  wrap.style.height = height + 'px';
+  const c = document.createElement('canvas');
+  c.id = id;
+  wrap.appendChild(c);
+  return { wrap, canvas: c };
+}
 
-    // ── Interactive ──
-    if (viz.interactive && viz.interactive.ttft_p50 != null) {
-      el.appendChild(sectionTitle('Interactive — single request latency'));
-      el.appendChild(statChips([
-        { label: 'TTFT p50',  value: viz.interactive.ttft_p50  != null ? viz.interactive.ttft_p50.toFixed(1)  + ' ms' : null, cls: 'blue' },
-        { label: 'TTFT p90',  value: viz.interactive.ttft_p90  != null ? viz.interactive.ttft_p90.toFixed(1)  + ' ms' : null },
-        { label: 'TTFT p99',  value: viz.interactive.ttft_p99  != null ? viz.interactive.ttft_p99.toFixed(1)  + ' ms' : null },
-        { label: 'TPOT p50',  value: viz.interactive.tpot_p50  != null ? viz.interactive.tpot_p50.toFixed(1)  + ' ms' : null, cls: 'green' },
-        { label: 'TPOT p99',  value: viz.interactive.tpot_p99  != null ? viz.interactive.tpot_p99.toFixed(1)  + ' ms' : null },
-      ]));
-    }
+function secTitle(text) {
+  const d = document.createElement('div');
+  d.className   = 'chart-section-title';
+  d.textContent = text;
+  return d;
+}
+
+function statChips(items) {
+  const grid = document.createElement('div');
+  grid.className = 'stat-chips';
+  items.forEach(({ label, value, cls }) => {
+    grid.innerHTML += `<div class="stat-chip">
+      <p class="stat-chip-label">${label}</p>
+      <p class="stat-chip-value ${cls || ''}">${value != null ? value : '—'}</p>
+    </div>`;
+  });
+  return grid;
+}
+
+function legend(items) {
+  const d = document.createElement('div');
+  d.className = 'chart-legend';
+  items.forEach(({ color, label }) => {
+    d.innerHTML += `<span><span class="chart-legend-dot" style="background:${color}"></span>${label}</span>`;
+  });
+  return d;
+}
+
+// ── Viz dispatcher ────────────────────────────────────────────────────────────
+function renderViz(row) {
+  const viz       = row.viz || {};
+  const container = document.getElementById('modal-viz');
+  container.innerHTML = '';
+  destroyCharts();
+
+  if (!viz || viz.type === 'none') {
+    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text2)">No visualization available for this suite.</div>';
+    return;
   }
+  if      (viz.type === 'suite_A') renderSuiteA(container, viz, row);
+  else if (viz.type === 'suite_B') renderSuiteB(container, viz, row);
+  else if (viz.type === 'suite_C') renderSuiteC(container, viz, row);
+  else if (viz.type === 'suite_D') renderSuiteD(container, viz, row);
+  else if (viz.type === 'suite_E') renderSuiteE(container, viz, row);
+  else container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text2)">Visualization coming soon.</div>';
+}
 
-  // Suite B ─────────────────────────────────────────────────
-  function renderSuiteB(el, viz, row) {
-    // ── Offline: total + per-chip throughput grouped bars ──
-    if (viz.offline && viz.offline.labels.length) {
-      el.appendChild(sectionTitle('Offline — throughput by concurrency'));
-      el.appendChild(statChips([
-        { label: 'Peak total',   value: row.offline_throughput      ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s' : null, cls: 'blue' },
-        { label: 'Per chip',     value: row.tokens_per_sec_per_chip ? row.tokens_per_sec_per_chip.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s' : null, cls: 'teal' },
-        { label: 'Peak memory',  value: row.peak_memory_gb          ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
-        { label: 'Memory util.', value: row.memory_utilization_pct  ? row.memory_utilization_pct.toFixed(1) + '%' : null },
-      ]));
-      const { wrap, canvas } = mkCanvas('viz-b-offline', 200);
-      el.appendChild(wrap);
-      _activeCharts.push(new Chart(canvas, {
-        type: 'bar',
-        data: {
-          labels: viz.offline.labels,
-          datasets: [
-            {
-              label: 'Total (tok/s)',
-              data: viz.offline.throughput,
-              backgroundColor: C.blue + '99',
-              borderColor: C.blue,
-              borderWidth: 1,
-              borderRadius: 3,
-            },
-            {
-              label: 'Per chip (tok/s)',
-              data: viz.offline.throughput_per_chip,
-              backgroundColor: C.teal + '99',
-              borderColor: C.teal,
-              borderWidth: 1,
-              borderRadius: 3,
-            },
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: true, labels: { color: C.text, font: { size: 11 } } } },
-          scales: {
-            x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid },
-                 title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } },
-            y: { ticks: { color: C.text, font: { size: 11 }, callback: v => v.toLocaleString() }, grid: { color: C.grid },
-                 title: { display: true, text: 'tokens / sec', color: C.text, font: { size: 11 } } },
-          }
-        }
-      }));
-    }
-
-    // ── Online latency ──
-    if (viz.online && viz.online.labels.length) {
-      el.appendChild(sectionTitle('Online — TTFT & TPOT by QPS'));
-      const slaDiv = document.createElement('div');
-      slaDiv.style.cssText = 'margin-bottom:10px;font-size:12px;';
-      viz.online.labels.forEach((qps, i) => {
-        const pass = viz.online.sla_met[i];
-        slaDiv.innerHTML += `<span class="sla-row" style="display:inline-flex;margin-right:12px">
-          <span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>
-          <span style="color:#8b949e">${qps} QPS</span>
-          <span style="color:${pass ? C.green : C.red}">${pass ? 'SLA met' : 'SLA fail'}</span>
-        </span>`;
-      });
-      el.appendChild(slaDiv);
-      const { wrap, canvas } = mkCanvas('viz-b-online', 200);
-      el.appendChild(wrap);
-      _activeCharts.push(new Chart(canvas, {
-        type: 'line',
-        data: {
-          labels: viz.online.labels,
-          datasets: [
-            { label: 'TTFT p50', data: viz.online.ttft_p50, borderColor: C.blue,  backgroundColor: C.blue+'33',  tension: 0.3, pointRadius: 4, fill: false },
-            { label: 'TTFT p90', data: viz.online.ttft_p90, borderColor: C.coral, backgroundColor: C.coral+'33', tension: 0.3, pointRadius: 4, fill: false, borderDash: [4,3] },
-            { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal,  backgroundColor: C.teal+'33',  tension: 0.3, pointRadius: 4, fill: false },
-          ]
-        },
-        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
-        }
-      }));
-      const leg = document.createElement('div');
-      leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
-      leg.innerHTML = `
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.blue};display:inline-block"></span>TTFT p50</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.coral};display:inline-block"></span>TTFT p90</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>TPOT p50</span>`;
-      el.appendChild(leg);
-    }
-  }
-
-  // Suite D ─────────────────────────────────────────────────
-  function renderSuiteD(el, viz, row) {
-    // ── Interactive latency — prominent (32K prefill story) ──
-    if (viz.interactive && viz.interactive.ttft_p50 != null) {
-      el.appendChild(sectionTitle('Long-context latency (32K input tokens)'));
-      el.appendChild(statChips([
-        { label: 'TTFT p50', value: viz.interactive.ttft_p50 != null ? viz.interactive.ttft_p50.toFixed(0) + ' ms' : null, cls: 'blue' },
-        { label: 'TTFT p90', value: viz.interactive.ttft_p90 != null ? viz.interactive.ttft_p90.toFixed(0) + ' ms' : null, cls: 'blue' },
-        { label: 'TTFT p99', value: viz.interactive.ttft_p99 != null ? viz.interactive.ttft_p99.toFixed(0) + ' ms' : null, cls: 'blue' },
-        { label: 'TPOT p50', value: viz.interactive.tpot_p50 != null ? viz.interactive.tpot_p50.toFixed(1) + ' ms' : null, cls: 'teal' },
-        { label: 'TPOT p90', value: viz.interactive.tpot_p90 != null ? viz.interactive.tpot_p90.toFixed(1) + ' ms' : null, cls: 'teal' },
-        { label: 'TPOT p99', value: viz.interactive.tpot_p99 != null ? viz.interactive.tpot_p99.toFixed(1) + ' ms' : null, cls: 'teal' },
-      ]));
-      // Horizontal bar: TTFT p50/p90/p99 (blue) · TPOT p50/p90/p99 (teal)
-      const iv = viz.interactive;
-      const { wrap, canvas } = mkCanvas('viz-d-latency', 240);
-      el.appendChild(wrap);
-      _activeCharts.push(new Chart(canvas, {
-        type: 'bar',
-        data: {
-          labels: ['TTFT p50', 'TTFT p90', 'TTFT p99', 'TPOT p50', 'TPOT p90', 'TPOT p99'],
-          datasets: [
-            {
-              label: 'TTFT — prefill',
-              data: [iv.ttft_p50, iv.ttft_p90, iv.ttft_p99, null, null, null],
-              backgroundColor: C.blue + '99',
-              borderColor: C.blue,
-              borderWidth: 1,
-              borderRadius: 3,
-            },
-            {
-              label: 'TPOT — decode',
-              data: [null, null, null, iv.tpot_p50, iv.tpot_p90, iv.tpot_p99],
-              backgroundColor: C.teal + '99',
-              borderColor: C.teal,
-              borderWidth: 1,
-              borderRadius: 3,
-            },
-          ]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: true, labels: { color: C.text, font: { size: 11 } } } },
-          scales: {
-            x: {
-              ticks: { color: C.text, font: { size: 11 }, callback: v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms' },
-              grid: { color: C.grid },
-              title: { display: true, text: 'latency', color: C.text, font: { size: 11 } },
-            },
-            y: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-          }
-        }
-      }));
-    }
-
-    // ── Offline throughput (secondary) ──
-    if (viz.offline && viz.offline.labels.length) {
-      el.appendChild(sectionTitle('Offline throughput (32K context)'));
-      el.appendChild(statChips([
-        { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s' : null, cls: 'blue' },
-        { label: 'Peak memory',     value: row.peak_memory_gb    ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
-      ]));
-      const { wrap, canvas } = mkCanvas('viz-d-offline', 160);
-      el.appendChild(wrap);
-      _activeCharts.push(new Chart(canvas, {
-        type: 'bar',
-        data: {
-          labels: viz.offline.labels,
-          datasets: [{
-            data: viz.offline.throughput,
-            backgroundColor: C.blue + '99',
-            borderColor: C.blue,
-            borderWidth: 1,
-            borderRadius: 3,
-          }]
-        },
-        options: {
-          ...baseOpts('tokens / sec', v => v.toLocaleString()),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } }
-        }
-      }));
-    }
-  }
-
-  // Suite C ─────────────────────────────────────────────────
-  function renderSuiteC(el, viz, row) {
-    el.appendChild(sectionTitle('Throughput by precision'));
+// ── Suite A ───────────────────────────────────────────────────────────────────
+function renderSuiteA(el, viz, row) {
+  if (viz.offline && viz.offline.labels.length) {
+    el.appendChild(secTitle('Offline — throughput by concurrency'));
     el.appendChild(statChips([
-      { label: 'BF16 baseline', value: row.quant_bf16_throughput ? row.quant_bf16_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null },
-      { label: 'INT8 speedup',  value: row.quant_int8_speedup  != null ? row.quant_int8_speedup.toFixed(2)  + '×' : null, cls: 'blue' },
-      { label: 'INT4 speedup',  value: row.quant_int4_speedup  != null ? row.quant_int4_speedup.toFixed(2)  + '×' : null, cls: 'amber' },
-      { label: 'INT8 quality eff.', value: row.quant_int8_quality_eff != null ? (row.quant_int8_quality_eff*100).toFixed(1) + '%' : null },
-      { label: 'INT4 quality eff.', value: row.quant_int4_quality_eff != null ? (row.quant_int4_quality_eff*100).toFixed(1) + '%' : null },
+      { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'blue' },
+      { label: 'Peak memory',     value: row.peak_memory_gb     ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
+      { label: 'Memory util.',    value: row.memory_utilization_pct ? row.memory_utilization_pct.toFixed(1) + '%' : null },
     ]));
-
-    if (viz.labels && viz.labels.length) {
-      const { wrap, canvas } = mkCanvas('viz-quant-thr', 180);
-      el.appendChild(wrap);
-      const colors = { BF16: C.gray, INT8: C.blue, INT4: C.amber };
-      _activeCharts.push(new Chart(canvas, {
-        type: 'bar',
-        data: {
-          labels: viz.labels,
-          datasets: [{
-            data: viz.throughput,
-            backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
-            borderColor: viz.labels.map(l => colors[l] || C.gray),
-            borderWidth: 1, borderRadius: 3,
-          }]
-        },
-        options: baseOpts('tokens / sec', v => v ? v.toLocaleString() : '')
-      }));
-
-      if (viz.speedup && viz.speedup.some(v => v != null)) {
-        el.appendChild(sectionTitle('Speedup vs BF16'));
-        const { wrap: w2, canvas: c2 } = mkCanvas('viz-quant-spd', 150);
-        el.appendChild(w2);
-        _activeCharts.push(new Chart(c2, {
-          type: 'bar',
-          data: {
-            labels: viz.labels,
-            datasets: [{
-              data: viz.speedup,
-              backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
-              borderColor: viz.labels.map(l => colors[l] || C.gray),
-              borderWidth: 1, borderRadius: 3,
-            }]
-          },
-          options: baseOpts('speedup ×', v => v != null ? v.toFixed(2) + '×' : '')
-        }));
-      }
-
-      if (viz.quality_efficiency && viz.quality_efficiency.some(v => v != null)) {
-        el.appendChild(sectionTitle('Quality efficiency vs BF16'));
-        const { wrap: w3, canvas: c3 } = mkCanvas('viz-quant-qeff', 150);
-        el.appendChild(w3);
-        // BF16 is the 1.0 baseline; show it as 100% for reference
-        const qeffData = viz.labels.map((l, i) => l === 'BF16' ? 1.0 : viz.quality_efficiency[i]);
-        _activeCharts.push(new Chart(c3, {
-          type: 'bar',
-          data: {
-            labels: viz.labels,
-            datasets: [{
-              data: qeffData,
-              backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
-              borderColor: viz.labels.map(l => colors[l] || C.gray),
-              borderWidth: 1, borderRadius: 3,
-            }]
-          },
-          options: {
-            ...baseOpts('quality efficiency', v => v != null ? (v * 100).toFixed(0) + '%' : ''),
-            scales: {
-              ...baseOpts().scales,
-              y: { ...baseOpts().scales.y, min: 0, max: 1.1,
-                   ticks: { color: C.text, font: { size: 11 }, callback: v => (v * 100).toFixed(0) + '%' } },
-            }
-          }
-        }));
-      }
-    }
-  }
-
-  // Suite E ─────────────────────────────────────────────────
-  function renderSuiteE(el, viz, row) {
-    el.appendChild(sectionTitle('Multi-chip scaling'));
-    el.appendChild(statChips([
-      { label: '1× baseline',      value: viz.throughput[0] ? viz.throughput[0].toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'blue' },
-      { label: '2× throughput',    value: viz.throughput[1] ? viz.throughput[1].toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null },
-      { label: '4× throughput',    value: viz.throughput[2] ? viz.throughput[2].toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null },
-      { label: '2× efficiency',    value: row.scaling_efficiency_2x != null ? (row.scaling_efficiency_2x*100).toFixed(1) + '%' : null, cls: row.scaling_efficiency_2x >= 0.8 ? 'green' : 'amber' },
-      { label: '4× efficiency',    value: row.scaling_efficiency_4x != null ? (row.scaling_efficiency_4x*100).toFixed(1) + '%' : null, cls: row.scaling_efficiency_4x >= 0.8 ? 'green' : row.scaling_efficiency_4x >= 0.5 ? 'amber' : 'coral' },
-    ]));
-
-    // Throughput chart
-    const labels = (viz.chip_counts || []).map(c => c + '× GPU');
-    const { wrap, canvas } = mkCanvas('viz-scale-thr', 180);
+    const { wrap, canvas } = mkCanvas('vz-a-off', 180);
     el.appendChild(wrap);
     _activeCharts.push(new Chart(canvas, {
       type: 'bar',
       data: {
-        labels,
-        datasets: [{
-          label: 'Throughput',
-          data: viz.throughput,
-          backgroundColor: C.blue + '99',
-          borderColor: C.blue,
-          borderWidth: 1,
-          borderRadius: 3,
-        }]
+        labels: viz.offline.labels,
+        datasets: [{ data: viz.offline.throughput, backgroundColor: C.blue+'99', borderColor: C.blue, borderWidth: 1, borderRadius: 3 }],
       },
-      options: baseOpts('tokens / sec', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '')
+      options: { ...baseOpts('tokens / sec', v => v.toLocaleString()), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } } },
     }));
+  }
 
-    // Efficiency line chart vs ideal
-    el.appendChild(sectionTitle('Scaling efficiency vs ideal'));
-    const maxCount = Math.max(...(viz.chip_counts || [1]));
-    const idealLine = (viz.chip_counts || []).map(() => 100);
-    const targetLine = (viz.chip_counts || []).map(() => 80);
+  if (viz.online && viz.online.labels.length) {
+    el.appendChild(secTitle('Online — latency under load'));
+    const slaDiv = document.createElement('div');
+    slaDiv.className = 'sla-indicators';
+    viz.online.labels.forEach((qps, i) => {
+      const pass = viz.online.sla_met[i];
+      slaDiv.innerHTML += `<div class="sla-chip"><span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>${qps} QPS <span style="color:${pass ? C.green : C.red}">${pass ? '✓' : '✗'}</span></div>`;
+    });
+    el.appendChild(slaDiv);
 
-    const { wrap: w2, canvas: c2 } = mkCanvas('viz-scale-eff', 200);
-    el.appendChild(w2);
-    _activeCharts.push(new Chart(c2, {
+    const { wrap, canvas } = mkCanvas('vz-a-onl', 200);
+    el.appendChild(wrap);
+    _activeCharts.push(new Chart(canvas, {
       type: 'line',
       data: {
-        labels,
+        labels: viz.online.labels,
         datasets: [
-          { label: 'Actual', data: viz.efficiency_pct, borderColor: C.blue, backgroundColor: C.blue+'33', tension: 0.3, pointRadius: 5, pointBackgroundColor: C.blue, fill: true },
-          { label: 'Linear ideal', data: idealLine, borderColor: C.gray, borderDash: [6,4], tension: 0, pointRadius: 0, fill: false },
-          { label: 'Good target (80%)', data: targetLine, borderColor: C.teal, borderDash: [3,3], tension: 0, pointRadius: 0, fill: false },
-        ]
+          { label: 'TTFT p50', data: viz.online.ttft_p50, borderColor: C.blue,  tension: 0.3, pointRadius: 4, fill: false, borderDash: [] },
+          { label: 'TTFT p90', data: viz.online.ttft_p90, borderColor: C.coral, tension: 0.3, pointRadius: 4, fill: false, borderDash: [4,3] },
+          { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal,  tension: 0.3, pointRadius: 4, fill: false },
+        ],
       },
-      options: {
-        ...baseOpts('efficiency %', v => v + '%'),
-        scales: {
-          x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-          y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: v => v + '%' }, grid: { color: C.grid } }
-        }
-      }
+      options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } } },
     }));
+    el.appendChild(legend([{ color: C.blue, label: 'TTFT p50' }, { color: C.coral, label: 'TTFT p90' }, { color: C.teal, label: 'TPOT p50' }]));
+  }
 
-    const leg = document.createElement('div');
-    leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
-    leg.innerHTML = `
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.blue};display:inline-block"></span>Actual</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.gray};display:inline-block"></span>Linear ideal</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>Good target (80%)</span>`;
-    el.appendChild(leg);
+  if (viz.interactive && viz.interactive.ttft_p50 != null) {
+    el.appendChild(secTitle('Interactive — single request latency'));
+    el.appendChild(statChips([
+      { label: 'TTFT p50', value: viz.interactive.ttft_p50 != null ? viz.interactive.ttft_p50.toFixed(1)+' ms' : null, cls: 'blue' },
+      { label: 'TTFT p90', value: viz.interactive.ttft_p90 != null ? viz.interactive.ttft_p90.toFixed(1)+' ms' : null },
+      { label: 'TTFT p99', value: viz.interactive.ttft_p99 != null ? viz.interactive.ttft_p99.toFixed(1)+' ms' : null },
+      { label: 'TPOT p50', value: viz.interactive.tpot_p50 != null ? viz.interactive.tpot_p50.toFixed(1)+' ms' : null, cls: 'green' },
+      { label: 'TPOT p99', value: viz.interactive.tpot_p99 != null ? viz.interactive.tpot_p99.toFixed(1)+' ms' : null },
+    ]));
+  }
+}
 
-    // Per-chip throughput
-    if (viz.throughput_per_chip && viz.throughput_per_chip.some(v => v != null)) {
-      el.appendChild(sectionTitle('Throughput per chip'));
-      const { wrap: w3, canvas: c3 } = mkCanvas('viz-scale-perchip', 150);
+// ── Suite B ───────────────────────────────────────────────────────────────────
+function renderSuiteB(el, viz, row) {
+  if (viz.offline && viz.offline.labels.length) {
+    el.appendChild(secTitle('Offline — total throughput'));
+    el.appendChild(statChips([
+      { label: 'Peak total',    value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : null, cls: 'blue' },
+      { label: 'Per chip',      value: row.tokens_per_sec_per_chip ? row.tokens_per_sec_per_chip.toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : null },
+      { label: 'Peak memory',   value: row.peak_memory_gb ? row.peak_memory_gb.toFixed(1)+' GB/chip' : null },
+    ]));
+    const { wrap, canvas } = mkCanvas('vz-b-tot', 180);
+    el.appendChild(wrap);
+    _activeCharts.push(new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: viz.offline.labels,
+        datasets: [
+          { label: 'Total',    data: viz.offline.throughput,          backgroundColor: C.blue+'99',  borderColor: C.blue,  borderWidth: 1, borderRadius: 3 },
+          { label: 'Per chip', data: viz.offline.throughput_per_chip, backgroundColor: C.teal+'99',  borderColor: C.teal,  borderWidth: 1, borderRadius: 3 },
+        ],
+      },
+      options: { ...baseOpts('tokens / sec', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : ''), plugins: { legend: { display: true, labels: { color: C.text, font: { size: 11 }, boxWidth: 10 } } } },
+    }));
+  }
+
+  if (viz.online && viz.online.labels.length) {
+    el.appendChild(secTitle('Online — QPS SLA'));
+    const slaDiv = document.createElement('div');
+    slaDiv.className = 'sla-indicators';
+    viz.online.labels.forEach((qps, i) => {
+      const pass = viz.online.sla_met[i];
+      slaDiv.innerHTML += `<div class="sla-chip"><span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>${qps} QPS</div>`;
+    });
+    el.appendChild(slaDiv);
+  }
+}
+
+// ── Suite C ───────────────────────────────────────────────────────────────────
+function renderSuiteC(el, viz, row) {
+  el.appendChild(secTitle('Throughput by precision'));
+  el.appendChild(statChips([
+    { label: 'BF16 baseline',     value: row.quant_bf16_throughput ? row.quant_bf16_throughput.toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : null },
+    { label: 'INT8 speedup',      value: row.quant_int8_speedup  != null ? row.quant_int8_speedup.toFixed(2)+'×' : null, cls: 'blue' },
+    { label: 'INT4 speedup',      value: row.quant_int4_speedup  != null ? row.quant_int4_speedup.toFixed(2)+'×' : null, cls: 'amber' },
+    { label: 'INT8 quality eff.', value: row.quant_int8_quality_eff != null ? (row.quant_int8_quality_eff*100).toFixed(1)+'%' : null },
+    { label: 'INT4 quality eff.', value: row.quant_int4_quality_eff != null ? (row.quant_int4_quality_eff*100).toFixed(1)+'%' : null },
+  ]));
+
+  if (viz.labels && viz.labels.length) {
+    const colors = { BF16: C.gray, INT8: C.blue, INT4: C.amber };
+    const bg     = viz.labels.map(l => (colors[l] || C.gray)+'99');
+    const bd     = viz.labels.map(l =>  colors[l] || C.gray);
+
+    const { wrap, canvas } = mkCanvas('vz-c-thr', 180);
+    el.appendChild(wrap);
+    _activeCharts.push(new Chart(canvas, { type: 'bar', data: { labels: viz.labels, datasets: [{ data: viz.throughput, backgroundColor: bg, borderColor: bd, borderWidth: 1, borderRadius: 3 }] }, options: baseOpts('tokens / sec', v => v ? v.toLocaleString() : '') }));
+
+    if (viz.speedup && viz.speedup.some(v => v != null)) {
+      el.appendChild(secTitle('Speedup vs BF16'));
+      const { wrap: w2, canvas: c2 } = mkCanvas('vz-c-spd', 150);
+      el.appendChild(w2);
+      _activeCharts.push(new Chart(c2, { type: 'bar', data: { labels: viz.labels, datasets: [{ data: viz.speedup, backgroundColor: bg, borderColor: bd, borderWidth: 1, borderRadius: 3 }] }, options: baseOpts('speedup ×', v => v != null ? v.toFixed(2)+'×' : '') }));
+    }
+
+    if (viz.quality_efficiency && viz.quality_efficiency.some(v => v != null)) {
+      el.appendChild(secTitle('Quality efficiency vs BF16'));
+      const { wrap: w3, canvas: c3 } = mkCanvas('vz-c-qeff', 150);
       el.appendChild(w3);
-      _activeCharts.push(new Chart(c3, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            data: viz.throughput_per_chip,
-            backgroundColor: C.teal + '99',
-            borderColor: C.teal,
-            borderWidth: 1,
-            borderRadius: 3,
-          }]
-        },
-        options: baseOpts('tok/s per chip', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '')
-      }));
+      const qd = viz.labels.map((l, i) => l === 'BF16' ? 1.0 : viz.quality_efficiency[i]);
+      _activeCharts.push(new Chart(c3, { type: 'bar', data: { labels: viz.labels, datasets: [{ data: qd, backgroundColor: bg, borderColor: bd, borderWidth: 1, borderRadius: 3 }] }, options: { ...baseOpts('quality eff.', v => v != null ? (v*100).toFixed(0)+'%' : ''), scales: { ...baseOpts().scales, y: { ...baseOpts().scales.y, min: 0, max: 1.1, ticks: { color: C.text, font: { size: 11 }, callback: v => (v*100).toFixed(0)+'%' } } } } }));
     }
   }
+}
+
+// ── Suite D ───────────────────────────────────────────────────────────────────
+function renderSuiteD(el, viz, row) {
+  if (viz.interactive && viz.interactive.ttft_p50 != null) {
+    el.appendChild(secTitle('Interactive latency — 32K context'));
+    el.appendChild(statChips([
+      { label: 'TTFT p50', value: viz.interactive.ttft_p50 != null ? viz.interactive.ttft_p50.toFixed(1)+' ms' : null, cls: 'blue' },
+      { label: 'TTFT p90', value: viz.interactive.ttft_p90 != null ? viz.interactive.ttft_p90.toFixed(1)+' ms' : null },
+      { label: 'TTFT p99', value: viz.interactive.ttft_p99 != null ? viz.interactive.ttft_p99.toFixed(1)+' ms' : null },
+      { label: 'TPOT p50', value: viz.interactive.tpot_p50 != null ? viz.interactive.tpot_p50.toFixed(1)+' ms' : null, cls: 'green' },
+      { label: 'TPOT p90', value: viz.interactive.tpot_p90 != null ? viz.interactive.tpot_p90.toFixed(1)+' ms' : null },
+      { label: 'TPOT p99', value: viz.interactive.tpot_p99 != null ? viz.interactive.tpot_p99.toFixed(1)+' ms' : null },
+    ]));
+    const iv = viz.interactive;
+    const { wrap, canvas } = mkCanvas('vz-d-lat', 220);
+    el.appendChild(wrap);
+    _activeCharts.push(new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: ['TTFT p50','TTFT p90','TTFT p99','TPOT p50','TPOT p90','TPOT p99'],
+        datasets: [
+          { label: 'TTFT', data: [iv.ttft_p50,iv.ttft_p90,iv.ttft_p99,null,null,null], backgroundColor: C.blue+'99',  borderColor: C.blue,  borderWidth: 1, borderRadius: 3 },
+          { label: 'TPOT', data: [null,null,null,iv.tpot_p50,iv.tpot_p90,iv.tpot_p99], backgroundColor: C.teal+'99',  borderColor: C.teal,  borderWidth: 1, borderRadius: 3 },
+        ],
+      },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: C.text, font: { size: 11 }, boxWidth: 10 } } }, scales: { x: { ticks: { color: C.text, font: { size: 11 }, callback: v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms' }, grid: { color: C.grid } }, y: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } } } },
+    }));
+  }
+
+  if (viz.offline && viz.offline.labels.length) {
+    el.appendChild(secTitle('Offline throughput (32K context)'));
+    el.appendChild(statChips([
+      { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : null, cls: 'blue' },
+      { label: 'Peak memory',     value: row.peak_memory_gb ? row.peak_memory_gb.toFixed(1)+' GB' : null },
+    ]));
+    const { wrap, canvas } = mkCanvas('vz-d-off', 160);
+    el.appendChild(wrap);
+    _activeCharts.push(new Chart(canvas, { type: 'bar', data: { labels: viz.offline.labels, datasets: [{ data: viz.offline.throughput, backgroundColor: C.blue+'99', borderColor: C.blue, borderWidth: 1, borderRadius: 3 }] }, options: { ...baseOpts('tokens / sec', v => v.toLocaleString()), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } } } }));
+  }
+}
+
+// ── Suite E ───────────────────────────────────────────────────────────────────
+function renderSuiteE(el, viz, row) {
+  el.appendChild(secTitle('Multi-chip scaling'));
+  el.appendChild(statChips([
+    { label: '1× baseline',   value: viz.throughput[0] ? viz.throughput[0].toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : null, cls: 'blue' },
+    { label: '2× throughput', value: viz.throughput[1] ? viz.throughput[1].toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : null },
+    { label: '4× throughput', value: viz.throughput[2] ? viz.throughput[2].toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : null },
+    { label: '2× efficiency', value: row.scaling_efficiency_2x != null ? (row.scaling_efficiency_2x*100).toFixed(1)+'%' : null, cls: row.scaling_efficiency_2x >= 0.8 ? 'green' : 'amber' },
+    { label: '4× efficiency', value: row.scaling_efficiency_4x != null ? (row.scaling_efficiency_4x*100).toFixed(1)+'%' : null, cls: row.scaling_efficiency_4x >= 0.8 ? 'green' : row.scaling_efficiency_4x >= 0.5 ? 'amber' : 'coral' },
+  ]));
+
+  const labels = (viz.chip_counts || []).map(c => c + '× GPU');
+
+  const { wrap, canvas } = mkCanvas('vz-e-thr', 180);
+  el.appendChild(wrap);
+  _activeCharts.push(new Chart(canvas, { type: 'bar', data: { labels, datasets: [{ data: viz.throughput, backgroundColor: C.blue+'99', borderColor: C.blue, borderWidth: 1, borderRadius: 3 }] }, options: baseOpts('tokens / sec', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '') }));
+
+  el.appendChild(secTitle('Scaling efficiency vs ideal'));
+  const ideal  = labels.map(() => 100);
+  const target = labels.map(() => 80);
+  const { wrap: w2, canvas: c2 } = mkCanvas('vz-e-eff', 200);
+  el.appendChild(w2);
+  _activeCharts.push(new Chart(c2, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Actual',       data: viz.efficiency_pct, borderColor: C.blue, backgroundColor: C.blue+'33', tension: 0.3, pointRadius: 5, pointBackgroundColor: C.blue, fill: true },
+        { label: 'Linear ideal', data: ideal,              borderColor: C.gray, borderDash: [6,4], tension: 0, pointRadius: 0, fill: false },
+        { label: '80% target',   data: target,             borderColor: C.teal, borderDash: [3,3], tension: 0, pointRadius: 0, fill: false },
+      ],
+    },
+    options: { ...baseOpts('efficiency %', v => v+'%'), scales: { x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } }, y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: v => v+'%' }, grid: { color: C.grid } } } },
+  }));
+  el.appendChild(legend([{ color: C.blue, label: 'Actual' }, { color: C.gray, label: 'Linear ideal' }, { color: C.teal, label: '80% target' }]));
+
+  if (viz.throughput_per_chip && viz.throughput_per_chip.some(v => v != null)) {
+    el.appendChild(secTitle('Throughput per chip'));
+    const { wrap: w3, canvas: c3 } = mkCanvas('vz-e-pch', 150);
+    el.appendChild(w3);
+    _activeCharts.push(new Chart(c3, { type: 'bar', data: { labels, datasets: [{ data: viz.throughput_per_chip, backgroundColor: C.teal+'99', borderColor: C.teal, borderWidth: 1, borderRadius: 3 }] }, options: baseOpts('tok/s per chip', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '') }));
+  }
+}
 </script>
 </body>
 </html>
