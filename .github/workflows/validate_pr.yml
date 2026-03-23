@@ -6,8 +6,69 @@ on:
   pull_request:
     paths:
       - 'results/**'
+      - 'runners/**'
 
 jobs:
+  validate-runners:
+    name: Validate runner folders
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install jsonschema
+
+      - name: Detect changed runner folders
+        id: changed
+        run: |
+          BASE_FILES="benchmark_runner.py collect_env.py validate_submission.py \
+                      validate_runners.py hash_runner.py meta.schema.json \
+                      protocol.py __init__.py __pycache__"
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          FOLDERS=""
+          while IFS= read -r f; do
+            if echo "$f" | grep -qE '^runners/[^/]+/'; then
+              folder=$(echo "$f" | cut -d'/' -f2)
+              is_base=false
+              for base in $BASE_FILES; do
+                [ "$folder" = "$base" ] && is_base=true && break
+              done
+              [ "$is_base" = "false" ] && FOLDERS="$FOLDERS $folder"
+            fi
+          done <<< "$CHANGED"
+          FOLDERS=$(echo "$FOLDERS" | tr ' ' '\n' | sort -u | grep -v '^$' | tr '\n' ' ')
+          echo "folders=$FOLDERS" >> $GITHUB_OUTPUT
+          echo "Detected runner folders: ${FOLDERS:-none}"
+
+      - name: Validate changed runner folders
+        if: steps.changed.outputs.folders != ''
+        id: validate_runners
+        run: |
+          FAILED=0
+          for folder in ${{ steps.changed.outputs.folders }}; do
+            runner_path="runners/$folder"
+            [ -d "$runner_path" ] || continue
+            echo "::group::Validating $folder"
+            if ! python runners/validate_runners.py "$runner_path"; then
+              echo "::error file=runners/$folder/meta.json::Validation failed for $folder"
+              FAILED=1
+            fi
+            echo "::endgroup::"
+          done
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          [ $FAILED -eq 0 ] || exit 1
+
+      - name: No runner folders changed
+        if: steps.changed.outputs.folders == ''
+        run: echo "No runner folders changed in this PR — skipping."
+
   validate:
     name: Validate result submissions
     runs-on: ubuntu-latest
@@ -26,7 +87,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install jsonschema numpy psutil --quiet
+          pip install jsonschema --quiet
 
       - name: Find changed submission directories
         id: find_dirs
@@ -69,7 +130,7 @@ jobs:
             echo "Validating: $DIR"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-            if python scripts/validate_submission.py --dir "$DIR"; then
+            if python runners/validate_submission.py --dir "$DIR"; then
               echo "✓ PASSED: $DIR"
               PASSED=$((PASSED + 1))
             else
@@ -96,14 +157,33 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
             const outcome = '${{ job.status }}';
-            const icon = outcome === 'success' ? '✅' : '❌';
+            const icon   = outcome === 'success' ? '✅' : '❌';
             const status = outcome === 'success' ? 'All submissions valid' : 'Validation failed';
+            const marker = '<!-- accelmark-validation-comment -->';
+            const body   = `${marker}\n## ${icon} AccelMark Validation: ${status}\n\nSee the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`;
 
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            // Update existing bot comment rather than accumulating new ones
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ${icon} AccelMark Validation: ${status}\n\nSee the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
             });
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

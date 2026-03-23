@@ -53,7 +53,7 @@ def collect_environment(repo_path: Path, output_dir: Path) -> dict:
     """Run collect_env.py and return parsed env_info."""
     env_path = output_dir / "env_info.json"
     subprocess.run(
-        [sys.executable, "scripts/collect_env.py", "--output", str(env_path)],
+        [sys.executable, "runners/collect_env.py", "--output", str(env_path)],
         cwd=repo_path, capture_output=True, text=True, check=True
     )
     with open(env_path) as f:
@@ -217,8 +217,8 @@ def main(user_message: str, context: dict) -> str:
 
             # Step 2: select mode
             sys.path.insert(0, str(repo_path))
-            from mini.mini_suite_selector import select_mode, select_mini_suite
-            from mini.hardware_assessment import assess_hardware, format_assessment_report
+            from openclaw_skill.mini.mini_suite_selector import select_mode, select_mini_suite
+            from openclaw_skill.mini.hardware_assessment import assess_hardware, format_assessment_report
 
             mode = select_mode(env)
 
@@ -230,7 +230,7 @@ def main(user_message: str, context: dict) -> str:
             config = select_mini_suite(env)
 
             # Step 4: run benchmark
-            from mini.run_mini import run_benchmark, build_result_json, format_benchmark_report
+            from openclaw_skill.mini.run_mini import run_benchmark, build_result_json, format_benchmark_report
             benchmark_result = run_benchmark(config, env)
 
             # Step 5: build full result.json

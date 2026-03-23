@@ -12,15 +12,21 @@ For running benchmarks and submitting results, see [CONTRIBUTING.md](CONTRIBUTIN
 
 ```
 AccelMark/
-├── loadgen/
-│   ├── loadgen.py          ← Shared timing and measurement engine
-│   └── types.py            ← InferenceResult, SampleRecord
-├── scripts/
+├── run.py                  ← Unified CLI entry point
+├── runners/
 │   ├── benchmark_runner.py ← Base class: all orchestration logic
 │   ├── collect_env.py      ← Hardware/software detection
 │   ├── validate_submission.py
-│   └── nvidia/
-│       └── run_vllm.py     ← VLLMRunner(BenchmarkRunner)
+│   ├── hash_runner.py      ← Compute runner ID before submission
+│   ├── validate_runners.py ← CI: validate all runner folders
+│   ├── meta.schema.json    ← JSON schema for runner meta.json
+│   └── nvidia_vllm_{hash}/ ← Reference runner (NVIDIA + vLLM)
+│       ├── runner.py
+│       ├── requirements.txt
+│       └── meta.json
+├── loadgen/
+│   ├── loadgen.py          ← Shared timing and measurement engine
+│   └── types.py            ← InferenceResult, SampleRecord
 ├── suites/
 │   ├── suite_A/suite.json + requests.jsonl
 │   ├── suite_B/...
@@ -43,7 +49,9 @@ AccelMark/
 ### Data flow
 
 ```
-Platform script (run_vllm.py)
+run.py  (or direct: python runners/{id}/runner.py)
+    ↓  loads runner by ID
+runners/{id}/runner.py  (BenchmarkRunner subclass)
     ↓  calls
 BenchmarkRunner._run_single_scenario()
     ↓  calls
@@ -74,14 +82,23 @@ regardless of platform.
 
 ### Overview
 
-Create a new file under `scripts/{platform}/run_{framework}.py` that
+Create a new runner folder under `runners/{platform}_{framework}_{hash8}/` that
 subclasses `BenchmarkRunner` and implements three methods.
+
+### Step 0: Compute the runner ID
+
+Before naming your folder, write your `runner.py` first, then compute the hash:
+
+    python runners/hash_runner.py path/to/your/runner.py
+
+This prints your implementation ID, e.g. `nvidia_lmdeploy_7f3a1b2c`.
+Create your folder with that exact name.
 
 ### Step 1: Implement the subclass
 
 ```python
-# scripts/nvidia/run_lmdeploy.py
-from scripts.benchmark_runner import BenchmarkRunner
+# runners/nvidia_lmdeploy_{hash8}/runner.py
+from runners.benchmark_runner import BenchmarkRunner
 from loadgen.types import InferenceResult
 import time
 
@@ -189,7 +206,7 @@ if __name__ == "__main__":
 ### Step 2: Add requirements
 
 ```
-# scripts/nvidia/requirements_lmdeploy.txt
+# runners/nvidia_lmdeploy_{hash8}/requirements.txt
 lmdeploy>=0.5.0
 transformers>=4.40.0
 ```
@@ -197,7 +214,7 @@ transformers>=4.40.0
 ### Step 3: Add a README
 
 ```
-# scripts/nvidia/README_lmdeploy.md
+# runners/nvidia_lmdeploy_{hash8}/README.md
 
 ## Setup
 
@@ -205,21 +222,36 @@ pip install lmdeploy>=0.5.0
 
 ## Usage
 
-python scripts/nvidia/run_lmdeploy.py --suite suite_A --scenario all
+python run.py --runner nvidia_lmdeploy_{hash8} --suite suite_A --scenario all
 ```
 
 ### Step 4: Test it
 
 ```bash
 # Verify imports
-python -c "from scripts.nvidia.run_lmdeploy import LMDeployRunner; print('OK')"
+python -c "from runners.nvidia_lmdeploy_{hash8}.runner import LMDeployRunner; print('OK')"
 
 # Dry run
-python scripts/nvidia/run_lmdeploy.py --help
+python run.py --runner nvidia_lmdeploy_{hash8} --help
 
 # Full run
-python scripts/nvidia/run_lmdeploy.py --suite suite_A --scenario all
+python run.py --runner nvidia_lmdeploy_{hash8} --suite suite_A --scenario all
 ```
+
+### Step 5: Write meta.json
+
+    {
+      "id":           "nvidia_lmdeploy_7f3a1b2c",
+      "platform":     "nvidia",
+      "name":         "LMDeploy on NVIDIA",
+      "framework":    "LMDeploy",
+      "submitted_by": "your_github_username",
+      "description":  "One sentence describing what makes this runner distinct.",
+      "notes":        null,
+      "created":      "YYYY-MM-DD"
+    }
+
+The `id` must exactly match the folder name.
 
 ### Capability flags
 
@@ -360,7 +392,7 @@ Format of each line in `requests.jsonl`:
 Run the accuracy check on reference hardware (A100) and record the score:
 
 ```bash
-python scripts/nvidia/run_vllm.py \
+python run.py --runner nvidia_vllm_e0859b3c \
     --suite suite_X \
     --scenario accuracy \
     --model-path /path/to/model
@@ -465,9 +497,10 @@ def main():
 ### Step 2: Create the platform script
 
 ```
-scripts/your_platform/
-├── run_your_framework.py   ← BenchmarkRunner subclass
+runners/your_platform_{hash8}/
+├── runner.py        ← BenchmarkRunner subclass
 ├── requirements.txt
+├── meta.json
 └── README.md
 ```
 
@@ -569,6 +602,134 @@ Use `"type": ["your_type", "null"]` to make fields optional.
 3. Add to `extract_row()` in `leaderboard/generate.py` if it should appear on leaderboard
 4. Run `validate_submission.py` on an existing result to confirm backward compatibility
 
+### Runner validation (`validate_runners.py`)
+
+Before opening a PR that adds a new runner, validate it locally:
+
+```bash
+python runners/validate_runners.py runners/nvidia_vllm_3f8a2c1d/
+```
+
+This validates a single runner folder and tells you clearly whether it is
+ready to submit:
+
+```
+Validating: nvidia_vllm_3f8a2c1d/
+==================================================
+Files:
+  ✓ runner.py
+  ✓ meta.json
+  ✓ requirements.txt
+
+Hash:
+  ✓ SHA-256(runner.py)[:8] = 3f8a2c1d ✓
+
+meta.json:
+  ✓ Valid against schema
+  ✓ meta.id matches folder name
+
+Duplicate check:
+  ✓ No existing runner with this ID
+
+==================================================
+✓ PASSED — nvidia_vllm_3f8a2c1d is ready to submit
+==================================================
+```
+
+| Check | What it enforces |
+|-------|-----------------|
+| `runner.py` present | Every runner folder must have a runnable entry point |
+| `meta.json` present | Metadata is required for discovery and the leaderboard |
+| Hash consistency | Folder name must end with `SHA-256(runner.py)[:8]` — detects untracked edits |
+| `meta.json` schema | Validates required fields: `id`, `platform`, `name`, `framework`, `submitted_by`, `description` |
+| `meta.id == folder name` | The ID in metadata must exactly match the folder name |
+| No duplicate IDs | Checks that no existing runner in `runners/` shares the same ID |
+| `supersedes` target exists | Warning if the referenced old runner folder is not found |
+| `deprecated_by` target exists | Warning if the referenced new runner folder is not found |
+
+`requirements.txt` absence is a warning, not an error.
+`supersedes` and `deprecated_by` cross-reference failures are also warnings —
+the referenced folder may not be merged yet when validating locally.
+
+**Hash mismatch** is the most common failure after editing `runner.py` without
+renaming the folder. The error message tells you exactly what to do:
+
+```
+  ✗ Hash mismatch.
+      Folder ends with : e0859b3c
+      runner.py hashes to: b3f29a11
+      Rename folder to: nvidia_vllm_b3f29a11
+```
+
+To compute the correct name before creating a new runner folder:
+
+```bash
+python runners/hash_runner.py path/to/your/runner.py
+# → nvidia_vllm_b3f29a11
+```
+
+CI runs the same validator across all runner folders automatically on every PR.
+
+### Updating an existing runner
+
+Runner folders are immutable once merged — you cannot edit `runner.py` in
+place. Instead, publish a new folder and mark the old one deprecated.
+This preserves the audit trail: results that reference the old ID always
+point to the exact code that produced them.
+
+**Step 1: Edit your `runner.py` and compute the new hash**
+
+```bash
+# Make your changes, then compute the new ID
+python runners/hash_runner.py runners/nvidia_vllm_old_hash/runner.py
+# → nvidia_vllm_b3f29a11
+```
+
+**Step 2: Create the new runner folder**
+
+```bash
+cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_b3f29a11
+# Apply your edits to runners/nvidia_vllm_b3f29a11/runner.py
+```
+
+**Step 3: Update `meta.json` in the new folder**
+
+```json
+{
+  "id":           "nvidia_vllm_b3f29a11",
+  "platform":     "nvidia",
+  "name":         "vLLM on NVIDIA (reference implementation)",
+  "framework":    "vLLM",
+  "submitted_by": "JuhaoLiang1997",
+  "description":  "...",
+  "supersedes":   "nvidia_vllm_old_hash",
+  "notes":        null,
+  "created":      "YYYY-MM-DD"
+}
+```
+
+**Step 4: Add `deprecated_by` to the old runner's `meta.json`**
+
+`meta.json` is the only file that may be edited in an existing runner folder.
+
+```json
+{
+  "id":            "nvidia_vllm_old_hash",
+  "deprecated_by": "nvidia_vllm_b3f29a11",
+  "notes":         "Deprecated — use nvidia_vllm_b3f29a11. Fixed edge case in release_resources()."
+}
+```
+
+**Step 5: Validate and submit**
+
+```bash
+python runners/validate_runners.py runners/nvidia_vllm_b3f29a11/
+```
+
+Open a PR that includes both the new folder and the updated old `meta.json`.
+The old runner remains runnable — existing results are unaffected. `run.py --list`
+will hide it by default and show a deprecation warning if someone runs it directly.
+
 ---
 
 ## Testing Your Changes
@@ -578,22 +739,25 @@ Use `"type": ["your_type", "null"]` to make fields optional.
 ```bash
 cd /path/to/AccelMark
 
+# 0. Validate your runner folder (hash, meta.json schema, no duplicate IDs)
+python runners/validate_runners.py runners/your_platform_{hash8}/
+
 # 1. Schema is valid JSON
 python -c "import json; json.load(open('schema/result.schema.json')); print('schema OK')"
 
 # 2. Existing results still validate
 for dir in results/verified/*/; do
-    PYTHONPATH=. python scripts/validate_submission.py --dir "$dir" && echo "OK: $dir"
+    python runners/validate_submission.py --dir "$dir" && echo "OK: $dir"
 done
 
 # 3. Leaderboard generates without errors
 python leaderboard/generate.py
 
-# 4. New platform script imports cleanly
-python -c "from scripts.your_platform.run_your_framework import YourRunner; print('OK')"
+# 4. New runner imports cleanly
+python -c "from runners.your_platform_{hash8}.runner import YourRunner; print('OK')"
 
 # 5. Help works
-python scripts/your_platform/run_your_framework.py --help
+python run.py --runner your_platform_{hash8} --help
 ```
 
 ### Running a quick benchmark test
@@ -601,13 +765,13 @@ python scripts/your_platform/run_your_framework.py --help
 ```bash
 # Run with minimal requests to test the pipeline end-to-end
 # Temporarily reduce request_count for testing only
-python scripts/nvidia/run_vllm.py \
+python run.py --runner nvidia_vllm_e0859b3c \
     --suite suite_A \
     --scenario offline \
     --output-dir /tmp/accelmark_test/
 
 # Validate the output
-PYTHONPATH=. python scripts/validate_submission.py --dir /tmp/accelmark_test/
+python runners/validate_submission.py --dir /tmp/accelmark_test/
 ```
 
 ---
@@ -615,7 +779,7 @@ PYTHONPATH=. python scripts/validate_submission.py --dir /tmp/accelmark_test/
 ## Code Style Guidelines
 
 - **No timing in platform scripts.** LoadGen owns all timing.
-- **No hardcoded paths.** Use `_REPO_ROOT` from `benchmark_runner.py`.
+- **No hardcoded paths.** Use `_REPO_ROOT` from `runners/benchmark_runner.py`.
 - **No per-request logging by default.** Suppress verbose framework logs unless `--verbose`.
 - **Fail fast, fail clearly.** Raise exceptions with descriptive messages rather than returning None silently.
 - **OOM is valid data.** Catch CUDA OOM in `inference_fn_offline`, raise a recognizable exception so LoadGen can record `"oom": true` and continue.
@@ -628,3 +792,43 @@ PYTHONPATH=. python scripts/validate_submission.py --dir /tmp/accelmark_test/
 - **New suite proposal:** Open a GitHub Issue with the "Request new suite" template
 - **New platform support:** Open a PR with a working platform script and at least one verified result
 - **Leaderboard question:** Check `leaderboard/generate.py` — it's well-commented
+
+---
+
+## Roadmap
+
+The following features are planned but not yet implemented.
+Contributors are welcome to pick these up — open an issue first to discuss.
+
+### Leaderboard: implementation tab
+
+The result modal currently has Details and Visualize tabs.
+A third Implementation tab should show the runner's `meta.json` fields
+(name, platform, framework, submitted_by, description, notes) and a
+link to the runner folder on GitHub.
+
+The `implementation_id` field is already present in new results.
+The leaderboard generator (`leaderboard/generate.py`) already passes
+`detail` and `viz` objects to the frontend — `impl` should follow the
+same pattern via a new `extract_impl(result)` function.
+
+The tab should only be visible when `row.implementation_id` is set.
+
+### OpenAI-compatible serving API
+
+Each runner already loads the model and exposes `inference_fn_streaming`.
+A `--serve` mode on `run.py` would start a FastAPI server with
+`/v1/chat/completions` and `/v1/models` endpoints backed by the same
+inference stack that was benchmarked.
+
+    python run.py --runner nvidia_vllm_e0859b3c --serve --port 8000
+
+Since AccelMark has already measured performance for the runner, the
+server could report capacity estimates (e.g. "Estimated: 5 max QPS
+based on Suite A results") in the startup log.
+
+Implementation notes:
+- Add `serve()` method to `BenchmarkRunner` alongside `main()`
+- Thin FastAPI adapter translating chat completions → `inference_fn_streaming`
+- `run.py --serve` calls `serve()` instead of `main()`
+- Optional `--workers N` for multi-request capacity

@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "implementation_id": "nvidia_vllm_e0859b3c",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb_per_chip": 80.0,
+    "interconnect_intra_node": "N/A",
+    "interconnect_inter_node": null
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online",
+      "interactive"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "data_parallel_size": 1,
+      "expert_parallel_size": null
+    },
+    "num_runs": 3
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 8,
+          "throughput_tokens_per_sec": 5248.13,
+          "throughput_tokens_per_sec_per_chip": 5248.13,
+          "elapsed_seconds_median": 22.6,
+          "peak_memory_gb": 69.83,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 32,
+          "throughput_tokens_per_sec": 5199.05,
+          "throughput_tokens_per_sec_per_chip": 5199.05,
+          "elapsed_seconds_median": 22.8,
+          "peak_memory_gb": 69.83,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 128,
+          "throughput_tokens_per_sec": 5186.34,
+          "throughput_tokens_per_sec_per_chip": 5186.34,
+          "elapsed_seconds_median": 22.8,
+          "peak_memory_gb": 69.83,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    },
+    "online": {
+      "max_valid_qps": 5,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 80.69,
+          "ttft_ms_p90": 142.23,
+          "ttft_ms_p99": 214.96,
+          "tpot_ms_p50": 33.2,
+          "tpot_ms_p90": 51.39,
+          "tpot_ms_p99": 56.34,
+          "elapsed_seconds_median": 113.0,
+          "sla_met": true
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 192.35,
+          "ttft_ms_p90": 12336.73,
+          "ttft_ms_p99": 14305.01,
+          "tpot_ms_p50": 95.05,
+          "tpot_ms_p90": 117.49,
+          "tpot_ms_p99": 134.61,
+          "elapsed_seconds_median": 82.4,
+          "sla_met": false
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 588.66,
+          "ttft_ms_p90": 32926.56,
+          "ttft_ms_p99": 37271.83,
+          "tpot_ms_p50": 94.28,
+          "tpot_ms_p90": 132.65,
+          "tpot_ms_p99": 346.09,
+          "elapsed_seconds_median": 72.4,
+          "sla_met": false
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 8320.62,
+          "ttft_ms_p90": 39684.42,
+          "ttft_ms_p99": 45097.48,
+          "tpot_ms_p50": 83.98,
+          "tpot_ms_p90": 100.3,
+          "tpot_ms_p99": 833.01,
+          "elapsed_seconds_median": 69.0,
+          "sla_met": false
+        },
+        {
+          "target_qps": 100,
+          "achieved_qps": 100.0,
+          "ttft_ms_p50": 10194.58,
+          "ttft_ms_p90": 42417.11,
+          "ttft_ms_p99": 47356.89,
+          "tpot_ms_p50": 81.99,
+          "tpot_ms_p90": 89.86,
+          "tpot_ms_p99": 477.72,
+          "elapsed_seconds_median": 71.5,
+          "sla_met": false
+        }
+      ]
+    },
+    "interactive": {
+      "ttft_ms_p50": 47.02,
+      "ttft_ms_p90": 58.0,
+      "ttft_ms_p99": 68.08,
+      "tpot_ms_p50": 12.43,
+      "tpot_ms_p90": 13.3,
+      "tpot_ms_p99": 13.39,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 448.4
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.59,
+    "baseline_delta": 0.0,
+    "valid": true,
+    "framework": "vLLM",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-03-23",
+    "reproduce_script": "runners/nvidia_vllm_e0859b3c/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-03-23T02:10:03.219994+00:00",
+    "benchmark_end_time": "2026-03-23T02:14:34.525816+00:00",
+    "benchmark_elapsed_minutes": 51.1,
+    "model_load_seconds": 43.6,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'interactive'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_e0859b3c/offline",
+      "online": "results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_e0859b3c/online",
+      "interactive": "results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_e0859b3c/interactive"
+    }
+  }
+}

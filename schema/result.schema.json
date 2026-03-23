@@ -16,6 +16,12 @@
       "description": "Suite identifier. Standard suites: suite_A through suite_D. Mini suites: mini-nano, mini-mini, mini-standard, mini-pro. Custom: 'custom'."
     },
 
+    "implementation_id": {
+      "type": ["string", "null"],
+      "description": "ID of the runner used to produce this result. Matches a folder name in runners/. Null or absent for results submitted before this feature was introduced.",
+      "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$"
+    },
+
     "chip": {
       "type": "object",
       "required": ["name", "vendor", "count", "memory_gb_per_chip", "interconnect_intra_node"],

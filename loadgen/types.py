@@ -44,6 +44,11 @@ class InferenceResult:
     output_text: Optional[str] = None
     # Generated text output. Used by _run_accuracy_integrated() for scoring.
 
+    text: Optional[str] = None
+    # Full generated text returned to serve layer. Runners used with --serve
+    # should set this in inference_fn_streaming(). The benchmark path never reads
+    # it, so existing runners without --serve are unaffected.
+
 
 @dataclass
 class SampleRecord:

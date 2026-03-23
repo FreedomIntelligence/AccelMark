@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AccelMark runner meta.json",
+  "type": "object",
+  "required": ["id", "platform", "name", "framework", "submitted_by", "description"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$",
+      "description": "Must match the folder name exactly: {platform}_{customname}_{hash8}"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["nvidia", "amd", "ascend", "apple", "other"],
+      "description": "Hardware platform this runner targets"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "framework": {
+      "type": "string",
+      "minLength": 1
+    },
+    "submitted_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "notes": {
+      "type": ["string", "null"]
+    },
+    "created": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "supersedes": {
+      "type": ["string", "null"],
+      "description": "ID of the runner this one replaces. Optional.",
+      "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$"
+    },
+    "deprecated_by": {
+      "type": ["string", "null"],
+      "description": "ID of the runner that supersedes this one. Set by maintainer after a newer runner is merged.",
+      "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$"
+    }
+  }
+}

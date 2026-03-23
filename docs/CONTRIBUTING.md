@@ -15,7 +15,7 @@ in the leaderboard and submitting your results.
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
 pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r scripts/nvidia/requirements.txt
+pip install -r runners/nvidia_vllm_e0859b3c/requirements.txt
 
 # 2. Set your name (one-time setup)
 cp configs/submitter.yaml.example configs/submitter.yaml
@@ -23,12 +23,12 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 
 # 3. Run the benchmark (~46 min on A100)
 #    Accuracy gate runs automatically before the benchmark starts.
-#    Output directory is auto-named: results/community/a100x1_llama3-8b_suite-A_YYYY-MM-DD
-python scripts/nvidia/run_vllm.py --suite suite_A --scenario all
+#    Output directory is auto-named: results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_e0859b3c
+python run.py --runner nvidia_vllm_e0859b3c --suite suite_A --scenario all
 
 # 4. Submit
 ls results/community/
-python scripts/validate_submission.py --dir results/community/<your_submission_dir>
+python runners/validate_submission.py --dir results/community/<your_submission_dir>
 # Then open a GitHub Issue using the "Community Submission" template
 ```
 
@@ -43,17 +43,14 @@ That's it. The CI bot handles the rest.
 **NVIDIA (vLLM):**
 ```bash
 pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r scripts/nvidia/requirements.txt
+pip install -r runners/nvidia_vllm_e0859b3c/requirements.txt
 ```
 
-**AMD (ROCm):**
+**Other platforms:**
 ```bash
-pip install -r scripts/amd/requirements.txt
-```
-
-**Apple Silicon (mlx-lm):**
-```bash
-pip install -r scripts/apple/requirements.txt
+# List all available runners and their install instructions
+python run.py --list
+# Then: pip install -r runners/<runner_id>/requirements.txt
 ```
 
 ### Set your submitter profile
@@ -100,7 +97,7 @@ need `--model-path` on the command line.
 ### Recommended: run all scenarios at once
 
 ```bash
-python scripts/nvidia/run_vllm.py --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_e0859b3c --suite suite_A --scenario all
 ```
 
 This runs the accuracy gate first, then offline → online → interactive in sequence
@@ -109,23 +106,23 @@ is aborted (use `--skip-accuracy-gate` to override).
 
 ```bash
 # Override the output directory if needed
-python scripts/nvidia/run_vllm.py \
+python run.py --runner nvidia_vllm_e0859b3c \
     --suite suite_A \
     --scenario all \
-    --output-dir ./results/verified/a100x1_llama3-8b_suite-A_2026-03-22
+    --output-dir ./results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_e0859b3c
 ```
 
 ### Run a single scenario
 
 ```bash
-python scripts/nvidia/run_vllm.py --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_e0859b3c --suite suite_A --scenario offline
 ```
 
 ### Multi-chip (Suite B and above)
 
 ```bash
 # Suite B: Llama-3-70B on 4 chips
-python scripts/nvidia/run_vllm.py \
+python run.py --runner nvidia_vllm_e0859b3c \
     --suite suite_B \
     --scenario all \
     --tensor-parallel-size 4
@@ -145,7 +142,7 @@ Suite E runs the same workload at 1×, 2×, 4×, and 8× chip counts and
 measures how efficiently throughput scales:
 
 ```bash
-python scripts/nvidia/run_vllm.py \
+python run.py --runner nvidia_vllm_e0859b3c \
     --suite suite_E \
     --chip_counts 1,2,4
 ```
@@ -160,7 +157,7 @@ Results report `concurrency` values, not batch sizes.
 ### With a local model path
 
 ```bash
-python scripts/nvidia/run_vllm.py \
+python run.py --runner nvidia_vllm_e0859b3c \
     --suite suite_A \
     --scenario all \
     --model-path /path/to/local/model
@@ -226,8 +223,8 @@ where it stopped. Completed steps are skipped automatically.
 
 ```bash
 ls results/community/
-python scripts/validate_submission.py \
-    --dir results/community/a100x1_llama3-8b_suite-A_2026-03-22
+python runners/validate_submission.py \
+    --dir results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_e0859b3c
 ```
 
 **Files required for submission:**
@@ -285,7 +282,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir /your/path/Meta-Llama-3-8B-Instruct
 
 # Use a local copy
-python scripts/nvidia/run_vllm.py --model-path /your/path/...
+python run.py --runner nvidia_vllm_e0859b3c --model-path /your/path/...
 ```
 
 If your local copy was downloaded at a different revision, add a note in
@@ -295,11 +292,13 @@ If your local copy was downloaded at a different revision, add a note in
 
 ## Adding support for a new platform
 
-Create a new platform script by subclassing `BenchmarkRunner`:
+Create a new runner folder under `runners/` by subclassing `BenchmarkRunner`.
+See [docs/DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation guide including
+how to compute your runner's hash ID.
 
 ```python
-# scripts/your_platform/run_your_framework.py
-from scripts.benchmark_runner import BenchmarkRunner
+# runners/your_platform_{hash8}/runner.py
+from runners.benchmark_runner import BenchmarkRunner
 from loadgen.types import InferenceResult
 
 class MyFrameworkRunner(BenchmarkRunner):
@@ -343,11 +342,12 @@ All orchestration (result building, accuracy reuse, Suite E, etc.) is
 inherited from `BenchmarkRunner` automatically.
 
 **Checklist for a new platform PR:**
-- [ ] Runner subclasses `BenchmarkRunner` and passes `validate_submission.py`
-- [ ] `scripts/<platform>/requirements.txt` included
-- [ ] `scripts/<platform>/README.md` with install and usage instructions
+- [ ] Runner folder named `{platform}_{name}_{hash8}` with correct hash
+- [ ] `runner.py` subclasses `BenchmarkRunner` and passes `runners/validate_submission.py`
+- [ ] `meta.json` present and valid (see `runners/meta.schema.json`)
+- [ ] `requirements.txt` included
 - [ ] At least one reference result in `results/community/`
-- [ ] `collect_env.py` updated to detect your hardware (see [DEVELOPMENT.md](DEVELOPMENT.md))
+- [ ] `runners/collect_env.py` updated to detect your hardware (see [DEVELOPMENT.md](DEVELOPMENT.md))
 - [ ] `README.md` supported platforms table updated
 
 See [docs/DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation reference.
@@ -369,7 +369,7 @@ Maintainers will investigate and may move the result to `flagged/`.
 ## Other ways to contribute
 
 - **Fix a bug** — open a PR with a description and test if possible
-- **Improve platform scripts** — better error messages, edge case handling
+- **Improve runners** — better error messages, edge case handling
 - **Update cloud pricing** — edit `schema/cloud_pricing.json`, open a PR
   titled `data: update cloud pricing YYYY-MM` with source URLs in the description
 - **Propose a new suite** — open an Issue with model, chip count, scenarios,

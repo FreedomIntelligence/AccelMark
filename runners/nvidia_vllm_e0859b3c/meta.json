@@ -1,0 +1,10 @@
+{
+  "id":           "nvidia_vllm_e0859b3c",
+  "platform":     "nvidia",
+  "name":         "vLLM on NVIDIA (reference implementation)",
+  "framework":    "vLLM",
+  "submitted_by": "JuhaoLiang1997",
+  "description":  "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A–E). Standard vLLM configuration, no custom patches.",
+  "notes":        null,
+  "created":      "2026-03-22"
+}

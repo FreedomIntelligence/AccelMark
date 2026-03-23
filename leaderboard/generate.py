@@ -21,6 +21,7 @@ if _pricing_path.exists():
 
 RESULTS_DIR = Path("results")
 SITE_DIR    = Path("leaderboard/site")
+RUNNERS_DIR = Path("runners")
 
 
 # ── Data loading ──────────────────────────────────────────────────────────────
@@ -148,6 +149,43 @@ def extract_detail(result: dict) -> dict:
         "meta_model_load_sec":   meta.get("model_load_seconds"),
         "meta_start_time":       meta.get("benchmark_start_time"),
         "meta_notes":            meta.get("notes"),
+    }
+
+
+# ── Implementation extraction (modal impl tab) ───────────────────────────────
+
+def extract_impl(result: dict) -> dict | None:
+    """
+    Load runner meta.json for the implementation_id referenced in result.json.
+    Returns None if implementation_id is absent or the runner folder is not found.
+    Fields returned match meta.json schema plus a GitHub link.
+    """
+    impl_id = result.get("implementation_id")
+    if not impl_id:
+        return None
+
+    meta_path = RUNNERS_DIR / impl_id / "meta.json"
+    if not meta_path.exists():
+        return None
+
+    try:
+        meta = json.loads(meta_path.read_text())
+    except Exception:
+        return None
+
+    return {
+        "id":           meta.get("id"),
+        "platform":     meta.get("platform"),
+        "name":         meta.get("name"),
+        "framework":    meta.get("framework"),
+        "submitted_by": meta.get("submitted_by"),
+        "description":  meta.get("description"),
+        "notes":        meta.get("notes"),
+        "created":      meta.get("created"),
+        "supersedes":   meta.get("supersedes"),
+        "deprecated_by": meta.get("deprecated_by"),
+        "github_url":   f"https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/{impl_id}",
+        "runner_url":   f"https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/{impl_id}/runner.py",
     }
 
 
@@ -451,6 +489,9 @@ def extract_row(result: dict) -> dict:
         # Panel data
         "detail": extract_detail(result),
         "viz":    extract_viz(result, metrics),
+        "impl":   extract_impl(result),
+        # Implementation ID (flat, for filtering/display without loading impl)
+        "implementation_id": result.get("implementation_id"),
     }
 
 
