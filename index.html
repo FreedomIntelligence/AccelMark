@@ -206,6 +206,37 @@
       display: inline-block;
     }
 
+    /* ── Suite color system ───────────────────────────────────── */
+    .suite-pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.1rem 0.45rem;
+      border-radius: 10px;
+      letter-spacing: 0.02em;
+      vertical-align: middle;
+    }
+    .suite-pill.suite_A { background: #0c2d4a; color: #58a6ff; }
+    .suite-pill.suite_B { background: #0f2d14; color: #56d364; }
+    .suite-pill.suite_C { background: #2d1f00; color: #d29922; }
+    .suite-pill.suite_D { background: #1e1040; color: #a78bfa; }
+    .suite-pill.suite_E { background: #062d1e; color: #1D9E75; }
+
+    /* ── Card suite top border ────────────────────────────────── */
+    .card { border-top: 3px solid #21262d; }
+    .card.suite_A { border-top-color: #58a6ff; }
+    .card.suite_B { border-top-color: #56d364; }
+    .card.suite_C { border-top-color: #d29922; }
+    .card.suite_D { border-top-color: #a78bfa; }
+    .card.suite_E { border-top-color: #1D9E75; }
+
+    /* ── Modal suite top border ───────────────────────────────── */
+    .modal.suite_A { border-top: 3px solid #58a6ff; }
+    .modal.suite_B { border-top: 3px solid #56d364; }
+    .modal.suite_C { border-top: 3px solid #d29922; }
+    .modal.suite_D { border-top: 3px solid #a78bfa; }
+    .modal.suite_E { border-top: 3px solid #1D9E75; }
+
     /* ── Detail modal ─────────────────────────────────────── */
     .modal-backdrop {
       display: none;
@@ -436,10 +467,10 @@
   </summary>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem 2rem;margin-top:0.75rem">
     <div><span style="color:#58a6ff;font-weight:500">Suite A</span> — Single chip, Llama-3-8B. How fast is this chip at inference? Primary metric: offline tokens/sec.</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite B</span> — Flexible chips, Llama-3-70B. Can this chip serve large models? Tests multi-chip setups required for 70B.</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite C</span> — Single chip, Llama-3-8B. Quantization speed/quality tradeoff across BF16, INT8, INT4.</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite D</span> — Single chip, Llama-3.1-8B. How does this chip handle 32K-token long-context inputs?</div>
-    <div><span style="color:#58a6ff;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
+    <div><span style="color:#56d364;font-weight:500">Suite B</span> — Flexible chips, Llama-3-70B. Can this chip serve large models? Tests multi-chip setups required for 70B.</div>
+    <div><span style="color:#d29922;font-weight:500">Suite C</span> — Single chip, Llama-3-8B. Quantization speed/quality tradeoff across BF16, INT8, INT4.</div>
+    <div><span style="color:#a78bfa;font-weight:500">Suite D</span> — Single chip, Llama-3.1-8B. How does this chip handle 32K-token long-context inputs?</div>
+    <div><span style="color:#1D9E75;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
   </div>
 </details>
 <div class="controls">
@@ -566,6 +597,13 @@
     render();
   });
 
+  // ── Suite pill ────────────────────────────────────────────
+  function suitePill(suite) {
+    if (!suite) return '';
+    const label = suite.replace('_', '\u00a0').toUpperCase(); // "SUITE A" with nbsp
+    return `<span class="suite-pill ${suite}">${label}</span>`;
+  }
+
   // ── Filters ──────────────────────────────────────────────
   function getFiltered() {
     const vendor   = document.getElementById('filter-vendor').value;
@@ -675,16 +713,19 @@
 
     chips.forEach(row => {
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = `card ${row.suite || ''}`;
       const isMini = (row.suite || '').startsWith('mini-');
       card.innerHTML = `
-        <div class="card-chip">
-          ${row.chip || 'Unknown'}
-          ${(row.chip_count || 1) > 1
-            ? `<span style="color:#8b949e;font-size:0.85rem;font-weight:400"> ×${row.chip_count}</span>`
-            : ''}
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.25rem">
+          <div class="card-chip">
+            ${row.chip || 'Unknown'}
+            ${(row.chip_count || 1) > 1
+              ? `<span style="color:#8b949e;font-size:0.85rem;font-weight:400"> ×${row.chip_count}</span>`
+              : ''}
+          </div>
+          ${suitePill(row.suite)}
         </div>
-        <div style="margin-top:0.5rem">
+        <div style="margin-top:0.25rem">
           ${row.is_suite_level ? `
             <div class="card-speed">${row.offline_throughput
               ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
@@ -701,7 +742,6 @@
             <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
           `}
         </div>
-        <div style="font-size:0.75rem;color:#388bfd;font-weight:500;margin-bottom:0.25rem">${row.suite || ''}</div>
         <div class="card-model">${row.model || ''} · ${row.framework || ''} · ${row.precision || ''}</div>
         ${row.suite === 'suite_E' ? `
             <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
@@ -804,7 +844,7 @@
         <td>${formatFramework(row)}</td>
         <td>${row.model || '—'}</td>
         <td>${row.precision || '—'}</td>
-        <td>${row.suite || '—'}</td>
+        <td>${suitePill(row.suite) || '—'}</td>
         <td>${row.scenario || '—'}</td>
         <td class="metric-primary">${
           row.is_suite_level
@@ -892,8 +932,9 @@
       (d.hw_chip || row.chip || '—') +
       (d.hw_count > 1 ? ` ×${d.hw_count}` : '');
 
-    document.getElementById('modal-subtitle').textContent =
-      [row.suite, row.scenario, row.date].filter(Boolean).join(' · ');
+    const subtitleEl = document.getElementById('modal-subtitle');
+    subtitleEl.innerHTML = [suitePill(row.suite), row.scenario, row.date]
+      .filter(Boolean).join(' <span style="color:#484f58">·</span> ');
 
     // Footer
     document.getElementById('modal-submission').textContent =
@@ -1021,6 +1062,9 @@
     document.getElementById('tab-details').classList.add('active');
     document.getElementById('tab-viz').classList.remove('active');
     document.getElementById('tab-impl').classList.remove('active');
+
+    // Apply suite accent color to modal
+    document.getElementById('modal').className = `modal ${row.suite || ''}`;
 
     // Viz tab
     const vizBtn = document.getElementById('tab-viz');
