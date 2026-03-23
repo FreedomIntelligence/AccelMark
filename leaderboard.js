@@ -429,5 +429,172 @@ const LEADERBOARD_DATA = [
       "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_e0859b3c/runner.py"
     },
     "implementation_id": "nvidia_vllm_e0859b3c"
+  },
+  {
+    "submission": "nvidia_a100sxm480gbx4_suite_B_nvidia_vllm_e0859b3c",
+    "tier": "verified",
+    "is_suite_level": true,
+    "chip": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "chip_count": 4,
+    "memory_gb_per_chip": 80.0,
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "model": "Meta-Llama-3-70B-Instruct",
+    "precision": "BF16",
+    "suite": "suite_B",
+    "scenario": "all",
+    "primary_metric": 2748.32,
+    "primary_metric_label": "tokens/sec (offline)",
+    "tokens_per_sec_per_chip": 687.1,
+    "offline_throughput": 2748.32,
+    "online_max_qps": 2,
+    "interactive_ttft_p99": null,
+    "peak_memory_gb": 67.42,
+    "memory_utilization_pct": 84.3,
+    "memory_efficiency_toks_per_gb": 40.8,
+    "min_price_usd_per_hr": null,
+    "cost_efficiency_toks_per_dollar_hr": null,
+    "tokens_per_watt": null,
+    "accuracy_valid": true,
+    "accuracy_score": 0.78,
+    "date": "2026-03-23",
+    "submitted_by": "JuhaoLiang1997",
+    "reproduce_script": "runners/nvidia_vllm_e0859b3c/runner.py",
+    "notes": null,
+    "scaling_efficiency_2x": null,
+    "scaling_efficiency_4x": null,
+    "scaling_base_throughput": null,
+    "quant_bf16_throughput": null,
+    "quant_int8_throughput": null,
+    "quant_int4_throughput": null,
+    "quant_int8_speedup": null,
+    "quant_int4_speedup": null,
+    "quant_int8_quality_eff": null,
+    "quant_int4_quality_eff": null,
+    "detail": {
+      "hw_chip": "NVIDIA A100-SXM4-80GB",
+      "hw_vendor": "NVIDIA",
+      "hw_count": 4,
+      "hw_memory_gb": 80.0,
+      "hw_interconnect_intra": "NVLink",
+      "hw_interconnect_inter": null,
+      "hw_cpu": "AMD EPYC 7742 64-Core Processor, 128 cores",
+      "hw_system_memory_gb": 1007.7,
+      "hw_pcie": "PCIe Gen 4",
+      "hw_network": "3x InfiniBand/RoCE (mlx5_0, mlx5_1, mlx5_2)",
+      "sw_framework": "vLLM",
+      "sw_framework_version": "0.6.6.post1",
+      "sw_driver": "565.57.01",
+      "sw_runtime": "CUDA 12.1",
+      "sw_os": "Ubuntu 22.04.4 LTS",
+      "sw_python": "3.10.18",
+      "sw_pytorch": "2.5.1+cu121",
+      "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+      "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+      "model_arch": "dense",
+      "model_params_b": 70.0,
+      "model_precision": "BF16",
+      "model_format": "HuggingFace original",
+      "run_scenarios": [
+        "offline",
+        "online"
+      ],
+      "run_chip_counts": null,
+      "run_num_runs": 3,
+      "run_tp": 4,
+      "run_pp": 1,
+      "run_dp": 1,
+      "acc_score": 0.78,
+      "acc_baseline_delta": 0.03,
+      "acc_valid": true,
+      "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
+      "meta_submitted_by": "JuhaoLiang1997",
+      "meta_submission_type": "individual",
+      "meta_date": "2026-03-23",
+      "meta_reproduce_script": "runners/nvidia_vllm_e0859b3c/runner.py",
+      "meta_elapsed_min": 65.4,
+      "meta_model_load_sec": 440.4,
+      "meta_start_time": "2026-03-23T06:10:26.011181+00:00",
+      "meta_notes": null
+    },
+    "viz": {
+      "type": "suite_B",
+      "offline": {
+        "labels": [
+          "8",
+          "32",
+          "128"
+        ],
+        "throughput": [
+          2740.37,
+          2748.32,
+          2730.92
+        ],
+        "throughput_per_chip": [
+          685.09,
+          687.08,
+          682.73
+        ],
+        "memory_gb": [
+          67.42,
+          67.42,
+          67.42
+        ]
+      },
+      "online": {
+        "labels": [
+          "1",
+          "2",
+          "5",
+          "10",
+          "25"
+        ],
+        "ttft_p50": [
+          110.19,
+          124.76,
+          216.45,
+          606.82,
+          3442.98
+        ],
+        "ttft_p90": [
+          170.89,
+          203.38,
+          635.48,
+          39880.42,
+          58145.47
+        ],
+        "tpot_p50": [
+          37.09,
+          46.28,
+          126.26,
+          153.95,
+          147.15
+        ],
+        "sla_met": [
+          true,
+          true,
+          false,
+          false,
+          false
+        ],
+        "max_valid_qps": 2
+      }
+    },
+    "impl": {
+      "id": "nvidia_vllm_e0859b3c",
+      "platform": "nvidia",
+      "name": "vLLM on NVIDIA (reference implementation)",
+      "framework": "vLLM",
+      "submitted_by": "JuhaoLiang1997",
+      "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A\u2013E). Standard vLLM configuration, no custom patches.",
+      "notes": null,
+      "created": "2026-03-22",
+      "supersedes": null,
+      "deprecated_by": null,
+      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_e0859b3c",
+      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_e0859b3c/runner.py"
+    },
+    "implementation_id": "nvidia_vllm_e0859b3c"
   }
 ];
