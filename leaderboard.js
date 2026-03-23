@@ -155,8 +155,21 @@ const LEADERBOARD_DATA = [
         "tpot_p99": 13.39
       }
     },
-    "impl": null,
-    "implementation_id": null
+    "impl": {
+      "id": "nvidia_vllm_e0859b3c",
+      "platform": "nvidia",
+      "name": "vLLM on NVIDIA (reference implementation)",
+      "framework": "vLLM",
+      "submitted_by": "JuhaoLiang1997",
+      "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A\u2013E). Standard vLLM configuration, no custom patches.",
+      "notes": null,
+      "created": "2026-03-22",
+      "supersedes": null,
+      "deprecated_by": null,
+      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_e0859b3c",
+      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_e0859b3c/runner.py"
+    },
+    "implementation_id": "nvidia_vllm_e0859b3c"
   },
   {
     "submission": "nvidia_a100sxm480gbx1_suite_D_nvidia_vllm_e0859b3c",
@@ -271,8 +284,21 @@ const LEADERBOARD_DATA = [
         "tpot_p99": 32.0
       }
     },
-    "impl": null,
-    "implementation_id": null
+    "impl": {
+      "id": "nvidia_vllm_e0859b3c",
+      "platform": "nvidia",
+      "name": "vLLM on NVIDIA (reference implementation)",
+      "framework": "vLLM",
+      "submitted_by": "JuhaoLiang1997",
+      "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A\u2013E). Standard vLLM configuration, no custom patches.",
+      "notes": null,
+      "created": "2026-03-22",
+      "supersedes": null,
+      "deprecated_by": null,
+      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_e0859b3c",
+      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_e0859b3c/runner.py"
+    },
+    "implementation_id": "nvidia_vllm_e0859b3c"
   },
   {
     "submission": "nvidia_a100sxm480gbx1_suite_E_nvidia_vllm_e0859b3c",
@@ -388,7 +414,20 @@ const LEADERBOARD_DATA = [
         2367.7
       ]
     },
-    "impl": null,
-    "implementation_id": null
+    "impl": {
+      "id": "nvidia_vllm_e0859b3c",
+      "platform": "nvidia",
+      "name": "vLLM on NVIDIA (reference implementation)",
+      "framework": "vLLM",
+      "submitted_by": "JuhaoLiang1997",
+      "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A\u2013E). Standard vLLM configuration, no custom patches.",
+      "notes": null,
+      "created": "2026-03-22",
+      "supersedes": null,
+      "deprecated_by": null,
+      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_e0859b3c",
+      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_e0859b3c/runner.py"
+    },
+    "implementation_id": "nvidia_vllm_e0859b3c"
   }
 ];
