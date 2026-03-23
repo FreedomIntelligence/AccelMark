@@ -1,26 +1,26 @@
 {
-  "nvidia_a100sxm480gbx1_suite_D_nvidia_vllm_e0859b3c": {
+  "nvidia_a100sxm480gbx1_suite_D_nvidia_vllm_c34f94c3": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "rank": 1,
     "total": 4,
     "percentile": 75.0,
     "best_throughput_tokens_per_sec": 7010.39
   },
-  "nvidia_a100sxm480gbx1_suite_E_nvidia_vllm_e0859b3c": {
+  "nvidia_a100sxm480gbx1_suite_E_nvidia_vllm_c34f94c3": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "rank": 2,
     "total": 4,
     "percentile": 50.0,
     "best_throughput_tokens_per_sec": 6063.43
   },
-  "nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_e0859b3c": {
+  "nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_c34f94c3": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "rank": 3,
     "total": 4,
     "percentile": 25.0,
     "best_throughput_tokens_per_sec": 5248.13
   },
-  "nvidia_a100sxm480gbx4_suite_B_nvidia_vllm_e0859b3c": {
+  "nvidia_a100sxm480gbx4_suite_B_nvidia_vllm_c34f94c3": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "rank": 4,
     "total": 4,
