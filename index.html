@@ -490,6 +490,17 @@
     <div><span style="color:#1D9E75;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
   </div>
 </details>
+<details style="padding:0.75rem 2rem;border-bottom:1px solid #21262d;font-size:0.82rem;color:#8b949e;cursor:pointer">
+  <summary style="color:#e6edf3;font-weight:500;list-style:none;display:flex;align-items:center;gap:0.5rem">
+    <span style="font-size:0.75rem;background:#21262d;padding:0.15rem 0.5rem;border-radius:4px">?</span> Scenario descriptions
+  </summary>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem 2rem;margin-top:0.75rem">
+    <div><span class="scenario-pill sc-offline">Offline</span> — All requests sent at once. Measures peak throughput (tokens/sec) at each concurrency level. Primary metric for most suites.</div>
+    <div><span class="scenario-pill sc-online">Online</span> — Poisson-arrival load at increasing QPS levels. Reports maximum QPS where TTFT p99 stays within the suite SLA.</div>
+    <div><span class="scenario-pill sc-interactive">Interactive</span> — One request at a time (serial). Measures isolated TTFT and TPOT with no queueing pressure.</div>
+    <div><span class="scenario-pill sc-sustained">Sustained</span> — Fixed-concurrency run for 30 minutes. Detects thermal throttling, memory fragmentation, and performance degradation over time.</div>
+  </div>
+</details>
 <div class="controls">
   <select id="filter-vendor">
     <option value="">All vendors</option>
@@ -1682,29 +1693,46 @@
 
   // Suite Stress / Sustained ─────────────────────────────────
   function renderSustained(el, viz, row) {
-    const dur   = viz.duration_minutes  ?? '?';
-    const qps   = viz.target_qps        ?? '?';
+    const dur   = viz.duration_minutes     ?? '?';
+    const conc  = viz.sustained_concurrency ?? '?';
     const mean  = viz.sustained_throughput;
     const thr   = viz.throttle_ratio;
     const onset = viz.throttle_onset_minute;
     const drift = viz.ttft_p99_drift_ms;
 
-    el.appendChild(sectionTitle(`Sustained load — ${dur} min @ ${qps} QPS`));
+    el.appendChild(sectionTitle(`Sustained load — ${dur} min @ concurrency ${conc}`));
 
     // Stat chips
-    const chips = [];
-    if (mean != null)  chips.push({ label: 'Mean throughput', value: mean.toFixed(0) + ' tok/s' });
-    if (thr  != null) {
-      const pct   = (thr * 100).toFixed(1) + '%';
-      const color = thr < 0.05 ? C.green : thr < 0.15 ? C.yellow : C.red;
-      chips.push({ label: 'Throttle ratio', value: pct, color });
-    }
-    if (onset != null) chips.push({ label: 'Throttle onset', value: onset + ' min' });
-    if (drift != null) {
-      const color = drift < 50 ? C.green : drift < 200 ? C.yellow : C.red;
-      chips.push({ label: 'TTFT p99 drift', value: drift.toFixed(0) + ' ms', color });
-    }
-    if (chips.length) el.appendChild(statChips(chips));
+    el.appendChild(statChips([
+      {
+        label: 'Sustained throughput',
+        value: mean != null
+          ? mean.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s'
+          : null,
+        cls: 'blue'
+      },
+      {
+        label: 'Concurrency',
+        value: viz.sustained_concurrency != null
+          ? viz.sustained_concurrency + ' in-flight'
+          : null,
+      },
+      {
+        label: 'Throttle ratio',
+        value: thr != null
+          ? (thr * 100).toFixed(1) + '%'
+          : null,
+        cls: thr >= 0.95 ? 'green'
+           : thr >= 0.85 ? 'amber' : 'coral'
+      },
+      {
+        label: 'Throttle onset',
+        value: onset != null
+          ? 'min ' + onset.toFixed(1)
+          : 'No throttling detected',
+        cls: onset == null ? 'green' : 'amber'
+      },
+    ]));
 
     // Throughput over time
     const samples = viz.samples;
