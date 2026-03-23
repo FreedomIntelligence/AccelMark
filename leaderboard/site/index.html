@@ -222,6 +222,23 @@
     .suite-pill.suite_D { background: #1e1040; color: #a78bfa; }
     .suite-pill.suite_E { background: #062d1e; color: #1D9E75; }
 
+    /* ── Scenario pill ────────────────────────────────────────── */
+    .scenario-pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.1rem 0.45rem;
+      border-radius: 10px;
+      letter-spacing: 0.02em;
+      vertical-align: middle;
+      cursor: default;
+    }
+    .scenario-pill.sc-offline     { background: #0c2d4a; color: #58a6ff; }
+    .scenario-pill.sc-online      { background: #0c2d2d; color: #39d0d0; }
+    .scenario-pill.sc-interactive { background: #1e1040; color: #a78bfa; }
+    .scenario-pill.sc-sustained   { background: #0f2d14; color: #56d364; }
+    .scenario-pill.sc-all         { background: #1c2028; color: #8b949e; }
+
     /* ── Card suite top border ────────────────────────────────── */
     .card { border-top: 3px solid #21262d; }
     .card.suite_A { border-top-color: #58a6ff; }
@@ -473,6 +490,17 @@
     <div><span style="color:#1D9E75;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
   </div>
 </details>
+<details style="padding:0.75rem 2rem;border-bottom:1px solid #21262d;font-size:0.82rem;color:#8b949e;cursor:pointer">
+  <summary style="color:#e6edf3;font-weight:500;list-style:none;display:flex;align-items:center;gap:0.5rem">
+    <span style="font-size:0.75rem;background:#21262d;padding:0.15rem 0.5rem;border-radius:4px">?</span> Scenario descriptions
+  </summary>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem 2rem;margin-top:0.75rem">
+    <div><span class="scenario-pill sc-offline">Offline</span> — All requests sent at once. Measures peak throughput (tokens/sec) at each concurrency level. Primary metric for most suites.</div>
+    <div><span class="scenario-pill sc-online">Online</span> — Poisson-arrival load at increasing QPS levels. Reports maximum QPS where TTFT p99 stays within the suite SLA.</div>
+    <div><span class="scenario-pill sc-interactive">Interactive</span> — One request at a time (serial). Measures isolated TTFT and TPOT with no queueing pressure.</div>
+    <div><span class="scenario-pill sc-sustained">Sustained</span> — Fixed-concurrency run for 30 minutes. Detects thermal throttling, memory fragmentation, and performance degradation over time.</div>
+  </div>
+</details>
 <div class="controls">
   <select id="filter-vendor">
     <option value="">All vendors</option>
@@ -483,7 +511,6 @@
     <option value="online">Online</option>
     <option value="interactive">Interactive</option>
     <option value="sustained">Sustained</option>
-    <option value="training">Training</option>
     <option value="all">All (suite-level)</option>
   </select>
   <select id="filter-tier">
@@ -533,16 +560,16 @@
           <th onclick="sortBy('suite')">Suite</th>
           <th onclick="sortBy('scenario')">Scenario</th>
           <th onclick="sortBy('primary_metric')">Performance</th>
-          <th onclick="sortBy('quant_int8_speedup')">INT8 speedup</th>
-          <th onclick="sortBy('quant_int4_speedup')">INT4 speedup</th>
-          <th onclick="sortBy('scaling_efficiency_2x')">2× eff.</th>
-          <th onclick="sortBy('scaling_efficiency_4x')">4× eff.</th>
-          <th onclick="sortBy('sustained_throughput')" title="Mean tokens/sec over sustained run">Sustained tok/s</th>
-          <th onclick="sortBy('throttle_ratio')" title="min/max throughput ratio (1.0 = no throttling)">Throttle ratio</th>
-          <th onclick="sortBy('throttle_onset_minute')" title="Minute when throughput first dropped >10%">Throttle onset</th>
-          <th onclick="sortBy('tokens_per_watt')">tok/s/W</th>
-          <th onclick="sortBy('memory_efficiency_toks_per_gb')">tok/s/GB</th>
-          <th onclick="sortBy('cost_efficiency_toks_per_dollar_hr')">tok/s/$/hr</th>
+          <th onclick="sortBy('quant_int8_speedup')" data-col="int8_speedup">INT8 speedup</th>
+          <th onclick="sortBy('quant_int4_speedup')" data-col="int4_speedup">INT4 speedup</th>
+          <th onclick="sortBy('scaling_efficiency_2x')" data-col="scaling_2x">2× eff.</th>
+          <th onclick="sortBy('scaling_efficiency_4x')" data-col="scaling_4x">4× eff.</th>
+          <th onclick="sortBy('sustained_throughput')" data-col="sustained" title="Mean tokens/sec over sustained run">Sustained tok/s</th>
+          <th onclick="sortBy('throttle_ratio')" data-col="throttle_ratio" title="min/max throughput ratio (1.0 = no throttling)">Throttle ratio</th>
+          <th onclick="sortBy('throttle_onset_minute')" data-col="throttle_onset" title="Minute when throughput first dropped >10%">Throttle onset</th>
+          <th onclick="sortBy('tokens_per_watt')" data-col="toks_w">tok/s/W</th>
+          <th onclick="sortBy('memory_efficiency_toks_per_gb')" data-col="toks_gb">tok/s/GB</th>
+          <th onclick="sortBy('cost_efficiency_toks_per_dollar_hr')" data-col="toks_dollar">tok/s/$/hr</th>
           <th onclick="sortBy('tier')">Tier</th>
           <th onclick="sortBy('date')">Date</th>
         </tr>
@@ -608,6 +635,30 @@
     return `<span class="suite-pill ${suite}">${label}</span>`;
   }
 
+  // ── Scenario pill ──────────────────────────────────────────
+  const SCENARIO_INFO = {
+    offline:     { label: 'Offline',      desc: 'Batch throughput benchmark' },
+    online:      { label: 'Online',       desc: 'Concurrent requests — max valid QPS & latency' },
+    interactive: { label: 'Interactive',  desc: 'Single-stream — TTFT and TPOT percentiles' },
+    sustained:   { label: 'Sustained',    desc: 'Long-run load stability & throttle detection' },
+  };
+
+  function scenarioPill(row) {
+    const scenario = row.scenario;
+    if (!scenario) return '';
+    if (scenario === 'all') {
+      const run = row.detail && row.detail.run_scenarios;
+      if (run && run.length) {
+        const text = run.map(s => (SCENARIO_INFO[s] || { label: s }).label).join(' · ');
+        const tip  = run.map(s => (SCENARIO_INFO[s] || { label: s, desc: s }).desc).join('\n');
+        return `<span class="scenario-pill sc-all" title="${tip}">${text}</span>`;
+      }
+      return `<span class="scenario-pill sc-all">All</span>`;
+    }
+    const info = SCENARIO_INFO[scenario] || { label: scenario, desc: '' };
+    return `<span class="scenario-pill sc-${scenario}" title="${info.desc}">${info.label}</span>`;
+  }
+
   // ── Filters ──────────────────────────────────────────────
   function getFiltered() {
     const vendor   = document.getElementById('filter-vendor').value;
@@ -671,7 +722,7 @@
     updateStats(filtered);
 
     if (currentView === 'consumer') renderConsumer(sorted);
-    else renderPro(sorted);
+    else { renderPro(sorted); hideEmptyCols(); }
   }
 
   function setView(v) {
@@ -783,6 +834,7 @@
         <div style="margin-top:0.75rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">
           <span class="badge badge-${row.tier}">${row.tier}</span>
           ${isMini ? '<span class="badge badge-mini">mini</span>' : ''}
+          ${scenarioPill(row)}
           <span style="margin-left:auto;font-size:0.75rem;color:#484f58">click for details</span>
         </div>
       `;
@@ -827,6 +879,21 @@
     `;
   }
 
+  // ── Hide columns where every visible row has no value ────
+  function hideEmptyCols() {
+    const COLS = ['int8_speedup','int4_speedup','scaling_2x','scaling_4x',
+                  'sustained','throttle_ratio','throttle_onset',
+                  'toks_w','toks_gb','toks_dollar'];
+    COLS.forEach(col => {
+      const tds = document.querySelectorAll(`#pro-tbody td[data-col="${col}"]`);
+      const th  = document.querySelector(`#pro-table th[data-col="${col}"]`);
+      const hasValue = [...tds].some(td => td.textContent.trim() !== '—');
+      const display = hasValue ? '' : 'none';
+      if (th) th.style.display = display;
+      tds.forEach(td => td.style.display = display);
+    });
+  }
+
   // ── Pro View ─────────────────────────────────────────────
   function renderPro(rows) {
     const tbody = document.getElementById('pro-tbody');
@@ -852,19 +919,14 @@
       tr.innerHTML = `
         <td class="chip-name">${row.chip || '—'}</td>
         <td>${row.vendor || '—'}</td>
-        <td>
-          <span style="font-weight:500">${row.chip_count || 1}</span>
-          ${(row.chip_count || 1) > 1
-            ? `<span style="color:#8b949e;font-size:0.75rem;margin-left:4px">×${row.chip_count}</span>`
-            : ''}
-        </td>
+        <td>${row.chip_count || 1}</td>
         <td>${formatFramework(row)}</td>
         <td>${row.model || '—'}</td>
         <td>${row.precision || '—'}${row.precision_fallback
             ? ' <span style="color:#d29922;font-size:0.75rem" title="Suite requires BF16; hardware uses FP16">⚠</span>'
             : ''}</td>
         <td>${suitePill(row.suite) || '—'}</td>
-        <td>${row.scenario || '—'}</td>
+        <td>${scenarioPill(row) || '—'}</td>
         <td class="metric-primary">${
           row.is_suite_level
             ? `<div>${row.offline_throughput
@@ -876,40 +938,40 @@
                    row.online_max_qps ? row.online_max_qps + ' max QPS' : '',
                    row.interactive_ttft_p99 ? row.interactive_ttft_p99.toFixed(0) + 'ms TTFT p99' : '',
                  ].filter(Boolean).join(' · ')
-               }</div>`
+               }</div>${
+                 row.tokens_per_sec_per_chip && (row.chip_count || 1) > 1
+                   ? `<div style="font-size:0.8rem;color:#8b949e;font-weight:400">${row.tokens_per_sec_per_chip.toLocaleString(undefined, {maximumFractionDigits:0})} tok/s per chip</div>`
+                   : ''
+               }`
             : row.primary_metric
               ? row.primary_metric.toLocaleString(undefined, {maximumFractionDigits: 1})
                 + ' <small style="color:#8b949e;font-weight:400">' + (row.primary_metric_label || '') + '</small>'
               : '—'
-        }${
-          row.tokens_per_sec_per_chip && (row.chip_count || 1) > 1
-            ? `<br><small style="color:#8b949e">${row.tokens_per_sec_per_chip.toLocaleString(undefined, {maximumFractionDigits:0})} tok/s per chip</small>`
-            : ''
         }</td>
-        <td>${row.quant_int8_speedup != null
+        <td data-col="int8_speedup">${row.quant_int8_speedup != null
             ? row.quant_int8_speedup.toFixed(2) + '×'
             : '—'}</td>
-        <td>${row.quant_int4_speedup != null
+        <td data-col="int4_speedup">${row.quant_int4_speedup != null
             ? row.quant_int4_speedup.toFixed(2) + '×'
             : '—'}</td>
-        <td>${row.scaling_efficiency_2x != null
+        <td data-col="scaling_2x">${row.scaling_efficiency_2x != null
             ? (row.scaling_efficiency_2x * 100).toFixed(1) + '%'
             : '—'}</td>
-        <td>${row.scaling_efficiency_4x != null
+        <td data-col="scaling_4x">${row.scaling_efficiency_4x != null
             ? (row.scaling_efficiency_4x * 100).toFixed(1) + '%'
             : '—'}</td>
-        <td>${row.sustained_throughput != null
+        <td data-col="sustained">${row.sustained_throughput != null
             ? row.sustained_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
             : '—'}</td>
-        <td>${row.throttle_ratio != null
+        <td data-col="throttle_ratio">${row.throttle_ratio != null
             ? (row.throttle_ratio * 100).toFixed(1) + '%'
             : '—'}</td>
-        <td>${row.throttle_onset_minute != null
+        <td data-col="throttle_onset">${row.throttle_onset_minute != null
             ? row.throttle_onset_minute.toFixed(1) + ' min'
             : '—'}</td>
-        <td>${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
-        <td>${row.memory_efficiency_toks_per_gb != null ? row.memory_efficiency_toks_per_gb.toLocaleString(undefined, {maximumFractionDigits: 1}) : '—'}</td>
-        <td>${row.cost_efficiency_toks_per_dollar_hr != null ? row.cost_efficiency_toks_per_dollar_hr.toLocaleString(undefined, {maximumFractionDigits: 0}) : '—'}</td>
+        <td data-col="toks_w">${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
+        <td data-col="toks_gb">${row.memory_efficiency_toks_per_gb != null ? row.memory_efficiency_toks_per_gb.toLocaleString(undefined, {maximumFractionDigits: 1}) : '—'}</td>
+        <td data-col="toks_dollar">${row.cost_efficiency_toks_per_dollar_hr != null ? row.cost_efficiency_toks_per_dollar_hr.toLocaleString(undefined, {maximumFractionDigits: 0}) : '—'}</td>
         <td>
           <span class="badge badge-${row.tier}">${row.tier}</span>
           ${isMini   ? '<span class="badge badge-mini" style="margin-left:4px">mini</span>' : ''}
@@ -964,7 +1026,7 @@
     const precisionNote = row.precision_fallback
         ? `<span style="color:#d29922;font-size:0.75rem">FP16 fallback</span>`
         : '';
-    subtitleEl.innerHTML = [suitePill(row.suite), row.scenario, row.date, precisionNote]
+    subtitleEl.innerHTML = [suitePill(row.suite), scenarioPill(row), row.date, precisionNote]
       .filter(Boolean).join(' <span style="color:#484f58">·</span> ');
 
     // Footer
@@ -1199,6 +1261,11 @@
     else if (viz.type === 'suite_E') renderSuiteE(container, viz, row);
     else if (viz.type === 'sustained') renderSustained(container, viz, row);
     else container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">Visualization coming soon.</div>';
+
+    // Also render sustained charts when a suite result includes a sustained run
+    if (viz.type !== 'sustained' && viz.sustained) {
+      renderSustained(container, viz.sustained, row);
+    }
   }
 
   // Suite A ─────────────────────────────────────────────────
@@ -1626,29 +1693,46 @@
 
   // Suite Stress / Sustained ─────────────────────────────────
   function renderSustained(el, viz, row) {
-    const dur   = viz.duration_minutes  ?? '?';
-    const qps   = viz.target_qps        ?? '?';
+    const dur   = viz.duration_minutes     ?? '?';
+    const conc  = viz.sustained_concurrency ?? '?';
     const mean  = viz.sustained_throughput;
     const thr   = viz.throttle_ratio;
     const onset = viz.throttle_onset_minute;
     const drift = viz.ttft_p99_drift_ms;
 
-    el.appendChild(sectionTitle(`Sustained load — ${dur} min @ ${qps} QPS`));
+    el.appendChild(sectionTitle(`Sustained load — ${dur} min @ concurrency ${conc}`));
 
     // Stat chips
-    const chips = [];
-    if (mean != null)  chips.push({ label: 'Mean throughput', value: mean.toFixed(0) + ' tok/s' });
-    if (thr  != null) {
-      const pct   = (thr * 100).toFixed(1) + '%';
-      const color = thr < 0.05 ? C.green : thr < 0.15 ? C.yellow : C.red;
-      chips.push({ label: 'Throttle ratio', value: pct, color });
-    }
-    if (onset != null) chips.push({ label: 'Throttle onset', value: onset + ' min' });
-    if (drift != null) {
-      const color = drift < 50 ? C.green : drift < 200 ? C.yellow : C.red;
-      chips.push({ label: 'TTFT p99 drift', value: drift.toFixed(0) + ' ms', color });
-    }
-    if (chips.length) el.appendChild(statChips(chips));
+    el.appendChild(statChips([
+      {
+        label: 'Sustained throughput',
+        value: mean != null
+          ? mean.toLocaleString(undefined, {maximumFractionDigits: 0}) + ' tok/s'
+          : null,
+        cls: 'blue'
+      },
+      {
+        label: 'Concurrency',
+        value: viz.sustained_concurrency != null
+          ? viz.sustained_concurrency + ' in-flight'
+          : null,
+      },
+      {
+        label: 'Throttle ratio',
+        value: thr != null
+          ? (thr * 100).toFixed(1) + '%'
+          : null,
+        cls: thr >= 0.95 ? 'green'
+           : thr >= 0.85 ? 'amber' : 'coral'
+      },
+      {
+        label: 'Throttle onset',
+        value: onset != null
+          ? 'min ' + onset.toFixed(1)
+          : 'No throttling detected',
+        cls: onset == null ? 'green' : 'amber'
+      },
+    ]));
 
     // Throughput over time
     const samples = viz.samples;

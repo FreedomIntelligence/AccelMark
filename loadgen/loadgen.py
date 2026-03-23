@@ -127,53 +127,53 @@ class AccelMarkLoadGen:
     async def run_sustained(
         self,
         inference_fn,
-        target_qps: float,
+        sustained_concurrency: int,
         duration_minutes: float,
         sample_interval_seconds: float,
         warmup_minutes: float = 2.0,
     ) -> dict:
         """
-        Time-based, rate-controlled load test.
+        Fixed-concurrency sustained load test.
 
-        Sends requests at target_qps for duration_minutes, recording a
-        throughput/latency snapshot every sample_interval_seconds.
+        Keeps exactly `sustained_concurrency` requests in-flight at all times.
+        A new request fires the moment one completes — no rate limiting, no queue
+        buildup. The hardware is always busy.
 
-        Returns a metrics dict with a 'sustained' block containing:
-          - samples: list of per-interval snapshots
-          - sustained_throughput_tokens_per_sec: mean over all intervals
-          - throttle_ratio: min_throughput / max_throughput (1.0 = no throttle)
-          - throttle_onset_minute: first minute throughput drops >10% from peak
-          - ttft_p99_drift_ms: ttft_p99 in last interval minus ttft_p99 in first
+        This cleanly separates hardware/memory degradation from scheduling effects:
+        any throughput drop at constant concurrency is genuine degradation, not
+        queue saturation.
+
+        Returns a metrics dict with a 'sustained' block containing per-interval
+        samples and derived scalar metrics (sustained_throughput, throttle_ratio,
+        throttle_onset_minute, ttft_p99_drift_ms).
         """
         import asyncio
         import time as _time
 
-        duration_seconds    = duration_minutes * 60
-        interval_seconds    = sample_interval_seconds
-        request_interval_s  = 1.0 / target_qps   # seconds between requests
+        duration_seconds  = duration_minutes * 60
+        interval_seconds  = sample_interval_seconds
 
-        # Load requests (cycle through the suite's request pool)
-        requests = self.requests   # already loaded in __init__
+        requests = list(self.requests)
         if not requests:
             raise ValueError("run_sustained requires requests to be loaded.")
 
-        samples          = []
-        start_time       = _time.perf_counter()
-        next_request_at  = start_time
-        next_sample_at   = start_time + interval_seconds
-        request_idx      = 0
+        samples           = []
+        start_time        = _time.perf_counter()
+        next_sample_at    = start_time + interval_seconds
+        request_idx       = 0
 
         # Per-interval accumulators
-        interval_tokens_out   = 0
-        interval_tokens_in    = 0
-        interval_ttfts        = []
-        interval_start        = start_time
-        interval_requests     = 0
+        interval_tokens_out  = 0
+        interval_tokens_in   = 0
+        interval_ttfts       = []
+        interval_requests    = 0
+        interval_start       = start_time
 
-        # Semaphore: allow up to 32 concurrent requests; let the event loop manage.
-        sem = asyncio.Semaphore(32)
+        # ── Fixed-concurrency semaphore ───────────────────────────────────────
+        # Limits in-flight count to exactly sustained_concurrency.
+        sem = asyncio.Semaphore(sustained_concurrency)
 
-        async def _one_request(prompt: str):
+        async def _one_request(prompt: str) -> None:
             nonlocal interval_tokens_out, interval_tokens_in
             nonlocal interval_ttfts, interval_requests
             async with sem:
@@ -187,33 +187,58 @@ class AccelMarkLoadGen:
 
         pending_tasks = set()
 
+        def _fire_request() -> None:
+            nonlocal request_idx
+            prompt_data = requests[request_idx % len(requests)]
+            prompt      = prompt_data.get("prompt", "")
+            request_idx += 1
+            task = asyncio.create_task(_one_request(prompt))
+            pending_tasks.add(task)
+            task.add_done_callback(pending_tasks.discard)
+
+        # ── Pre-fill to sustained_concurrency ────────────────────────────────
+        for _ in range(sustained_concurrency):
+            _fire_request()
+
+        # ── Main loop ─────────────────────────────────────────────────────────
         while True:
-            now = _time.perf_counter()
+            now     = _time.perf_counter()
             elapsed = now - start_time
 
-            # ── Check if duration exceeded ─────────────────────────────────
+            # Duration check
             if elapsed >= duration_seconds:
                 break
 
-            # ── Sample interval checkpoint ─────────────────────────────────
+            # Sample interval checkpoint
             if now >= next_sample_at:
                 interval_elapsed = now - interval_start
-                total_tokens = interval_tokens_out + interval_tokens_in
-                throughput = total_tokens / interval_elapsed if interval_elapsed > 0 else 0
+                total_tokens     = interval_tokens_out + interval_tokens_in
+                throughput       = (
+                    total_tokens / interval_elapsed if interval_elapsed > 0 else 0
+                )
 
                 ttft_p50 = _percentile(interval_ttfts, 50) if interval_ttfts else None
                 ttft_p99 = _percentile(interval_ttfts, 99) if interval_ttfts else None
 
                 samples.append({
-                    "minute":                     round(elapsed / 60, 1),
-                    "is_warmup":                  elapsed < warmup_minutes * 60,
-                    "throughput_tokens_per_sec":  round(throughput, 1),
-                    "tokens_out":                 interval_tokens_out,
-                    "tokens_in":                  interval_tokens_in,
-                    "requests_completed":         interval_requests,
-                    "ttft_ms_p50":                round(ttft_p50, 1) if ttft_p50 else None,
-                    "ttft_ms_p99":                round(ttft_p99, 1) if ttft_p99 else None,
+                    "minute":                    round(elapsed / 60, 1),
+                    "is_warmup":                 elapsed < warmup_minutes * 60,
+                    "throughput_tokens_per_sec": round(throughput, 1),
+                    "tokens_out":                interval_tokens_out,
+                    "tokens_in":                 interval_tokens_in,
+                    "requests_completed":        interval_requests,
+                    "ttft_ms_p50":               round(ttft_p50, 1) if ttft_p50 else None,
+                    "ttft_ms_p99":               round(ttft_p99, 1) if ttft_p99 else None,
                 })
+
+                # Log progress
+                msg = (
+                    f"  [{elapsed/60:.1f}/{duration_minutes:.0f} min] "
+                    f"{throughput:,.0f} tok/s"
+                )
+                if ttft_p99:
+                    msg += f" | TTFT p99: {ttft_p99:.0f}ms"
+                print(msg)
 
                 # Reset interval accumulators
                 interval_tokens_out  = 0
@@ -223,45 +248,22 @@ class AccelMarkLoadGen:
                 interval_start       = now
                 next_sample_at      += interval_seconds
 
-                # Log progress
-                if ttft_p99:
-                    print(
-                        f"  [{elapsed/60:.1f}/{duration_minutes:.0f} min] "
-                        f"{throughput:,.0f} tok/s | "
-                        f"TTFT p99: {ttft_p99:.0f}ms"
-                    )
-                else:
-                    print(
-                        f"  [{elapsed/60:.1f}/{duration_minutes:.0f} min] "
-                        f"{throughput:,.0f} tok/s"
-                    )
+            # Keep concurrency topped up — fire new requests as slots open.
+            # The semaphore limits actual in-flight count; we can queue extras
+            # without concern because sem.acquire() blocks inside _one_request.
+            while len(pending_tasks) < sustained_concurrency * 2:
+                _fire_request()
 
-            # ── Fire next request ──────────────────────────────────────────
-            if now >= next_request_at:
-                prompt_data = requests[request_idx % len(requests)]
-                prompt      = prompt_data.get("prompt", "")
-                request_idx += 1
+            await asyncio.sleep(0.05)   # yield control, check again shortly
 
-                task = asyncio.create_task(_one_request(prompt))
-                pending_tasks.add(task)
-                task.add_done_callback(pending_tasks.discard)
-
-                next_request_at += request_interval_s
-
-            # ── Yield control ──────────────────────────────────────────────
-            sleep_until = min(next_request_at, next_sample_at)
-            sleep_for   = max(0, sleep_until - _time.perf_counter())
-            await asyncio.sleep(sleep_for)
-
-        # Wait for in-flight requests to finish (up to 30s grace period)
+        # Grace period for in-flight requests
         if pending_tasks:
-            await asyncio.wait(pending_tasks, timeout=30)
+            await asyncio.wait(pending_tasks, timeout=60)
 
-        # ── Compute derived metrics ────────────────────────────────────────
-        # Split warmup from analysis samples
+        # ── Derived metrics ───────────────────────────────────────────────────
+        # Exclude warmup samples from scalar metrics
         analysis_samples = [s for s in samples if not s.get("is_warmup")]
 
-        # Use analysis_samples for all scalar metrics
         throughputs = [
             s["throughput_tokens_per_sec"]
             for s in analysis_samples
@@ -273,12 +275,15 @@ class AccelMarkLoadGen:
             if s["ttft_ms_p99"] is not None
         ]
 
-        sustained_throughput = round(sum(throughputs) / len(throughputs), 1) if throughputs else None
-        max_thr              = max(throughputs) if throughputs else None
-        min_thr              = min(throughputs) if throughputs else None
-        throttle_ratio       = round(min_thr / max_thr, 3) if max_thr and max_thr > 0 else None
+        sustained_throughput = (
+            round(sum(throughputs) / len(throughputs), 1) if throughputs else None
+        )
+        max_thr        = max(throughputs) if throughputs else None
+        min_thr        = min(throughputs) if throughputs else None
+        throttle_ratio = (
+            round(min_thr / max_thr, 3) if max_thr and max_thr > 0 else None
+        )
 
-        # Throttle onset: first minute where throughput drops >10% below peak
         throttle_onset_minute = None
         if max_thr:
             for s in analysis_samples:
@@ -286,22 +291,21 @@ class AccelMarkLoadGen:
                     throttle_onset_minute = s["minute"]
                     break
 
-        # TTFT drift: last interval p99 minus first interval p99
         ttft_p99_drift_ms = None
         if len(ttft_p99s) >= 2:
             ttft_p99_drift_ms = round(ttft_p99s[-1] - ttft_p99s[0], 1)
 
         return {
             "sustained": {
-                "target_qps":                      target_qps,
-                "duration_minutes":                duration_minutes,
-                "warmup_minutes":                  warmup_minutes,
-                "sample_interval_seconds":         sample_interval_seconds,
-                "samples":                         samples,
+                "sustained_concurrency":               sustained_concurrency,
+                "duration_minutes":                    duration_minutes,
+                "warmup_minutes":                      warmup_minutes,
+                "sample_interval_seconds":             sample_interval_seconds,
+                "samples":                             samples,
                 "sustained_throughput_tokens_per_sec": sustained_throughput,
-                "throttle_ratio":                  throttle_ratio,
-                "throttle_onset_minute":           throttle_onset_minute,
-                "ttft_p99_drift_ms":               ttft_p99_drift_ms,
+                "throttle_ratio":                      throttle_ratio,
+                "throttle_onset_minute":               throttle_onset_minute,
+                "ttft_p99_drift_ms":                   ttft_p99_drift_ms,
             }
         }
 
@@ -745,71 +749,26 @@ class AccelMarkLoadGen:
 
     def _run_sustained(self, inference_fn: Callable) -> dict:
         """
-        Run at fixed QPS for suite.duration_minutes.
-        Record throughput and latency every suite.sample_interval_seconds.
-        Goal: detect thermal throttling, memory fragmentation, performance decay.
+        Run fixed-concurrency sustained load test.
+        Delegates to run_sustained() for the actual implementation.
         """
-        duration_s = self.suite["duration_minutes"] * 60
-        interval_s = self.suite["sample_interval_seconds"]
-        target_qps = self.suite["target_qps"]
-        prompts = [r["prompt"] for r in self.requests]
+        sustained_concurrency = self.suite.get("sustained_concurrency", 8)
+        duration_minutes      = self.suite.get("duration_minutes", 30)
+        sample_interval_s     = self.suite.get("sample_interval_seconds", 60)
+        warmup_minutes        = self.suite.get("warmup_minutes", 2.0)
 
-        samples_over_time = []
-        t_start = time.perf_counter()
-        t_next_sample = t_start + interval_s
-        t_next_request = t_start
-        request_idx = 0
-
-        print(f"[sustained] Running {self.suite['duration_minutes']} min at {target_qps} QPS...")
-        with tqdm(total=self.suite["duration_minutes"], desc="[sustained]", unit="min", bar_format="{l_bar}{bar}| {n:.1f}/{total}min [{elapsed}<{remaining}]") as pbar:
-            last_pbar_update = t_start
-
-            while time.perf_counter() - t_start < duration_s:
-                now = time.perf_counter()
-
-                # Update progress bar every second
-                elapsed_min = (now - t_start) / 60
-                delta = elapsed_min - (last_pbar_update - t_start) / 60
-                if delta >= 1/60:  # update every ~1 second
-                    pbar.n = min(elapsed_min, self.suite["duration_minutes"])
-                    pbar.refresh()
-                    last_pbar_update = now
-
-                # Send request on schedule
-                if now >= t_next_request:
-                    prompt = prompts[request_idx % len(prompts)]
-                    request_idx += 1
-                    result = inference_fn([prompt])[0]
-                    t_next_request += 1.0 / target_qps
-
-                # Record sample at interval
-                if time.perf_counter() >= t_next_sample:
-                    elapsed_min = (time.perf_counter() - t_start) / 60
-                    samples_over_time.append({
-                        "elapsed_minutes": round(elapsed_min, 1),
-                        "throughput_tokens_per_sec": None,
-                        "ttft_ms_p99": None,
-                    })
-                    print(f"  [sustained] {elapsed_min:.1f}min — sample recorded")
-                    t_next_sample += interval_s
-
-        # Compute stability metrics
-        throughputs = [s["throughput_tokens_per_sec"] for s in samples_over_time if s["throughput_tokens_per_sec"]]
-        if throughputs:
-            initial = float(np.mean(throughputs[:3])) if len(throughputs) >= 3 else throughputs[0]
-            final = float(np.mean(throughputs[-3:])) if len(throughputs) >= 3 else throughputs[-1]
-            degradation = (initial - final) / initial if initial > 0 else 0
-        else:
-            initial = final = degradation = None
-
-        return {"sustained": {
-            "duration_minutes": self.suite["duration_minutes"],
-            "target_qps": target_qps,
-            "samples_over_time": samples_over_time,
-            "initial_throughput": initial,
-            "final_throughput": final,
-            "degradation_pct": round(degradation * 100, 1) if degradation is not None else None,
-        }}
+        print(
+            f"[sustained] Running {duration_minutes} min at concurrency {sustained_concurrency}..."
+        )
+        return asyncio.run(
+            self.run_sustained(
+                inference_fn=inference_fn,
+                sustained_concurrency=sustained_concurrency,
+                duration_minutes=duration_minutes,
+                sample_interval_seconds=sample_interval_s,
+                warmup_minutes=warmup_minutes,
+            )
+        )
 
     # ------------------------------------------------------------------
     # Helpers

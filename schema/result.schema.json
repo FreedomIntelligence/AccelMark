@@ -325,7 +325,10 @@
           "type": ["object", "null"],
           "description": "Time-based sustained load test metrics",
           "properties": {
-            "target_qps":             { "type": ["number", "null"] },
+            "sustained_concurrency":  {
+              "type": ["integer", "null"],
+              "description": "Number of requests kept in-flight simultaneously throughout the sustained run."
+            },
             "duration_minutes":       { "type": ["number", "null"] },
             "sample_interval_seconds":{ "type": ["number", "null"] },
             "warmup_minutes":         { "type": ["number", "null"] },

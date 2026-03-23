@@ -34,5 +34,8 @@
   "request_count": 100,
   "_request_count_note": "offline uses 100, interactive uses 50, online uses 50 (controlled in loadgen).",
   "online_request_count": 50,
-  "interactive_request_count": 50
+  "interactive_request_count": 50,
+  "sustained_concurrency": 8,
+  "duration_minutes": 30,
+  "sample_interval_seconds": 60
 }

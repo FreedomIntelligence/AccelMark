@@ -521,7 +521,7 @@ class BenchmarkRunner(ABC):
                 metrics = _loop.run_until_complete(
                     loadgen.run_sustained(
                         inference_fn=inference_fn,
-                        target_qps=suite.get("target_qps", 10),
+                        sustained_concurrency=suite.get("sustained_concurrency", 8),
                         duration_minutes=suite.get("duration_minutes", 30),
                         sample_interval_seconds=suite.get("sample_interval_seconds", 60),
                         warmup_minutes=suite.get("warmup_minutes", 2.0),
@@ -531,7 +531,7 @@ class BenchmarkRunner(ABC):
                 metrics = asyncio.run(
                     loadgen.run_sustained(
                         inference_fn=inference_fn,
-                        target_qps=suite.get("target_qps", 10),
+                        sustained_concurrency=suite.get("sustained_concurrency", 8),
                         duration_minutes=suite.get("duration_minutes", 30),
                         sample_interval_seconds=suite.get("sample_interval_seconds", 60),
                         warmup_minutes=suite.get("warmup_minutes", 2.0),

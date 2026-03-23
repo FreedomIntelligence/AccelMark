@@ -33,5 +33,8 @@
   "request_count": 200,
   "online_request_count": 500,
   "interactive_request_count": null,
-  "_request_count_note": "offline uses 200, online uses 500."
+  "_request_count_note": "offline uses 200, online uses 500.",
+  "sustained_concurrency": 4,
+  "duration_minutes": 30,
+  "sample_interval_seconds": 60
 }

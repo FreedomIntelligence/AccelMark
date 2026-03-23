@@ -238,6 +238,26 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "tpot_p99": iv.get("tpot_ms_p99"),
         }
 
+    def _sustained_block():
+        s = metrics.get("sustained")
+        if not s:
+            return None
+        samples = s.get("samples", [])
+        return {
+            "minutes":               [x["minute"] for x in samples],
+            "throughput":            [x["throughput_tokens_per_sec"] for x in samples],
+            "ttft_p99":              [x.get("ttft_ms_p99") for x in samples],
+            "is_warmup":             [x.get("is_warmup", False) for x in samples],
+            "sustained_concurrency": s.get("sustained_concurrency"),
+            "duration_minutes":      s.get("duration_minutes"),
+            "warmup_minutes":        s.get("warmup_minutes"),
+            "sustained_throughput":  s.get("sustained_throughput_tokens_per_sec"),
+            "throttle_ratio":        s.get("throttle_ratio"),
+            "throttle_onset_minute": s.get("throttle_onset_minute"),
+            "ttft_p99_drift_ms":     s.get("ttft_p99_drift_ms"),
+            "samples":               samples,
+        }
+
     if suite == "suite_A":
         rows = _offline_rows()
         return {
@@ -249,6 +269,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             },
             "online":      _online_block(),
             "interactive": _interactive_block(),
+            "sustained":   _sustained_block(),
         }
 
     if suite == "suite_B":
@@ -261,7 +282,8 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                 "throughput_per_chip": [r.get("throughput_tokens_per_sec_per_chip") for r in rows],
                 "memory_gb":           [r.get("peak_memory_gb")                     for r in rows],
             },
-            "online": _online_block(),
+            "online":    _online_block(),
+            "sustained": _sustained_block(),
         }
 
     if suite == "suite_D":
@@ -274,6 +296,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                 "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
             },
             "interactive": _interactive_block(),
+            "sustained":   _sustained_block(),
         }
 
     if suite == "suite_C":
@@ -314,18 +337,19 @@ def extract_viz(result: dict, metrics: dict) -> dict:
         sustained = metrics.get("sustained", {})
         samples   = sustained.get("samples", [])
         return {
-            "type":                 "sustained",
-            "minutes":              [s["minute"] for s in samples],
-            "throughput":           [s["throughput_tokens_per_sec"] for s in samples],
-            "ttft_p99":             [s.get("ttft_ms_p99") for s in samples],
-            "target_qps":           sustained.get("target_qps"),
-            "duration_minutes":     sustained.get("duration_minutes"),
-            "warmup_minutes":       sustained.get("warmup_minutes"),
-            "sustained_throughput": sustained.get("sustained_throughput_tokens_per_sec"),
-            "throttle_ratio":       sustained.get("throttle_ratio"),
+            "type":                  "sustained",
+            "minutes":               [s["minute"] for s in samples],
+            "throughput":            [s["throughput_tokens_per_sec"] for s in samples],
+            "ttft_p99":              [s.get("ttft_ms_p99") for s in samples],
+            "is_warmup":             [s.get("is_warmup", False) for s in samples],
+            "sustained_concurrency": sustained.get("sustained_concurrency"),
+            "duration_minutes":      sustained.get("duration_minutes"),
+            "warmup_minutes":        sustained.get("warmup_minutes"),
+            "sustained_throughput":  sustained.get("sustained_throughput_tokens_per_sec"),
+            "throttle_ratio":        sustained.get("throttle_ratio"),
             "throttle_onset_minute": sustained.get("throttle_onset_minute"),
-            "ttft_p99_drift_ms":    sustained.get("ttft_p99_drift_ms"),
-            "samples":              samples,
+            "ttft_p99_drift_ms":     sustained.get("ttft_p99_drift_ms"),
+            "samples":               samples,
         }
 
     return {"type": "none"}
@@ -371,6 +395,21 @@ def extract_row(result: dict) -> dict:
     # ── Interactive ───────────────────────────────────────────────────────────
     interactive          = metrics.get("interactive")
     interactive_ttft_p99 = interactive.get("ttft_ms_p99") if interactive else None
+
+    # ── Sustained ─────────────────────────────────────────────────────────────
+    sustained_throughput   = None
+    throttle_ratio         = None
+    throttle_onset_minute  = None
+    ttft_p99_drift_ms      = None
+
+    sustained = metrics.get("sustained")
+    sustained_concurrency  = None
+    if sustained:
+        sustained_throughput  = sustained.get("sustained_throughput_tokens_per_sec")
+        throttle_ratio        = sustained.get("throttle_ratio")
+        throttle_onset_minute = sustained.get("throttle_onset_minute")
+        ttft_p99_drift_ms     = sustained.get("ttft_p99_drift_ms")
+        sustained_concurrency = sustained.get("sustained_concurrency")
 
     # ── Primary metric ────────────────────────────────────────────────────────
     scenario = task.get("scenario", "offline")
@@ -419,19 +458,6 @@ def extract_row(result: dict) -> dict:
             offline_throughput   = scaling_base_throughput
             primary_metric       = scaling_base_throughput
             primary_metric_label = "tokens/sec (1x baseline)"
-
-    # ── Sustained ─────────────────────────────────────────────────────────────
-    sustained_throughput   = None
-    throttle_ratio         = None
-    throttle_onset_minute  = None
-    ttft_p99_drift_ms      = None
-
-    sustained = metrics.get("sustained")
-    if sustained:
-        sustained_throughput  = sustained.get("sustained_throughput_tokens_per_sec")
-        throttle_ratio        = sustained.get("throttle_ratio")
-        throttle_onset_minute = sustained.get("throttle_onset_minute")
-        ttft_p99_drift_ms     = sustained.get("ttft_p99_drift_ms")
 
     # ── Suite C quantization ──────────────────────────────────────────────────
     quant_bf16_throughput  = None
@@ -541,6 +567,7 @@ def extract_row(result: dict) -> dict:
         "throttle_ratio":          throttle_ratio,
         "throttle_onset_minute":   throttle_onset_minute,
         "ttft_p99_drift_ms":       ttft_p99_drift_ms,
+        "sustained_concurrency":   sustained_concurrency,
         # Panel data
         "detail": extract_detail(result),
         "viz":    extract_viz(result, metrics),
