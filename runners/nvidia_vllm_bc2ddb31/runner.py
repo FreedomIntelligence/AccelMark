@@ -11,6 +11,7 @@ import asyncio
 import sys
 import time
 from pathlib import Path
+from typing import Optional
 
 # Add repo root to path
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -42,6 +43,7 @@ class VLLMRunner(BenchmarkRunner):
     # vLLM on NVIDIA supports all precisions — hardware detection in BenchmarkRunner
     # will automatically restrict to FP16 on V100/T4
     SUPPORTED_PRECISIONS = ["bf16", "fp16", "fp32"]
+    SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]
 
     def __init__(self):
         self.llm: LLM = None
@@ -68,30 +70,44 @@ class VLLMRunner(BenchmarkRunner):
         scenario = getattr(self, "_current_scenario", None)
 
         # Use precision resolved by BenchmarkRunner._resolve_precision()
-        # Falls back to BF16 if not set (e.g. direct invocation without base class)
+        # Falls back to BF16 if not set
         effective_precision = getattr(self, "_effective_precision", "BF16").upper()
+        precision           = getattr(self, "_precision", None) or effective_precision
+        quantization        = None
+        dtype               = "bfloat16"
 
-        # Determine dtype and quantization
-        precision    = getattr(self, "_precision", None) or effective_precision
-        quantization = None
-
+        # Map Suite C precision format names to vLLM kwargs
+        # For pre-quantized checkpoints (FP8, W8A8, W8A16, W4A16), use dtype="auto"
+        # and let vLLM detect quantization from the checkpoint's config.json.
+        # self._quantization_method records what was detected for result.json.
         if precision == "BF16":
             dtype = "bfloat16"
+            self._quantization_method = None
+        elif precision == "FP8":
+            dtype = "auto"    # vLLM detects fp8 from checkpoint config
+            self._quantization_method = "fp8"
+        elif precision == "W8A8":
+            dtype = "auto"    # compressed sparse — detected from config
+            self._quantization_method = "w8a8"
+        elif precision == "W8A16":
+            dtype = "auto"    # weight-only int8 — detected from config
+            self._quantization_method = "w8a16"
+        elif precision == "W4A16":
+            dtype = "auto"    # AWQ int4 — detected from config
+            self._quantization_method = "awq"
         elif precision == "FP16":
             dtype = "float16"
+            self._quantization_method = None
         elif precision == "FP32":
             dtype = "float32"
-        elif precision == "INT8":
-            quantization = "bitsandbytes"
-            dtype = "auto"
-        elif precision == "INT4":
-            quantization = "awq"
-            dtype = "auto"
+            self._quantization_method = None
         else:
             dtype = "auto"
+            self._quantization_method = None
 
-        print(f"Loading model with precision={precision}, dtype={dtype}"
-              + (f", quantization={quantization}" if quantization else ""))
+        print(f"Loading model: precision={precision}, dtype={dtype}"
+              + (f", quantization_method={self._quantization_method}"
+                 if self._quantization_method else ""))
 
         self.tokenizer = AutoTokenizer.from_pretrained(
             model_path, trust_remote_code=False
@@ -134,6 +150,27 @@ class VLLMRunner(BenchmarkRunner):
                 engine_kwargs["max_model_len"] = max_model_len
             engine_args = AsyncEngineArgs(**engine_kwargs)
             self.engine = AsyncLLMEngine.from_engine_args(engine_args)
+
+    def get_effective_dtype(self) -> Optional[str]:
+        """
+        Report the actual compute dtype vLLM used after model loading.
+
+        vLLM exposes the resolved dtype via model_config after initialization.
+        This captures cases like FP8 weights on A100 computing in BF16.
+        """
+        try:
+            if self.llm is not None:
+                # Sync LLM path
+                dtype = self.llm.llm_engine.model_config.dtype
+                return str(dtype).replace("torch.", "")
+            elif self.engine is not None:
+                # Async engine path
+                dtype = self.engine.engine.model_config.dtype
+                return str(dtype).replace("torch.", "")
+        except Exception:
+            pass
+        # Fall back to declared dtype if introspection fails
+        return getattr(self, "_effective_dtype", None)
 
     def format_prompt(self, prompt: str) -> str:
         """Apply chat template if tokenizer has one."""

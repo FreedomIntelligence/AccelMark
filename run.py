@@ -7,21 +7,21 @@ Usage:
     python run.py --list
 
     # Run a benchmark
-    python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --scenario all
+    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario all
 
     # Serve — using a suite for model + generation params
-    python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --serve
+    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve
 
     # Serve — specifying the model directly (no suite required)
-    python run.py --runner nvidia_vllm_c34f94c3 --model meta-llama/Llama-3.1-8B-Instruct --serve
+    python run.py --runner nvidia_vllm_bc2ddb31 --model meta-llama/Llama-3.1-8B-Instruct --serve
 
     # Serve — suite as base, override model and tune params
-    python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --serve \\
+    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve \\
         --model meta-llama/Llama-3.1-8B-Instruct \\
         --max-tokens 4096 --port 8080 --workers 8 --api-key secret
 
     # All flags after --runner <id> are passed through to the runner unchanged (non-serve mode)
-    python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --scenario offline --output-dir ./my_result
+    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario offline --output-dir ./my_result
 """
 
 import argparse

@@ -106,6 +106,30 @@ class BenchmarkRunner(ABC):
           SUPPORTED_PRECISIONS = ["bf16"]
     """
 
+    SUPPORTED_QUANTIZATIONS: list[str] = []
+    """
+    List of quantization formats this runner supports for Suite C.
+    Use uppercase strings matching suite_C precision_levels:
+      'FP8', 'W8A8', 'W8A16', 'W4A16'
+
+    BF16 is always supported and does not need to be listed here.
+    An empty list means the runner can run BF16 only — it will be skipped
+    for all quantized formats in Suite C.
+
+    Examples:
+      NVIDIA vLLM on H100 (full support including FP8):
+          SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]
+
+      NVIDIA vLLM on A100 (no native FP8):
+          SUPPORTED_QUANTIZATIONS = ["w8a8", "w8a16", "w4a16"]
+
+      AMD ROCm vLLM (FP8 on MI300X only):
+          SUPPORTED_QUANTIZATIONS = ["w8a8", "w4a16"]
+
+      Apple MLX (no quantization support yet):
+          SUPPORTED_QUANTIZATIONS = []
+    """
+
     # ── Abstract methods (must implement) ─────────────────────────────────────
 
     @abstractmethod
@@ -220,6 +244,50 @@ class BenchmarkRunner(ABC):
         """
         return None
 
+    def get_effective_dtype(self) -> Optional[str]:
+        """
+        Return the actual compute dtype the framework used after model loading.
+
+        Override in subclass to report the real compute dtype, especially when
+        it differs from the requested precision. Common cases:
+
+        - FP8 weights on A100 (no native FP8 tensor cores): framework computes
+          in bfloat16, storing/loading weights as fp8 → return "bfloat16"
+        - FP8 weights on H100 (native FP8): framework computes in fp8
+          → return "fp8"
+        - W4A16: weights stored as int4, activations and compute in float16
+          → return "float16"
+        - W8A8: both weights and activations quantized, compute in int8
+          → return "int8"
+
+        Default: returns None (not reported). The base class will use
+        self._effective_dtype if set, or fall back to None.
+
+        Use lowercase dtype strings matching PyTorch conventions:
+        "bfloat16", "float16", "float32", "float8_e4m3fn", "int8"
+        """
+        return getattr(self, "_effective_dtype", None)
+
+    def get_quantization_method(self) -> Optional[str]:
+        """
+        Return the quantization method used for weight storage.
+
+        This describes how weights are stored in memory, independent of
+        compute dtype. Common values:
+
+        - "fp8"    — weights stored in FP8 format
+        - "awq"    — Activation-aware Weight Quantization (4-bit)
+        - "gptq"   — GPTQ 4-bit quantization
+        - "w8a8"   — 8-bit weights and activations (compressed sparse)
+        - "w8a16"  — 8-bit weights, 16-bit activations
+        - "bitsandbytes" — bitsandbytes runtime quantization
+        - None     — no quantization (BF16/FP16/FP32 full precision)
+
+        Default: returns None. The base class will use
+        self._quantization_method if set, or fall back to None.
+        """
+        return getattr(self, "_quantization_method", None)
+
     # ── Implementation identity ───────────────────────────────────────────────
 
     def _compute_implementation_id(self) -> str | None:
@@ -289,9 +357,7 @@ class BenchmarkRunner(ABC):
         # Validate scenario is available for this suite
         self._validate_scenario_for_suite(args.scenario, suite)
 
-        if args.suite == "suite_C" and args.scenario not in (
-            "offline", "online", "interactive", "default", "all", "accuracy"
-        ):
+        if args.suite == "suite_C" and args.scenario in ("default", "all") and args.precision is None:
             self._run_suite_c(args, suite)
         elif args.suite == "suite_E" and args.scenario in (None, "default", "all"):
             self._run_suite_e(args, suite)
@@ -331,11 +397,13 @@ class BenchmarkRunner(ABC):
             "--precision",
             type=str,
             default=None,
-            choices=["BF16", "INT8", "INT4"],
+            choices=["BF16", "FP8", "W8A8", "W8A16", "W4A16"],
             help=(
-                "Precision level for Suite C. "
-                "BF16=full precision, INT8=W8A8, INT4=W4A16 AWQ. "
-                "Auto-set when running suite_C (runs all three)."
+                "Quantization format for Suite C subprocesses. "
+                "BF16=full precision baseline, FP8=8-bit float (H100/MI300X), "
+                "W8A8=INT8 weights+activations, W8A16=INT8 weights only, "
+                "W4A16=INT4 weights only (AWQ). "
+                "Auto-set by _run_suite_c() — do not set manually."
             ),
         )
         parser.add_argument("--output-dir", default=None,
@@ -390,20 +458,25 @@ class BenchmarkRunner(ABC):
             self._setup_logging(str(output_dir))
 
             # Resolve and load model
-            model_id = suite["model_id"]
+            model_id = suite.get("model_id") or suite.get("base_model_id", "")
             effective_model_path = self._resolve_model_path(
                 model_id, getattr(args, "model_path", None)
             )
             tp_size = getattr(args, "tensor_parallel_size", 1)
 
-            # Load env_info for precision resolution
-            _acc_env_path = output_dir.parent / "env_info.json"
+            # Load env_info for precision resolution (search up to 2 levels)
             _acc_env_info: dict = {}
-            if _acc_env_path.exists():
-                with open(_acc_env_path) as _f:
-                    _acc_env_info = json.load(_f)
+            for _c in [output_dir, output_dir.parent, output_dir.parent.parent]:
+                _p = _c / "env_info.json"
+                if _p.exists():
+                    with open(_p) as _f:
+                        _acc_env_info = json.load(_f)
+                    break
 
-            effective_precision = self._resolve_precision(suite, _acc_env_info)
+            if getattr(args, "precision", None):
+                effective_precision = args.precision.upper()
+            else:
+                effective_precision = self._resolve_precision(suite, _acc_env_info)
             self._effective_precision = effective_precision
 
             print(f"Loading {model_id} for accuracy check...")
@@ -437,21 +510,21 @@ class BenchmarkRunner(ABC):
         profile = self._load_submitter_profile()
 
         # Resolve model path
-        model_id = suite["model_id"]
+        model_id = suite.get("model_id") or suite.get("base_model_id", "")
         effective_model_path = self._resolve_model_path(
             model_id, getattr(args, "model_path", None)
         )
 
         # Read env_info.json from task directory.
         # For standalone runs it's in output_dir; for --scenario all it's in the parent.
-        env_info_path = output_dir / "env_info.json"
-        if not env_info_path.exists():
-            env_info_path = output_dir.parent / "env_info.json"
-
+        # For Suite C per-format subprocesses it's two levels up (base_dir/w8a8/offline/).
         env_info = {}
-        if env_info_path.exists():
-            with open(env_info_path) as f:
-                env_info = json.load(f)
+        for _candidate in [output_dir, output_dir.parent, output_dir.parent.parent]:
+            _p = _candidate / "env_info.json"
+            if _p.exists():
+                with open(_p) as f:
+                    env_info = json.load(f)
+                break
 
         # Load model
         tp_size = getattr(args, "tensor_parallel_size", 1)
@@ -466,7 +539,11 @@ class BenchmarkRunner(ABC):
         self._advance_dist_port()
 
         # Resolve precision — handles BF16→FP16 fallback for older hardware
-        effective_precision = self._resolve_precision(suite, env_info)
+        # Explicit --precision (Suite C per-format subprocess) takes priority
+        if getattr(args, "precision", None):
+            effective_precision = args.precision.upper()
+        else:
+            effective_precision = self._resolve_precision(suite, env_info)
         self._effective_precision = effective_precision
 
         self.load_model(effective_model_path, suite, tp_size)
@@ -560,11 +637,12 @@ class BenchmarkRunner(ABC):
             driver_version = accelerators[0].get("driver_version", "unknown")
 
         # env_info.json always lives at task dir level (never in scenario subdirs)
-        env_info_file = (
-            "../env_info.json"
-            if (output_dir.parent / "env_info.json").exists()
-            else "env_info.json"
-        )
+        if (output_dir.parent / "env_info.json").exists():
+            env_info_file = "../env_info.json"
+        elif (output_dir.parent.parent / "env_info.json").exists():
+            env_info_file = "../../env_info.json"
+        else:
+            env_info_file = "env_info.json"
 
         result = self._build_result_json(
             args=args,
@@ -633,6 +711,9 @@ class BenchmarkRunner(ABC):
         run_accuracy = "accuracy" in all_requested
         skip_gate    = getattr(args, "skip_accuracy_gate", False)
 
+        # Suite C per-format subprocess: precision is explicit, accuracy is non-blocking
+        is_suite_c_format = (args.suite == "suite_C" and getattr(args, "precision", None) is not None)
+
         # Benchmark scenarios: exclude accuracy, training; respect capability flags
         benchmark_scenarios = [
             s for s in all_requested
@@ -672,8 +753,11 @@ class BenchmarkRunner(ABC):
 
         if run_accuracy:
             print(f"\n{'='*60}")
-            print(f"  Step 1: Accuracy Gate")
-            print(f"  Must pass before benchmark runs.")
+            if is_suite_c_format:
+                print(f"  Step 1: Accuracy Check (data only — non-blocking for Suite C)")
+            else:
+                print(f"  Step 1: Accuracy Gate")
+                print(f"  Must pass before benchmark runs.")
             print(f"{'='*60}\n")
 
             # Accuracy outputs go to base_dir/accuracy/ (consistent with other scenario subdirs)
@@ -682,20 +766,27 @@ class BenchmarkRunner(ABC):
 
             # Load model for accuracy check
             # Model stays loaded for first benchmark scenario
-            model_id = suite["model_id"]
+            model_id = suite.get("model_id") or suite.get("base_model_id", "")
             effective_model_path = self._resolve_model_path(
                 model_id, getattr(args, "model_path", None)
             )
             tp_size = getattr(args, "tensor_parallel_size", 1)
 
-            # Load env_info for precision resolution
-            _all_env_path = base_dir / "env_info.json"
+            # Load env_info for precision resolution (search up to 1 level for Suite C)
             _all_env_info: dict = {}
-            if _all_env_path.exists():
-                with open(_all_env_path) as _f:
-                    _all_env_info = json.load(_f)
+            for _c in [base_dir, base_dir.parent]:
+                _p = _c / "env_info.json"
+                if _p.exists():
+                    with open(_p) as _f:
+                        _all_env_info = json.load(_f)
+                    break
 
-            effective_precision = self._resolve_precision(suite, _all_env_info)
+            # Respect explicit --precision for Suite C per-format subprocesses;
+            # otherwise resolve from suite requirements and hardware capability
+            if getattr(args, "precision", None):
+                effective_precision = args.precision.upper()
+            else:
+                effective_precision = self._resolve_precision(suite, _all_env_info)
             self._effective_precision = effective_precision
 
             if getattr(self, "llm", None) is None and getattr(self, "engine", None) is None:
@@ -723,9 +814,11 @@ class BenchmarkRunner(ABC):
                         f"  To run anyway: --skip-accuracy-gate\n"
                         f"{'='*60}\n"
                     )
-                    if not skip_gate:
+                    if not skip_gate and not is_suite_c_format:
                         self._release_gpu_memory()
                         return
+                    elif is_suite_c_format:
+                        print("  Suite C: accuracy is non-blocking — continuing benchmark.\n")
                     else:
                         print("  --skip-accuracy-gate set — continuing anyway.\n")
                 else:
@@ -834,121 +927,97 @@ class BenchmarkRunner(ABC):
 
     def _run_suite_c(self, args, suite: dict) -> None:
         """
-        Run Suite C: accuracy gate (BF16) first, then offline at BF16, INT8, and INT4.
-        Each precision level runs as a separate subprocess to ensure
-        clean GPU state between quantization configurations.
+        Run Suite C: per-format accuracy + offline benchmark for each
+        supported quantization format.
+
+        Each format runs as a separate subprocess for clean GPU state.
+        Accuracy is NOT a gate — it runs per format and records results
+        without blocking. Missing baselines (placeholders) are allowed.
+
+        Format selection:
+        - Always includes BF16 (baseline)
+        - Other formats: intersection of suite["precision_levels"] and
+          runner.SUPPORTED_QUANTIZATIONS
+        - Formats the runner doesn't declare are skipped with a warning
         """
-        base_dir = Path(args.output_dir)
+        base_dir     = Path(args.output_dir)
         base_dir.mkdir(parents=True, exist_ok=True)
 
-        precision_levels = suite.get("precision_levels", ["BF16", "INT8", "INT4"])
-        results_summary = []
-        total_start = time.time()
-        skip_gate = getattr(args, "skip_accuracy_gate", False)
+        precision_model_map = suite.get("precision_model_map", {})
+        all_precisions      = suite.get("precision_levels", ["BF16"])
+        default_scenarios, _ = self._parse_scenarios_config(suite)
+        run_accuracy        = "accuracy" in default_scenarios
+        platform_script     = sys.argv[0]
+        total_start         = time.time()
+
+        # ── Resolve which formats this runner supports ────────────────────────
+        runner_quants = [q.upper() for q in self.SUPPORTED_QUANTIZATIONS]
+        precisions_to_run = []
+        skipped = []
+        for p in all_precisions:
+            if p == "BF16":
+                precisions_to_run.append(p)   # always run BF16
+            elif p in runner_quants:
+                precisions_to_run.append(p)
+            else:
+                skipped.append(p)
 
         print(f"\n{'='*60}")
         print(f"  Suite C — Quantization Efficiency Benchmark")
-        print(f"  Precision levels: {precision_levels}")
-        print(f"  Base output: {base_dir}")
+        print(f"  Formats to run : {precisions_to_run}")
+        if skipped:
+            print(f"  Skipped        : {skipped} (not in SUPPORTED_QUANTIZATIONS)")
+        print(f"  Base output    : {base_dir}")
         print(f"{'='*60}\n")
 
-        platform_script = sys.argv[0]
+        results_summary = []
 
-        # ── Step 1: Accuracy gate (BF16) ──────────────────────────────────
-        acc_result = None
-        default_scenarios, _ = self._parse_scenarios_config(suite)
-        if "accuracy" in default_scenarios:
-            acc_dir = base_dir / "accuracy"
-            acc_dir.mkdir(parents=True, exist_ok=True)
-            acc_path = acc_dir / "accuracy.json"
+        # ── Run each precision format as a subprocess ─────────────────────────
+        for precision in precisions_to_run:
+            fmt_info     = precision_model_map.get(precision, {})
+            fmt_model_id = fmt_info.get("model_id") or suite.get("base_model_id")
+            fmt_revision = fmt_info.get("model_revision")
 
-            # Skip if already done
-            if acc_path.exists():
-                try:
-                    with open(acc_path) as f:
-                        acc_result = json.load(f)
-                    print(
-                        f"\n  Accuracy already done — loading from {acc_path}\n"
-                        f"  Score: {acc_result.get('subset_score')}, "
-                        f"valid={acc_result.get('valid')}\n"
-                    )
-                except Exception as e:
-                    print(f"  Warning: could not load existing accuracy.json ({e}) — re-running.")
-                    acc_result = None
-
-            if acc_result is None:
-                print(f"\n{'='*60}")
-                print(f"  Step 1: Accuracy Gate (BF16)")
-                print(f"{'='*60}\n")
-
-                cmd = [
-                    sys.executable, platform_script,
-                    "--suite", args.suite,
-                    "--scenario", "accuracy",
-                    "--output-dir", str(acc_dir),
-                    "--tensor-parallel-size", str(getattr(args, "tensor_parallel_size", 1)),
-                    "--precision", "BF16",
-                ]
-                if getattr(args, "model_path", None):
-                    cmd += ["--model-path", args.model_path]
-
-                try:
-                    subprocess.run(cmd, check=True, cwd=str(_REPO_ROOT))
-                    if acc_path.exists():
-                        with open(acc_path) as f:
-                            acc_result = json.load(f)
-                except subprocess.CalledProcessError as e:
-                    print(f"  ✗ Accuracy subprocess failed (return code {e.returncode})")
-                    if not skip_gate:
-                        print("  Aborting Suite C. Use --skip-accuracy-gate to override.")
-                        return
-                    print("  --skip-accuracy-gate set — continuing anyway.\n")
-
-            if acc_result and not acc_result.get("valid") and not skip_gate:
-                delta = acc_result.get('baseline_delta', '?')
-                threshold = suite.get('accuracy_threshold_delta', 0.03)
-                print(
-                    f"\n  ✗ ACCURACY GATE FAILED\n"
-                    f"  Score: {acc_result.get('subset_score')}\n"
-                    f"  Delta: {delta} (min allowed: -{threshold})\n"
-                    f"  Aborting Suite C. Use --skip-accuracy-gate to override.\n"
-                )
-                return
-
-            print(f"\n  ✓ Accuracy passed: {acc_result.get('subset_score') if acc_result else '?'}\n")
-
-        # ── Step 2: Precision subprocesses ────────────────────────────────
-        for precision in precision_levels:
             precision_dir = base_dir / precision.lower()
             precision_dir.mkdir(parents=True, exist_ok=True)
 
             print(f"\n{'='*60}")
-            print(f"  Running precision: {precision}")
+            print(f"  Precision: {precision}")
+            print(f"  Model    : {fmt_model_id}")
             print(f"{'='*60}\n")
 
+            # Resolve local path for this format's model_id
+            fmt_model_path = self._resolve_model_path(
+                fmt_model_id,
+                getattr(args, "model_path", None) if precision == "BF16" else None,
+                # Only pass CLI --model-path override for BF16 (the base model).
+                # Quantized formats always use their own checkpoint from config.
+            )
+
+            # Build subprocess command — runs "default" scenarios for this format
+            # (accuracy + offline per suite_C/suite.json)
             cmd = [
                 sys.executable, platform_script,
-                "--suite", args.suite,
-                "--scenario", "all",        # runs offline + accuracy for that precision
-                "--output-dir", str(precision_dir),
+                "--suite",               args.suite,
+                "--scenario",            "default",
+                "--output-dir",          str(precision_dir),
                 "--tensor-parallel-size", str(getattr(args, "tensor_parallel_size", 1)),
-                "--precision", precision,
-                "--skip-accuracy-gate",     # outer gate already passed above
+                "--precision",           precision,
+                "--model-path",          fmt_model_path,
+                "--skip-accuracy-gate",  # Suite C never uses accuracy as a gate
             ]
-            if getattr(args, "model_path", None):
-                cmd += ["--model-path", args.model_path]
 
             print(f"  Command: {' '.join(cmd)}\n")
 
             try:
                 subprocess.run(cmd, check=True, cwd=str(_REPO_ROOT))
                 results_summary.append((precision, "SUCCESS", str(precision_dir)))
-                print(f"\n✓ {precision} completed")
+                print(f"\n  \u2713 {precision} completed")
             except subprocess.CalledProcessError as e:
                 results_summary.append(
                     (precision, f"FAILED: returncode={e.returncode}", str(precision_dir))
                 )
-                print(f"\n✗ {precision} failed (return code {e.returncode})")
+                print(f"\n  \u2717 {precision} failed (return code {e.returncode})")
 
             print("  Waiting 10s before next precision level...")
             time.sleep(10)
@@ -959,13 +1028,19 @@ class BenchmarkRunner(ABC):
         print(f"  Suite C complete ({total_elapsed} min total)")
         print(f"{'='*60}")
         for precision, status, _ in results_summary:
-            icon = "✓" if status == "SUCCESS" else "✗"
+            icon = "\u2713" if status == "SUCCESS" else "\u2717"
             print(f"  [{icon}] {precision:6s} — {status}")
+        if skipped:
+            for p in skipped:
+                print(f"  [—] {p:6s} — skipped (not in SUPPORTED_QUANTIZATIONS)")
         print()
 
         successful = [p for p, status, _ in results_summary if status == "SUCCESS"]
         if successful:
-            self._merge_suite_c_results(base_dir, suite, successful, total_elapsed)
+            self._merge_suite_c_results(
+                base_dir, suite, successful, total_elapsed,
+                skipped=skipped,
+            )
 
     def _merge_suite_c_results(
         self,
@@ -973,6 +1048,7 @@ class BenchmarkRunner(ABC):
         suite: dict,
         successful_precisions: list[str],
         total_elapsed_minutes: float,
+        skipped: list[str] = None,
     ) -> None:
         """
         Merge per-precision results into one Suite C result.
@@ -998,60 +1074,83 @@ class BenchmarkRunner(ABC):
         quant_results = []
         bf16_best = None
 
-        for precision in ["BF16", "INT8", "INT4_AWQ", "INT4_GPTQ", "FP8", "INT4"]:
+        precision_model_map = suite.get("precision_model_map", {})
+        all_precisions = suite.get("precision_levels", ["BF16", "FP8", "W8A8", "W8A16", "W4A16"])
+
+        for precision in all_precisions:
             if precision not in precision_results:
                 continue
-            r = precision_results[precision]
+            r           = precision_results[precision]
+            fmt_model_id = precision_model_map.get(precision, {}).get("model_id") \
+                           or suite.get("base_model_id")
             rows = (r.get("metrics", {}).get("offline", {}).get("results_by_concurrency")
                     or r.get("metrics", {}).get("offline", {}).get("results_by_batch_size", []))
             valid = [row for row in rows if not row.get("oom") and row.get("throughput_tokens_per_sec")]
-            best = max((row["throughput_tokens_per_sec"] for row in valid), default=None)
+            best  = max((row["throughput_tokens_per_sec"] for row in valid), default=None)
 
             if precision == "BF16":
                 bf16_best = best
 
-            speedup = round(best / bf16_best, 3) if bf16_best and best and precision != "BF16" else (1.0 if precision == "BF16" else None)
-            acc_score = r.get("accuracy", {}).get("subset_score")
+            speedup = (
+                round(best / bf16_best, 3)
+                if bf16_best and best and precision != "BF16"
+                else (1.0 if precision == "BF16" else None)
+            )
+
+            # Per-format accuracy — read from precision subdir accuracy.json
+            acc_file = base_dir / precision.lower() / "accuracy" / "accuracy.json"
+            acc_score = None
+            acc_delta = None
+            acc_valid = None
+            if acc_file.exists():
+                try:
+                    with open(acc_file) as f:
+                        acc_data  = json.load(f)
+                    acc_score = acc_data.get("subset_score")
+                    acc_delta = acc_data.get("baseline_delta")
+                    acc_valid = acc_data.get("valid")
+                except Exception:
+                    pass
+
             quality_eff = round(best * acc_score, 1) if best and acc_score else None
 
+            # effective_dtype and quantization_method from per-format result.json
+            fmt_model = r.get("model", {})
+            fmt_effective_dtype     = fmt_model.get("effective_dtype")
+            fmt_quantization_method = fmt_model.get("quantization_method")
+
             quant_results.append({
-                "precision": precision,
-                "model_id": r.get("model", {}).get("model_id"),
+                "precision":                    precision,
+                "model_id":                     fmt_model_id,
                 "best_throughput_tokens_per_sec": round(best, 2) if best else None,
-                "accuracy_score": acc_score,
-                "quality_efficiency": quality_eff,
-                "speedup_vs_bf16": speedup,
-                "results_by_concurrency": rows,
-                "result_dir": precision.lower(),
+                "accuracy_score":               acc_score,
+                "accuracy_baseline_delta":      acc_delta,
+                "accuracy_valid":               acc_valid,
+                "quality_efficiency":           quality_eff,
+                "speedup_vs_bf16":              speedup,
+                "results_by_concurrency":       rows,
+                "result_dir":                   precision.lower(),
+                "effective_dtype":              fmt_effective_dtype,
+                "quantization_method":          fmt_quantization_method,
             })
 
-        # Load accuracy from accuracy/accuracy.json (written by BF16 accuracy gate subprocess)
-        suite_c_accuracy = None
-        acc_file = base_dir / "accuracy" / "accuracy.json"
-        if acc_file.exists():
-            try:
-                with open(acc_file) as f:
-                    suite_c_accuracy = json.load(f)
-            except Exception:
-                pass
-
         merged = {
-            "schema_version": "1.0",
-            "suite_id": "suite_C",
+            "schema_version":    "1.0",
+            "suite_id":          "suite_C",
             "implementation_id": base_result.get("implementation_id"),
-            # ── Key fix: read from BF16 subprocess result ──
-            "chip": base_result["chip"],
-            "software": base_result["software"],
+            "chip":              base_result["chip"],
+            "software":          base_result["software"],
             "model": {
                 **base_result["model"],
                 "model_id": suite.get("base_model_id", base_result["model"]["model_id"]),
-                "_note": "base_model_id. Each precision level may use a different quantized variant.",
+                "_note": "base_model_id. Each precision level uses its own quantized checkpoint.",
             },
             "task": {
-                "scenarios_run": ["offline"],
+                "scenarios_run":       ["accuracy", "offline"],
                 "precision_levels_run": successful_precisions,
-                "parallelism": base_result["task"]["parallelism"],
-                "num_runs": suite.get("num_runs", 3),
+                "precision_levels_skipped": skipped or [],
+                "parallelism":         base_result["task"]["parallelism"],
+                "num_runs":            suite.get("num_runs", 3),
             },
             "metrics": {
                 "quantization": {
@@ -1059,23 +1158,40 @@ class BenchmarkRunner(ABC):
                 },
                 "derived": {},
             },
-            "accuracy": suite_c_accuracy or {
-                "subset_score": None,
-                "baseline_delta": None,
-                "valid": False,
-                "notes": "Run --scenario accuracy to populate.",
-            },
+            # No top-level accuracy block for Suite C — accuracy is per-format
+            # inside metrics.quantization.results_by_precision[i].accuracy_score
+            "accuracy": None,
             "meta": {
                 **base_result["meta"],
                 "benchmark_elapsed_minutes": total_elapsed_minutes,
                 "benchmark_elapsed_minutes_note": "Total across all precision levels.",
-                "precision_dirs": {p: p.lower() for p in successful_precisions},
+                "precision_dirs":  {p: p.lower() for p in successful_precisions},
+                "precision_model_map": {
+                    p: suite["precision_model_map"].get(p, {})
+                    for p in successful_precisions
+                    if "precision_model_map" in suite
+                },
             },
         }
 
         out_path = base_dir / "result.json"
         with open(out_path, "w") as f:
             json.dump(merged, f, indent=2)
+
+        # Primary metric: best quality_efficiency across all evaluated formats
+        best_qe = max(
+            (r["quality_efficiency"] for r in quant_results if r["quality_efficiency"]),
+            default=None
+        )
+        best_thr = max(
+            (r["best_throughput_tokens_per_sec"] for r in quant_results
+             if r["best_throughput_tokens_per_sec"]),
+            default=None
+        )
+        if best_qe:
+            print(f"\n  Best quality efficiency : {best_qe:,.0f}")
+        if best_thr:
+            print(f"  Best throughput         : {best_thr:,.0f} tok/s")
 
         # Print summary
         print(f"\n  Quantization efficiency summary:")
@@ -1504,6 +1620,29 @@ class BenchmarkRunner(ABC):
         except Exception:
             return None
 
+    def _load_accuracy_baseline_for_format(
+        self, model_id: str, precision: str
+    ) -> Optional[float]:
+        """
+        Load the accuracy baseline for a specific model_id + precision format.
+        Used by Suite C where each format has its own checkpoint and baseline.
+
+        Looks up: accuracy_baselines.json[model_id]["{precision_lower}_baseline_score"]
+
+        Returns None if not found (placeholder) — accuracy check still runs
+        but delta/valid are None, not a failure.
+        """
+        path = _REPO_ROOT / "schema" / "accuracy_baselines.json"
+        if not path.exists():
+            return None
+        try:
+            with open(path) as f:
+                baselines = json.load(f)
+            key = f"{precision.lower()}_baseline_score"
+            return baselines.get(model_id, {}).get(key)
+        except Exception:
+            return None
+
     def _run_accuracy_scenario(
         self,
         suite: dict,
@@ -1525,7 +1664,7 @@ class BenchmarkRunner(ABC):
         print(f"\n{'='*60}")
         print(f"  Accuracy Check ({len(questions)} questions)")
         print(f"  Framework: {self._get_framework_name()}")
-        print(f"  Precision: {suite.get('precision_required', 'BF16')}")
+        print(f"  Precision: {getattr(self, '_effective_precision', None) or suite.get('precision_required', 'BF16')}")
         print(f"{'='*60}\n")
 
         # Format prompts using the same format_prompt() as the benchmark
@@ -1609,7 +1748,7 @@ class BenchmarkRunner(ABC):
             "baseline_delta": delta,
             "valid": valid,
             "framework": self._get_framework_name(),
-            "precision": suite.get("precision_required", "BF16"),
+            "precision": getattr(self, "_effective_precision", None) or suite.get("precision_required", "BF16"),
             "notes": (
                 f"Integrated accuracy check — used same "
                 f"{self._get_framework_name()} instance as benchmark."
@@ -1628,6 +1767,141 @@ class BenchmarkRunner(ABC):
             for row in scored_outputs:
                 f.write(json.dumps(row) + "\n")
         print(f"Per-question outputs saved to: {outputs_path}")
+
+        return acc
+
+    def _run_accuracy_scenario_for_format(
+        self,
+        suite: dict,
+        output_dir: Path,
+        model_id: str,
+        precision: str,
+    ) -> dict:
+        """
+        Run accuracy check for a specific precision format in Suite C.
+
+        Unlike _run_accuracy_scenario(), this:
+        - Uses model_id-specific baseline (not suite-level baseline)
+        - Uses per-format threshold from suite["accuracy_thresholds"]
+        - Never blocks — records valid=False as data, does not abort
+        - Records the precision format in the returned dict
+
+        Args:
+            suite:      Parsed suite.json dict
+            output_dir: Where to write accuracy.json
+            model_id:   The specific checkpoint being tested (e.g. AWQ model_id)
+            precision:  Format string e.g. "W4A16"
+
+        Returns:
+            Accuracy dict with subset_score, baseline_delta, valid, precision fields.
+        """
+        questions = self._load_accuracy_questions()
+
+        print(f"\n{'='*60}")
+        print(f"  Accuracy Check — {precision} ({len(questions)} questions)")
+        print(f"  Model: {model_id}")
+        print(f"  Framework: {self._get_framework_name()}")
+        print(f"{'='*60}\n")
+
+        # Format and run prompts
+        prompts = []
+        for q in questions:
+            raw = (
+                f"Question: {q['question']}\n"
+                f"A) {q['choices'][0]}\n"
+                f"B) {q['choices'][1]}\n"
+                f"C) {q['choices'][2]}\n"
+                f"D) {q['choices'][3]}\n"
+                f"Answer:"
+            )
+            prompts.append(self.format_prompt(raw))
+
+        t_start = time.perf_counter()
+        try:
+            results = self.inference_fn_offline(prompts)
+        except Exception as e:
+            raise RuntimeError(f"Accuracy inference failed: {e}") from e
+        elapsed = round(time.perf_counter() - t_start, 1)
+        print(f"Completed in {elapsed}s")
+
+        # Score answers
+        correct = 0
+        wrong_examples = []
+        scored_outputs = []
+        for i, result in enumerate(results):
+            text = (result.output_text or "").strip()
+            match = re.search(r"\b([ABCD])\b", text.upper())
+            predicted = match.group(1) if match else "?"
+            expected  = questions[i].get("answer", "")
+            is_correct = (predicted == expected)
+            if is_correct:
+                correct += 1
+            elif len(wrong_examples) < 3:
+                wrong_examples.append(
+                    f"  Q: {questions[i]['question'][:65]}\n"
+                    f"  Expected: {expected}, Got: {predicted} "
+                    f"(raw: '{text[:20]}')"
+                )
+            scored_outputs.append({
+                "question_id": questions[i].get("question_id", i),
+                "question":    questions[i]["question"],
+                "choices":     questions[i]["choices"],
+                "expected":    expected,
+                "predicted":   predicted,
+                "correct":     is_correct,
+                "raw_output":  text[:500],
+            })
+
+        score = round(correct / len(questions), 4) if questions else 0.0
+
+        # Per-format baseline and threshold
+        baseline_score = self._load_accuracy_baseline_for_format(model_id, precision)
+        delta          = round(score - baseline_score, 4) if baseline_score is not None else None
+        thresholds     = suite.get("accuracy_thresholds", {})
+        threshold      = thresholds.get(precision, 0.05)
+        valid          = (delta >= -threshold) if delta is not None else None
+        # None = baseline not set yet (placeholder) — not a failure
+
+        # Print results
+        print(f"Score: {correct}/{len(questions)} = {score:.4f}")
+        if baseline_score is not None:
+            sign = "+" if delta >= 0 else ""
+            print(f"Baseline ({precision}): {baseline_score:.4f}")
+            print(f"Delta: {sign}{delta:.4f} (min allowed: {-threshold:.4f})")
+            print(f"Valid: {valid}")
+        else:
+            print("Baseline: not set (placeholder) — score recorded, valid=None")
+        if wrong_examples:
+            print("Example wrong answers:")
+            for ex in wrong_examples:
+                print(ex)
+        if valid is False:
+            print(
+                f"WARNING: Score dropped {abs(delta):.4f} below baseline "
+                f"(threshold: {threshold}) — will be flagged on leaderboard"
+            )
+
+        acc = {
+            "subset_score":   score,
+            "baseline_delta": delta,
+            "valid":          valid,
+            "precision":      precision,
+            "model_id":       model_id,
+            "framework":      self._get_framework_name(),
+            "notes":          f"Suite C per-format accuracy check. Threshold: {threshold}",
+        }
+
+        # Write accuracy.json
+        acc_path = output_dir / "accuracy.json"
+        with open(acc_path, "w") as f:
+            json.dump(acc, f, indent=2)
+        print(f"Saved to: {acc_path}")
+
+        # Write per-question outputs (gitignored)
+        outputs_path = output_dir / "accuracy_outputs.jsonl"
+        with open(outputs_path, "w") as f:
+            for row in scored_outputs:
+                f.write(json.dumps(row) + "\n")
 
         return acc
 
@@ -1727,13 +2001,15 @@ class BenchmarkRunner(ABC):
                 "python_version": env_info.get("python_version", "unknown"),
             },
             "model": {
-                "model_id": suite["model_id"],
+                "model_id": suite.get("model_id") or suite.get("base_model_id", ""),
                 "model_revision": suite.get("model_revision", "unknown"),
                 "architecture": "dense",
-                "parameter_count_b": self._estimate_param_count(suite["model_id"]),
+                "parameter_count_b": self._estimate_param_count(suite.get("model_id") or suite.get("base_model_id", "")),
                 "precision": getattr(self, "_effective_precision", None)
                              or getattr(args, "precision", None)
                              or suite.get("precision_required", "BF16"),
+                "effective_dtype":     self.get_effective_dtype(),
+                "quantization_method": self.get_quantization_method(),
                 "model_format": "HuggingFace original",
             },
             "task": {

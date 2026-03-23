@@ -15,7 +15,7 @@ in the leaderboard and submitting your results.
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
 pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r runners/nvidia_vllm_c34f94c3/requirements.txt
+pip install -r runners/nvidia_vllm_bc2ddb31/requirements.txt
 
 # 2. Set your name (one-time setup)
 cp configs/submitter.yaml.example configs/submitter.yaml
@@ -23,8 +23,8 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 
 # 3. Run the benchmark (~46 min on A100)
 #    Accuracy gate runs automatically before the benchmark starts.
-#    Output directory is auto-named: results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_c34f94c3
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A
+#    Output directory is auto-named: results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_bc2ddb31
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A
 
 # 4. Submit
 ls results/community/
@@ -43,7 +43,7 @@ That's it. The CI bot handles the rest.
 **NVIDIA (vLLM):**
 ```bash
 pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r runners/nvidia_vllm_c34f94c3/requirements.txt
+pip install -r runners/nvidia_vllm_bc2ddb31/requirements.txt
 ```
 
 **Other platforms:**
@@ -97,7 +97,7 @@ need `--model-path` on the command line.
 ### Recommended: run the full suite
 
 ```bash
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A
 ```
 
 This runs the suite's default scenarios (accuracy gate → offline → online → interactive)
@@ -109,22 +109,22 @@ or `--scenario offline` (or any other scenario name) to run a single scenario.
 
 ```bash
 # Override the output directory if needed
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_bc2ddb31 \
     --suite suite_A \
-    --output-dir ./results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_c34f94c3
+    --output-dir ./results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_bc2ddb31
 ```
 
 ### Run a single scenario
 
 ```bash
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario offline
 ```
 
 ### Multi-chip (Suite B and above)
 
 ```bash
 # Suite B: Llama-3-70B on 4 chips
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_bc2ddb31 \
     --suite suite_B \
     --tensor-parallel-size 4
 ```
@@ -143,7 +143,7 @@ Suite E runs the same workload at 1×, 2×, 4×, and 8× chip counts and
 measures how efficiently throughput scales:
 
 ```bash
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_bc2ddb31 \
     --suite suite_E \
     --chip_counts 1,2,4
 ```
@@ -158,7 +158,7 @@ Results report `concurrency` values, not batch sizes.
 ### With a local model path
 
 ```bash
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_bc2ddb31 \
     --suite suite_A \
     --model-path /path/to/local/model
 ```
@@ -224,7 +224,7 @@ where it stopped. Completed steps are skipped automatically.
 ```bash
 ls results/community/
 python runners/validate_submission.py \
-    --dir results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_c34f94c3
+    --dir results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_bc2ddb31
 ```
 
 **Files required for submission:**
@@ -282,7 +282,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir /your/path/Meta-Llama-3-8B-Instruct
 
 # Use a local copy
-python run.py --runner nvidia_vllm_c34f94c3 --model-path /your/path/...
+python run.py --runner nvidia_vllm_bc2ddb31 --model-path /your/path/...
 ```
 
 If your local copy was downloaded at a different revision, add a note in

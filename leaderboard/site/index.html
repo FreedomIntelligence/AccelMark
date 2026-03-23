@@ -814,13 +814,13 @@
             </div>
         ` : ''}
         ${row.suite === 'suite_C' ? `
-            <div class="card-speed">${row.quant_bf16_throughput
-                ? row.quant_bf16_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
+            <div class="card-speed">${row.quant_throughput
+                ? row.quant_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
                 : '—'}</div>
-            <div class="card-speed-label">tokens/sec (BF16 baseline)</div>
+            <div class="card-speed-label">tok/s (${row.quant_best_precision || 'best format'})</div>
             <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
-                ${row.quant_int8_speedup ? 'INT8: ' + row.quant_int8_speedup.toFixed(2) + '× faster' : ''}
-                ${row.quant_int4_speedup ? ' · INT4: ' + row.quant_int4_speedup.toFixed(2) + '× faster' : ''}
+                ${row.quant_int8_speedup ? 'W8A16: ' + row.quant_int8_speedup.toFixed(2) + '× faster' : ''}
+                ${row.quant_int4_speedup ? ' · W4A16: ' + row.quant_int4_speedup.toFixed(2) + '× faster' : ''}
             </div>
         ` : ''}
         ${row.sustained_throughput ? `
@@ -924,6 +924,8 @@
         <td>${row.model || '—'}</td>
         <td>${row.precision || '—'}${row.precision_fallback
             ? ' <span style="color:#d29922;font-size:0.75rem" title="Suite requires BF16; hardware uses FP16">⚠</span>'
+            : ''}${row.precision_emulated
+            ? ` <span style="color:#8b949e;font-size:0.75rem" title="Requested ${row.precision} but framework computed in ${row.effective_dtype}">~</span>`
             : ''}</td>
         <td>${suitePill(row.suite) || '—'}</td>
         <td>${scenarioPill(row) || '—'}</td>
@@ -1071,6 +1073,17 @@
         detailRow('Architecture', d.model_arch),
         detailRow('Parameters', d.model_params_b, { format: v => v + 'B' }),
         detailRow('Precision', d.model_precision),
+        row.effective_dtype
+            ? detailRow('Compute dtype',
+                row.effective_dtype
+                + (row.precision_emulated
+                    ? ` <span style="color:#8b949e;font-size:0.8em">(${row.precision} weights computed as ${row.effective_dtype})</span>`
+                    : ''),
+                { html: true })
+            : null,
+        row.quantization_method
+            ? detailRow('Quantization', row.quantization_method)
+            : null,
         detailRow('Format', d.model_format),
       ]),
       detailSection('Run settings', [
@@ -1524,81 +1537,84 @@
 
   // Suite C ─────────────────────────────────────────────────
   function renderSuiteC(el, viz, row) {
-    el.appendChild(sectionTitle('Throughput by precision'));
-    el.appendChild(statChips([
-      { label: 'BF16 baseline', value: row.quant_bf16_throughput ? row.quant_bf16_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null },
-      { label: 'INT8 speedup',  value: row.quant_int8_speedup  != null ? row.quant_int8_speedup.toFixed(2)  + '×' : null, cls: 'blue' },
-      { label: 'INT4 speedup',  value: row.quant_int4_speedup  != null ? row.quant_int4_speedup.toFixed(2)  + '×' : null, cls: 'amber' },
-      { label: 'INT8 quality eff.', value: row.quant_int8_quality_eff != null ? (row.quant_int8_quality_eff*100).toFixed(1) + '%' : null },
-      { label: 'INT4 quality eff.', value: row.quant_int4_quality_eff != null ? (row.quant_int4_quality_eff*100).toFixed(1) + '%' : null },
-    ]));
+    if (!viz || !viz.precisions || !viz.precisions.length) {
+        el.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">No quantization data available.</div>';
+        return;
+    }
 
-    if (viz.labels && viz.labels.length) {
-      const { wrap, canvas } = mkCanvas('viz-quant-thr', 180);
-      el.appendChild(wrap);
-      const colors = { BF16: C.gray, INT8: C.blue, INT4: C.amber };
-      _activeCharts.push(new Chart(canvas, {
+    function _precToDtype(p) {
+        return {BF16:'bfloat16',FP16:'float16',FP8:'float8_e4m3fn',
+                W8A8:'int8',W8A16:'float16',W4A16:'float16'}[p] || '';
+    }
+
+    el.appendChild(sectionTitle('Quantization efficiency'));
+
+    // Per-format table
+    const table = document.createElement('table');
+    table.style.cssText = 'width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:1rem';
+    table.innerHTML = `
+        <thead>
+            <tr style="border-bottom:1px solid #21262d;color:#8b949e">
+                <th style="text-align:left;padding:0.4rem">Format</th>
+                <th style="text-align:right;padding:0.4rem">Throughput</th>
+                <th style="text-align:right;padding:0.4rem">Speedup</th>
+                <th style="text-align:right;padding:0.4rem">Accuracy</th>
+                <th style="text-align:right;padding:0.4rem">Quality eff.</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${viz.precisions.map((prec, i) => {
+                const thr  = viz.throughputs[i];
+                const spd  = viz.speedups[i];
+                const acc  = viz.accuracies[i];
+                const qe   = viz.quality_effs[i];
+                const valid = viz.acc_valid[i];
+                const accColor = valid === false ? '#f85149'
+                               : valid === true  ? '#56d364' : '#8b949e';
+                const edt = viz.effective_dtypes && viz.effective_dtypes[i];
+                const emulated = edt && edt !== _precToDtype(prec);
+                const precCell = emulated
+                    ? `${prec} <span style="color:#8b949e;font-size:0.8em" title="Computed as ${edt}">~${edt}</span>`
+                    : prec;
+                return `<tr style="border-bottom:1px solid #21262d21">
+                    <td style="padding:0.4rem;font-weight:500">${precCell}</td>
+                    <td style="text-align:right;padding:0.4rem">${
+                        thr ? thr.toLocaleString(undefined,{maximumFractionDigits:0})+' tok/s' : '—'
+                    }</td>
+                    <td style="text-align:right;padding:0.4rem">${
+                        spd ? spd.toFixed(2)+'×' : '—'
+                    }</td>
+                    <td style="text-align:right;padding:0.4rem;color:${accColor}">${
+                        acc != null ? acc.toFixed(4) : '—'
+                    }</td>
+                    <td style="text-align:right;padding:0.4rem">${
+                        qe ? qe.toLocaleString(undefined,{maximumFractionDigits:0}) : '—'
+                    }</td>
+                </tr>`;
+            }).join('')}
+        </tbody>
+    `;
+    el.appendChild(table);
+
+    // Throughput bar chart
+    const { wrap: w1, canvas: c1 } = mkCanvas('viz-suitec-thr', 200);
+    el.appendChild(w1);
+    _activeCharts.push(new Chart(c1, {
         type: 'bar',
         data: {
-          labels: viz.labels,
-          datasets: [{
-            data: viz.throughput,
-            backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
-            borderColor: viz.labels.map(l => colors[l] || C.gray),
-            borderWidth: 1, borderRadius: 3,
-          }]
+            labels: viz.precisions,
+            datasets: [{
+                label: 'Throughput',
+                data: viz.throughputs,
+                backgroundColor: [C.teal, C.blue, C.amber, C.coral, C.green],
+            }],
         },
-        options: baseOpts('tokens / sec', v => v ? v.toLocaleString() : '')
-      }));
-
-      if (viz.speedup && viz.speedup.some(v => v != null)) {
-        el.appendChild(sectionTitle('Speedup vs BF16'));
-        const { wrap: w2, canvas: c2 } = mkCanvas('viz-quant-spd', 150);
-        el.appendChild(w2);
-        _activeCharts.push(new Chart(c2, {
-          type: 'bar',
-          data: {
-            labels: viz.labels,
-            datasets: [{
-              data: viz.speedup,
-              backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
-              borderColor: viz.labels.map(l => colors[l] || C.gray),
-              borderWidth: 1, borderRadius: 3,
-            }]
-          },
-          options: baseOpts('speedup ×', v => v != null ? v.toFixed(2) + '×' : '')
-        }));
-      }
-
-      if (viz.quality_efficiency && viz.quality_efficiency.some(v => v != null)) {
-        el.appendChild(sectionTitle('Quality efficiency vs BF16'));
-        const { wrap: w3, canvas: c3 } = mkCanvas('viz-quant-qeff', 150);
-        el.appendChild(w3);
-        // BF16 is the 1.0 baseline; show it as 100% for reference
-        const qeffData = viz.labels.map((l, i) => l === 'BF16' ? 1.0 : viz.quality_efficiency[i]);
-        _activeCharts.push(new Chart(c3, {
-          type: 'bar',
-          data: {
-            labels: viz.labels,
-            datasets: [{
-              data: qeffData,
-              backgroundColor: viz.labels.map(l => (colors[l] || C.gray) + '99'),
-              borderColor: viz.labels.map(l => colors[l] || C.gray),
-              borderWidth: 1, borderRadius: 3,
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-              y: { min: 0, max: 1.1, ticks: { color: C.text, font: { size: 11 }, callback: v => (v * 100).toFixed(0) + '%' }, grid: { color: C.grid }, title: { display: true, text: 'quality efficiency', color: C.text, font: { size: 11 } } },
-            }
-          }
-        }));
-      }
-    }
+        options: baseOpts(
+            'tokens / sec',
+            v => v.toLocaleString(undefined, {maximumFractionDigits: 0}),
+            'precision'
+        ),
+    }));
   }
 
   // Suite E ─────────────────────────────────────────────────

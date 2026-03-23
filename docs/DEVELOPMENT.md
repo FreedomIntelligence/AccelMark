@@ -505,7 +505,7 @@ Format of each line in `requests.jsonl`:
 Run the accuracy check on reference hardware (A100) and record the score:
 
 ```bash
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_bc2ddb31 \
     --suite suite_X \
     --scenario accuracy \
     --model-path /path/to/model
@@ -880,7 +880,7 @@ python run.py --runner your_platform_{hash8} --help
 ```bash
 # Run with minimal requests to test the pipeline end-to-end
 # Temporarily reduce request_count for testing only
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_bc2ddb31 \
     --suite suite_A \
     --scenario offline \
     --output-dir /tmp/accelmark_test/

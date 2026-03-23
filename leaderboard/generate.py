@@ -24,6 +24,20 @@ SITE_DIR    = Path("leaderboard/site")
 RUNNERS_DIR = Path("runners")
 
 
+def _precision_to_dtype(precision: str) -> str:
+    """Map requested precision name to expected compute dtype."""
+    _MAP = {
+        "BF16":  "bfloat16",
+        "FP16":  "float16",
+        "FP32":  "float32",
+        "FP8":   "float8_e4m3fn",
+        "W8A8":  "int8",
+        "W8A16": "float16",
+        "W4A16": "float16",
+    }
+    return _MAP.get(precision.upper(), "")
+
+
 def _get_suite_precision_required(suite_id: str) -> str:
     """Read precision_required from suite.json. Returns 'BF16' if not found."""
     path = Path("suites") / suite_id / "suite.json"
@@ -300,20 +314,26 @@ def extract_viz(result: dict, metrics: dict) -> dict:
         }
 
     if suite == "suite_C":
-        quantization = metrics.get("quantization", {})
-        entries      = quantization.get("results_by_precision", [])
-        labels, throughputs, speedups, quality_effs = [], [], [], []
-        for e in entries:
-            labels.append(e.get("precision", ""))
-            throughputs.append(e.get("best_throughput_tokens_per_sec"))
-            speedups.append(e.get("speedup_vs_bf16"))
-            quality_effs.append(e.get("quality_efficiency"))
+        results_by_precision = metrics.get("quantization", {}).get(
+            "results_by_precision", []
+        )
         return {
-            "type":              "suite_C",
-            "labels":            labels,
-            "throughput":        throughputs,
-            "speedup":           speedups,
-            "quality_efficiency": quality_effs,
+            "type":       "suite_C",
+            "precisions": [r["precision"] for r in results_by_precision],
+            "throughputs": [r.get("best_throughput_tokens_per_sec") for r in results_by_precision],
+            "speedups":   [r.get("speedup_vs_bf16") for r in results_by_precision],
+            "accuracies": [r.get("accuracy_score") for r in results_by_precision],
+            "acc_valid":  [r.get("accuracy_valid") for r in results_by_precision],
+            "acc_deltas": [r.get("accuracy_baseline_delta") for r in results_by_precision],
+            "quality_effs": [r.get("quality_efficiency") for r in results_by_precision],
+            "model_ids":  [r.get("model_id") for r in results_by_precision],
+            "effective_dtypes":     [r.get("effective_dtype") for r in results_by_precision],
+            "quantization_methods": [r.get("quantization_method") for r in results_by_precision],
+            "bf16_throughput": next(
+                (r.get("best_throughput_tokens_per_sec")
+                 for r in results_by_precision if r["precision"] == "BF16"),
+                None
+            ),
         }
 
     if suite == "suite_E":
@@ -460,33 +480,41 @@ def extract_row(result: dict) -> dict:
             primary_metric_label = "tokens/sec (1x baseline)"
 
     # ── Suite C quantization ──────────────────────────────────────────────────
+    quant_throughput       = None
+    quant_best_precision   = None
+    quant_quality_eff      = None
     quant_bf16_throughput  = None
-    quant_int8_throughput  = None
-    quant_int4_throughput  = None
     quant_int8_speedup     = None
     quant_int4_speedup     = None
-    quant_int8_quality_eff = None
-    quant_int4_quality_eff = None
 
-    quantization = metrics.get("quantization")
-    if quantization:
-        for entry in quantization.get("results_by_precision", []):
-            p   = entry.get("precision")
-            thr = entry.get("best_throughput_tokens_per_sec")
-            spd = entry.get("speedup_vs_bf16")
-            qe  = entry.get("quality_efficiency")
-            if p == "BF16":
+    quant = metrics.get("quantization", {})
+    if quant:
+        results_by_precision = quant.get("results_by_precision", [])
+        best_qe = None
+        for r in results_by_precision:
+            thr  = r.get("best_throughput_tokens_per_sec")
+            qe   = r.get("quality_efficiency")
+            prec = r.get("precision", "")
+
+            if prec == "BF16":
                 quant_bf16_throughput = thr
-                primary_metric        = thr
-                primary_metric_label  = "tokens/sec (BF16 baseline)"
-            elif p == "INT8":
-                quant_int8_throughput  = thr
-                quant_int8_speedup     = spd
-                quant_int8_quality_eff = qe
-            elif p == "INT4":
-                quant_int4_throughput  = thr
-                quant_int4_speedup     = spd
-                quant_int4_quality_eff = qe
+            elif prec in ("W8A8", "W8A16"):
+                # Use W8A16 as the "int8-tier" speedup if available,
+                # fall back to W8A8
+                if quant_int8_speedup is None or prec == "W8A16":
+                    quant_int8_speedup = r.get("speedup_vs_bf16")
+            elif prec == "W4A16":
+                quant_int4_speedup = r.get("speedup_vs_bf16")
+
+            if qe and (best_qe is None or qe > best_qe):
+                best_qe              = qe
+                quant_quality_eff    = qe
+                quant_throughput     = thr
+                quant_best_precision = prec
+
+        if quant_throughput:
+            primary_metric       = quant_throughput
+            primary_metric_label = f"tok/s ({quant_best_precision or 'best format'})"
 
     # ── Efficiency ────────────────────────────────────────────────────────────
     memory_gb_per_chip     = chip.get("memory_gb_per_chip", 0)
@@ -509,9 +537,19 @@ def extract_row(result: dict) -> dict:
     )
 
     # ── Precision fallback detection ──────────────────────────────────────────
-    precision         = model.get("precision", "BF16")
-    suite_required    = _get_suite_precision_required(suite_id)
-    precision_fallback = precision.upper() != suite_required.upper()
+    precision           = model.get("precision", "BF16")
+    effective_dtype     = model.get("effective_dtype")
+    quantization_method = model.get("quantization_method")
+    suite_required      = _get_suite_precision_required(suite_id)
+    precision_fallback  = (
+        precision.upper() != suite_required.upper()
+        if precision and suite_required else False
+    )
+    # Emulated flag: precision was requested but compute was in a different dtype
+    precision_emulated = (
+        effective_dtype is not None
+        and effective_dtype.replace("torch.", "") != _precision_to_dtype(precision)
+    )
 
     return {
         "submission":         result.get("_submission_name"),
@@ -526,6 +564,9 @@ def extract_row(result: dict) -> dict:
         "model":              model.get("model_id", "").split("/")[-1],
         "precision":          precision,
         "precision_fallback": precision_fallback,
+        "precision_emulated": precision_emulated,
+        "effective_dtype":    effective_dtype,
+        "quantization_method": quantization_method,
         "suite":              suite_id,
         "scenario":           "all" if is_suite_level else scenario,
         # Primary
@@ -555,13 +596,12 @@ def extract_row(result: dict) -> dict:
         "scaling_efficiency_4x":   scaling_efficiency_4x,
         "scaling_base_throughput": scaling_base_throughput,
         # Suite C
-        "quant_bf16_throughput":   quant_bf16_throughput,
-        "quant_int8_throughput":   quant_int8_throughput,
-        "quant_int4_throughput":   quant_int4_throughput,
-        "quant_int8_speedup":      quant_int8_speedup,
-        "quant_int4_speedup":      quant_int4_speedup,
-        "quant_int8_quality_eff":  quant_int8_quality_eff,
-        "quant_int4_quality_eff":  quant_int4_quality_eff,
+        "quant_best_precision":  quant_best_precision,
+        "quant_throughput":      quant_throughput,
+        "quant_quality_eff":     quant_quality_eff,
+        "quant_bf16_throughput": quant_bf16_throughput,
+        "quant_int8_speedup":    quant_int8_speedup,
+        "quant_int4_speedup":    quant_int4_speedup,
         # Sustained
         "sustained_throughput":    sustained_throughput,
         "throttle_ratio":          throttle_ratio,

@@ -1,10 +1,10 @@
 {
-  "id":           "nvidia_vllm_c34f94c3",
+  "id":           "nvidia_vllm_bc2ddb31",
   "platform":     "nvidia",
   "name":         "vLLM on NVIDIA (reference implementation)",
   "framework":    "vLLM",
   "submitted_by": "JuhaoLiang1997",
   "description":  "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A–E). Standard vLLM configuration, no custom patches.",
-  "notes":        "Adds SUPPORTED_PRECISIONS and BF16→FP16 fallback for older hardware (V100, T4).",
+  "notes":        "Adds effective_dtype and quantization_method transparency fields; updated Suite C precision mapping (FP8/W8A8/W8A16/W4A16 via dtype=auto).",
   "created":      "2026-03-23"
 }

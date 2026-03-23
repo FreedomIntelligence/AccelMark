@@ -193,7 +193,7 @@ INT4       13,500 tok/s  0.54      2.20×     7,290  ← aggressive
 ### Running Suite C
 
 ```bash
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_C
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_C
 ```
 
 Runs BF16 → INT8 → INT4 in sequence. Each precision level is a separate
@@ -277,10 +277,10 @@ chip_counts_all: [1, 2, 4, 8]
 
 ```bash
 # 4-chip machine
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_E --max-chips 4
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_E --max-chips 4
 
 # 8-chip machine
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_E --max-chips 8
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_E --max-chips 8
 ```
 
 **Minimum requirement:** both 1× and 2× must succeed for the submission

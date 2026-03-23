@@ -73,7 +73,15 @@
         "precision": {
           "type": "string",
           "description": "Effective compute precision used during this run. BF16 is standard; FP16 is used on hardware that does not support BF16 (e.g. V100, T4).",
-          "enum": ["FP32","BF16","FP16","FP8","INT8","INT4","mixed"]
+          "enum": ["FP32","BF16","FP16","FP8","W8A8","W8A16","W4A16","INT8","INT4","mixed"]
+        },
+        "effective_dtype": {
+          "type": ["string", "null"],
+          "description": "Actual compute dtype used by the framework during inference. May differ from 'precision' — e.g. FP8 weights computed in bfloat16 on hardware without native FP8 tensor cores. Uses PyTorch dtype naming: 'bfloat16', 'float16', 'float32', 'float8_e4m3fn', 'int8'."
+        },
+        "quantization_method": {
+          "type": ["string", "null"],
+          "description": "Weight quantization method used. Describes how weights are stored in memory: 'fp8', 'awq', 'gptq', 'w8a8', 'w8a16', 'bitsandbytes', or null for full-precision runs."
         },
         "model_format": { "type": "string" },
         "_note": {

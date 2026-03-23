@@ -1,38 +1,59 @@
 {
   "suite_id": "suite_C",
-  "description": "Quantization efficiency. Same model (Llama-3-8B) at three precision levels: BF16, INT8, INT4. Measures the speed/quality tradeoff of quantization on a single chip.",
-  "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+  "description": "Quantization efficiency benchmark. Measures throughput and accuracy across BF16, FP8, W8A8, W8A16, and W4A16 precision formats using fixed pre-quantized checkpoints.",
+  "base_model_id": "meta-llama/Llama-3.1-8B-Instruct",
+  "model_revision":  "0e9e39f249a16976918f6564b8830bc894c89659",
+
+  "precision_model_map": {
+    "BF16":  {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+    },
+    "FP8":   {
+      "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8",
+      "model_revision": "12fd6884d2585dd4d020373e7f39f74507b31866"
+    },
+    "W8A8":  {
+      "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8",
+      "model_revision": "e2bfb7d92784ad7d1b606c2f9644d3cefb2ec708"
+    },
+    "W8A16": {
+      "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16",
+      "model_revision": "38e03ba250017bf8ed3eeecd3a744e21f6b994a9"
+    },
+    "W4A16": {
+      "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+      "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e"
+    }
+  },
+
+  "precision_levels": ["BF16", "FP8", "W8A8", "W8A16", "W4A16"],
+
+  "accuracy_thresholds": {
+    "BF16":  0.03,
+    "FP8":   0.03,
+    "W8A8":  0.04,
+    "W8A16": 0.03,
+    "W4A16": 0.05
+  },
+
   "scenarios": {
     "default": ["accuracy", "offline"],
-    "extra": []
+    "extra":   ["online", "sustained"]
   },
-  "precision_levels": ["BF16", "INT8", "INT4"],
-  "_precision_levels_note": "BF16 = full precision baseline. INT8 = W8A8 via vLLM bitsandbytes or compressed-tensors. INT4 = W4A16 via AWQ.",
-  "precision_required": "BF16",
-  "allowed_precisions": ["BF16", "FP16"],
-  "request_distribution": {
-    "input_tokens_p25": 120,
-    "input_tokens_p50": 280,
-    "input_tokens_p75": 580,
-    "input_tokens_p99": 2100,
-    "output_tokens_p50": 310,
-    "output_tokens_p99": 1200,
-    "source": "shibing624/sharegpt_gpt4"
-  },
+
   "output_tokens_max": 512,
-  "concurrency_levels": [8, 32, 128],
-  "_concurrency_levels_note": "Client-side concurrency. See suite_A note.",
-  "online_qps_levels": null,
-  "online_sla_ttft_ms": null,
-  "online_sla_ttft_ms_relaxed": null,
+  "concurrency_levels": [1, 4, 16, 64],
   "num_runs": 3,
   "warmup_runs": 1,
-  "online_warmup_runs": 0,
-  "interactive_warmup_runs": 0,
-  "accuracy_threshold_delta": 0.05,
-  "_accuracy_note": "Threshold is wider than other suites (0.05 vs 0.03) because quantization reduces accuracy. Valid if score ≥ baseline − 0.05. INT4 submissions scoring more than 0.05 below the BF16 baseline are flagged.",
   "request_count": 200,
-  "online_request_count": null,
-  "interactive_request_count": null
+
+  "online_qps_levels": [5, 10, 25, 50],
+  "online_sla_ttft_ms": 500,
+  "online_request_count": 500,
+
+  "sustained_concurrency": 8,
+  "duration_minutes": 30,
+  "warmup_minutes": 2,
+  "sample_interval_seconds": 60
 }

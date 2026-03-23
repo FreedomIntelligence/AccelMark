@@ -73,6 +73,14 @@ class MyFrameworkRunner(BenchmarkRunner):
     # You almost never need to restrict this below ["bf16", "fp16", "fp32"].
     SUPPORTED_PRECISIONS = ["bf16", "fp16", "fp32"]
 
+    # Declare supported quantization formats for Suite C.
+    # BF16 is always included. List only formats your framework can load.
+    # FP8 requires native FP8 hardware (H100, MI300X).
+    SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]  # H100 full support
+    # SUPPORTED_QUANTIZATIONS = ["w8a8", "w8a16", "w4a16"]        # A100 (no FP8)
+    # SUPPORTED_QUANTIZATIONS = ["w8a8", "w4a16"]                 # ROCm example
+    # SUPPORTED_QUANTIZATIONS = []                                 # Apple MLX
+
     def load_model(self, model_path: str, suite: dict, tp_size: int) -> None:
         from myframework import Engine
         self.engine = Engine(model_path, tp_size=tp_size)
@@ -130,7 +138,7 @@ if __name__ == "__main__":
     MyFrameworkRunner().main()
 ```
 
-See the [reference implementation](nvidia_vllm_c34f94c3/runner.py) and
+See the [reference implementation](nvidia_vllm_bc2ddb31/runner.py) and
 [DEVELOPMENT.md](../docs/DEVELOPMENT.md) for a full working example.
 
 ### Step 2 — Compute the hash and name your folder
@@ -217,6 +225,7 @@ Override these class attributes in your runner to declare what the framework sup
 | `SUPPORTS_ONLINE` | `True` | Set `False` if framework cannot handle concurrent requests |
 | `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism — `--tensor-parallel-size` is ignored |
 | `SUPPORTED_PRECISIONS` | `["bf16", "fp16", "fp32"]` | Maximum compute precisions on capable hardware. Hardware detection automatically restricts this (V100 → FP16, MI100 → FP16, M1 → FP16). Only restrict below the default if your framework genuinely cannot use a precision regardless of hardware. |
+| `SUPPORTED_QUANTIZATIONS` | `[]` | Quantization formats supported for Suite C. Use uppercase strings: `"FP8"`, `"W8A8"`, `"W8A16"`, `"W4A16"`. BF16 is always supported and does not need to be listed. Empty list means this runner skips all quantized formats in Suite C. |
 
 ---
 
@@ -329,22 +338,22 @@ Use `run.py` at the repo root to run any runner:
 python run.py --list
 
 # Run the default benchmark (offline + online + interactive + accuracy)
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A
 
 # Run a specific scenario only
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario offline
 
 # Run extra scenarios (e.g. sustained load test)
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario sustained
 
 # Run everything including extras
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario all
 
 # Multi-GPU
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_B --tensor-parallel-size 4
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_B --tensor-parallel-size 4
 
 # Use a local model path
-python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --model-path /path/to/model
+python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --model-path /path/to/model
 ```
 
 Results are written to `results/community/{chip}_{suite}_{runner_id}/`.
@@ -361,7 +370,7 @@ OpenAI-compatible inference server:
 ```bash
 pip install -r serve/requirements.txt
 
-python run.py --runner nvidia_vllm_c34f94c3 --serve --port 8000
+python run.py --runner nvidia_vllm_bc2ddb31 --serve --port 8000
 ```
 
 See [serve/README.md](../serve/README.md) for full documentation.
