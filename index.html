@@ -206,37 +206,6 @@
       display: inline-block;
     }
 
-    /* ── Suite color pills ───────────────────────────────────── */
-    .suite-pill {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 0.1rem 0.45rem;
-      border-radius: 10px;
-      letter-spacing: 0.02em;
-      vertical-align: middle;
-    }
-    .suite-pill.suite_A { background: #0c2d4a; color: #58a6ff; }
-    .suite-pill.suite_B { background: #0f2d14; color: #56d364; }
-    .suite-pill.suite_C { background: #2d1f00; color: #d29922; }
-    .suite-pill.suite_D { background: #1e1040; color: #a78bfa; }
-    .suite-pill.suite_E { background: #062d1e; color: #1D9E75; }
-
-    /* ── Card suite top border ───────────────────────────────── */
-    .card { border-top: 3px solid #21262d; }
-    .card.suite_A { border-top-color: #58a6ff; }
-    .card.suite_B { border-top-color: #56d364; }
-    .card.suite_C { border-top-color: #d29922; }
-    .card.suite_D { border-top-color: #a78bfa; }
-    .card.suite_E { border-top-color: #1D9E75; }
-
-    /* ── Modal suite top border ──────────────────────────────── */
-    .modal.suite_A { border-top: 3px solid #58a6ff; }
-    .modal.suite_B { border-top: 3px solid #56d364; }
-    .modal.suite_C { border-top: 3px solid #d29922; }
-    .modal.suite_D { border-top: 3px solid #a78bfa; }
-    .modal.suite_E { border-top: 3px solid #1D9E75; }
-
     /* ── Detail modal ─────────────────────────────────────── */
     .modal-backdrop {
       display: none;
@@ -564,9 +533,11 @@
     <div class="modal-tabs" id="modal-tabs">
       <button class="modal-tab active" id="tab-details" onclick="switchTab('details')">Details</button>
       <button class="modal-tab" id="tab-viz" onclick="switchTab('viz')">Visualize</button>
+      <button class="modal-tab" id="tab-impl" onclick="switchTab('impl')" style="display:none">Implementation</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-body" id="modal-viz" style="display:none"></div>
+    <div class="modal-body" id="modal-impl" style="display:none"></div>
     <div class="modal-footer">
       <span id="modal-submission">—</span>
       <a id="modal-script-link" href="#" target="_blank" style="display:none">View reproduce script ↗</a>
@@ -594,12 +565,6 @@
     updateStats();
     render();
   });
-
-  // ── Suite pill helper ─────────────────────────────────────
-  function suitePill(suite) {
-    if (!suite) return '';
-    return `<span class="suite-pill ${suite}">${suite.replace('_',' ').toUpperCase()}</span>`;
-  }
 
   // ── Filters ──────────────────────────────────────────────
   function getFiltered() {
@@ -710,19 +675,16 @@
 
     chips.forEach(row => {
       const card = document.createElement('div');
-      card.className = `card ${row.suite || ''}`;
+      card.className = 'card';
       const isMini = (row.suite || '').startsWith('mini-');
       card.innerHTML = `
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.25rem">
-          <div class="card-chip">
-            ${row.chip || 'Unknown'}
-            ${(row.chip_count || 1) > 1
-              ? `<span style="color:#8b949e;font-size:0.85rem;font-weight:400"> ×${row.chip_count}</span>`
-              : ''}
-          </div>
-          ${suitePill(row.suite)}
+        <div class="card-chip">
+          ${row.chip || 'Unknown'}
+          ${(row.chip_count || 1) > 1
+            ? `<span style="color:#8b949e;font-size:0.85rem;font-weight:400"> ×${row.chip_count}</span>`
+            : ''}
         </div>
-        <div style="margin-top:0.25rem">
+        <div style="margin-top:0.5rem">
           ${row.is_suite_level ? `
             <div class="card-speed">${row.offline_throughput
               ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
@@ -739,6 +701,7 @@
             <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
           `}
         </div>
+        <div style="font-size:0.75rem;color:#388bfd;font-weight:500;margin-bottom:0.25rem">${row.suite || ''}</div>
         <div class="card-model">${row.model || ''} · ${row.framework || ''} · ${row.precision || ''}</div>
         ${row.suite === 'suite_E' ? `
             <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
@@ -841,7 +804,7 @@
         <td>${formatFramework(row)}</td>
         <td>${row.model || '—'}</td>
         <td>${row.precision || '—'}</td>
-        <td>${suitePill(row.suite) || '—'}</td>
+        <td>${row.suite || '—'}</td>
         <td>${row.scenario || '—'}</td>
         <td class="metric-primary">${
           row.is_suite_level
@@ -929,8 +892,8 @@
       (d.hw_chip || row.chip || '—') +
       (d.hw_count > 1 ? ` ×${d.hw_count}` : '');
 
-    const subtitleEl = document.getElementById('modal-subtitle');
-    subtitleEl.innerHTML = [suitePill(row.suite), row.scenario, row.date].filter(Boolean).join(' <span style="color:#484f58">·</span> ');
+    document.getElementById('modal-subtitle').textContent =
+      [row.suite, row.scenario, row.date].filter(Boolean).join(' · ');
 
     // Footer
     document.getElementById('modal-submission').textContent =
@@ -1030,8 +993,10 @@
     _activeTab = tab;
     document.getElementById('modal-body').style.display  = tab === 'details' ? '' : 'none';
     document.getElementById('modal-viz').style.display   = tab === 'viz'     ? '' : 'none';
+    document.getElementById('modal-impl').style.display  = tab === 'impl'    ? '' : 'none';
     document.getElementById('tab-details').classList.toggle('active', tab === 'details');
     document.getElementById('tab-viz').classList.toggle('active', tab === 'viz');
+    document.getElementById('tab-impl').classList.toggle('active', tab === 'impl');
     if (tab === 'viz' && _pendingViz) {
       renderViz(_pendingViz);
       _pendingViz = null;
@@ -1050,20 +1015,28 @@
   function openModal(row) {
     destroyCharts();
     _activeTab = 'details';
-    document.getElementById('modal-body').style.display = '';
-    document.getElementById('modal-viz').style.display  = 'none';
+    document.getElementById('modal-body').style.display  = '';
+    document.getElementById('modal-viz').style.display   = 'none';
+    document.getElementById('modal-impl').style.display  = 'none';
     document.getElementById('tab-details').classList.add('active');
     document.getElementById('tab-viz').classList.remove('active');
+    document.getElementById('tab-impl').classList.remove('active');
 
-    // Apply suite accent color to modal border
-    document.getElementById('modal').className = `modal ${row.suite || ''}`;
-
-    const tabBtn = document.getElementById('tab-viz');
+    // Viz tab
+    const vizBtn = document.getElementById('tab-viz');
     if (row.viz && row.viz.type !== 'none') {
-      tabBtn.style.display = '';
-      tabBtn.textContent = 'Visualize';
+      vizBtn.style.display = '';
     } else {
-      tabBtn.style.display = 'none';
+      vizBtn.style.display = 'none';
+    }
+
+    // Implementation tab
+    const implBtn = document.getElementById('tab-impl');
+    if (row.impl) {
+      implBtn.style.display = '';
+      renderImpl(row.impl);
+    } else {
+      implBtn.style.display = 'none';
     }
 
     _pendingViz = row;
@@ -1084,17 +1057,21 @@
     white:  '#e6edf3',
   };
 
-  function baseOpts(yLabel, yFormat) {
+  function baseOpts(yLabel, yFormat, xLabel) {
     return {
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+        x: {
+          ticks: { color: C.text, font: { size: 11 } },
+          grid:  { color: C.grid },
+          title: { display: !!xLabel, text: xLabel || '', color: C.text, font: { size: 11 } },
+        },
         y: {
           ticks: { color: C.text, font: { size: 11 }, callback: yFormat || (v => v) },
-          grid: { color: C.grid },
-          title: { display: !!yLabel, text: yLabel || '', color: C.text, font: { size: 11 } }
+          grid:  { color: C.grid },
+          title: { display: !!yLabel, text: yLabel || '', color: C.text, font: { size: 11 } },
         }
       }
     };
@@ -1173,7 +1150,7 @@
             borderRadius: 3,
           }]
         },
-        options: { ...baseOpts('tokens / sec', v => v.toLocaleString()), scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } } }
+        options: baseOpts('tokens / sec', v => v.toLocaleString(), 'concurrency')
       }));
     }
 
@@ -1206,9 +1183,7 @@
             { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal, backgroundColor: C.teal+'33', tension: 0.3, pointRadius: 4, fill: false },
           ]
         },
-        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
-        }
+        options: baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms', 'target QPS')
       }));
       // custom legend
       const leg = document.createElement('div');
@@ -1309,9 +1284,7 @@
             { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal,  backgroundColor: C.teal+'33',  tension: 0.3, pointRadius: 4, fill: false },
           ]
         },
-        options: { ...baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms'),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } } }
-        }
+        options: baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms', 'target QPS')
       }));
       const leg = document.createElement('div');
       leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
@@ -1401,10 +1374,7 @@
             borderRadius: 3,
           }]
         },
-        options: {
-          ...baseOpts('tokens / sec', v => v.toLocaleString()),
-          scales: { ...baseOpts().scales, x: { ...baseOpts().scales.x, title: { display: true, text: 'concurrency', color: C.text, font: { size: 11 } } } }
-        }
+        options: baseOpts('tokens / sec', v => v.toLocaleString(), 'concurrency')
       }));
     }
   }
@@ -1475,11 +1445,12 @@
             }]
           },
           options: {
-            ...baseOpts('quality efficiency', v => v != null ? (v * 100).toFixed(0) + '%' : ''),
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
             scales: {
-              ...baseOpts().scales,
-              y: { ...baseOpts().scales.y, min: 0, max: 1.1,
-                   ticks: { color: C.text, font: { size: 11 }, callback: v => (v * 100).toFixed(0) + '%' } },
+              x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+              y: { min: 0, max: 1.1, ticks: { color: C.text, font: { size: 11 }, callback: v => (v * 100).toFixed(0) + '%' }, grid: { color: C.grid }, title: { display: true, text: 'quality efficiency', color: C.text, font: { size: 11 } } },
             }
           }
         }));
@@ -1537,10 +1508,12 @@
         ]
       },
       options: {
-        ...baseOpts('efficiency %', v => v + '%'),
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-          y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: v => v + '%' }, grid: { color: C.grid } }
+          y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: v => v + '%' }, grid: { color: C.grid }, title: { display: true, text: 'efficiency %', color: C.text, font: { size: 11 } } },
         }
       }
     }));
@@ -1573,6 +1546,60 @@
         options: baseOpts('tok/s per chip', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '')
       }));
     }
+  }
+
+  // ── Implementation tab ────────────────────────────────────
+  function renderImpl(impl) {
+    const el = document.getElementById('modal-impl');
+    const isDeprecated = !!impl.deprecated_by;
+
+    el.innerHTML = [
+      // Deprecation warning banner
+      isDeprecated ? `
+        <div style="background:#2d1f00;border:1px solid #d29922;border-radius:6px;padding:0.65rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:#d29922">
+          ⚠ This runner has been superseded by
+          <span style="font-family:monospace;font-weight:500">${impl.deprecated_by}</span>.
+          Results using this runner remain valid — the code is unchanged.
+        </div>` : '',
+
+      detailSection('Runner', [
+        detailRow('ID',           impl.id,           { mono: true }),
+        detailRow('Platform',     impl.platform),
+        detailRow('Framework',    impl.framework),
+        detailRow('Name',         impl.name),
+        detailRow('Submitted by', impl.submitted_by),
+        detailRow('Created',      impl.created),
+        impl.supersedes    ? detailRow('Supersedes',    impl.supersedes,    { mono: true }) : null,
+        impl.deprecated_by ? detailRow('Deprecated by', impl.deprecated_by, { mono: true }) : null,
+      ]),
+
+      detailSection('Description', [
+        impl.description ? `<div class="detail-row" style="border:none;display:block;padding:0.4rem 0">
+          <span class="detail-value" style="white-space:pre-wrap;line-height:1.6">${impl.description}</span>
+        </div>` : null,
+        impl.notes ? `<div class="detail-row" style="border-bottom:none">
+          <span class="detail-label">Notes</span>
+          <span class="detail-value" style="white-space:pre-wrap">${impl.notes}</span>
+        </div>` : null,
+      ]),
+
+      detailSection('Source', [
+        `<div class="detail-row">
+          <span class="detail-label">Runner folder</span>
+          <a href="${impl.github_url}" target="_blank"
+             style="color:#58a6ff;font-size:0.8rem;font-family:monospace;text-decoration:none">
+            runners/${impl.id} ↗
+          </a>
+        </div>`,
+        `<div class="detail-row" style="border-bottom:none">
+          <span class="detail-label">runner.py</span>
+          <a href="${impl.runner_url}" target="_blank"
+             style="color:#58a6ff;font-size:0.8rem;text-decoration:none">
+            View source ↗
+          </a>
+        </div>`,
+      ]),
+    ].join('');
   }
 </script>
 </body>
