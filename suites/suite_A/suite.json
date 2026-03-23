@@ -3,8 +3,12 @@
   "description": "Single chip inference, Llama-3-8B-Instruct. Minimum required suite for leaderboard entry.",
   "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
   "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
-  "scenarios": ["accuracy", "offline", "online", "interactive"],
+  "scenarios": {
+    "default": ["accuracy", "offline", "online", "interactive"],
+    "extra": ["sustained"]
+  },
   "precision_required": "BF16",
+  "allowed_precisions": ["BF16", "FP16"],
   "request_distribution": {
     "input_tokens_p25": 120,
     "input_tokens_p50": 280,
@@ -22,6 +26,7 @@
   "online_sla_ttft_ms_relaxed": 2000,
   "num_runs": 3,
   "warmup_runs": 1,
+  "warmup_minutes": 2,
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0 ,
   "accuracy_threshold_delta": 0.03,

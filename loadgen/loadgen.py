@@ -38,6 +38,17 @@ SAMPLE_SEED = 42
 MAX_SAMPLES_PER_CONFIG = 200
 
 
+def _percentile(data: list, p: float):
+    """Return the p-th percentile of data. Returns None if data is empty."""
+    if not data:
+        return None
+    sorted_data = sorted(data)
+    idx = (len(sorted_data) - 1) * p / 100
+    lo  = int(idx)
+    hi  = min(lo + 1, len(sorted_data) - 1)
+    return sorted_data[lo] + (sorted_data[hi] - sorted_data[lo]) * (idx - lo)
+
+
 class AccelMarkLoadGen:
 
     def __init__(
@@ -112,6 +123,187 @@ class AccelMarkLoadGen:
             return self._run_sustained(inference_fn)
         else:
             raise ValueError(f"Unknown scenario: {self.scenario}")
+
+    async def run_sustained(
+        self,
+        inference_fn,
+        target_qps: float,
+        duration_minutes: float,
+        sample_interval_seconds: float,
+        warmup_minutes: float = 2.0,
+    ) -> dict:
+        """
+        Time-based, rate-controlled load test.
+
+        Sends requests at target_qps for duration_minutes, recording a
+        throughput/latency snapshot every sample_interval_seconds.
+
+        Returns a metrics dict with a 'sustained' block containing:
+          - samples: list of per-interval snapshots
+          - sustained_throughput_tokens_per_sec: mean over all intervals
+          - throttle_ratio: min_throughput / max_throughput (1.0 = no throttle)
+          - throttle_onset_minute: first minute throughput drops >10% from peak
+          - ttft_p99_drift_ms: ttft_p99 in last interval minus ttft_p99 in first
+        """
+        import asyncio
+        import time as _time
+
+        duration_seconds    = duration_minutes * 60
+        interval_seconds    = sample_interval_seconds
+        request_interval_s  = 1.0 / target_qps   # seconds between requests
+
+        # Load requests (cycle through the suite's request pool)
+        requests = self.requests   # already loaded in __init__
+        if not requests:
+            raise ValueError("run_sustained requires requests to be loaded.")
+
+        samples          = []
+        start_time       = _time.perf_counter()
+        next_request_at  = start_time
+        next_sample_at   = start_time + interval_seconds
+        request_idx      = 0
+
+        # Per-interval accumulators
+        interval_tokens_out   = 0
+        interval_tokens_in    = 0
+        interval_ttfts        = []
+        interval_start        = start_time
+        interval_requests     = 0
+
+        # Semaphore: allow up to 32 concurrent requests; let the event loop manage.
+        sem = asyncio.Semaphore(32)
+
+        async def _one_request(prompt: str):
+            nonlocal interval_tokens_out, interval_tokens_in
+            nonlocal interval_ttfts, interval_requests
+            async with sem:
+                result = await inference_fn(prompt)
+            if result.success:
+                interval_tokens_out += result.output_tokens
+                interval_tokens_in  += result.input_tokens or 0
+                if result.first_token_time_ms is not None:
+                    interval_ttfts.append(result.first_token_time_ms)
+                interval_requests += 1
+
+        pending_tasks = set()
+
+        while True:
+            now = _time.perf_counter()
+            elapsed = now - start_time
+
+            # ── Check if duration exceeded ─────────────────────────────────
+            if elapsed >= duration_seconds:
+                break
+
+            # ── Sample interval checkpoint ─────────────────────────────────
+            if now >= next_sample_at:
+                interval_elapsed = now - interval_start
+                total_tokens = interval_tokens_out + interval_tokens_in
+                throughput = total_tokens / interval_elapsed if interval_elapsed > 0 else 0
+
+                ttft_p50 = _percentile(interval_ttfts, 50) if interval_ttfts else None
+                ttft_p99 = _percentile(interval_ttfts, 99) if interval_ttfts else None
+
+                samples.append({
+                    "minute":                     round(elapsed / 60, 1),
+                    "is_warmup":                  elapsed < warmup_minutes * 60,
+                    "throughput_tokens_per_sec":  round(throughput, 1),
+                    "tokens_out":                 interval_tokens_out,
+                    "tokens_in":                  interval_tokens_in,
+                    "requests_completed":         interval_requests,
+                    "ttft_ms_p50":                round(ttft_p50, 1) if ttft_p50 else None,
+                    "ttft_ms_p99":                round(ttft_p99, 1) if ttft_p99 else None,
+                })
+
+                # Reset interval accumulators
+                interval_tokens_out  = 0
+                interval_tokens_in   = 0
+                interval_ttfts       = []
+                interval_requests    = 0
+                interval_start       = now
+                next_sample_at      += interval_seconds
+
+                # Log progress
+                if ttft_p99:
+                    print(
+                        f"  [{elapsed/60:.1f}/{duration_minutes:.0f} min] "
+                        f"{throughput:,.0f} tok/s | "
+                        f"TTFT p99: {ttft_p99:.0f}ms"
+                    )
+                else:
+                    print(
+                        f"  [{elapsed/60:.1f}/{duration_minutes:.0f} min] "
+                        f"{throughput:,.0f} tok/s"
+                    )
+
+            # ── Fire next request ──────────────────────────────────────────
+            if now >= next_request_at:
+                prompt_data = requests[request_idx % len(requests)]
+                prompt      = prompt_data.get("prompt", "")
+                request_idx += 1
+
+                task = asyncio.create_task(_one_request(prompt))
+                pending_tasks.add(task)
+                task.add_done_callback(pending_tasks.discard)
+
+                next_request_at += request_interval_s
+
+            # ── Yield control ──────────────────────────────────────────────
+            sleep_until = min(next_request_at, next_sample_at)
+            sleep_for   = max(0, sleep_until - _time.perf_counter())
+            await asyncio.sleep(sleep_for)
+
+        # Wait for in-flight requests to finish (up to 30s grace period)
+        if pending_tasks:
+            await asyncio.wait(pending_tasks, timeout=30)
+
+        # ── Compute derived metrics ────────────────────────────────────────
+        # Split warmup from analysis samples
+        analysis_samples = [s for s in samples if not s.get("is_warmup")]
+
+        # Use analysis_samples for all scalar metrics
+        throughputs = [
+            s["throughput_tokens_per_sec"]
+            for s in analysis_samples
+            if s["throughput_tokens_per_sec"]
+        ]
+        ttft_p99s = [
+            s["ttft_ms_p99"]
+            for s in analysis_samples
+            if s["ttft_ms_p99"] is not None
+        ]
+
+        sustained_throughput = round(sum(throughputs) / len(throughputs), 1) if throughputs else None
+        max_thr              = max(throughputs) if throughputs else None
+        min_thr              = min(throughputs) if throughputs else None
+        throttle_ratio       = round(min_thr / max_thr, 3) if max_thr and max_thr > 0 else None
+
+        # Throttle onset: first minute where throughput drops >10% below peak
+        throttle_onset_minute = None
+        if max_thr:
+            for s in analysis_samples:
+                if s["throughput_tokens_per_sec"] < max_thr * 0.90:
+                    throttle_onset_minute = s["minute"]
+                    break
+
+        # TTFT drift: last interval p99 minus first interval p99
+        ttft_p99_drift_ms = None
+        if len(ttft_p99s) >= 2:
+            ttft_p99_drift_ms = round(ttft_p99s[-1] - ttft_p99s[0], 1)
+
+        return {
+            "sustained": {
+                "target_qps":                      target_qps,
+                "duration_minutes":                duration_minutes,
+                "warmup_minutes":                  warmup_minutes,
+                "sample_interval_seconds":         sample_interval_seconds,
+                "samples":                         samples,
+                "sustained_throughput_tokens_per_sec": sustained_throughput,
+                "throttle_ratio":                  throttle_ratio,
+                "throttle_onset_minute":           throttle_onset_minute,
+                "ttft_p99_drift_ms":               ttft_p99_drift_ms,
+            }
+        }
 
     # ------------------------------------------------------------------
     # Offline scenario

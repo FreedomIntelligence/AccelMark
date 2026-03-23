@@ -27,14 +27,16 @@
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
 pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r runners/nvidia_vllm_e0859b3c/requirements.txt
+pip install -r runners/nvidia_vllm_c34f94c3/requirements.txt
 
 # 2. One-time setup
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name
 
 # 3. Run the benchmark (~46 min on A100)
-python run.py --runner nvidia_vllm_e0859b3c --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A
+# Add --scenario all to also run extra scenarios (e.g. sustained),
+# or --scenario offline to run a single scenario.
 
 # 4. Validate and submit
 python runners/validate_submission.py --dir results/community/<your_dir>
@@ -69,13 +71,13 @@ code that produced the benchmark result serves your API.
 pip install -r serve/requirements.txt
 
 # Option A — use a suite (model + generation params come from suite.json)
-python run.py --runner nvidia_vllm_e0859b3c --suite suite_A --serve
+python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --serve
 
 # Option B — specify the model directly, no suite required
-python run.py --runner nvidia_vllm_e0859b3c --model meta-llama/Llama-3.1-8B-Instruct --serve
+python run.py --runner nvidia_vllm_c34f94c3 --model meta-llama/Llama-3.1-8B-Instruct --serve
 
 # With options
-python run.py --runner nvidia_vllm_e0859b3c --suite suite_A --serve \
+python run.py --runner nvidia_vllm_c34f94c3 --suite suite_A --serve \
     --port 8000 --workers 4 --api-key sk-mykey
 ```
 
@@ -123,7 +125,7 @@ AccelMark/
 │   ├── hash_runner.py        # Compute runner ID before submission
 │   ├── validate_runners.py   # CI: validate all runner folders
 │   ├── meta.schema.json      # JSON schema for runner meta.json
-│   └── nvidia_vllm_e0859b3c/ # Reference runner (NVIDIA + vLLM)
+│   └── nvidia_vllm_c34f94c3/ # Reference runner (NVIDIA + vLLM)
 │       ├── runner.py
 │       ├── requirements.txt
 │       └── meta.json

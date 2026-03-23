@@ -24,6 +24,16 @@ SITE_DIR    = Path("leaderboard/site")
 RUNNERS_DIR = Path("runners")
 
 
+def _get_suite_precision_required(suite_id: str) -> str:
+    """Read precision_required from suite.json. Returns 'BF16' if not found."""
+    path = Path("suites") / suite_id / "suite.json"
+    try:
+        with open(path) as f:
+            return json.load(f).get("precision_required", "BF16")
+    except Exception:
+        return "BF16"
+
+
 # ── Data loading ──────────────────────────────────────────────────────────────
 
 def load_results() -> list[dict]:
@@ -300,6 +310,24 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "throughput_per_chip": per_chip,
         }
 
+    if metrics.get("sustained"):
+        sustained = metrics.get("sustained", {})
+        samples   = sustained.get("samples", [])
+        return {
+            "type":                 "sustained",
+            "minutes":              [s["minute"] for s in samples],
+            "throughput":           [s["throughput_tokens_per_sec"] for s in samples],
+            "ttft_p99":             [s.get("ttft_ms_p99") for s in samples],
+            "target_qps":           sustained.get("target_qps"),
+            "duration_minutes":     sustained.get("duration_minutes"),
+            "warmup_minutes":       sustained.get("warmup_minutes"),
+            "sustained_throughput": sustained.get("sustained_throughput_tokens_per_sec"),
+            "throttle_ratio":       sustained.get("throttle_ratio"),
+            "throttle_onset_minute": sustained.get("throttle_onset_minute"),
+            "ttft_p99_drift_ms":    sustained.get("ttft_p99_drift_ms"),
+            "samples":              samples,
+        }
+
     return {"type": "none"}
 
 
@@ -359,6 +387,9 @@ def extract_row(result: dict) -> dict:
         training             = metrics.get("training", {})
         primary_metric       = training.get("tokens_per_sec") if training else None
         primary_metric_label = "tokens/sec (training)"
+    elif scenario == "sustained":
+        primary_metric       = sustained_throughput
+        primary_metric_label = "tok/s (sustained mean)"
     else:
         primary_metric       = None
         primary_metric_label = None
@@ -388,6 +419,19 @@ def extract_row(result: dict) -> dict:
             offline_throughput   = scaling_base_throughput
             primary_metric       = scaling_base_throughput
             primary_metric_label = "tokens/sec (1x baseline)"
+
+    # ── Sustained ─────────────────────────────────────────────────────────────
+    sustained_throughput   = None
+    throttle_ratio         = None
+    throttle_onset_minute  = None
+    ttft_p99_drift_ms      = None
+
+    sustained = metrics.get("sustained")
+    if sustained:
+        sustained_throughput  = sustained.get("sustained_throughput_tokens_per_sec")
+        throttle_ratio        = sustained.get("throttle_ratio")
+        throttle_onset_minute = sustained.get("throttle_onset_minute")
+        ttft_p99_drift_ms     = sustained.get("ttft_p99_drift_ms")
 
     # ── Suite C quantization ──────────────────────────────────────────────────
     quant_bf16_throughput  = None
@@ -438,6 +482,11 @@ def extract_row(result: dict) -> dict:
         if offline_throughput and min_price and min_price > 0 else None
     )
 
+    # ── Precision fallback detection ──────────────────────────────────────────
+    precision         = model.get("precision", "BF16")
+    suite_required    = _get_suite_precision_required(suite_id)
+    precision_fallback = precision.upper() != suite_required.upper()
+
     return {
         "submission":         result.get("_submission_name"),
         "tier":               result.get("_tier"),
@@ -449,7 +498,8 @@ def extract_row(result: dict) -> dict:
         "framework":          software.get("framework"),
         "framework_version":  software.get("framework_version"),
         "model":              model.get("model_id", "").split("/")[-1],
-        "precision":          model.get("precision"),
+        "precision":          precision,
+        "precision_fallback": precision_fallback,
         "suite":              suite_id,
         "scenario":           "all" if is_suite_level else scenario,
         # Primary
@@ -486,6 +536,11 @@ def extract_row(result: dict) -> dict:
         "quant_int4_speedup":      quant_int4_speedup,
         "quant_int8_quality_eff":  quant_int8_quality_eff,
         "quant_int4_quality_eff":  quant_int4_quality_eff,
+        # Sustained
+        "sustained_throughput":    sustained_throughput,
+        "throttle_ratio":          throttle_ratio,
+        "throttle_onset_minute":   throttle_onset_minute,
+        "ttft_p99_drift_ms":       ttft_p99_drift_ms,
         # Panel data
         "detail": extract_detail(result),
         "viz":    extract_viz(result, metrics),

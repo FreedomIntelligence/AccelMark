@@ -482,6 +482,7 @@
     <option value="offline">Offline</option>
     <option value="online">Online</option>
     <option value="interactive">Interactive</option>
+    <option value="sustained">Sustained</option>
     <option value="training">Training</option>
     <option value="all">All (suite-level)</option>
   </select>
@@ -536,6 +537,9 @@
           <th onclick="sortBy('quant_int4_speedup')">INT4 speedup</th>
           <th onclick="sortBy('scaling_efficiency_2x')">2× eff.</th>
           <th onclick="sortBy('scaling_efficiency_4x')">4× eff.</th>
+          <th onclick="sortBy('sustained_throughput')" title="Mean tokens/sec over sustained run">Sustained tok/s</th>
+          <th onclick="sortBy('throttle_ratio')" title="min/max throughput ratio (1.0 = no throttling)">Throttle ratio</th>
+          <th onclick="sortBy('throttle_onset_minute')" title="Minute when throughput first dropped >10%">Throttle onset</th>
           <th onclick="sortBy('tokens_per_watt')">tok/s/W</th>
           <th onclick="sortBy('memory_efficiency_toks_per_gb')">tok/s/GB</th>
           <th onclick="sortBy('cost_efficiency_toks_per_dollar_hr')">tok/s/$/hr</th>
@@ -742,7 +746,12 @@
             <div class="card-speed-label">${row.primary_metric_label || 'tokens/sec'}</div>
           `}
         </div>
-        <div class="card-model">${row.model || ''} · ${row.framework || ''} · ${row.precision || ''}</div>
+        <div class="card-model">
+          ${row.model || ''} · ${row.framework || ''} ·
+          ${row.precision_fallback
+            ? `<span style="color:#d29922" title="BF16 not supported on this hardware — using FP16">${row.precision || ''} ⚠</span>`
+            : (row.precision || '')}
+        </div>
         ${row.suite === 'suite_E' ? `
             <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
                 ${row.scaling_efficiency_2x != null
@@ -762,6 +771,14 @@
                 ${row.quant_int8_speedup ? 'INT8: ' + row.quant_int8_speedup.toFixed(2) + '× faster' : ''}
                 ${row.quant_int4_speedup ? ' · INT4: ' + row.quant_int4_speedup.toFixed(2) + '× faster' : ''}
             </div>
+        ` : ''}
+        ${row.sustained_throughput ? `
+          <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
+            Sustained: ${row.sustained_throughput.toLocaleString(undefined, {maximumFractionDigits:0})} tok/s
+            ${row.throttle_ratio != null
+              ? ' · throttle: ' + (row.throttle_ratio * 100).toFixed(1) + '%'
+              : ''}
+          </div>
         ` : ''}
         <div style="margin-top:0.75rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">
           <span class="badge badge-${row.tier}">${row.tier}</span>
@@ -843,7 +860,9 @@
         </td>
         <td>${formatFramework(row)}</td>
         <td>${row.model || '—'}</td>
-        <td>${row.precision || '—'}</td>
+        <td>${row.precision || '—'}${row.precision_fallback
+            ? ' <span style="color:#d29922;font-size:0.75rem" title="Suite requires BF16; hardware uses FP16">⚠</span>'
+            : ''}</td>
         <td>${suitePill(row.suite) || '—'}</td>
         <td>${row.scenario || '—'}</td>
         <td class="metric-primary">${
@@ -878,6 +897,15 @@
             : '—'}</td>
         <td>${row.scaling_efficiency_4x != null
             ? (row.scaling_efficiency_4x * 100).toFixed(1) + '%'
+            : '—'}</td>
+        <td>${row.sustained_throughput != null
+            ? row.sustained_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
+            : '—'}</td>
+        <td>${row.throttle_ratio != null
+            ? (row.throttle_ratio * 100).toFixed(1) + '%'
+            : '—'}</td>
+        <td>${row.throttle_onset_minute != null
+            ? row.throttle_onset_minute.toFixed(1) + ' min'
             : '—'}</td>
         <td>${row.tokens_per_watt ? row.tokens_per_watt.toFixed(2) : '—'}</td>
         <td>${row.memory_efficiency_toks_per_gb != null ? row.memory_efficiency_toks_per_gb.toLocaleString(undefined, {maximumFractionDigits: 1}) : '—'}</td>
@@ -933,7 +961,10 @@
       (d.hw_count > 1 ? ` ×${d.hw_count}` : '');
 
     const subtitleEl = document.getElementById('modal-subtitle');
-    subtitleEl.innerHTML = [suitePill(row.suite), row.scenario, row.date]
+    const precisionNote = row.precision_fallback
+        ? `<span style="color:#d29922;font-size:0.75rem">FP16 fallback</span>`
+        : '';
+    subtitleEl.innerHTML = [suitePill(row.suite), row.scenario, row.date, precisionNote]
       .filter(Boolean).join(' <span style="color:#484f58">·</span> ');
 
     // Footer
@@ -1166,6 +1197,7 @@
     else if (viz.type === 'suite_C') renderSuiteC(container, viz, row);
     else if (viz.type === 'suite_D') renderSuiteD(container, viz, row);
     else if (viz.type === 'suite_E') renderSuiteE(container, viz, row);
+    else if (viz.type === 'sustained') renderSustained(container, viz, row);
     else container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">Visualization coming soon.</div>';
   }
 
@@ -1588,6 +1620,119 @@
           }]
         },
         options: baseOpts('tok/s per chip', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '')
+      }));
+    }
+  }
+
+  // Suite Stress / Sustained ─────────────────────────────────
+  function renderSustained(el, viz, row) {
+    const dur   = viz.duration_minutes  ?? '?';
+    const qps   = viz.target_qps        ?? '?';
+    const mean  = viz.sustained_throughput;
+    const thr   = viz.throttle_ratio;
+    const onset = viz.throttle_onset_minute;
+    const drift = viz.ttft_p99_drift_ms;
+
+    el.appendChild(sectionTitle(`Sustained load — ${dur} min @ ${qps} QPS`));
+
+    // Stat chips
+    const chips = [];
+    if (mean != null)  chips.push({ label: 'Mean throughput', value: mean.toFixed(0) + ' tok/s' });
+    if (thr  != null) {
+      const pct   = (thr * 100).toFixed(1) + '%';
+      const color = thr < 0.05 ? C.green : thr < 0.15 ? C.yellow : C.red;
+      chips.push({ label: 'Throttle ratio', value: pct, color });
+    }
+    if (onset != null) chips.push({ label: 'Throttle onset', value: onset + ' min' });
+    if (drift != null) {
+      const color = drift < 50 ? C.green : drift < 200 ? C.yellow : C.red;
+      chips.push({ label: 'TTFT p99 drift', value: drift.toFixed(0) + ' ms', color });
+    }
+    if (chips.length) el.appendChild(statChips(chips));
+
+    // Throughput over time
+    const samples = viz.samples;
+    if (!samples || !samples.length) return;
+
+    const minutes = samples.map(s => s.minute);
+    const tputs   = samples.map(s => s.throughput_tokens_per_sec ?? null);
+
+    el.appendChild(sectionTitle('Throughput over time'));
+    const { wrap: w1, canvas: c1 } = mkCanvas('viz-sustained-tput', 180);
+    el.appendChild(w1);
+
+    const warmupSamples = samples.filter(s => s.is_warmup).length;
+    const pointColors = minutes.map((_, i) => i < warmupSamples ? C.gray : C.blue);
+    const pointRadii  = minutes.map((_, i) => i < warmupSamples ? 2 : 3);
+
+    const datasets = [{
+      label: 'Throughput',
+      data: tputs,
+      borderColor: C.blue,
+      backgroundColor: C.blue + '22',
+      fill: true,
+      tension: 0.3,
+      pointBackgroundColor: pointColors,
+      pointRadius: pointRadii,
+    }];
+
+    if (mean != null) {
+      datasets.push({
+        label: 'Sustained mean',
+        data: new Array(tputs.length).fill(mean),
+        borderColor: C.teal,
+        borderDash: [6, 3],
+        borderWidth: 1.5,
+        pointRadius: 0,
+      });
+    }
+
+    _activeCharts.push(new Chart(c1, {
+      type: 'line',
+      data: { labels: minutes.map(m => m + ' min'), datasets },
+      options: {
+        ...baseOpts('tok/s', v => v != null ? v.toFixed(0) : ''),
+        plugins: {
+          ...baseOpts('tok/s').plugins,
+          legend: { display: true, labels: { color: '#8b949e', font: { size: 11 } } },
+        },
+      },
+    }));
+
+    if (warmupSamples > 0) {
+      const note = document.createElement('div');
+      note.style.cssText = 'font-size:11px;color:#8b949e;margin-top:4px';
+      note.textContent = `First ${warmupSamples} sample(s) are warmup (shown in gray) and excluded from scalar metrics.`;
+      el.appendChild(note);
+    }
+
+    // TTFT p99 over time (optional)
+    const ttfts = samples.map(s => s.ttft_ms_p99 ?? null);
+    if (ttfts.some(v => v != null)) {
+      el.appendChild(sectionTitle('TTFT p99 over time'));
+      const { wrap: w2, canvas: c2 } = mkCanvas('viz-sustained-ttft', 150);
+      el.appendChild(w2);
+      _activeCharts.push(new Chart(c2, {
+        type: 'line',
+        data: {
+          labels: minutes.map(m => m + ' min'),
+          datasets: [{
+            label: 'TTFT p99',
+            data: ttfts,
+            borderColor: C.yellow,
+            backgroundColor: C.yellow + '22',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2,
+          }],
+        },
+        options: {
+          ...baseOpts('ms', v => v != null ? v.toFixed(0) : ''),
+          plugins: {
+            ...baseOpts('ms').plugins,
+            legend: { display: false },
+          },
+        },
       }));
     }
   }

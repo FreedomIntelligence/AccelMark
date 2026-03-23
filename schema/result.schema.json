@@ -72,6 +72,7 @@
         "parameter_count_b": { "type": "number", "minimum": 0 },
         "precision": {
           "type": "string",
+          "description": "Effective compute precision used during this run. BF16 is standard; FP16 is used on hardware that does not support BF16 (e.g. V100, T4).",
           "enum": ["FP32","BF16","FP16","FP8","INT8","INT4","mixed"]
         },
         "model_format": { "type": "string" },
@@ -100,7 +101,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["offline","online","interactive"]
+            "enum": ["offline","online","interactive","sustained"]
           },
           "description": "List of scenarios run. Used for suite-level submissions (--scenario all)."
         },
@@ -315,6 +316,36 @@
                   },
                   "results_by_concurrency": {"type": "array"},
                   "result_dir": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "sustained": {
+          "type": ["object", "null"],
+          "description": "Time-based sustained load test metrics",
+          "properties": {
+            "target_qps":             { "type": ["number", "null"] },
+            "duration_minutes":       { "type": ["number", "null"] },
+            "sample_interval_seconds":{ "type": ["number", "null"] },
+            "warmup_minutes":         { "type": ["number", "null"] },
+            "sustained_throughput_tokens_per_sec": { "type": ["number", "null"] },
+            "throttle_ratio":         { "type": ["number", "null"] },
+            "throttle_onset_minute":  { "type": ["number", "null"] },
+            "ttft_p99_drift_ms":      { "type": ["number", "null"] },
+            "samples": {
+              "type": ["array", "null"],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "minute":                      { "type": ["number", "null"] },
+                  "is_warmup":                   { "type": ["boolean", "null"] },
+                  "throughput_tokens_per_sec":   { "type": ["number", "null"] },
+                  "tokens_out":                  { "type": ["integer", "null"] },
+                  "tokens_in":                   { "type": ["integer", "null"] },
+                  "requests_completed":          { "type": ["integer", "null"] },
+                  "ttft_ms_p50":                 { "type": ["number", "null"] },
+                  "ttft_ms_p99":                 { "type": ["number", "null"] }
                 }
               }
             }

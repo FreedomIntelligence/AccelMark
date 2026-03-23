@@ -19,13 +19,18 @@ from pathlib import Path
 def collect_nvidia() -> list[dict]:
     try:
         out = subprocess.check_output(
-            ["nvidia-smi", "--query-gpu=index,name,memory.total,driver_version",
+            ["nvidia-smi", "--query-gpu=index,name,memory.total,driver_version,compute_cap",
              "--format=csv,noheader,nounits"],
             text=True
         )
         accelerators = []
         for line in out.strip().splitlines():
-            idx, name, mem, driver = [x.strip() for x in line.split(",")]
+            idx, name, mem, driver, compute_cap = [x.strip() for x in line.split(",")]
+            try:
+                cc_float = float(compute_cap) if compute_cap else 0.0
+                supports_bf16 = cc_float >= 8.0
+            except (ValueError, TypeError):
+                supports_bf16 = True  # unknown — assume capable, runner will handle
             accelerators.append({
                 "index": int(idx),
                 "name": name,
@@ -33,10 +38,44 @@ def collect_nvidia() -> list[dict]:
                 "memory_gb": round(float(mem) / 1024, 1),
                 "driver_version": driver,
                 "firmware_version": None,
+                "compute_capability": compute_cap,
+                "supports_bf16": supports_bf16,
             })
         return accelerators
     except Exception:
         return []
+
+
+# Known AMD architectures with BF16 support
+_AMD_BF16_SUPPORTED = {
+    "cdna2", "cdna3",                          # MI200, MI300 series
+    "rdna3", "rdna4",                          # RX 7000+ series
+    "gfx90a",                                  # MI250X arch code
+    "gfx940", "gfx941", "gfx942",             # MI300 arch codes
+    "gfx1100", "gfx1101", "gfx1102",          # RDNA3 arch codes
+}
+
+# Known AMD architectures WITHOUT BF16
+_AMD_NO_BF16 = {
+    "cdna1",                                   # MI100
+    "rdna", "rdna1", "rdna2",                 # RX 5000, RX 6000 series
+    "gfx908",                                  # MI100 arch code
+    "gfx1030", "gfx1031",                     # RDNA2 arch codes
+}
+
+
+def _amd_supports_bf16(arch_str: str) -> bool:
+    """Determine BF16 support from AMD architecture string."""
+    if not arch_str:
+        return True   # unknown — assume capable
+    arch_lower = arch_str.lower()
+    for known in _AMD_BF16_SUPPORTED:
+        if known in arch_lower:
+            return True
+    for known in _AMD_NO_BF16:
+        if known in arch_lower:
+            return False
+    return True   # unrecognized — assume capable
 
 
 def collect_amd() -> list[dict]:
@@ -47,6 +86,20 @@ def collect_amd() -> list[dict]:
             text=True, stderr=subprocess.DEVNULL
         )
         data = json.loads(out)
+
+        # Try to get architecture string for BF16 detection
+        arch_str = ""
+        try:
+            arch_out = subprocess.check_output(
+                ["rocm-smi", "--showallinfo"],
+                text=True, stderr=subprocess.DEVNULL
+            )
+            import re as _re
+            gfx_matches = _re.findall(r'gfx\d+[a-z]?', arch_out.lower())
+            arch_str = gfx_matches[0] if gfx_matches else ""
+        except Exception:
+            pass
+
         accelerators = []
         for idx, (card_id, info) in enumerate(data.items()):
             # Skip non-card keys (e.g. "system" metadata in some versions)
@@ -79,10 +132,32 @@ def collect_amd() -> list[dict]:
                 "memory_gb": round(mem_bytes / (1024**3), 1),
                 "driver_version": driver,
                 "firmware_version": None,
+                "supports_bf16": _amd_supports_bf16(arch_str),
             })
         return accelerators
     except Exception:
         return []
+
+
+_ASCEND_BF16_SUPPORTED = {
+    "910b", "atlas 800t a2", "910b1", "910b2", "910b3", "910b4",
+}
+_ASCEND_NO_BF16 = {
+    "310", "310p", "atlas 300",
+}
+
+
+def _ascend_supports_bf16(chip_name: str) -> bool:
+    if not chip_name:
+        return True
+    name_lower = chip_name.lower()
+    for known in _ASCEND_BF16_SUPPORTED:
+        if known in name_lower:
+            return True
+    for known in _ASCEND_NO_BF16:
+        if known in name_lower:
+            return False
+    return True   # unknown Ascend chip — assume capable
 
 
 def collect_ascend() -> list[dict]:
@@ -101,6 +176,7 @@ def collect_ascend() -> list[dict]:
             npu_match = re.search(r'NPU\s+ID\s*:\s*(\d+)', line, re.IGNORECASE)
             if npu_match:
                 if current_npu:
+                    current_npu["supports_bf16"] = _ascend_supports_bf16(current_npu.get("name", ""))
                     accelerators.append(current_npu)
                 current_npu = {
                     "index": int(npu_match.group(1)),
@@ -130,6 +206,7 @@ def collect_ascend() -> list[dict]:
                 current_npu["memory_gb"] = round(int(mem_match2.group(1)) / 1024, 1)
 
         if current_npu:
+            current_npu["supports_bf16"] = _ascend_supports_bf16(current_npu.get("name", ""))
             accelerators.append(current_npu)
 
         if accelerators:
@@ -146,6 +223,7 @@ def collect_ascend() -> list[dict]:
             "memory_gb": None,
             "driver_version": _get_cann_version(),
             "firmware_version": None,
+            "supports_bf16": True,   # unknown fallback — assume capable
         }]
 
     except Exception:
@@ -182,6 +260,17 @@ def _get_cann_version() -> str:
     return "unknown"
 
 
+def _apple_supports_bf16(chip_name: str) -> bool:
+    """M1 has limited/slow BF16. M2+ has full hardware BF16."""
+    if not chip_name:
+        return True
+    name_lower = chip_name.lower()
+    # M1 variants: "Apple M1", "Apple M1 Pro", "Apple M1 Max", "Apple M1 Ultra"
+    if "m1" in name_lower and "m10" not in name_lower:  # avoid matching "m10x"
+        return False
+    return True  # M2, M3, M4 and unknown — assume supported
+
+
 def collect_apple() -> list[dict]:
     """Detect Apple Silicon chips (M1/M2/M3/M4 series)."""
     try:
@@ -204,6 +293,7 @@ def collect_apple() -> list[dict]:
             "memory_gb": round(mem_bytes / (1024**3), 1),
             "driver_version": os_version,
             "firmware_version": None,
+            "supports_bf16": _apple_supports_bf16(chip),
         }]
     except Exception:
         return []

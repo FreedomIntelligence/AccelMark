@@ -81,6 +81,31 @@ class BenchmarkRunner(ABC):
     """True if tensor parallelism is supported.
     If False, --tensor-parallel-size is ignored and always treated as 1."""
 
+    SUPPORTED_PRECISIONS: list[str] = ["bf16", "fp16", "fp32"]
+    """
+    List of compute precisions this runner supports, in order of preference.
+    Use lowercase strings: 'fp32', 'bf16', 'fp16'.
+
+    The first entry is the runner's preferred precision.
+    BenchmarkRunner._resolve_precision() selects the best match against
+    the suite's allowed_precisions and hardware capability.
+
+    Override in subclass if the runner or hardware has restrictions.
+
+    Examples:
+      NVIDIA A100/H100 (full support):
+          SUPPORTED_PRECISIONS = ["bf16", "fp16", "fp32"]
+
+      NVIDIA V100/T4 (no BF16):
+          SUPPORTED_PRECISIONS = ["fp16", "fp32"]
+
+      Apple Silicon M1 (limited BF16):
+          SUPPORTED_PRECISIONS = ["fp16", "fp32"]
+
+      Ascend (BF16 only for LLM):
+          SUPPORTED_PRECISIONS = ["bf16"]
+    """
+
     # ── Abstract methods (must implement) ─────────────────────────────────────
 
     @abstractmethod
@@ -149,6 +174,52 @@ class BenchmarkRunner(ABC):
         """
         return prompt
 
+    def get_supported_precisions(
+        self, chip_name: str, env_info: dict
+    ) -> list[str] | None:
+        """
+        Return the effective compute precisions supported by this runner on the
+        given chip, or None to trigger automatic hardware detection.
+
+        Default implementation returns None — the base class will run three-tier
+        hardware detection (supports_bf16 field → compute_capability → chip name
+        lookup) and intersect the result with SUPPORTED_PRECISIONS.
+
+        Override this method when the runner has framework-specific knowledge
+        that hardware detection cannot capture. The runner's answer is trusted
+        completely — hardware detection is NOT applied as an override.
+
+        Return values:
+            list[str] — explicit precision list, e.g. ["BF16", "FP16", "FP32"]
+                        Runner's answer is used directly. Hardware detection skipped.
+            None      — runner has no opinion. Auto-detection runs instead.
+            []        — runner explicitly supports nothing. Will cause an error
+                        unless the suite allows no precisions (unusual).
+
+        Examples:
+
+            # H100 with vLLM FP8 — runner knows this works even though
+            # hardware detection doesn't know about FP8
+            def get_supported_precisions(self, chip_name, env_info):
+                base = super().get_supported_precisions(chip_name, env_info)
+                if "h100" in chip_name.lower():
+                    return (base or ["BF16", "FP16"]) + ["FP8"]
+                return None   # auto-detect for other chips
+
+            # Framework has a BF16 bug on A100 — force FP16 even on capable HW
+            def get_supported_precisions(self, chip_name, env_info):
+                if "a100" in chip_name.lower():
+                    return ["FP16", "FP32"]
+                return None   # auto-detect elsewhere
+
+            # Custom V100 patch that makes BF16 work via FP32 accumulation
+            def get_supported_precisions(self, chip_name, env_info):
+                if "v100" in chip_name.lower():
+                    return ["BF16", "FP16", "FP32"]   # override hardware detection
+                return None
+        """
+        return None
+
     # ── Implementation identity ───────────────────────────────────────────────
 
     def _compute_implementation_id(self) -> str | None:
@@ -215,11 +286,16 @@ class BenchmarkRunner(ABC):
                 json.dump(env_info, f, indent=2)
 
         # Dispatch
-        if args.suite == "suite_C" and args.scenario not in ("offline", "online", "interactive", "all", "accuracy"):
+        # Validate scenario is available for this suite
+        self._validate_scenario_for_suite(args.scenario, suite)
+
+        if args.suite == "suite_C" and args.scenario not in (
+            "offline", "online", "interactive", "default", "all", "accuracy"
+        ):
             self._run_suite_c(args, suite)
-        elif args.suite == "suite_E" and args.scenario in (None, "all"):
+        elif args.suite == "suite_E" and args.scenario in (None, "default", "all"):
             self._run_suite_e(args, suite)
-        elif args.scenario == "all":
+        elif args.scenario in ("default", "all"):
             self._run_all_scenarios(args, suite)
         else:
             self._setup_logging(args.output_dir)
@@ -236,12 +312,19 @@ class BenchmarkRunner(ABC):
             help="Suite ID e.g. suite_A")
         parser.add_argument(
             "--scenario",
-            default="all",
-            choices=["offline", "online", "interactive", "accuracy", "all"],
+            default="default",
+            choices=[
+                "offline", "online", "interactive",
+                "accuracy", "sustained",
+                "default", "all",
+            ],
             help=(
                 "Scenario to run. "
-                "'accuracy' runs quality check using same model instance. "
-                "'all' runs all scenarios defined in suite.json including accuracy. "
+                "'default' runs the suite's standard scenarios (accuracy + offline + "
+                "online + interactive where applicable). "
+                "'sustained' runs a 30-minute rate-controlled stability test. "
+                "'all' runs default + extra scenarios defined in suite.json. "
+                "'accuracy' runs the accuracy check only. "
             ),
         )
         parser.add_argument(
@@ -290,9 +373,8 @@ class BenchmarkRunner(ABC):
 
         args = parser.parse_args()
 
-        # Validate
-        if args.suite not in ("suite_C", "suite_E") and args.scenario is None:
-            parser.error("--scenario is required (or use suite_C/suite_E which have their own dispatch)")
+        # Suite-specific scenario validation happens in main() after suite is loaded.
+        # See _validate_scenario_for_suite().
 
         return args
 
@@ -303,7 +385,7 @@ class BenchmarkRunner(ABC):
 
         # Handle accuracy scenario — needs model loaded first
         if args.scenario == "accuracy":
-            output_dir = Path(args.output_dir)
+            output_dir = Path(args.output_dir) / "accuracy"
             output_dir.mkdir(parents=True, exist_ok=True)
             self._setup_logging(str(output_dir))
 
@@ -313,6 +395,16 @@ class BenchmarkRunner(ABC):
                 model_id, getattr(args, "model_path", None)
             )
             tp_size = getattr(args, "tensor_parallel_size", 1)
+
+            # Load env_info for precision resolution
+            _acc_env_path = output_dir.parent / "env_info.json"
+            _acc_env_info: dict = {}
+            if _acc_env_path.exists():
+                with open(_acc_env_path) as _f:
+                    _acc_env_info = json.load(_f)
+
+            effective_precision = self._resolve_precision(suite, _acc_env_info)
+            self._effective_precision = effective_precision
 
             print(f"Loading {model_id} for accuracy check...")
             t_load = time.perf_counter()
@@ -329,10 +421,16 @@ class BenchmarkRunner(ABC):
             # Return minimal result dict
             return {"accuracy": acc}
 
-        output_dir = Path(args.output_dir)
+        # ── For all other scenarios: always use a subdirectory ────────────────
+        # This ensures single-scenario runs compose correctly with incremental runs.
+        # Running --scenario offline then --scenario online produces:
+        #   submission_dir/offline/result.json
+        #   submission_dir/online/result.json
+        #   submission_dir/result.json  (merged, updated each time)
+        output_dir = Path(args.output_dir) / args.scenario
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Setup logging
+        # Setup logging to scenario subdir
         self._setup_logging(str(output_dir))
 
         # Load submitter profile
@@ -366,6 +464,11 @@ class BenchmarkRunner(ABC):
         t_load_start = time.perf_counter()
         self._current_scenario = args.scenario
         self._advance_dist_port()
+
+        # Resolve precision — handles BF16→FP16 fallback for older hardware
+        effective_precision = self._resolve_precision(suite, env_info)
+        self._effective_precision = effective_precision
+
         self.load_model(effective_model_path, suite, tp_size)
         model_load_seconds = round(time.perf_counter() - t_load_start, 1)
         print(f"Model loaded in {model_load_seconds}s")
@@ -393,6 +496,12 @@ class BenchmarkRunner(ABC):
         # Select inference function
         if args.scenario == "offline":
             inference_fn = self.inference_fn_offline
+        elif args.scenario == "sustained":
+            # Rate-controlled time-based run — uses async streaming engine
+            if not self.SUPPORTS_STREAMING:
+                print(f"Error: sustained scenario requires SUPPORTS_STREAMING = True.")
+                sys.exit(1)
+            inference_fn = self.inference_fn_streaming
         elif self.SUPPORTS_STREAMING:
             inference_fn = self.inference_fn_streaming
         else:
@@ -406,7 +515,30 @@ class BenchmarkRunner(ABC):
         benchmark_start = datetime.now(timezone.utc)
         t_bench_start = time.perf_counter()
 
-        metrics = loadgen.run(inference_fn)
+        if args.scenario == "sustained":
+            _loop = getattr(self, "_loop", None)
+            if _loop is not None:
+                metrics = _loop.run_until_complete(
+                    loadgen.run_sustained(
+                        inference_fn=inference_fn,
+                        target_qps=suite.get("target_qps", 10),
+                        duration_minutes=suite.get("duration_minutes", 30),
+                        sample_interval_seconds=suite.get("sample_interval_seconds", 60),
+                        warmup_minutes=suite.get("warmup_minutes", 2.0),
+                    )
+                )
+            else:
+                metrics = asyncio.run(
+                    loadgen.run_sustained(
+                        inference_fn=inference_fn,
+                        target_qps=suite.get("target_qps", 10),
+                        duration_minutes=suite.get("duration_minutes", 30),
+                        sample_interval_seconds=suite.get("sample_interval_seconds", 60),
+                        warmup_minutes=suite.get("warmup_minutes", 2.0),
+                    )
+                )
+        else:
+            metrics = loadgen.run(inference_fn)
 
         benchmark_end = datetime.now(timezone.utc)
         benchmark_elapsed_minutes = round(
@@ -454,34 +586,58 @@ class BenchmarkRunner(ABC):
             json.dump(result, f, indent=2)
         print(f"\nResult written to {out_path}")
 
+        # ── Merge into suite-level result.json ────────────────────────────────
+        # Find all completed scenario subdirectories and merge them.
+        # This updates results/<submission>/result.json incrementally.
+        base_dir = Path(args.output_dir)
+        known_scenarios = ["offline", "online", "interactive", "sustained"]
+        completed = [
+            s for s in known_scenarios
+            if (base_dir / s / "result.json").exists()
+        ]
+        if completed:
+            self._merge_scenario_results(
+                base_dir, suite,
+                successful_scenarios=completed,
+                total_elapsed_minutes=None,
+            )
+
         return result
 
     # ── All scenarios ─────────────────────────────────────────────────────────
 
     def _run_all_scenarios(self, args, suite: dict) -> None:
         """
-        Run all scenarios defined in suite.json.
+        Run scenarios based on --scenario flag:
+          'default' → runs suite's default scenarios (standard benchmark)
+          'all'     → runs default + extra scenarios
 
-        Accuracy always runs FIRST as a gate:
-        - If accuracy fails → benchmark is aborted (unless --skip-accuracy-gate)
-        - If accuracy passes → benchmark runs with confidence
-        - Model stays loaded between accuracy and first benchmark scenario
-          (no extra model load cost)
+        Accuracy always runs FIRST as a gate if it is in the default list.
         """
         import copy
 
         base_dir = Path(args.output_dir)
         base_dir.mkdir(parents=True, exist_ok=True)
 
-        all_scenarios = suite.get("scenarios", ["offline"])
-        run_accuracy = "accuracy" in all_scenarios
-        skip_gate = getattr(args, "skip_accuracy_gate", False)
+        # ── Resolve which scenarios to run ────────────────────────────────────
+        default_scenarios, extra_scenarios = self._parse_scenarios_config(suite)
 
-        # Benchmark scenarios in order, excluding accuracy and training
+        if args.scenario == "all":
+            all_requested = default_scenarios + [
+                s for s in extra_scenarios if s not in default_scenarios
+            ]
+        else:
+            # "default"
+            all_requested = default_scenarios
+
+        run_accuracy = "accuracy" in all_requested
+        skip_gate    = getattr(args, "skip_accuracy_gate", False)
+
+        # Benchmark scenarios: exclude accuracy, training; respect capability flags
         benchmark_scenarios = [
-            s for s in all_scenarios
+            s for s in all_requested
             if s not in ("accuracy", "training")
-            and (s != "online" or self.SUPPORTS_ONLINE)
+            and (s != "online"      or self.SUPPORTS_ONLINE)
             and (s != "interactive" or self.SUPPORTS_STREAMING)
         ]
 
@@ -531,6 +687,16 @@ class BenchmarkRunner(ABC):
                 model_id, getattr(args, "model_path", None)
             )
             tp_size = getattr(args, "tensor_parallel_size", 1)
+
+            # Load env_info for precision resolution
+            _all_env_path = base_dir / "env_info.json"
+            _all_env_info: dict = {}
+            if _all_env_path.exists():
+                with open(_all_env_path) as _f:
+                    _all_env_info = json.load(_f)
+
+            effective_precision = self._resolve_precision(suite, _all_env_info)
+            self._effective_precision = effective_precision
 
             if getattr(self, "llm", None) is None and getattr(self, "engine", None) is None:
                 print(f"Loading model for accuracy check...")
@@ -603,7 +769,7 @@ class BenchmarkRunner(ABC):
 
             scenario_args = copy.copy(args)
             scenario_args.scenario = scenario
-            scenario_args.output_dir = str(scenario_dir)
+            scenario_args.output_dir = str(base_dir)
 
             try:
                 self._run_single_scenario(scenario_args, suite)
@@ -690,7 +856,8 @@ class BenchmarkRunner(ABC):
 
         # ── Step 1: Accuracy gate (BF16) ──────────────────────────────────
         acc_result = None
-        if "accuracy" in suite.get("scenarios", []):
+        default_scenarios, _ = self._parse_scenarios_config(suite)
+        if "accuracy" in default_scenarios:
             acc_dir = base_dir / "accuracy"
             acc_dir.mkdir(parents=True, exist_ok=True)
             acc_path = acc_dir / "accuracy.json"
@@ -960,7 +1127,8 @@ class BenchmarkRunner(ABC):
         print(f"{'='*60}\n")
 
         # ── Step 1: Accuracy gate ─────────────────────────────────────────
-        if "accuracy" in suite.get("scenarios", []):
+        _default_scenarios_e, _ = self._parse_scenarios_config(suite)
+        if "accuracy" in _default_scenarios_e:
             acc_dir = base_dir / "accuracy"
             acc_dir.mkdir(parents=True, exist_ok=True)
             acc_path = acc_dir / "accuracy.json"
@@ -1087,8 +1255,12 @@ class BenchmarkRunner(ABC):
     ) -> dict:
         """Merge per-scenario result.json files into one suite-level result."""
 
+        default_scenarios, extra_scenarios = self._parse_scenarios_config(suite)
+        all_suite_scenarios = default_scenarios + [
+            s for s in extra_scenarios if s not in default_scenarios
+        ]
         scenarios_to_merge = [
-            s for s in suite.get("scenarios", ["offline"])
+            s for s in (all_suite_scenarios or ["offline"])
             if s in successful_scenarios and s not in ("training", "accuracy")
         ]
 
@@ -1118,7 +1290,7 @@ class BenchmarkRunner(ABC):
                 r = json.load(f)
             elapsed = r.get("meta", {}).get("benchmark_elapsed_minutes") or 0
             scenario_elapsed += elapsed
-            for key in ["offline", "online", "interactive", "training"]:
+            for key in ["offline", "online", "interactive", "sustained", "training"]:
                 if r.get("metrics", {}).get(key):
                     merged_metrics[key] = r["metrics"][key]
 
@@ -1559,7 +1731,9 @@ class BenchmarkRunner(ABC):
                 "model_revision": suite.get("model_revision", "unknown"),
                 "architecture": "dense",
                 "parameter_count_b": self._estimate_param_count(suite["model_id"]),
-                "precision": getattr(args, "precision", None) or suite.get("precision_required", "BF16"),
+                "precision": getattr(self, "_effective_precision", None)
+                             or getattr(args, "precision", None)
+                             or suite.get("precision_required", "BF16"),
                 "model_format": "HuggingFace original",
             },
             "task": {
@@ -1611,6 +1785,177 @@ class BenchmarkRunner(ABC):
         return float(m.group(1)) if m else None
 
     # ── Helper utilities ──────────────────────────────────────────────────────
+
+    def _parse_scenarios_config(self, suite: dict) -> tuple[list[str], list[str]]:
+        """
+        Parse the suite's scenarios config into (default_scenarios, extra_scenarios).
+
+        Handles both legacy flat-array format and new dict format:
+          Legacy: "scenarios": ["accuracy", "offline", "online", "interactive"]
+          New:    "scenarios": {"default": [...], "extra": [...]}
+
+        Returns (default_scenarios, extra_scenarios).
+        """
+        config = suite.get("scenarios", {})
+        if isinstance(config, list):
+            # Legacy format — entire list is treated as default, no extras
+            return config, []
+        default = config.get("default", [])
+        extra   = config.get("extra", [])
+        return default, extra
+
+    def _detect_supported_precisions(self, env_info: dict) -> list[str]:
+        """
+        Three-tier automatic hardware detection for supported precisions.
+
+        Tier 1 — reads acc["supports_bf16"] set by collect_env.py (all platforms)
+        Tier 2 — reads acc["compute_capability"] for NVIDIA (backward compat with
+                  old env_info.json files that predate supports_bf16)
+        Tier 3 — chip name substring lookup for known FP16-only chips
+
+        Result is intersected with SUPPORTED_PRECISIONS so a runner that
+        declares SUPPORTED_PRECISIONS = ["fp16"] gets FP16 even on A100.
+
+        Returns a list of uppercase precision strings, e.g. ["BF16","FP16","FP32"]
+        or ["FP16","FP32"]. Never returns an empty list — falls back to
+        ["BF16","FP16","FP32"] if nothing can be determined.
+        """
+        hw_supports_bf16 = None
+        accelerators     = env_info.get("accelerators", [])
+
+        if accelerators:
+            acc = accelerators[0]
+
+            # Tier 1: explicit supports_bf16 field (new collect_env.py format)
+            if "supports_bf16" in acc:
+                hw_supports_bf16 = bool(acc["supports_bf16"])
+
+            # Tier 2: NVIDIA compute_capability fallback
+            if hw_supports_bf16 is None:
+                cc = acc.get("compute_capability", "")
+                if cc:
+                    try:
+                        hw_supports_bf16 = float(str(cc)) >= 8.0
+                    except (ValueError, TypeError):
+                        pass
+
+            # Tier 3: chip name substring lookup
+            if hw_supports_bf16 is None:
+                _FP16_ONLY = {
+                    # NVIDIA
+                    "v100", "t4", "p100", "p40", "p4", "k80", "k40",
+                    # AMD
+                    "mi100", "gfx908",
+                    # Apple
+                    "m1",
+                }
+                chip_lower = acc.get("name", "").lower()
+                if any(c in chip_lower for c in _FP16_ONLY):
+                    hw_supports_bf16 = False
+
+        # Default: unknown hardware → assume BF16 capable
+        if hw_supports_bf16 is None:
+            hw_supports_bf16 = True
+
+        hw_precisions = (
+            ["BF16", "FP16", "FP32"] if hw_supports_bf16
+            else ["FP16", "FP32"]
+        )
+
+        # Intersect with runner's declared maximum capability
+        runner_max = [p.upper() for p in self.SUPPORTED_PRECISIONS]
+        result     = [p for p in runner_max if p in hw_precisions]
+
+        # Safety net: never return empty (would always error)
+        return result if result else hw_precisions
+
+    def _resolve_precision(self, suite: dict, env_info: dict) -> str:
+        """
+        Resolve the effective compute precision for this run.
+
+        Priority:
+          1. Runner's get_supported_precisions() — if it returns a list, use it
+             directly. Hardware detection is NOT applied as an override.
+          2. Auto-detection via _detect_supported_precisions() — runs when
+             get_supported_precisions() returns None.
+
+        Both results are intersected with suite.allowed_precisions.
+        Raises SystemExit if no compatible precision can be found.
+        Returns precision as uppercase string: "BF16", "FP16", "FP32", etc.
+        """
+        required  = suite.get("precision_required", "BF16").upper()
+        allowed   = [p.upper() for p in suite.get("allowed_precisions", [required])]
+        chip_name = (env_info.get("accelerators") or [{}])[0].get("name", "")
+
+        # ── Step 1: ask the runner ────────────────────────────────────────────
+        runner_answer = self.get_supported_precisions(chip_name, env_info)
+
+        if runner_answer is not None:
+            # Runner spoke — trust it completely, skip hardware detection
+            candidate = [p.upper() for p in runner_answer]
+            source    = "runner"
+        else:
+            # Runner silent — use automatic three-tier hardware detection
+            candidate = self._detect_supported_precisions(env_info)
+            source    = "auto-detection"
+
+        # ── Step 2: intersect with suite's allowed precisions ─────────────────
+        effective = [p for p in candidate if p in allowed]
+
+        # ── Step 3: fail clearly if nothing is compatible ─────────────────────
+        if not effective:
+            print(
+                f"\nError: No compatible precision found.\n"
+                f"  Suite requires   : {required}\n"
+                f"  Suite allows     : {allowed}\n"
+                f"  {source:16s} : {candidate}\n"
+                f"  Chip             : {chip_name or 'unknown'}\n"
+                f"\nThis suite cannot be run on this hardware with this runner.\n"
+                f"Check suite.allowed_precisions or runner.SUPPORTED_PRECISIONS."
+            )
+            sys.exit(1)
+
+        # ── Step 4: pick best precision ───────────────────────────────────────
+        # Prefer the suite's required precision if available.
+        # Otherwise take the first item in effective (runner/detection preference order).
+        resolved = required if required in effective else effective[0]
+
+        if resolved != required:
+            print(
+                f"\nWarning: '{required}' not available "
+                f"on {chip_name or 'this hardware'} "
+                f"(detected via {source}).\n"
+                f"  Falling back to '{resolved}'.\n"
+                f"  Result will be labeled '{resolved}' on the leaderboard.\n"
+            )
+
+        return resolved
+
+    def _validate_scenario_for_suite(self, scenario: str, suite: dict) -> None:
+        """
+        Validate that the requested scenario is available for this suite.
+        Raises SystemExit with a clear message if not.
+
+        Meta-scenarios ("default", "all") are not checked — they expand
+        dynamically and are always valid.
+        """
+        meta_scenarios = {"default", "all"}
+        if scenario in meta_scenarios:
+            return
+
+        default_scenarios, extra_scenarios = self._parse_scenarios_config(suite)
+        available = set(default_scenarios) | set(extra_scenarios)
+
+        if scenario not in available:
+            print(
+                f"Error: scenario '{scenario}' is not available for "
+                f"{suite.get('suite_id', 'this suite')}.\n"
+                f"  Default scenarios : {default_scenarios}\n"
+                f"  Extra scenarios   : {extra_scenarios}\n"
+                f"\nRun with --scenario default to run the standard benchmark,\n"
+                f"or --scenario all to include extra scenarios."
+            )
+            sys.exit(1)
 
     def _load_suite(self, suite_id: str) -> dict:
         suite_path = _REPO_ROOT / f"suites/{suite_id}/suite.json"

@@ -222,7 +222,7 @@ pip install lmdeploy>=0.5.0
 
 ## Usage
 
-python run.py --runner nvidia_lmdeploy_{hash8} --suite suite_A --scenario all
+python run.py --runner nvidia_lmdeploy_{hash8} --suite suite_A
 ```
 
 ### Step 4: Test it
@@ -235,7 +235,7 @@ python -c "from runners.nvidia_lmdeploy_{hash8}.runner import LMDeployRunner; pr
 python run.py --runner nvidia_lmdeploy_{hash8} --help
 
 # Full run
-python run.py --runner nvidia_lmdeploy_{hash8} --suite suite_A --scenario all
+python run.py --runner nvidia_lmdeploy_{hash8} --suite suite_A
 ```
 
 ### Step 5: Write meta.json
@@ -257,12 +257,13 @@ The `id` must exactly match the folder name.
 
 Override these class attributes to declare what your framework supports:
 
-| Flag | Default | When to set False |
-|------|---------|------------------|
-| `SUPPORTS_STREAMING` | `True` | Framework has no token streaming API. TTFT will not be measured for online/interactive. |
-| `SUPPORTS_BATCHING` | `True` | Framework is serial only (e.g. mlx-lm). Offline runs requests one-by-one. |
-| `SUPPORTS_ONLINE` | `True` | Framework cannot handle concurrent requests. Online scenario is skipped. |
-| `SUPPORTS_MULTI_CHIP` | `True` | No tensor parallelism support. `--tensor-parallel-size` is ignored. |
+| Flag | Default | When to change |
+|------|---------|----------------|
+| `SUPPORTS_STREAMING` | `True` | Set `False` if framework has no token streaming API. TTFT will not be measured for online/interactive/sustained. |
+| `SUPPORTS_BATCHING` | `True` | Set `False` if framework is serial only (e.g. mlx-lm). Offline runs requests one-by-one. |
+| `SUPPORTS_ONLINE` | `True` | Set `False` if framework cannot handle concurrent requests. Online scenario is skipped. |
+| `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism. `--tensor-parallel-size` is ignored. |
+| `SUPPORTED_PRECISIONS` | `["bf16", "fp16", "fp32"]` | Maximum compute precisions on capable hardware. Hardware detection automatically restricts this at runtime. See *Precision resolution* below. |
 
 ### Example: Apple Silicon (no batching, no streaming)
 
@@ -297,6 +298,114 @@ class MLXRunner(BenchmarkRunner):
         del self.model
         self.model = None
 ```
+
+---
+
+## Precision resolution
+
+AccelMark automatically resolves the correct compute precision before each
+model load. Understanding this is useful when adding support for hardware that
+doesn't support BF16 (V100, T4, MI100, Apple M1, etc.).
+
+### How it works
+
+`BenchmarkRunner._resolve_precision(suite, env_info)` is called before every
+`load_model()`. It uses a layered approach:
+
+```
+Step 1 — Ask the runner
+    runner.get_supported_precisions(chip_name, env_info)
+    Returns a list → use it directly, skip hardware detection
+    Returns None   → proceed to step 2
+
+Step 2 — Auto-detect from env_info (three tiers)
+    Tier 1: env_info.accelerators[0].supports_bf16
+            (set by collect_env.py for NVIDIA, AMD, Ascend, Apple)
+    Tier 2: env_info.accelerators[0].compute_capability >= 8.0
+            (NVIDIA fallback for older env_info.json files)
+    Tier 3: chip name substring lookup
+            (known FP16-only chips: v100, t4, mi100, m1, ...)
+    Default: assume BF16 capable if nothing matches
+
+Step 3 — Intersect with SUPPORTED_PRECISIONS
+    (only applies when runner returns None)
+
+Step 4 — Intersect with suite.allowed_precisions
+    Fail with clear error if intersection is empty
+```
+
+### Priority rule
+
+The runner always wins when it speaks. Hardware detection is only the fallback:
+
+| Runner `get_supported_precisions` | Hardware detects | Resolved |
+|---|---|---|
+| Returns `["BF16", "FP16"]` | V100 (no BF16) | **BF16** — runner wins |
+| Returns `["FP16"]` | A100 (has BF16) | **FP16** — runner wins |
+| Returns `None` | V100 (no BF16) | **FP16** — hardware wins |
+| Returns `None` | A100 (has BF16) | **BF16** — hardware wins |
+
+### When to override `get_supported_precisions`
+
+The default (`return None`) is correct for most runners — auto-detection handles
+the common BF16/FP16 cases automatically.
+
+Override when the runner has framework-specific knowledge hardware detection
+cannot capture:
+
+```python
+def get_supported_precisions(self, chip_name: str, env_info: dict) -> list[str] | None:
+    # vLLM FP8 is only useful on H100 — not detectable from hardware info alone
+    base = super().get_supported_precisions(chip_name, env_info)
+    if "h100" in chip_name.lower():
+        return (base or ["bf16", "fp16"]) + ["fp8"]
+    return None   # auto-detect for all other chips
+
+# Framework has a BF16 bug on a specific chip
+def get_supported_precisions(self, chip_name: str, env_info: dict) -> list[str] | None:
+    if "a100" in chip_name.lower():
+        return ["fp16", "fp32"]   # force FP16 even though A100 supports BF16
+    return None
+```
+
+Returning `None` from a chip-specific branch means auto-detection handles
+that chip — you only need to cover cases where your knowledge differs from
+hardware capability.
+
+### `SUPPORTED_PRECISIONS` vs `get_supported_precisions`
+
+Use `SUPPORTED_PRECISIONS` when the restriction applies to **all hardware**:
+
+```python
+# Framework genuinely cannot use BF16 on any hardware
+SUPPORTED_PRECISIONS = ["fp16", "fp32"]
+```
+
+Use `get_supported_precisions()` when the restriction or addition is
+**chip-specific**:
+
+```python
+# FP8 only on H100, auto-detect everything else
+def get_supported_precisions(self, chip_name, env_info):
+    base = super().get_supported_precisions(chip_name, env_info)
+    if "h100" in chip_name.lower():
+        return (base or []) + ["fp8"]
+    return None
+```
+
+### Hardware detection in `collect_env.py`
+
+`collect_env.py` populates `supports_bf16` on each accelerator entry:
+
+| Platform | Detection method |
+|---|---|
+| NVIDIA | `compute_capability >= 8.0` (V100=7.0, T4=7.5, A100=8.0, H100=9.0) |
+| AMD | `gfx` architecture code (gfx908/MI100=no, gfx90a/MI250X=yes, gfx942/MI300X=yes) |
+| Ascend | Chip model name (910B=yes, 310=no) |
+| Apple | Chip generation (M1=no, M2/M3/M4=yes) |
+
+When adding a new platform, populate `supports_bf16` in your `collect_*()` function.
+See the existing collectors for reference.
 
 ---
 
@@ -340,8 +449,12 @@ Copy the closest existing suite and modify. Required fields:
   "description": "One sentence describing what this suite measures.",
   "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
   "model_revision": "8afb486c...",
-  "scenarios": ["offline", "online", "interactive"],
+  "scenarios": {
+    "default": ["accuracy", "offline", "online", "interactive"],
+    "extra":   ["sustained"]
+  },
   "precision_required": "BF16",
+  "allowed_precisions": ["BF16", "FP16"],
   "request_distribution": {
     "input_tokens_p50": 280,
     "output_tokens_p50": 310,
@@ -392,7 +505,7 @@ Format of each line in `requests.jsonl`:
 Run the accuracy check on reference hardware (A100) and record the score:
 
 ```bash
-python run.py --runner nvidia_vllm_e0859b3c \
+python run.py --runner nvidia_vllm_c34f94c3 \
     --suite suite_X \
     --scenario accuracy \
     --model-path /path/to/model
@@ -472,6 +585,7 @@ def collect_your_platform() -> list[dict]:
                 "compute_capability": None,
                 "pcie_generation": None,
                 "interconnect_intra_node": device.get("interconnect"),
+                "supports_bf16": True,   # set based on chip model/generation
             })
     except Exception as e:
         print(f"Warning: could not detect YourPlatform: {e}")
@@ -576,6 +690,7 @@ class InferenceResult:
 | offline | Total tokens / elapsed time | `throughput_tokens_per_sec` (input + output) |
 | online | TTFT distribution at each QPS level | `max_valid_qps` (highest QPS with p99 TTFT < SLA) |
 | interactive | TTFT distribution, serial requests | `ttft_ms_p99` |
+| sustained | Throughput + TTFT sampled every N seconds over 30 min | `sustained_throughput_tokens_per_sec`, `throttle_ratio` |
 
 ---
 
@@ -765,7 +880,7 @@ python run.py --runner your_platform_{hash8} --help
 ```bash
 # Run with minimal requests to test the pipeline end-to-end
 # Temporarily reduce request_count for testing only
-python run.py --runner nvidia_vllm_e0859b3c \
+python run.py --runner nvidia_vllm_c34f94c3 \
     --suite suite_A \
     --scenario offline \
     --output-dir /tmp/accelmark_test/
@@ -792,43 +907,3 @@ python runners/validate_submission.py --dir /tmp/accelmark_test/
 - **New suite proposal:** Open a GitHub Issue with the "Request new suite" template
 - **New platform support:** Open a PR with a working platform script and at least one verified result
 - **Leaderboard question:** Check `leaderboard/generate.py` — it's well-commented
-
----
-
-## Roadmap
-
-The following features are planned but not yet implemented.
-Contributors are welcome to pick these up — open an issue first to discuss.
-
-### Leaderboard: implementation tab
-
-The result modal currently has Details and Visualize tabs.
-A third Implementation tab should show the runner's `meta.json` fields
-(name, platform, framework, submitted_by, description, notes) and a
-link to the runner folder on GitHub.
-
-The `implementation_id` field is already present in new results.
-The leaderboard generator (`leaderboard/generate.py`) already passes
-`detail` and `viz` objects to the frontend — `impl` should follow the
-same pattern via a new `extract_impl(result)` function.
-
-The tab should only be visible when `row.implementation_id` is set.
-
-### OpenAI-compatible serving API
-
-Each runner already loads the model and exposes `inference_fn_streaming`.
-A `--serve` mode on `run.py` would start a FastAPI server with
-`/v1/chat/completions` and `/v1/models` endpoints backed by the same
-inference stack that was benchmarked.
-
-    python run.py --runner nvidia_vllm_e0859b3c --serve --port 8000
-
-Since AccelMark has already measured performance for the runner, the
-server could report capacity estimates (e.g. "Estimated: 5 max QPS
-based on Suite A results") in the startup log.
-
-Implementation notes:
-- Add `serve()` method to `BenchmarkRunner` alongside `main()`
-- Thin FastAPI adapter translating chat completions → `inference_fn_streaming`
-- `run.py --serve` calls `serve()` instead of `main()`
-- Optional `--workers N` for multi-request capacity

@@ -4,8 +4,12 @@
   "model_id": "meta-llama/Llama-3.1-8B-Instruct",
   "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
   "max_model_len": 40000,
-  "scenarios": ["accuracy", "offline", "interactive"],
+  "scenarios": {
+    "default": ["accuracy", "offline", "interactive"],
+    "extra": ["sustained", "online"]
+  },
   "precision_required": "BF16",
+  "allowed_precisions": ["BF16", "FP16"],
   "request_distribution": {
     "input_tokens_p25": 32202,
     "input_tokens_p50": 32705,
@@ -18,16 +22,17 @@
   "output_tokens_max": 256,
   "concurrency_levels": [1, 4],
   "_concurrency_levels_note": "Client-side concurrency for long-context requests. Lower values used because 32K-token requests are memory-intensive.",
-  "online_qps_levels": null,
-  "online_sla_ttft_ms": null,
-  "online_sla_ttft_ms_relaxed": null,
+  "online_qps_levels": [0.5, 1, 2],
+  "online_sla_ttft_ms": 5000,
+  "online_sla_ttft_ms_relaxed": 10000,
   "num_runs": 2,
   "warmup_runs": 1,
+  "warmup_minutes": 2,
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.03,
   "request_count": 100,
-  "_request_count_note": "offline uses 100, interactive uses 50 (controlled in loadgen). No online scenario for suite_D.",
-  "online_request_count": null,
+  "_request_count_note": "offline uses 100, interactive uses 50, online uses 50 (controlled in loadgen).",
+  "online_request_count": 50,
   "interactive_request_count": 50
 }

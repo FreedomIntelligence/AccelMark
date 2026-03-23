@@ -3,10 +3,14 @@
   "description": "Quantization efficiency. Same model (Llama-3-8B) at three precision levels: BF16, INT8, INT4. Measures the speed/quality tradeoff of quantization on a single chip.",
   "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
   "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
-  "scenarios": ["accuracy", "offline"],
+  "scenarios": {
+    "default": ["accuracy", "offline"],
+    "extra": []
+  },
   "precision_levels": ["BF16", "INT8", "INT4"],
   "_precision_levels_note": "BF16 = full precision baseline. INT8 = W8A8 via vLLM bitsandbytes or compressed-tensors. INT4 = W4A16 via AWQ.",
   "precision_required": "BF16",
+  "allowed_precisions": ["BF16", "FP16"],
   "request_distribution": {
     "input_tokens_p25": 120,
     "input_tokens_p50": 280,
