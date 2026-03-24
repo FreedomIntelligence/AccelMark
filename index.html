@@ -781,7 +781,7 @@
           ${suitePill(row.suite)}
         </div>
         <div style="margin-top:0.25rem">
-          ${row.is_suite_level ? `
+          ${row.is_suite_level && row.suite !== 'suite_C' ? `
             <div class="card-speed">${row.offline_throughput
               ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
               : '—'}</div>
@@ -936,7 +936,7 @@
         <td>${suitePill(row.suite) || '—'}</td>
         <td>${scenarioPill(row) || '—'}</td>
         <td class="metric-primary">${
-          row.is_suite_level
+          (row.is_suite_level && row.suite !== 'suite_C')
             ? `<div>${row.offline_throughput
                 ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
                   + ' <small style="color:#8b949e">tok/s</small>'
