@@ -132,8 +132,8 @@ Primary metric: subset_score (fraction correct)
 
 ### Sustained scenario (extra)
 
-30-minute fixed-concurrency load test. Detects thermal throttling and
-memory fragmentation that point-in-time benchmarks miss.
+30-minute fixed-concurrency load test. Detects KV cache exhaustion, thermal
+throttling, and memory fragmentation that point-in-time benchmarks miss.
 
 ```
 sustained_concurrency: 8    — requests kept in-flight simultaneously
@@ -142,10 +142,18 @@ sample_interval_seconds: 60  — throughput snapshot every minute
 warmup_minutes: 2
 ```
 
+**A100 reference result:** 504 tok/s sustained, throttle ratio 0.87,
+throttle onset at minute 12.
+
+Key output metrics:
+- `sustained_throughput_tokens_per_sec` — average post-warmup throughput
+- `throttle_ratio` — min/max throughput ratio. 1.0 = no degradation. Lower = more throttling.
+- `throttle_onset_minute` — when throughput first dropped below 90% of peak
+
 Run explicitly with `--scenario sustained`. Not part of the default run.
 
 ```bash
-python run.py --runner nvidia_vllm_xxxx --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario sustained
 ```
 
 ---
@@ -168,6 +176,16 @@ The chip count is flexible — use however many chips your hardware needs.
 efficiency = (Suite B throughput / N) / (Suite A throughput / 1)
 ```
 A value of 0.8 with N=4 means 4 chips deliver 3.2× the single-chip throughput.
+
+### Sustained scenario (extra)
+
+```
+sustained_concurrency: 4    — lower than Suite A due to higher memory pressure per request
+duration_minutes: 30
+```
+
+Run with `--scenario sustained`. Concurrency set to 4 because the 70B model
+occupies most GPU memory, leaving less room for KV cache than the 8B model.
 
 ---
 
@@ -261,7 +279,7 @@ models:
 ### Running Suite C
 
 ```bash
-python run.py --runner nvidia_vllm_xxxx --suite suite_C
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_C
 ```
 
 Runs all supported formats in sequence. Each format is a separate subprocess
@@ -297,6 +315,18 @@ which is compute-bound and tests raw FLOPS more than memory bandwidth.
 **OOM on some batch sizes is expected and recorded as valid data.**
 A chip that OOMs at batch_size=4 but succeeds at batch_size=1 will show
 `"oom": true` for that row — useful information, not a failure.
+
+### Sustained scenario (extra)
+
+```
+sustained_concurrency: 8
+duration_minutes: 30
+```
+
+**A100 reference result:** 52 tok/s sustained, throttle ratio 0.85,
+throttle onset at minute 13. Low absolute throughput is expected due to
+the 32K input token prefill overhead — what matters is the throttle ratio
+relative to peak.
 
 ---
 

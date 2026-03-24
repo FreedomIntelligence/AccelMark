@@ -29,7 +29,7 @@ def _write_result(tmpdir: Path, tier: str, name: str, data: dict) -> Path:
     return p
 
 
-def _base_result(impl_id: str = "nvidia_vllm_3f8a2c1d") -> dict:
+def _base_result(impl_id: str = "nvidia_vllm_6e78e779") -> dict:
     return {
         "suite_id": "suite_A",
         "implementation_id": impl_id,
@@ -54,7 +54,7 @@ def _base_result(impl_id: str = "nvidia_vllm_3f8a2c1d") -> dict:
 def test_returns_none_for_empty_results_dir():
     with tempfile.TemporaryDirectory() as tmpdir:
         with patch("serve.capacity._RESULTS_DIR", Path(tmpdir)):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
     assert est is None
 
 
@@ -63,7 +63,7 @@ def test_returns_none_when_no_matching_impl_id():
         tmppath = Path(tmpdir)
         _write_result(tmppath, "community", "sub1", _base_result("other_impl_abc12345"))
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
     assert est is None
 
 
@@ -84,13 +84,13 @@ def test_returns_none_for_none_impl_id():
 def test_finds_matching_result():
     with tempfile.TemporaryDirectory() as tmpdir:
         tmppath = Path(tmpdir)
-        _write_result(tmppath, "community", "sub1", _base_result("nvidia_vllm_3f8a2c1d"))
+        _write_result(tmppath, "community", "sub1", _base_result("nvidia_vllm_6e78e779"))
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est is not None
     assert isinstance(est, CapacityEstimate)
-    assert est.implementation_id == "nvidia_vllm_3f8a2c1d"
+    assert est.implementation_id == "nvidia_vllm_6e78e779"
     assert est.suite_id == "suite_A"
     assert est.chip == "NVIDIA A100-SXM4-80GB"
     assert est.date == "2026-03-22"
@@ -101,7 +101,7 @@ def test_extracts_best_offline_throughput():
         tmppath = Path(tmpdir)
         _write_result(tmppath, "community", "sub1", _base_result())
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     # Best is 5321.0 from concurrency=32
     assert est.offline_throughput_tokens_per_sec == 5321.0
@@ -112,7 +112,7 @@ def test_extracts_online_max_qps():
         tmppath = Path(tmpdir)
         _write_result(tmppath, "community", "sub1", _base_result())
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est.online_max_qps == 5.0
 
@@ -122,7 +122,7 @@ def test_extracts_interactive_ttft():
         tmppath = Path(tmpdir)
         _write_result(tmppath, "community", "sub1", _base_result())
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est.interactive_ttft_p99_ms == pytest.approx(68.4)
 
@@ -143,7 +143,7 @@ def test_picks_most_recent_when_multiple_results():
         _write_result(tmppath, "verified", "new_sub", new)
 
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est.online_max_qps == 5.0
     assert est.date == "2026-03-22"
@@ -160,7 +160,7 @@ def test_skips_oom_rows():
         ]
         _write_result(tmppath, "community", "sub1", data)
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est.offline_throughput_tokens_per_sec == 5000.0
 
@@ -176,7 +176,7 @@ def test_falls_back_to_legacy_batch_size_field():
         }
         _write_result(tmppath, "community", "sub1", data)
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est.offline_throughput_tokens_per_sec == 4200.0
 
@@ -187,7 +187,7 @@ def test_suite_e_scaling_fallback():
         tmppath = Path(tmpdir)
         data = {
             "suite_id": "suite_E",
-            "implementation_id": "nvidia_vllm_3f8a2c1d",
+            "implementation_id": "nvidia_vllm_6e78e779",
             "chip": {"name": "NVIDIA A100-SXM4-80GB"},
             "meta": {"date": "2026-03-22"},
             "metrics": {
@@ -199,7 +199,7 @@ def test_suite_e_scaling_fallback():
         }
         _write_result(tmppath, "verified", "sub1", data)
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est.offline_throughput_tokens_per_sec == pytest.approx(6018.79)
 
@@ -216,7 +216,7 @@ def test_tolerates_corrupt_result_json():
         _write_result(tmppath, "community", "good_sub", _base_result())
 
         with patch("serve.capacity._RESULTS_DIR", tmppath):
-            est = load_capacity_estimate("nvidia_vllm_3f8a2c1d")
+            est = load_capacity_estimate("nvidia_vllm_6e78e779")
 
     assert est is not None
     assert est.offline_throughput_tokens_per_sec == 5321.0
@@ -226,7 +226,7 @@ def test_tolerates_corrupt_result_json():
 
 def test_format_capacity_log_full():
     est = CapacityEstimate(
-        implementation_id="nvidia_vllm_3f8a2c1d",
+        implementation_id="nvidia_vllm_6e78e779",
         suite_id="suite_A",
         chip="NVIDIA A100-SXM4-80GB",
         date="2026-03-22",
@@ -250,7 +250,7 @@ def test_format_capacity_log_full():
 def test_format_capacity_log_minimal():
     """Should not crash when most fields are None."""
     est = CapacityEstimate(
-        implementation_id="nvidia_vllm_3f8a2c1d",
+        implementation_id="nvidia_vllm_6e78e779",
         suite_id="suite_A",
         chip="NVIDIA A100",
         date="2026-01-01",

@@ -13,13 +13,17 @@ For running benchmarks and submitting results, see [CONTRIBUTING.md](CONTRIBUTIN
 ```
 AccelMark/
 ├── run.py                  ← Unified CLI entry point
+├── CONTRIBUTING.md
+├── DEVELOPMENT.md
 ├── runners/
 │   ├── benchmark_runner.py ← Base class: all orchestration logic
+│   ├── protocol.py         ← RunnerProtocol interface (serve layer)
 │   ├── collect_env.py      ← Hardware/software detection
 │   ├── validate_submission.py
-│   ├── hash_runner.py      ← Compute runner ID before submission
 │   ├── validate_runners.py ← CI: validate all runner folders
+│   ├── hash_runner.py      ← Compute runner ID before submission
 │   ├── meta.schema.json    ← JSON schema for runner meta.json
+│   ├── template/runner.py  ← Annotated scaffold for new runners
 │   └── nvidia_vllm_{hash}/ ← Reference runner (NVIDIA + vLLM)
 │       ├── runner.py
 │       ├── requirements.txt
@@ -29,21 +33,30 @@ AccelMark/
 │   └── types.py            ← InferenceResult, SampleRecord
 ├── suites/
 │   ├── suite_A/suite.json + requests.jsonl
-│   ├── suite_B/...
-│   ├── suite_C/...
-│   ├── suite_D/...
-│   └── suite_E/...
+│   ├── suite_B/suite.json + requests.jsonl
+│   ├── suite_C/suite.json + suite.py + requests.jsonl
+│   ├── suite_D/suite.json + requests.jsonl
+│   └── suite_E/suite.json + suite.py + requests.jsonl
+├── datasets/
+│   ├── sharegpt_standard_v1/requests.jsonl  ← 500 prompts, ~280/310 tok
+│   └── sharegpt_longctx_v1/requests.jsonl   ← 200 prompts, ~28K input tok
+├── serve/
+│   ├── server.py           ← FastAPI OpenAI-compatible API
+│   ├── adapter.py          ← Pydantic request/response models
+│   └── tests/
 ├── schema/
 │   ├── result.schema.json
 │   ├── accuracy_subset.jsonl   ← immutable
-│   └── accuracy_baselines.json
+│   └── accuracy_baselines.json ← MMLU baselines per model/precision
 ├── leaderboard/
 │   ├── generate.py         ← reads results/, writes leaderboard.js + api/
 │   └── site/
-│       └── index.html
-└── results/
-    ├── verified/
-    └── community/
+│       ├── index.html
+│       └── api/            ← rank.json, chips.json, index.json, suites.json
+├── results/
+│   ├── verified/
+│   └── community/
+└── openclaw_skill/         ← Voice interface ("benchmark my GPU")
 ```
 
 ### Data flow
@@ -150,9 +163,8 @@ class LMDeployRunner(BenchmarkRunner):
             del self.pipeline
             self.pipeline = None
 
-    # ── Optional: streaming for online/interactive ───────────────────
+    # ── Optional: streaming for online/interactive/sustained ─────────
     async def inference_fn_streaming(self, request: InferenceRequest) -> InferenceResult:
-        import asyncio
         formatted = self._format_prompt(request.prompt)
         t_start = time.perf_counter()
         first_token_time_ms = None
@@ -258,12 +270,13 @@ The `id` must exactly match the folder name.
 
 Override these class attributes to declare what your framework supports:
 
-| Flag | Default | When to set False |
-|------|---------|------------------|
-| `SUPPORTS_STREAMING` | `True` | Framework has no token streaming API. TTFT will not be measured for online/interactive. |
-| `SUPPORTS_BATCHING` | `True` | Framework is serial only (e.g. mlx-lm). Offline runs requests one-by-one. |
-| `SUPPORTS_ONLINE` | `True` | Framework cannot handle concurrent requests. Online scenario is skipped. |
-| `SUPPORTS_MULTI_CHIP` | `True` | No tensor parallelism support. `--tensor-parallel-size` is ignored. |
+| Flag | Default | When to change |
+|------|---------|----------------|
+| `SUPPORTS_STREAMING` | `True` | Set `False` if framework has no token streaming API. TTFT will not be measured for online/interactive/sustained. |
+| `SUPPORTS_BATCHING` | `True` | Set `False` if framework is serial only (e.g. mlx-lm). Offline runs requests one-by-one. |
+| `SUPPORTS_ONLINE` | `True` | Set `False` if framework cannot handle concurrent requests. Online scenario is skipped. |
+| `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism. `--tensor-parallel-size` is ignored. |
+| `SUPPORTED_PRECISIONS` | `["bf16", "fp16", "fp32"]` | Maximum compute precisions on capable hardware. Hardware detection automatically restricts this at runtime. See *Precision resolution* below. |
 
 ### Example: Apple Silicon (no batching, no streaming)
 
@@ -301,6 +314,114 @@ class MLXRunner(BenchmarkRunner):
 
 ---
 
+## Precision resolution
+
+AccelMark automatically resolves the correct compute precision before each
+model load. Understanding this is useful when adding support for hardware that
+doesn't support BF16 (V100, T4, MI100, Apple M1, etc.).
+
+### How it works
+
+`BenchmarkRunner._resolve_precision(suite, env_info)` is called before every
+`load_model()`. It uses a layered approach:
+
+```
+Step 1 — Ask the runner
+    runner.get_supported_precisions(chip_name, env_info)
+    Returns a list → use it directly, skip hardware detection
+    Returns None   → proceed to step 2
+
+Step 2 — Auto-detect from env_info (three tiers)
+    Tier 1: env_info.accelerators[0].supports_bf16
+            (set by collect_env.py for NVIDIA, AMD, Ascend, Apple)
+    Tier 2: env_info.accelerators[0].compute_capability >= 8.0
+            (NVIDIA fallback for older env_info.json files)
+    Tier 3: chip name substring lookup
+            (known FP16-only chips: v100, t4, mi100, m1, ...)
+    Default: assume BF16 capable if nothing matches
+
+Step 3 — Intersect with SUPPORTED_PRECISIONS
+    (only applies when runner returns None)
+
+Step 4 — Intersect with suite.allowed_precisions
+    Fail with clear error if intersection is empty
+```
+
+### Priority rule
+
+The runner always wins when it speaks. Hardware detection is only the fallback:
+
+| Runner `get_supported_precisions` | Hardware detects | Resolved |
+|---|---|---|
+| Returns `["BF16", "FP16"]` | V100 (no BF16) | **BF16** — runner wins |
+| Returns `["FP16"]` | A100 (has BF16) | **FP16** — runner wins |
+| Returns `None` | V100 (no BF16) | **FP16** — hardware wins |
+| Returns `None` | A100 (has BF16) | **BF16** — hardware wins |
+
+### When to override `get_supported_precisions`
+
+The default (`return None`) is correct for most runners — auto-detection handles
+the common BF16/FP16 cases automatically.
+
+Override when the runner has framework-specific knowledge hardware detection
+cannot capture:
+
+```python
+def get_supported_precisions(self, chip_name: str, env_info: dict) -> list[str] | None:
+    # vLLM FP8 is only useful on H100 — not detectable from hardware info alone
+    base = super().get_supported_precisions(chip_name, env_info)
+    if "h100" in chip_name.lower():
+        return (base or ["bf16", "fp16"]) + ["fp8"]
+    return None   # auto-detect for all other chips
+
+# Framework has a BF16 bug on a specific chip
+def get_supported_precisions(self, chip_name: str, env_info: dict) -> list[str] | None:
+    if "a100" in chip_name.lower():
+        return ["fp16", "fp32"]   # force FP16 even though A100 supports BF16
+    return None
+```
+
+Returning `None` from a chip-specific branch means auto-detection handles
+that chip — you only need to cover cases where your knowledge differs from
+hardware capability.
+
+### `SUPPORTED_PRECISIONS` vs `get_supported_precisions`
+
+Use `SUPPORTED_PRECISIONS` when the restriction applies to **all hardware**:
+
+```python
+# Framework genuinely cannot use BF16 on any hardware
+SUPPORTED_PRECISIONS = ["fp16", "fp32"]
+```
+
+Use `get_supported_precisions()` when the restriction or addition is
+**chip-specific**:
+
+```python
+# FP8 only on H100, auto-detect everything else
+def get_supported_precisions(self, chip_name, env_info):
+    base = super().get_supported_precisions(chip_name, env_info)
+    if "h100" in chip_name.lower():
+        return (base or []) + ["fp8"]
+    return None
+```
+
+### Hardware detection in `collect_env.py`
+
+`collect_env.py` populates `supports_bf16` on each accelerator entry:
+
+| Platform | Detection method |
+|---|---|
+| NVIDIA | `compute_capability >= 8.0` (V100=7.0, T4=7.5, A100=8.0, H100=9.0) |
+| AMD | `gfx` architecture code (gfx908/MI100=no, gfx90a/MI250X=yes, gfx942/MI300X=yes) |
+| Ascend | Chip model name (910B=yes, 310=no) |
+| Apple | Chip generation (M1=no, M2/M3/M4=yes) |
+
+When adding a new platform, populate `supports_bf16` in your `collect_*()` function.
+See the existing collectors for reference.
+
+---
+
 ## Adding a New Suite
 
 Suites are fully specified benchmark configurations. Each suite answers
@@ -315,7 +436,7 @@ Before writing any files, answer these questions:
    e.g. "How does this chip handle quantized 8B inference?"
 
 2. What is the controlled variable?
-   e.g. quantization level (INT8 vs INT4 vs BF16)
+   e.g. quantization format (BF16 / FP8 / W8A8 / W8A16 / W4A16)
 
 3. What model?
    Use a model that is already in another suite if possible.
@@ -325,6 +446,7 @@ Before writing any files, answer these questions:
    offline: always include (throughput is the most comparable metric)
    online: include if latency under load matters
    interactive: include if single-user latency matters
+   sustained: include as an extra if long-run stability matters
 
 5. What chip count?
    1 chip: for suites that test per-chip capability
@@ -341,8 +463,13 @@ Copy the closest existing suite and modify. Required fields:
   "description": "One sentence describing what this suite measures.",
   "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
   "model_revision": "8afb486c...",
-  "scenarios": ["offline", "online", "interactive"],
+  "dataset": "sharegpt_standard_v1",
+  "scenarios": {
+    "default": ["accuracy", "offline", "online", "interactive"],
+    "extra":   ["sustained"]
+  },
   "precision_required": "BF16",
+  "allowed_precisions": ["BF16", "FP16"],
   "request_distribution": {
     "input_tokens_p50": 280,
     "output_tokens_p50": 310,
@@ -363,20 +490,29 @@ Copy the closest existing suite and modify. Required fields:
 }
 ```
 
-### Step 3: Generate `suites/suite_X/requests.jsonl`
+### Step 3: Choose or create a dataset
 
-```bash
-# Option A: same distribution as Suite A — just copy it
-cp suites/suite_A/requests.jsonl suites/suite_X/requests.jsonl
+If your suite uses a standard prompt distribution, reference an existing
+shared dataset:
 
-# Option B: generate from ShareGPT with custom parameters
-# Edit AccelMark-internal/data_pipeline/configs/suite_X.yaml
-# then run:
-python AccelMark-internal/data_pipeline/generate_requests.py --suite suite_X
-bash AccelMark-internal/ops/publish_outputs.sh suite_X
+```json
+"dataset": "sharegpt_standard_v1"
 ```
 
-Format of each line in `requests.jsonl`:
+Available datasets are in `datasets/`. Check `datasets/README.md` for
+descriptions and distributions.
+
+If you need a custom distribution:
+
+1. Create `datasets/{your_dataset}_v1/requests.jsonl`
+2. Create `datasets/{your_dataset}_v1/README.md`
+3. Set `"dataset": "{your_dataset}_v1"` in your suite.json
+
+If your suite needs a custom dataset only used by that suite, you can
+also place `requests.jsonl` directly in `suites/suite_X/` — the
+benchmark runner checks there as a fallback.
+
+Dataset format (one JSON object per line):
 ```json
 {
   "request_id": 0,
@@ -393,7 +529,7 @@ Format of each line in `requests.jsonl`:
 Run the accuracy check on reference hardware (A100) and record the score:
 
 ```bash
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_6e78e779 \
     --suite suite_X \
     --scenario accuracy \
     --model-path /path/to/model
@@ -437,6 +573,101 @@ not shown on the main leaderboard.
 
 ---
 
+## Suite plugin system
+
+Suites with custom orchestration logic (multiple subprocesses, special
+merge logic) can provide a `suite.py` file in their folder.
+`BenchmarkRunner.main()` checks for this file and delegates to it when
+present. Suites without a `suite.py` use the generic scenario dispatch.
+
+### When to use `suite.py`
+
+Use it when your suite needs orchestration that `_run_all_scenarios()`
+cannot handle generically:
+
+- **Multiple subprocesses in sequence** — Suite C runs one subprocess
+  per precision format; Suite E runs one per chip count
+- **Custom merge logic** — combining results from subprocesses into a
+  single suite-level `result.json` with derived metrics
+- **Non-standard scenario ordering** — e.g. accuracy must run before
+  other scenarios as a gate
+
+Suites that run standard scenarios (offline, online, interactive,
+sustained) on a single model do NOT need `suite.py`.
+
+### File structure
+
+```
+suites/
+├── suite_A/
+│   ├── suite.json        ← no suite.py needed
+│   └── requests.jsonl
+├── suite_C/
+│   ├── suite.json
+│   ├── suite.py          ← custom quantization orchestration
+│   └── requests.jsonl
+└── suite_E/
+    ├── suite.json
+    ├── suite.py          ← custom scaling orchestration
+    └── requests.jsonl
+```
+
+### Required interface
+
+`suite.py` must export a single `run()` function:
+
+```python
+def run(br, args, suite: dict, env_info: dict) -> None:
+    """
+    Suite entry point called by BenchmarkRunner.main().
+
+    Args:
+        br:       BenchmarkRunner instance — full access to all methods
+        args:     Parsed argparse.Namespace from parse_args()
+        suite:    Parsed suite.json dict
+        env_info: Hardware/software info from collect_env.py
+    """
+```
+
+The `br` parameter gives full access to all BenchmarkRunner methods:
+`br._run_single_scenario()`, `br._merge_scenario_results()`,
+`br._resolve_model_path()`, `br._build_result_json()`, etc.
+
+### Delegating single-scenario runs
+
+`suite.py` typically only handles `--scenario default` and `--scenario all`.
+For single scenarios (e.g. `--scenario offline`), delegate back to the
+base class:
+
+```python
+def run(br, args, suite, env_info):
+    if args.scenario in ("default", "all"):
+        _run_my_suite(br, args, suite)
+    else:
+        br._setup_logging(args.output_dir)
+        br._run_single_scenario(args, suite)
+```
+
+### Using base class methods
+
+Common patterns:
+
+```python
+# Resolve model path (checks models_local.yaml)
+path = br._resolve_model_path(model_id, args.model_path)
+
+# Parse scenarios config (handles legacy flat array and new dict format)
+default, extra = br._parse_scenarios_config(suite)
+
+# Merge scenario results after running offline+online+interactive
+br._merge_scenario_results(base_dir, suite, successful, elapsed)
+
+# Run a single scenario as subprocess
+# (use sys.argv[0] as the platform script path)
+```
+
+---
+
 ## Adding a New Platform (Chip Type)
 
 Adding a new platform means adding support for a chip family that
@@ -473,6 +704,7 @@ def collect_your_platform() -> list[dict]:
                 "compute_capability": None,
                 "pcie_generation": None,
                 "interconnect_intra_node": device.get("interconnect"),
+                "supports_bf16": True,   # set based on chip model/generation
             })
     except Exception as e:
         print(f"Warning: could not detect YourPlatform: {e}")
@@ -544,16 +776,16 @@ platform-specific reasons.** All platforms use the same LoadGen.
 def inference_fn(requests: list[InferenceRequest]) -> list[InferenceResult]:
     # Must return one InferenceResult per request (same order)
     # Read request.prompt for the formatted prompt string
-    # Do NOT time anything inside this function — LoadGen handles all timing
+    # Do NOT time anything — LoadGen handles all timing
     prompts = [r.prompt for r in requests]
     ...
 ```
 
-**Online and interactive scenarios** (async):
+**Online, interactive, and sustained scenarios** (async):
 ```python
 async def inference_fn(request: InferenceRequest) -> InferenceResult:
     # Must be a coroutine (async def)
-    # LoadGen schedules concurrent calls for online
+    # LoadGen schedules concurrent calls for online/sustained
     # LoadGen awaits serially for interactive
     # first_token_time_ms should be set if streaming is available
     formatted = self.format_prompt(request.prompt)
@@ -571,6 +803,7 @@ class InferenceResult:
     input_tokens: int                     # number of input tokens (0 if unknown)
     success: bool                         # False if inference failed
     error: Optional[str] = None           # error message if success=False
+    output_text: Optional[str] = None     # generated text (used by accuracy scoring and serve layer)
 ```
 
 ### What LoadGen measures
@@ -580,6 +813,7 @@ class InferenceResult:
 | offline | Total tokens / elapsed time | `throughput_tokens_per_sec` (input + output) |
 | online | TTFT distribution at each QPS level | `max_valid_qps` (highest QPS with p99 TTFT < SLA) |
 | interactive | TTFT distribution, serial requests | `ttft_ms_p99` |
+| sustained | Throughput + TTFT sampled every N seconds over 30 min | `sustained_throughput_tokens_per_sec`, `throttle_ratio` |
 
 ---
 
@@ -611,14 +845,14 @@ Use `"type": ["your_type", "null"]` to make fields optional.
 Before opening a PR that adds a new runner, validate it locally:
 
 ```bash
-python runners/validate_runners.py runners/nvidia_vllm_3f8a2c1d/
+python runners/validate_runners.py runners/nvidia_vllm_6e78e779/
 ```
 
 This validates a single runner folder and tells you clearly whether it is
 ready to submit:
 
 ```
-Validating: nvidia_vllm_3f8a2c1d/
+Validating: nvidia_vllm_6e78e779/
 ==================================================
 Files:
   ✓ runner.py
@@ -636,7 +870,7 @@ Duplicate check:
   ✓ No existing runner with this ID
 
 ==================================================
-✓ PASSED — nvidia_vllm_3f8a2c1d is ready to submit
+✓ PASSED — nvidia_vllm_6e78e779 is ready to submit
 ==================================================
 ```
 
@@ -661,15 +895,15 @@ renaming the folder. The error message tells you exactly what to do:
 ```
   ✗ Hash mismatch.
       Folder ends with : e0859b3c
-      runner.py hashes to: b3f29a11
-      Rename folder to: nvidia_vllm_b3f29a11
+      runner.py hashes to: 6e78e779
+      Rename folder to: nvidia_vllm_6e78e779
 ```
 
 To compute the correct name before creating a new runner folder:
 
 ```bash
 python runners/hash_runner.py path/to/your/runner.py
-# → nvidia_vllm_b3f29a11
+# → nvidia_vllm_6e78e779
 ```
 
 CI runs the same validator across all runner folders automatically on every PR.
@@ -686,21 +920,21 @@ point to the exact code that produced them.
 ```bash
 # Make your changes, then compute the new ID
 python runners/hash_runner.py runners/nvidia_vllm_old_hash/runner.py
-# → nvidia_vllm_b3f29a11
+# → nvidia_vllm_6e78e779
 ```
 
 **Step 2: Create the new runner folder**
 
 ```bash
-cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_b3f29a11
-# Apply your edits to runners/nvidia_vllm_b3f29a11/runner.py
+cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_6e78e779
+# Apply your edits to runners/nvidia_vllm_6e78e779/runner.py
 ```
 
 **Step 3: Update `meta.json` in the new folder**
 
 ```json
 {
-  "id":           "nvidia_vllm_b3f29a11",
+  "id":           "nvidia_vllm_6e78e779",
   "platform":     "nvidia",
   "name":         "vLLM on NVIDIA (reference implementation)",
   "framework":    "vLLM",
@@ -719,15 +953,15 @@ cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_b3f29a11
 ```json
 {
   "id":            "nvidia_vllm_old_hash",
-  "deprecated_by": "nvidia_vllm_b3f29a11",
-  "notes":         "Deprecated — use nvidia_vllm_b3f29a11. Fixed edge case in release_resources()."
+  "deprecated_by": "nvidia_vllm_6e78e779",
+  "notes":         "Deprecated — use nvidia_vllm_6e78e779. Fixed edge case in release_resources()."
 }
 ```
 
 **Step 5: Validate and submit**
 
 ```bash
-python runners/validate_runners.py runners/nvidia_vllm_b3f29a11/
+python runners/validate_runners.py runners/nvidia_vllm_6e78e779/
 ```
 
 Open a PR that includes both the new folder and the updated old `meta.json`.
@@ -769,7 +1003,7 @@ python run.py --runner your_platform_{hash8} --help
 ```bash
 # Run with minimal requests to test the pipeline end-to-end
 # Temporarily reduce request_count for testing only
-python run.py --runner nvidia_vllm_c34f94c3 \
+python run.py --runner nvidia_vllm_6e78e779 \
     --suite suite_A \
     --scenario offline \
     --output-dir /tmp/accelmark_test/

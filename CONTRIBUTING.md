@@ -14,8 +14,7 @@ in the leaderboard and submitting your results.
 # 1. Clone and install
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
-pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r runners/nvidia_vllm_3607f3ff/requirements.txt
+pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
 
 # 2. Set your name (one-time setup)
 cp configs/submitter.yaml.example configs/submitter.yaml
@@ -23,9 +22,8 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 
 # 3. Run the benchmark (~46 min on A100)
 #    Accuracy gate runs automatically before the benchmark starts.
-#    Output directory is auto-named:
-#    results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_3607f3ff
-python run.py --runner nvidia_vllm_3607f3ff --suite suite_A
+#    Output directory is auto-named: results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_6e78e779
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
 
 # 4. Submit
 ls results/community/
@@ -41,17 +39,16 @@ That's it. The CI bot handles the rest.
 
 ### Install dependencies
 
-**NVIDIA (vLLM):**
+Each runner ships its own `requirements.txt`. Install for the runner you want to use:
+
 ```bash
-pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r runners/nvidia_vllm_3607f3ff/requirements.txt
+pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
 ```
 
-**Other platforms:**
+To see all available runners and their install commands:
+
 ```bash
-# List all available runners and their install instructions
 python run.py --list
-# Then: pip install -r runners/<runner_id>/requirements.txt
 ```
 
 ### Set your submitter profile
@@ -89,8 +86,7 @@ models:
 ```
 
 `configs/models_local.yaml` is gitignored. Once configured, you don't
-need `--model-path` on the command line — the benchmark script reads
-the local path automatically.
+need `--model-path` on the command line.
 
 ---
 
@@ -99,12 +95,7 @@ the local path automatically.
 ### Recommended: run the full suite
 
 ```bash
-python run.py --runner nvidia_vllm_3607f3ff --suite suite_A
-
-# Override the output directory if needed
-python run.py --runner nvidia_vllm_3607f3ff \
-    --suite suite_A \
-    --output-dir ./results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_3607f3ff
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
 ```
 
 This runs the suite's default scenarios (accuracy gate → offline → online → interactive)
@@ -114,17 +105,24 @@ the benchmark is aborted (use `--skip-accuracy-gate` to override).
 Use `--scenario all` to also include extra scenarios defined in the suite (e.g. `sustained`),
 or `--scenario offline` (or any other scenario name) to run a single scenario.
 
+```bash
+# Override the output directory if needed
+python run.py --runner nvidia_vllm_6e78e779 \
+    --suite suite_A \
+    --output-dir ./results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_6e78e779
+```
+
 ### Run a single scenario
 
 ```bash
-python run.py --runner nvidia_vllm_3607f3ff --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario offline
 ```
 
 ### Multi-chip (Suite B and above)
 
 ```bash
 # Suite B: Llama-3-70B on 4 chips
-python run.py --runner nvidia_vllm_3607f3ff \
+python run.py --runner nvidia_vllm_6e78e779 \
     --suite suite_B \
     --tensor-parallel-size 4
 ```
@@ -139,54 +137,89 @@ chip count and the leaderboard groups results by chip count for fair comparison.
 
 ### Suite E: multi-chip scaling
 
-Suite E runs the same workload at 1×, 2×, 4×, and 8× chip counts and
-measures how efficiently throughput scales:
+Suite E runs the same workload at 1×, 2×, 4×, and 8× chip counts automatically
+and measures how efficiently throughput scales. Specify the maximum chip count
+you want to test:
 
 ```bash
-python run.py --runner nvidia_vllm_3607f3ff \
+python run.py --runner nvidia_vllm_6e78e779 \
     --suite suite_E \
     --max-chips 4
 ```
 
+Suite E handles the scaling automatically — it runs at 1×, 2×, and 4× chips
+sequentially and computes `scaling_efficiency = N_chip_throughput / (1_chip_throughput × N)`.
+
+**Note on `concurrency` vs batch size:** The offline scenario sweeps
+*client-side concurrency* (how many requests the load generator fires
+simultaneously) — not the inference engine's internal batch size.
+The engine's internal batching (e.g. vLLM's `max_num_seqs`) is
+configured separately in the runner and is not varied by the suite.
+Results report `concurrency` values, not batch sizes.
+
 ### With a local model path
 
 ```bash
-python run.py --runner nvidia_vllm_3607f3ff \
+python run.py --runner nvidia_vllm_6e78e779 \
     --suite suite_A \
     --model-path /path/to/local/model
 ```
 
 ---
 
-## What Gets Measured
+## What gets measured
+
+### Scenarios
 
 | Scenario | Primary metric | What it tells you |
 |----------|---------------|-------------------|
 | **offline** | tokens/sec | Max throughput when the GPU is fully loaded |
-| **online** | max valid QPS | How many users/sec this chip can serve within a 500ms latency SLA |
+| **online** | max valid QPS | How many users/sec this chip can serve within a latency SLA |
 | **interactive** | TTFT p99 | Single-user latency when the system is idle |
+| **sustained** | sustained tok/s + throttle ratio | Whether throughput degrades over a 30-minute run under constant load |
+| **accuracy** | subset score | Model output quality against an MMLU baseline |
 
-All three together give a complete picture of a chip's inference capability.
+Which scenarios are included in the default run and which are extras depends on
+the suite. Check the suite's `suite.json` or see [suites/README.md](suites/README.md).
 
-### Expected run times (A100 SXM4 80GB reference)
+### Key metrics
 
-| Scenario | Time |
-|----------|------|
-| offline | ~5 min |
-| online | ~19 min |
-| interactive | ~22 min |
-| **all (recommended)** | **~46 min** |
+**`throughput_tokens_per_sec`** — input + output tokens per second. Offline
+scenario primary metric.
 
-Faster hardware completes proportionally quicker. Slower hardware takes longer.
+**`max_valid_qps`** — highest request rate (queries/sec) where TTFT p99 stays
+under the suite's SLA. Online scenario primary metric.
+
+**`ttft_ms_p99`** — 99th percentile time-to-first-token in milliseconds.
+Interactive scenario primary metric.
+
+**`throttle_ratio`** — `min_throughput / max_throughput` over the 30-minute
+sustained run. 1.0 = perfectly stable. A100 reference: ~0.87 at concurrency 8.
+
+**`quality_efficiency`** — Suite C only. `speedup_vs_bf16 × accuracy_retention`.
+Rewards quantized formats that are both fast and accurate.
+See [suites/README.md](suites/README.md) for full details on all suites and metrics.
+
+### Expected run times (A100-SXM4-80GB reference)
+
+| Suite | Default run | Notes |
+|-------|-------------|-------|
+| A | ~50 min | offline + online + interactive |
+| B | ~69 min | 4× chips |
+| C | ~45 min | All 5 precision formats |
+| D | ~60 min | Long-context |
+| E | ~24 min | Up to 4× scaling |
+
+Sustained adds ~30 min to any suite that supports it.
 
 ---
 
-## Submitting Your Results
+## Submitting your results
 
 ### Accuracy gate (automatic)
 
-When you run `--scenario all`, accuracy runs automatically as the **first step**
-before any benchmark scenarios start. If accuracy fails, the benchmark is aborted.
+When you run the suite (with or without `--scenario all`), accuracy runs automatically as the **first step**.
+If accuracy fails, the benchmark is aborted.
 
 ```
 ============================================================
@@ -203,190 +236,92 @@ Valid: True
 ```
 
 The accuracy check uses the **same model instance** as the benchmark — same
-framework, same precision, same inference stack. This ensures the accuracy
-result reflects exactly what the benchmark measured.
-
-The result is saved to `accuracy/accuracy.json` inside the output directory and
-injected into `result.json` automatically.
+framework, same precision, same inference stack.
 
 **If accuracy fails:**
-```
-  ✗ ACCURACY GATE FAILED
-  Score:     0.45
-  Delta:     0.1500
-  Threshold: 0.03
+- Check model weights and revision against the suite spec
+- Common cause: quantized weights with too much quality loss
+- Use `--skip-accuracy-gate` only for debugging — results submitted with a failed
+  accuracy gate are permanently flagged on the leaderboard
 
-  Fix model weights before submitting.
-  To run anyway: --skip-accuracy-gate
-```
-
-The benchmark is aborted. Common causes:
-- Wrong model revision (update `model_revision` in suite.json)
-- Quantized weights with too much quality loss
-- Model loaded with wrong precision
-
-**`--skip-accuracy-gate`** — run benchmark even if accuracy fails:
-```bash
-python run.py --runner nvidia_vllm_3607f3ff \
-    --suite suite_A \
-    --skip-accuracy-gate
-```
-
-Results submitted with a failed accuracy gate are flagged on the leaderboard.
-This flag is permanent — it cannot be removed by re-running. Only use
-`--skip-accuracy-gate` for debugging or stress testing.
-
-**Running accuracy standalone** (optional):
-
-If you want to check accuracy before committing to a full benchmark run,
-you can run accuracy as its own scenario:
-```bash
-python run.py --runner nvidia_vllm_3607f3ff --suite suite_A --scenario accuracy
-```
-
-**Per-question outputs** (`accuracy_outputs.jsonl`):
-
-Every accuracy run writes `accuracy_outputs.jsonl` alongside `accuracy.json`.
-Each line records one question — the model's raw output, extracted answer,
-ground truth, and whether it was correct. Useful for validating answer
-extraction or debugging low scores.
-
-This file is gitignored and only needed locally. It is **not** required for
-submission.
-
-**Resuming an interrupted run:**
-
-If a run is interrupted, re-running the same command resumes from where it
-stopped. Completed steps are detected by the presence of their output files
-and skipped automatically:
-
-- Accuracy gate: skipped if `accuracy/accuracy.json` already exists
-- Each scenario: skipped if `<scenario>/result.json` already exists
-
-```
-  [○] accuracy     -- SKIPPED (already done)
-  [○] offline      -- SKIPPED (already done)
-  [✓] online       -- SUCCESS
-  [✓] interactive  -- SUCCESS
-```
+**Resuming an interrupted run:** Re-running the same command resumes from
+where it stopped. Completed steps are skipped automatically.
 
 ### Step 1: Validate
 
 ```bash
-# Find your auto-generated output directory
 ls results/community/
-
-# Validate it (replace the directory name with yours)
 python runners/validate_submission.py \
-    --dir results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_3607f3ff
+    --dir results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_6e78e779
 ```
 
-The validator checks:
-- All required fields are present in `result.json`
-- Accuracy check passed
-- `submitted_by` is not empty
-- Throughput values are non-zero and not anomalously high
-
-**Files required for submission** (the rest are gitignored and stay local):
+**Files required for submission:**
 
 ```
 <submission_dir>/
-  result.json                  # merged suite result — required
-  env_info.json                # hardware environment — required
+  result.json          # merged suite result — required
+  env_info.json        # hardware environment — required
   accuracy/
-    accuracy.json              # accuracy gate result — required
-  offline/
-    result.json
-  online/
-    result.json
-  interactive/
-    result.json
+    accuracy.json      # accuracy gate result — required
+  offline/result.json
+  online/result.json
+  interactive/result.json
 ```
 
-`run.log`, `samples.jsonl`, and `accuracy_outputs.jsonl` are gitignored and
-stay on your machine — they are not part of the submission.
-
-Fix any errors before submitting. If validate exits with no errors, you're ready.
+`run.log`, `samples.jsonl`, and `accuracy_outputs.jsonl` are gitignored
+and stay on your machine — they are not part of the submission.
 
 ### Step 2: Open a GitHub Issue
 
-Go to: **https://github.com/JuhaoLiang1997/AccelMark/issues/new**
+Go to [Issues → New → Community Submission](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
 
-Select template: **Community Submission**
-
-Paste the contents of your `result.json` into the issue body.
-
-**Submission directory naming** is handled automatically. The benchmark
-generates a standardized name based on chip, suite, and runner:
-
-```
-results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_3607f3ff
-                  ^^^^^^^^^^^^^^^^^^^^^ ^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^
-                  chip (count + name)   suite   runner id
-```
-
-You can override this with `--output-dir` if needed.
-
-The CI bot will automatically:
-1. Validate the submission
-2. Create a PR adding your result to `results/community/`
-3. Update the leaderboard (usually within a few minutes)
+Paste the contents of your `result.json` into the issue body and attach
+`env_info.json`. The CI bot will validate, create a PR, and update the
+leaderboard automatically.
 
 ### Step 3: Done
 
-Your result appears on the **Community** tab of the leaderboard immediately
-after the CI bot merges the PR. No manual review needed for community tier.
+Your result appears on the **Community** tab immediately after CI merges the PR.
 
 ---
 
-## Leaderboard Tiers
+## Leaderboard tiers
 
 | Tier | How to get it | Leaderboard placement |
 |------|--------------|----------------------|
 | **community** | Submit via GitHub Issue, passes CI validation | Community tab |
 | **verified** | Maintainer reproduced your result within 5% | Main leaderboard |
 
-Most results live in community tier — this is completely normal.
-Community results are visible and fully comparable; they just haven't
-been independently reproduced yet.
-
-To request verification, comment on your submission PR.
+To request verification, comment on your submission issue.
 
 ---
 
-## Using Local or Air-gapped Models
+## Using local or air-gapped models
 
 AccelMark separates the **model identifier** (used for leaderboard comparisons)
-from the **model path** (where weights are loaded from at runtime).
+from the **model path** (where weights load from at runtime).
 
-The `model_id` and `model_revision` in `result.json` are always the canonical
+`model_id` and `model_revision` in `result.json` always use canonical
 HuggingFace identifiers — they don't change regardless of where you load from.
 
-**To download a model for offline use:**
 ```bash
+# Download for offline use
 huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir /your/path/Meta-Llama-3-8B-Instruct
+
+# Use a local copy
+python run.py --runner nvidia_vllm_6e78e779 --model-path /your/path/...
 ```
 
-**To use a local copy:**
-```bash
-# Option A: set it in configs/models_local.yaml (recommended)
-# Option B: pass --model-path at runtime
-python run.py --runner nvidia_vllm_3607f3ff --suite suite_A --model-path /your/path/...
-```
-
-If your local copy was downloaded at a different time but has identical
-weight files, add a note in `meta.notes`:
-```json
-"notes": "Local copy, weights identical to locked revision 8afb486c"
-```
+If your local copy was downloaded at a different revision, add a note in
+`meta.notes` of `result.json`.
 
 ---
 
 ## Adding support for a new platform
 
 Create a new runner folder under `runners/` by subclassing `BenchmarkRunner`.
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full implementation guide including
+See [DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation guide including
 how to compute your runner's hash ID.
 
 ```python
@@ -402,7 +337,6 @@ class MyFrameworkRunner(BenchmarkRunner):
     SUPPORTS_MULTI_CHIP = True    # set False if no tensor parallelism
 
     def load_model(self, model_path: str, suite: dict, parallelism: dict) -> None:
-        # Read only the parallelism keys you need — ignore others
         tp_size = parallelism["tensor_parallel_size"]
         self.model = MyFramework.load(model_path, tp=tp_size)
 
@@ -435,50 +369,51 @@ if __name__ == "__main__":
     MyFrameworkRunner().main()
 ```
 
-All orchestration (result building, accuracy, suite dispatch, etc.) is
+All orchestration (result building, accuracy reuse, Suite E, etc.) is
 inherited from `BenchmarkRunner` automatically.
 
-See `runners/template/runner.py` for a fully annotated starting point.
-
-**Checklist for a new runner PR:**
+**Checklist for a new platform PR:**
 - [ ] Runner folder named `{platform}_{name}_{hash8}` with correct hash
 - [ ] `runner.py` subclasses `BenchmarkRunner` and passes `runners/validate_runners.py`
-- [ ] `meta.json` present and valid
+- [ ] `meta.json` present and valid (see `runners/meta.schema.json`)
 - [ ] `requirements.txt` included
 - [ ] At least one reference result in `results/community/`
-- [ ] `runners/collect_env.py` detects your hardware
+- [ ] `runners/collect_env.py` updated to detect your hardware (see [DEVELOPMENT.md](DEVELOPMENT.md))
+- [ ] `README.md` supported platforms table updated
 
-See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for the full implementation reference.
+See [DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation reference.
 
 ---
 
-## Reporting a Suspicious Result
+## Reporting a suspicious result
 
-If you think a result looks wrong:
+If a result looks wrong:
 
 1. Open a GitHub Issue using the **"Challenge a Result"** template
-2. Include: the submission name, what looks wrong, and ideally your own run
-   on the same hardware as evidence
+2. Include: the submission name, what looks wrong, and ideally your own
+   run on the same hardware as evidence
 
-Be specific. Maintainers will investigate and may move the result to `flagged`.
+Maintainers will investigate and may move the result to `flagged/`.
 
 ---
 
 ## Other ways to contribute
 
-- **Fix a bug** — open a PR, include a test if possible
+- **Fix a bug** — open a PR with a description and test if possible
 - **Improve runners** — better error messages, edge case handling
 - **Update cloud pricing** — edit `schema/cloud_pricing.json`, open a PR
-  titled `data: update cloud pricing YYYY-MM` with source URLs
+  titled `data: update cloud pricing YYYY-MM` with source URLs in the description
 - **Propose a new suite** — open an Issue with model, chip count, scenarios,
-  and rationale. New suites require a reference result before going live.
+  and rationale; new suites require a reference result before going live
 
 ---
 
-## A Few Rules
+## A few rules
 
 - Do not modify `schema/accuracy_subset.jsonl` — it is immutable
 - Do not modify other people's results in `results/`
-- Vendor employees may submit results for their own chips (shown with a Vendor badge)
+- Vendor employees may submit results for their own chips (shown with a Vendor badge);
+  disclose affiliation by tagging `[vendor]` in your submitter name
 - Results submitted with `--enforce-eager` are valid but noted — they may
   underrepresent true hardware capability
+- Results submitted with `--skip-accuracy-gate` are permanently flagged

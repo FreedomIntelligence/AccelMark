@@ -27,14 +27,14 @@
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
 pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r runners/nvidia_vllm_3607f3ff/requirements.txt
+pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
 
 # 2. One-time setup
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name
 
 # 3. Run the benchmark (~46 min on A100)
-python run.py --runner nvidia_vllm_3607f3ff --suite suite_A
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
 
 # 4. Validate and submit
 python runners/validate_submission.py --dir results/community/<your_dir>
