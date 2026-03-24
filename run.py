@@ -7,21 +7,24 @@ Usage:
     python run.py --list
 
     # Run a benchmark
-    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario all
+    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario all
+
+    # Run a benchmark on multi-le chip
+    python run.py --runner nvidia_vllm_6e78e779 --suite suite_B --scenario all --tensor-parallel-size 4
 
     # Serve — using a suite for model + generation params
-    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve
+    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --serve
 
     # Serve — specifying the model directly (no suite required)
-    python run.py --runner nvidia_vllm_bc2ddb31 --model meta-llama/Llama-3.1-8B-Instruct --serve
+    python run.py --runner nvidia_vllm_6e78e779 --model meta-llama/Llama-3.1-8B-Instruct --serve
 
     # Serve — suite as base, override model and tune params
-    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve \\
+    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --serve \\
         --model meta-llama/Llama-3.1-8B-Instruct \\
         --max-tokens 4096 --port 8080 --workers 8 --api-key secret
 
     # All flags after --runner <id> are passed through to the runner unchanged (non-serve mode)
-    python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario offline --output-dir ./my_result
+    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario offline --output-dir ./my_result
 """
 
 import argparse
@@ -84,7 +87,7 @@ def cmd_list(args) -> int:
 
     if not runners:
         print("No runners found in runners/")
-        print("See docs/CONTRIBUTING.md to submit a runner.")
+        print("See CONTRIBUTING.md to add a runner.")
         return 0
 
     by_platform: dict[str, list] = {}
@@ -289,7 +292,12 @@ def cmd_serve(
           + (f"  max_model_len={suite['max_model_len']}" if suite.get("max_model_len") else ""))
     print()
     try:
-        runner.load_model(effective_model_path, suite, tp_size)
+        runner.load_model(effective_model_path, suite, {
+            "tensor_parallel_size":   tp_size,
+            "pipeline_parallel_size": 1,
+            "expert_parallel_size":   1,
+            "data_parallel_size":     1,
+        })
     except Exception as e:
         print(f"Error loading model: {e}")
         return 1

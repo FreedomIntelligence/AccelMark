@@ -72,6 +72,6 @@ Files not tracked in git (stay on the submitter's machine):
 
 ## Submitting
 
-See [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md) for the full guide.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full guide.
 
 To submit a runner (new inference framework), see [runners/README.md](../runners/README.md).

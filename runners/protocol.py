@@ -13,8 +13,9 @@ Any class that implements these methods satisfies RunnerProtocol structurally
 
 from __future__ import annotations
 
-from typing import AsyncGenerator, AsyncIterator, Protocol, runtime_checkable, Optional
+from typing import Protocol, runtime_checkable, Optional
 from loadgen.types import InferenceResult
+from runners.benchmark_runner import InferenceRequest
 
 
 @runtime_checkable
@@ -34,8 +35,17 @@ class RunnerProtocol(Protocol):
 
     # ── Required methods ──────────────────────────────────────────────────────
 
-    def load_model(self, model_path: str, suite: dict, tp_size: int) -> None:
-        """Load model weights into accelerator memory."""
+    def load_model(self, model_path: str, suite: dict, parallelism: dict) -> None:
+        """
+        Load model weights into accelerator memory.
+
+        parallelism dict always contains:
+            tensor_parallel_size:   int (default 1)
+            pipeline_parallel_size: int (default 1)
+            expert_parallel_size:   int (default 1)
+            data_parallel_size:     int (default 1)
+        Read only the keys you need. Ignore unknown keys.
+        """
         ...
 
     def release_resources(self) -> None:
@@ -44,36 +54,26 @@ class RunnerProtocol(Protocol):
 
     # ── Inference ─────────────────────────────────────────────────────────────
 
-    async def inference_fn_streaming(self, prompt: str) -> InferenceResult:
+    async def inference_fn_streaming(self, request: InferenceRequest) -> InferenceResult:
         """
-        Async single-prompt inference. Required for serving.
+        Async single-request inference. Required for serving.
 
         Returns a single InferenceResult after the full response is complete.
         first_token_time_ms should be set if the framework supports streaming.
+        Read request.prompt at minimum — other fields are optional.
         """
         ...
 
-    async def inference_fn_token_stream(
-        self, prompt: str
-    ) -> AsyncGenerator[str, None]:
+    async def inference_fn_token_stream(self, request: InferenceRequest):
         """
-        Async generator that yields decoded text tokens as they are produced.
-
-        Optional — implement only if the framework exposes a token-level
-        streaming API. When present, the serve layer uses this for true
-        progressive streaming instead of sending the full response as one chunk.
+        Async generator yielding text deltas for true SSE streaming.
+        Optional — serve layer falls back to inference_fn_streaming() if
+        this raises NotImplementedError.
 
         Yields:
-            Decoded token strings (may be multi-character subwords, e.g. " hello")
-
-        The serve layer falls back to inference_fn_streaming (single-chunk mode)
-        if this method is not implemented.
+            str — decoded text delta (not cumulative)
         """
         ...
-        # Make this an async generator at the type level
-        # (implementations must use `yield`)
-        return
-        yield  # noqa: unreachable — makes type checker treat this as AsyncGenerator
 
     # ── Metadata ──────────────────────────────────────────────────────────────
 

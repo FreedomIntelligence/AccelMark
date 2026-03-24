@@ -30,6 +30,9 @@ runners/
 ├── hash_runner.py          ← Compute runner ID before submitting
 ├── meta.schema.json        ← JSON schema for meta.json
 │
+├── template/               ← starter template for new runners
+│   └── runner.py
+│
 ├── nvidia_vllm_{hash}/     ← Official reference runner (NVIDIA + vLLM)
 │   ├── runner.py
 │   ├── requirements.txt
@@ -49,6 +52,10 @@ runners/
 
 Create a temporary folder and write your runner. It must inherit from
 `BenchmarkRunner` and implement three methods:
+
+> **Tip:** Copy `runners/template/runner.py` as your starting point.
+> It has all required and optional methods pre-scaffolded with comments
+> explaining each decision point.
 
 ```python
 # runners/tmp/runner.py
@@ -138,8 +145,8 @@ if __name__ == "__main__":
     MyFrameworkRunner().main()
 ```
 
-See the [reference implementation](nvidia_vllm_bc2ddb31/runner.py) and
-[DEVELOPMENT.md](../docs/DEVELOPMENT.md) for a full working example.
+See the [reference implementation](nvidia_vllm_6e78e779/runner.py) and
+[DEVELOPMENT.md](../DEVELOPMENT.md) for a full working example.
 
 ### Step 2 — Compute the hash and name your folder
 
@@ -338,22 +345,22 @@ Use `run.py` at the repo root to run any runner:
 python run.py --list
 
 # Run the default benchmark (offline + online + interactive + accuracy)
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
 
 # Run a specific scenario only
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario offline
 
 # Run extra scenarios (e.g. sustained load test)
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario sustained
 
 # Run everything including extras
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario all
 
 # Multi-GPU
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_B --tensor-parallel-size 4
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_B --tensor-parallel-size 4
 
 # Use a local model path
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --model-path /path/to/model
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --model-path /path/to/model
 ```
 
 Results are written to `results/community/{chip}_{suite}_{runner_id}/`.
@@ -370,7 +377,7 @@ OpenAI-compatible inference server:
 ```bash
 pip install -r serve/requirements.txt
 
-python run.py --runner nvidia_vllm_bc2ddb31 --serve --port 8000
+python run.py --runner nvidia_vllm_6e78e779 --serve --port 8000
 ```
 
 See [serve/README.md](../serve/README.md) for full documentation.
@@ -379,9 +386,9 @@ See [serve/README.md](../serve/README.md) for full documentation.
 
 ## Further reading
 
-- **[docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md)** — full implementation
+- **[DEVELOPMENT.md](../DEVELOPMENT.md)** — full implementation
   guide with a complete working example (LMDeploy), capability flag details,
   platform detection, loadgen contract, and the runner update workflow
-- **[docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md)** — how to submit
+- **[CONTRIBUTING.md](../CONTRIBUTING.md)** — how to submit
   benchmark results to the leaderboard
 - **[serve/README.md](../serve/README.md)** — OpenAI-compatible serving API

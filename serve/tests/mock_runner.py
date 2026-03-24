@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 from typing import Optional
 from loadgen.types import InferenceResult
+from runners.benchmark_runner import InferenceRequest
 
 
 class MockRunner:
@@ -17,9 +18,9 @@ class MockRunner:
     Returns configurable fake responses with no GPU required.
     """
 
-    SUPPORTS_STREAMING = True
-    SUPPORTS_BATCHING  = True
-    SUPPORTS_ONLINE    = True
+    SUPPORTS_STREAMING  = True
+    SUPPORTS_BATCHING   = True
+    SUPPORTS_ONLINE     = True
     SUPPORTS_MULTI_CHIP = False
 
     def __init__(
@@ -39,13 +40,14 @@ class MockRunner:
         self._impl_id       = impl_id
         self._loaded        = False
 
-    def load_model(self, model_path: str, suite: dict, tp_size: int) -> None:
+    def load_model(self, model_path: str, suite: dict, parallelism: dict) -> None:
+        """parallelism dict contains tensor_parallel_size, pipeline_parallel_size, etc."""
         self._loaded = True
 
     def release_resources(self) -> None:
         self._loaded = False
 
-    def inference_fn_offline(self, prompts: list[str]) -> list[InferenceResult]:
+    def inference_fn_offline(self, requests: list[InferenceRequest]) -> list[InferenceResult]:
         return [
             InferenceResult(
                 first_token_time_ms=self._ttft_ms,
@@ -53,13 +55,13 @@ class MockRunner:
                 output_tokens=self._output_tokens,
                 input_tokens=self._input_tokens,
                 success=True,
-                text=self._response_text,
+                output_text=self._response_text,
             )
-            for _ in prompts
+            for _ in requests
         ]
 
-    async def inference_fn_streaming(self, prompt: str) -> InferenceResult:
-        # Simulate a small async delay
+    async def inference_fn_streaming(self, request: InferenceRequest) -> InferenceResult:
+        """Read request.prompt if needed. Simulates a small async delay."""
         await asyncio.sleep(0.001)
         return InferenceResult(
             first_token_time_ms=self._ttft_ms,
@@ -67,8 +69,14 @@ class MockRunner:
             output_tokens=self._output_tokens,
             input_tokens=self._input_tokens,
             success=True,
-            text=self._response_text,
+            output_text=self._response_text,
         )
+
+    async def inference_fn_token_stream(self, request: InferenceRequest):
+        """Yield response word by word to simulate token streaming."""
+        for word in self._response_text.split():
+            await asyncio.sleep(0.001)
+            yield word + " "
 
     def format_prompt(self, prompt: str) -> str:
         return prompt  # pass through unchanged
@@ -81,22 +89,6 @@ class MockRunner:
 
     def _compute_implementation_id(self) -> Optional[str]:
         return self._impl_id
-
-
-class TokenStreamingMockRunner(MockRunner):
-    """
-    Mock runner that implements inference_fn_token_stream.
-
-    Yields the response word-by-word with a small async delay between
-    each token, simulating true progressive streaming.
-    """
-
-    async def inference_fn_token_stream(self, prompt: str):
-        words = self._response_text.split(" ")
-        for i, word in enumerate(words):
-            await asyncio.sleep(0.002)  # simulate per-token latency
-            # Preserve spaces between words (first word has no leading space)
-            yield word if i == 0 else f" {word}"
 
 
 class NoStreamingMockRunner(MockRunner):

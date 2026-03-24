@@ -34,6 +34,23 @@ except ImportError:
 
 from .types import InferenceResult, SampleRecord
 
+# Import InferenceRequest for type hints — runners pass list[InferenceRequest]
+# to inference_fn_offline and inference_fn_streaming
+try:
+    from runners.benchmark_runner import InferenceRequest
+except ImportError:
+    # Fallback if running loadgen standalone — define a minimal shim
+    from dataclasses import dataclass as _dc, field as _field
+    from typing import Optional as _Opt
+    @_dc
+    class InferenceRequest:
+        prompt:       str
+        request_id:   int           = 0
+        input_tokens: int           = 0
+        max_tokens:   _Opt[int]     = None
+        temperature:  float         = 0.0
+        extra:        dict          = _field(default_factory=dict)
+
 SAMPLE_SEED = 42
 MAX_SAMPLES_PER_CONFIG = 200
 
@@ -54,7 +71,7 @@ class AccelMarkLoadGen:
     def __init__(
         self,
         suite: dict,
-        requests: list[dict],
+        requests: list,
         scenario: str,
         output_dir: str,
         chip_count: int = 1,
@@ -62,7 +79,8 @@ class AccelMarkLoadGen:
         """
         Args:
             suite:       Parsed contents of suite.json
-            requests:    Parsed contents of requests.jsonl (list of {"prompt": str} dicts)
+            requests:    List of InferenceRequest objects (built from requests.jsonl
+                         by benchmark_runner._run_single_scenario)
             scenario:    One of: offline, online, interactive, training
             output_dir:  Directory where samples.jsonl will be written
             chip_count:  Number of chips being used (affects throughput display per-chip)
@@ -98,7 +116,8 @@ class AccelMarkLoadGen:
         Run the benchmark for the configured scenario.
 
         inference_fn signature:
-            def inference_fn(prompts: list[str]) -> list[InferenceResult]
+            offline:  def inference_fn(requests: list[InferenceRequest]) -> list[InferenceResult]
+            online/interactive/sustained: async def inference_fn(request: InferenceRequest) -> InferenceResult
 
         Returns:
             Aggregated metrics dict suitable for embedding in result.json["metrics"]
@@ -110,8 +129,8 @@ class AccelMarkLoadGen:
         elif self.scenario == "interactive":
             if not asyncio.iscoroutinefunction(inference_fn):
                 raise TypeError(
-                    "_run_interactive requires an async inference_fn(prompt: str) -> InferenceResult. "
-                    "Pass an async coroutine (e.g. _run_one_streaming from run_vllm.py)."
+                    "_run_interactive requires an async inference_fn(request: InferenceRequest) -> InferenceResult. "
+                    "Pass an async coroutine (inference_fn_streaming)."
                 )
             loop = asyncio.get_event_loop()
             return loop.run_until_complete(self._run_interactive_async(inference_fn))
@@ -173,11 +192,11 @@ class AccelMarkLoadGen:
         # Limits in-flight count to exactly sustained_concurrency.
         sem = asyncio.Semaphore(sustained_concurrency)
 
-        async def _one_request(prompt: str) -> None:
+        async def _one_request(req: InferenceRequest) -> None:
             nonlocal interval_tokens_out, interval_tokens_in
             nonlocal interval_ttfts, interval_requests
             async with sem:
-                result = await inference_fn(prompt)
+                result = await inference_fn(req)
             if result.success:
                 interval_tokens_out += result.output_tokens
                 interval_tokens_in  += result.input_tokens or 0
@@ -189,10 +208,9 @@ class AccelMarkLoadGen:
 
         def _fire_request() -> None:
             nonlocal request_idx
-            prompt_data = requests[request_idx % len(requests)]
-            prompt      = prompt_data.get("prompt", "")
+            req = requests[request_idx % len(requests)]
             request_idx += 1
-            task = asyncio.create_task(_one_request(prompt))
+            task = asyncio.create_task(_one_request(req))
             pending_tasks.add(task)
             task.add_done_callback(pending_tasks.discard)
 
@@ -336,7 +354,6 @@ class AccelMarkLoadGen:
         """
         results_by_concurrency = []
         all_samples: list[SampleRecord] = []
-        prompts = [r["prompt"] for r in self.requests]
 
         total_runs = self.suite["num_runs"] + self.warmup_runs
         total_concurrency_levels = len(self.suite["concurrency_levels"])
@@ -344,7 +361,7 @@ class AccelMarkLoadGen:
         total_steps = self.suite["num_runs"] * total_concurrency_levels
         print(f"\n{'='*60}")
         print(f"  AccelMark Offline Benchmark")
-        print(f"  Requests  : {len(prompts)}")
+        print(f"  Requests  : {len(self.requests)}")
         print(f"  Client concurrency levels: {self.suite['concurrency_levels']}")
         print(f"  Runs      : {self.suite['num_runs']} (+{self.warmup_runs} warmup)")
         print(f"{'='*60}\n")
@@ -365,7 +382,7 @@ class AccelMarkLoadGen:
                         f"run {run_idx - self.warmup_runs + 1}/{self.suite['num_runs']}"
 
                     desc = f"  client_concurrency={client_concurrency} ({cc_idx+1}/{total_concurrency_levels}) {run_label}"
-                    tqdm.write(f"{desc} — sending all {len(prompts)} requests...")
+                    tqdm.write(f"{desc} — sending all {len(self.requests)} requests...")
 
                     t_start = time.perf_counter()
 
@@ -373,7 +390,7 @@ class AccelMarkLoadGen:
                     all_results: list[InferenceResult] = []
                     oom_occurred = False
                     try:
-                        all_results = inference_fn(prompts)
+                        all_results = inference_fn(self.requests)
                     except Exception as e:
                         err_str = str(e).lower()
                         if "out of memory" in err_str or "cuda" in err_str:
@@ -485,14 +502,14 @@ class AccelMarkLoadGen:
         Poisson arrival at each target QPS level.
         Identifies max QPS where p99 TTFT < suite SLA.
 
-        inference_fn must be an async coroutine: async def fn(prompt: str) -> InferenceResult
+        inference_fn must be an async coroutine: async def fn(request: InferenceRequest) -> InferenceResult
         Requests are dispatched concurrently according to Poisson arrival times so that
         the engine experiences realistic queueing pressure.
         """
         if not asyncio.iscoroutinefunction(inference_fn):
             raise TypeError(
-                "_run_online requires an async inference_fn(prompt: str) -> InferenceResult. "
-                "Pass an async coroutine (e.g. _run_one_streaming from run_vllm.py), "
+                "_run_online requires an async inference_fn(request: InferenceRequest) -> InferenceResult. "
+                "Pass an async coroutine (inference_fn_streaming), "
                 "not a sync wrapper."
             )
         loop = asyncio.get_event_loop()
@@ -508,7 +525,6 @@ class AccelMarkLoadGen:
         sla_ms = self.suite["online_sla_ttft_ms"]
         results_by_qps = []
         all_samples: list[SampleRecord] = []
-        prompts = [r["prompt"] for r in self.requests]
         max_valid_qps = 0.0
 
         for target_qps in self.suite["online_qps_levels"]:
@@ -519,7 +535,7 @@ class AccelMarkLoadGen:
 
             for run_idx in range(self.suite["num_runs"]):
                 run_label = f"run {run_idx + 1}/{self.suite['num_runs']}"
-                n = len(prompts)
+                n = len(self.requests)
 
                 # Generate all Poisson inter-arrival times upfront
                 inter_arrivals = [self._rng.expovariate(target_qps) for _ in range(n)]
@@ -527,11 +543,11 @@ class AccelMarkLoadGen:
 
                 t_start = loop.time()
 
-                async def send_request(p: str, t_arrival: float) -> InferenceResult:
+                async def send_request(req: InferenceRequest, t_arrival: float) -> InferenceResult:
                     delay = t_arrival - (loop.time() - t_start)
                     if delay > 0:
                         await asyncio.sleep(delay)
-                    return await async_inference_fn(p)
+                    return await async_inference_fn(req)
 
                 tqdm.write(
                     f"[online] qps={target_qps} {run_label} "
@@ -541,7 +557,7 @@ class AccelMarkLoadGen:
                 # Run all requests concurrently; each sleeps until its arrival time
                 all_results: list[InferenceResult] = list(
                     await asyncio.gather(
-                        *[send_request(p, t) for p, t in zip(prompts, arrival_times)]
+                        *[send_request(req, t) for req, t in zip(self.requests, arrival_times)]
                     )
                 )
 
@@ -562,7 +578,7 @@ class AccelMarkLoadGen:
 
             all_ttfts = [v for run in run_ttfts for v in run]
             all_tpots = [v for run in run_tpots for v in run]
-            achieved_qps = len(all_ttfts) / (self.suite["num_runs"] * len(prompts) / target_qps) if target_qps > 0 else 0
+            achieved_qps = len(all_ttfts) / (self.suite["num_runs"] * len(self.requests) / target_qps) if target_qps > 0 else 0
 
             ttft_p50 = float(np.percentile(all_ttfts, 50)) if all_ttfts else 0
             ttft_p90 = float(np.percentile(all_ttfts, 90)) if all_ttfts else 0
@@ -605,7 +621,6 @@ class AccelMarkLoadGen:
         Measures single-request latency in isolation (no queueing pressure).
         Uses the same async engine as online to ensure consistent TTFT measurement.
         """
-        prompts = [r["prompt"] for r in self.requests]
         all_ttfts: list[float] = []
         all_tpots: list[float] = []
         all_samples: list[SampleRecord] = []
@@ -622,9 +637,9 @@ class AccelMarkLoadGen:
             run_tpots: list[float] = []
             t_run_start = time.perf_counter()
 
-            for i, prompt in enumerate(prompts):
+            for i, req in enumerate(self.requests):
                 # Send one request, await completion before next — true serial
-                r = await async_inference_fn(prompt)
+                r = await async_inference_fn(req)
 
                 if r.success:
                     if r.first_token_time_ms is not None:
@@ -646,7 +661,7 @@ class AccelMarkLoadGen:
                 # Print progress every 10 requests
                 if (i + 1) % 10 == 0:
                     tqdm.write(
-                        f"  [interactive] {run_label} {i+1}/{len(prompts)} "
+                        f"  [interactive] {run_label} {i+1}/{len(self.requests)} "
                         f"— last TTFT: {r.first_token_time_ms:.0f}ms" if r.first_token_time_ms else ""
                     )
 
@@ -714,20 +729,21 @@ class AccelMarkLoadGen:
         from collections import defaultdict
         conversations = defaultdict(list)
         for r in self.requests:
-            conv_id = r.get("conversation_id", str(r["request_id"]))
+            conv_id = r.extra.get("conversation_id", str(r.request_id)) if r.extra else str(r.request_id)
             conversations[conv_id].append(r)
 
         # Sort turns within each conversation
         for conv_id in conversations:
-            conversations[conv_id].sort(key=lambda r: r.get("turn_index", 0))
+            conversations[conv_id].sort(key=lambda r: r.extra.get("turn_index", 0) if r.extra else 0)
 
         # Run conversations sequentially
         all_results = []
         total_turns = sum(len(turns) for turns in conversations.values())
         for conv_id, turns in tqdm(conversations.items(), desc="[multiturn] conversations", unit="conv"):
             for turn in turns:
-                result = inference_fn([turn["prompt"]])[0]
-                all_results.append((conv_id, turn.get("turn_index", 0), result))
+                result = inference_fn([turn])[0]
+                turn_index = turn.extra.get("turn_index", 0) if turn.extra else 0
+                all_results.append((conv_id, turn_index, result))
 
         # Metrics: compare first-turn vs subsequent-turn latency
         # (subsequent turns benefit from prefix cache)

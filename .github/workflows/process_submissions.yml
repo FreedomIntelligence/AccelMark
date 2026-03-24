@@ -27,7 +27,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install jsonschema --quiet
+        run: pip install jsonschema numpy --quiet
 
       - name: Extract result JSON from issue body
         id: extract
@@ -130,18 +130,6 @@ jobs:
             echo "valid=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit result files to new branch
-        if: steps.validate.outputs.valid == 'true'
-        run: |
-          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
-          BRANCH="submission/${{ steps.extract.outputs.dir_name }}"
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
-          git add "$DIR"
-          git commit -m "community: add ${{ steps.extract.outputs.dir_name }}"
-          git push origin "$BRANCH"
-
       - name: Create PR if valid
         if: steps.validate.outputs.valid == 'true'
         uses: actions/github-script@v7
@@ -150,6 +138,20 @@ jobs:
             const dirName = '${{ steps.extract.outputs.dir_name }}';
             const issueNumber = '${{ steps.extract.outputs.issue_number }}';
             const branchName = `submission/${dirName}`;
+
+            // Create branch
+            const { data: ref } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'heads/main',
+            });
+
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/heads/${branchName}`,
+              sha: ref.object.sha,
+            });
 
             // Create PR
             const { data: pr } = await github.rest.pulls.create({

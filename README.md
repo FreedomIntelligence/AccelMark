@@ -4,9 +4,9 @@
 
 [![Live Leaderboard](https://img.shields.io/badge/leaderboard-live-brightgreen)](https://juhaoliang1997.github.io/AccelMark)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)](docs/CONTRIBUTING.md)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)](CONTRIBUTING.md)
 
-[**→ Live Leaderboard**](https://juhaoliang1997.github.io/AccelMark) · [Contributing](docs/CONTRIBUTING.md) · [Suites](suites/README.md) · [Serve](serve/README.md) · [Development](docs/DEVELOPMENT.md)
+[**→ Live Leaderboard**](https://juhaoliang1997.github.io/AccelMark) · [Contributing](CONTRIBUTING.md) · [Suites](suites/README.md) · [Development](DEVELOPMENT.md)
 
 ---
 
@@ -27,23 +27,21 @@
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
 pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121
-pip install -r runners/nvidia_vllm_bc2ddb31/requirements.txt
+pip install -r runners/nvidia_vllm_3607f3ff/requirements.txt
 
 # 2. One-time setup
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name
 
 # 3. Run the benchmark (~46 min on A100)
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A
-# Add --scenario all to also run extra scenarios (e.g. sustained),
-# or --scenario offline to run a single scenario.
+python run.py --runner nvidia_vllm_3607f3ff --suite suite_A
 
 # 4. Validate and submit
 python runners/validate_submission.py --dir results/community/<your_dir>
 # Open a GitHub Issue with the "Community Submission" template
 ```
 
-See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full guide.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ---
 
@@ -61,32 +59,6 @@ See [suites/README.md](suites/README.md) for full specs, time budgets, SLA defin
 
 ---
 
-## Serve
-
-Any runner can be started as an OpenAI-compatible inference server — the same
-code that produced the benchmark result serves your API.
-
-```bash
-# Install serve dependencies
-pip install -r serve/requirements.txt
-
-# Option A — use a suite (model + generation params come from suite.json)
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve
-
-# Option B — specify the model directly, no suite required
-python run.py --runner nvidia_vllm_bc2ddb31 --model meta-llama/Llama-3.1-8B-Instruct --serve
-
-# With options
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve \
-    --port 8000 --workers 4 --api-key sk-mykey
-```
-
-Endpoints: `GET /health`, `GET /v1/models`, `POST /v1/chat/completions`, `POST /v1/completions`.
-
-See [serve/README.md](serve/README.md) for the full flag reference and client examples.
-
----
-
 ## Supported platforms
 
 | Platform | Framework | A | B | C | D | E |
@@ -97,7 +69,7 @@ See [serve/README.md](serve/README.md) for the full flag reference and client ex
 | Huawei Ascend | MindIE | ✓ | — | — | — | — |
 | Apple Silicon | mlx-lm | ✓ | — | — | — | — |
 
-Adding a new platform? See [docs/CONTRIBUTING.md#adding-support-for-a-new-platform](docs/CONTRIBUTING.md#adding-support-for-a-new-platform).
+Adding a new platform? See [CONTRIBUTING.md#adding-support-for-a-new-platform](CONTRIBUTING.md#adding-support-for-a-new-platform).
 
 ---
 
@@ -116,28 +88,24 @@ Community results are fully visible and comparable — they just haven't been in
 
 ```
 AccelMark/
-├── run.py               # Unified CLI entry point (benchmark + serve)
+├── suites/              # Suite definitions — see suites/README.md
 ├── runners/             # Platform benchmark runners
 │   ├── benchmark_runner.py   # Shared base class — all orchestration logic
-│   ├── protocol.py           # RunnerProtocol — shared interface for runners and serve
 │   ├── collect_env.py        # Hardware/software detection → env_info.json
 │   ├── validate_submission.py
-│   ├── hash_runner.py        # Compute runner ID before submission
-│   ├── validate_runners.py   # CI: validate all runner folders
-│   ├── meta.schema.json      # JSON schema for runner meta.json
-│   └── nvidia_vllm_bc2ddb31/ # Reference runner (NVIDIA + vLLM)
+│   ├── validate_runners.py
+│   ├── protocol.py           # RunnerProtocol interface (serve layer)
+│   ├── template/             # Annotated starter template for new runners
+│   └── nvidia_vllm_{hash8}/  # Example: NVIDIA vLLM runner
 │       ├── runner.py
-│       ├── requirements.txt
-│       └── meta.json
-├── serve/               # OpenAI-compatible inference server
-│   ├── server.py        # FastAPI app, endpoints, start_server()
-│   ├── adapter.py       # Pydantic request/response models
-│   ├── capacity.py      # Capacity estimates from prior benchmark results
-│   ├── requirements.txt
-│   └── README.md
+│       ├── meta.json
+│       └── requirements.txt
 ├── loadgen/             # Shared request sending and timing logic
 │   ├── loadgen.py       # Core timing engine — do not modify per-platform
 │   └── types.py         # InferenceResult, SampleRecord
+├── serve/               # OpenAI-compatible inference server
+│   ├── server.py        # FastAPI app — wraps any runner as an HTTP API
+│   └── adapter.py       # OpenAI request/response models
 ├── schema/              # JSON schemas, accuracy subset, cloud pricing
 │   ├── result.schema.json
 │   ├── accuracy_subset.jsonl    # immutable
@@ -150,20 +118,9 @@ AccelMark/
 │   └── site/
 │       ├── index.html
 │       └── leaderboard.js   # Auto-generated — do not edit manually
-├── openclaw_skill/      # OpenClaw chat skill — benchmark from any chat app
-│   ├── accelmark_skill.py   # Skill entry point (trigger phrases → benchmark → report)
-│   ├── skill.json           # Trigger phrases, permissions, metadata
-│   ├── requirements.txt
-│   ├── README.md
-│   ├── mini/                # Auto-adaptive benchmark (hardware detection + tier selection)
-│   │   ├── mini_suite_selector.py  # Hardware → tier config (nano / mini / standard / pro)
-│   │   ├── run_mini.py             # vLLM + mlx-lm backends, result.json builder
-│   │   ├── hardware_assessment.py  # CPU-only analysis and model recommendations
-│   │   └── requests.jsonl          # Fixed 200-prompt set (reproducible across hardware)
-│   └── tests/
-├── docs/
-│   ├── CONTRIBUTING.md
-│   └── DEVELOPMENT.md
+├── run.py               # Unified entry point — benchmark and serve
+├── CONTRIBUTING.md
+├── DEVELOPMENT.md
 └── configs/             # Local config — gitignored
     └── submitter.yaml.example
 ```
@@ -174,10 +131,10 @@ AccelMark/
 
 The most valuable contribution is running the benchmark on hardware not yet in the leaderboard.
 
-- **Submit a result** → [Community Submission guide](docs/CONTRIBUTING.md)
+- **Submit a result** → [Community Submission guide](CONTRIBUTING.md)
 - **Report a bug** → [Open an issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=bug_report.md)
-- **Add platform support** → [Platform guide](docs/CONTRIBUTING.md#adding-support-for-a-new-platform)
-- **Extend the leaderboard** → [Development guide](docs/DEVELOPMENT.md)
+- **Add platform support** → [Platform guide](CONTRIBUTING.md#adding-support-for-a-new-platform)
+- **Extend the leaderboard** → [Development guide](DEVELOPMENT.md)
 
 ---
 

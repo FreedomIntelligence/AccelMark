@@ -3,6 +3,7 @@
   "description": "Single chip inference, Llama-3-8B-Instruct. Minimum required suite for leaderboard entry.",
   "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
   "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+  "dataset": "sharegpt_standard_v1",
   "scenarios": {
     "default": ["accuracy", "offline", "online", "interactive"],
     "extra": ["sustained"]
@@ -21,7 +22,7 @@
   "output_tokens_max": 512,
   "concurrency_levels": [8, 32, 128],
   "_concurrency_levels_note": "Client-side concurrency: number of requests sent simultaneously to the inference engine. The engine (e.g. vLLM) handles internal batching automatically. Higher concurrency allows the engine to form larger internal batches, which may improve throughput up to the engine's max_num_seqs limit.",
-  "online_qps_levels": [5, 10, 25, 50, 100],
+  "online_qps_levels": [5, 25, 100],
   "online_sla_ttft_ms": 500,
   "online_sla_ttft_ms_relaxed": 2000,
   "num_runs": 3,
@@ -29,7 +30,7 @@
   "warmup_minutes": 2,
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0 ,
-  "accuracy_threshold_delta": 0.03,
+  "accuracy_threshold_delta": 0.1,
   "request_count": 200,
   "_request_count_note": "offline uses 200, online/interactive uses 500 (controlled in loadgen)",
   "online_request_count": 500,

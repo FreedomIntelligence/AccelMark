@@ -10,8 +10,8 @@ AI accelerators apples-to-apples.
 | Suite | Model | Chips | Scenarios | Purpose |
 |-------|-------|-------|-----------|---------|
 | [Suite A](#suite-a) | Llama-3-8B-Instruct | 1 | offline, online, interactive | Standard single-chip inference. **Required for leaderboard entry.** |
-| [Suite B](#suite-b) | Llama-3-70B-Instruct | 8 | offline, online | Large model multi-chip inference |
-| [Suite C](#suite-c) | Llama-3-8B-Instruct | 1 | offline | Quantization efficiency (BF16/INT8/INT4) — **not yet implemented** |
+| [Suite B](#suite-b) | Llama-3-70B-Instruct | flexible | offline, online | Large model multi-chip inference |
+| [Suite C](#suite-c) | Llama-3.1-8B-Instruct | 1 | offline | Quantization efficiency (BF16/FP8/W8A8/W8A16/W4A16) |
 | [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline, interactive | Long-context inference (32K tokens) |
 | [Suite E](#suite-e) | Llama-3-8B-Instruct | 1×/2×/4×/8× | offline | Multi-chip scaling efficiency |
 
@@ -30,9 +30,11 @@ Times on other hardware will differ.
 | A | interactive | 100 | ~23 min | **~50 min** |
 | B | offline | 200 | ~9 min | |
 | B | online | 500 | ~60 min | **~69 min** |
-| C | offline (BF16) | 200 | — | |
-| C | offline (INT8) | 200 | — | |
-| C | offline (INT4) | 200 | — | **not yet implemented** |
+| C | offline (BF16) | 200 | ~9 min | |
+| C | offline (FP8) | 200 | ~9 min | |
+| C | offline (W8A8) | 200 | ~8 min | |
+| C | offline (W8A16) | 200 | ~10 min | |
+| C | offline (W4A16) | 200 | ~9 min | **~45 min** |
 | D | offline | 100 | ~47 min | |
 | D | interactive | 50 | ~13 min | **~60 min** |
 | E | offline (1×) | 500 | ~10 min | |
@@ -40,6 +42,9 @@ Times on other hardware will differ.
 | E | offline (4×) | 500 | ~6 min | **~24 min** |
 
 ¹ Measured on NVIDIA A100 SXM4 80 GB with vLLM as reference. Recorded in `meta.benchmark_elapsed_minutes` of each result.json.
+
+> **Sustained scenario** (extra, opt-in): adds ~30 min to any suite that supports it.
+> Run with `--scenario sustained`. Not included in default suite runs.
 
 ---
 
@@ -83,7 +88,7 @@ Measures maximum throughput when all requests are sent at once.
 vLLM's internal scheduler handles batching.
 
 ```
-concurrency_levels: [8, 32, 128]   — client-side concurrency (requests sent simultaneously)
+concurrency_levels: [1, 4, 16, 64]   — client-side concurrency (requests sent simultaneously)
 request_count: 200
 num_runs: 3 + 1 warmup
 Primary metric: throughput_tokens_per_sec (input + output tokens)
@@ -95,7 +100,7 @@ Measures maximum sustainable QPS while meeting a latency SLA.
 Requests arrive following a Poisson process (realistic service traffic).
 
 ```
-online_qps_levels: [5, 10, 25, 50, 100]
+online_qps_levels: [5, 25, 100]
 online_sla_ttft_ms: 500    — p99 TTFT must be < 500ms to pass
 online_request_count: 500
 num_runs: 3 (no warmup)
@@ -125,6 +130,24 @@ accuracy_threshold_delta: 0.03  — valid if score ≥ BF16_baseline − 0.03
 Primary metric: subset_score (fraction correct)
 ```
 
+### Sustained scenario (extra)
+
+30-minute fixed-concurrency load test. Detects thermal throttling and
+memory fragmentation that point-in-time benchmarks miss.
+
+```
+sustained_concurrency: 8    — requests kept in-flight simultaneously
+duration_minutes: 30
+sample_interval_seconds: 60  — throughput snapshot every minute
+warmup_minutes: 2
+```
+
+Run explicitly with `--scenario sustained`. Not part of the default run.
+
+```bash
+python run.py --runner nvidia_vllm_xxxx --suite suite_A --scenario sustained
+```
+
 ---
 
 ## Suite B
@@ -133,7 +156,7 @@ Primary metric: subset_score (fraction correct)
 
 ```
 Model:     meta-llama/Meta-Llama-3-70B-Instruct
-Chips:     4+ (tensor parallelism — use however many your hardware needs)
+Chips:     flexible — use however many your hardware requires
 Precision: BF16
 ```
 
@@ -152,62 +175,97 @@ A value of 0.8 with N=4 means 4 chips deliver 3.2× the single-chip throughput.
 
 **Quantization efficiency — speed vs quality tradeoff**
 
-> **Status: Not yet implemented.** Suite C is defined and documented but the benchmark runner support (`_run_suite_c()`) is not finished. Do not submit Suite C results yet.
->
 > *"How much faster does quantization make this chip, and what quality is lost?"*
 
-Suite C runs the same workload as Suite A (Llama-3-8B, offline) at three
-precision levels. Holding everything else constant isolates the effect of
-quantization on throughput and output quality.
+Suite C runs the same workload as Suite A at five precision formats using
+fixed pre-quantized HuggingFace checkpoints. All formats use the same
+Llama-3.1-8B base model — accuracy differences reflect quantization only,
+not model version differences.
 
 | | |
 |---|---|
-| **Model** | Llama-3-8B-Instruct |
+| **Base model** | `meta-llama/Llama-3.1-8B-Instruct` |
 | **Chips** | 1 |
-| **Scenarios** | offline |
-| **Precision levels** | BF16 · INT8 (W8A8) · INT4 (W4A16 AWQ) |
-| **Primary metrics** | throughput per precision · speedup_vs_bf16 · quality_efficiency |
-| **Run time** | ~15 min on A100 (5 min × 3 precision levels) |
+| **Default scenarios** | accuracy, offline |
+| **Extra scenarios** | online, sustained |
+| **Primary metric** | `quality_efficiency` (best across all formats) |
+| **Run time** | ~45 min on A100 (default scenarios, all 5 formats) |
 
-```
-concurrency_levels: [8, 32, 128]
-request_count: 200
-num_runs: 3 + 1 warmup
-accuracy_threshold_delta: 0.05  — wider than other suites; quantization reduces accuracy
-```
+### Precision formats
+
+| Format | Checkpoint | Accuracy threshold | Notes |
+|---|---|---|---|
+| BF16 | `meta-llama/Llama-3.1-8B-Instruct` | ±0.03 | Baseline |
+| FP8 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8` | ±0.03 | Fast on H100/MI300X; emulated on A100 |
+| W8A8 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8` | ±0.04 | INT8 weights + activations |
+| W8A16 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16` | ±0.03 | INT8 weights, FP16 activations |
+| W4A16 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16` | ±0.05 | INT4 weights (AWQ), FP16 activations |
+
+Each format runs against the same 200 prompts with the same concurrency
+sweep. Format availability depends on the runner's `SUPPORTED_QUANTIZATIONS`
+declaration — unsupported formats are skipped automatically.
 
 ### Metrics
 
-**speedup_vs_bf16**: throughput ratio vs BF16 baseline. 1.5 = 50% more throughput.
+**speedup_vs_bf16**: throughput ratio relative to BF16 baseline.
+`1.20` = 20% more throughput than BF16.
 
-**quality_efficiency**: `throughput × accuracy_score`. Higher = better overall tradeoff.
+**quality_efficiency**: `throughput × accuracy_score`. Rewards both
+speed and accuracy simultaneously. The leaderboard primary metric is the
+best quality_efficiency across all evaluated formats.
+
+**accuracy per format**: each format has its own accuracy baseline and
+threshold. Accuracy below threshold is flagged but does not block the run.
+
+### Example result (A100, vLLM)
 
 ```
-Example result on A100:
-Precision  Throughput    Accuracy  Speedup   Quality Eff
-BF16       6,123 tok/s   0.62      1.00×     3,796
-INT8       9,200 tok/s   0.60      1.50×     5,520  ← good tradeoff
-INT4       13,500 tok/s  0.54      2.20×     7,290  ← aggressive
+Format  Throughput    Accuracy  Speedup   Quality Eff   Compute dtype
+BF16    5,336 tok/s   0.57      1.000×    3,042         bfloat16
+FP8     5,179 tok/s   0.57      0.971×    2,952         bfloat16 (emulated)
+W8A8    6,399 tok/s   0.59      1.199×    3,776         bfloat16
+W8A16   4,939 tok/s   0.57      0.925×    2,815         bfloat16
+W4A16   5,095 tok/s   0.57      0.955×    2,904         float16
+```
+
+W8A8 wins on A100 because it uses INT8 tensor cores. FP8 shows no speedup
+because A100 lacks native FP8 hardware — compute falls back to BF16.
+On H100, FP8 would show ~1.5-1.8× speedup.
+
+### Runner requirements
+
+Declare which formats your runner supports:
+
+```python
+# In your runner class:
+SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]  # H100
+SUPPORTED_QUANTIZATIONS = ["w8a8", "w8a16", "w4a16"]          # A100 (no native FP8)
+SUPPORTED_QUANTIZATIONS = []                                   # BF16 only
+```
+
+Each format's checkpoint must be available locally. Add to
+`configs/models_local.yaml`:
+
+```yaml
+models:
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8":
+    local_path: /data/models/llama31-8b-fp8
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8":
+    local_path: /data/models/llama31-8b-w8a8
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16":
+    local_path: /data/models/llama31-8b-w8a16
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16":
+    local_path: /data/models/llama31-8b-w4a16
 ```
 
 ### Running Suite C
 
 ```bash
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_C
+python run.py --runner nvidia_vllm_xxxx --suite suite_C
 ```
 
-Runs BF16 → INT8 → INT4 in sequence. Each precision level is a separate
-subprocess for clean GPU state. BF16 is required; INT8 and INT4 are optional.
-
-### Requirements
-
-```bash
-# INT8: install bitsandbytes
-pip install bitsandbytes
-
-# INT4: requires AWQ quantized model weights
-# e.g. meta-llama/Meta-Llama-3-8B-Instruct-AWQ
-```
+Runs all supported formats in sequence. Each format is a separate subprocess
+for clean GPU state. BF16 always runs first as the baseline.
 
 ---
 
@@ -266,7 +324,7 @@ scaling_efficiency = N_chip_throughput / (1_chip_throughput × N)
 ```
 
 ```
-concurrency_levels: [8, 32, 128]
+concurrency_levels: [1, 4, 16, 64]
 request_count: 500
 num_runs: 3 + 1 warmup
 chip_counts_required: [1, 2]
@@ -277,10 +335,10 @@ chip_counts_all: [1, 2, 4, 8]
 
 ```bash
 # 4-chip machine
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_E --max-chips 4
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_E --max-chips 4
 
 # 8-chip machine
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_E --max-chips 8
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_E --max-chips 8
 ```
 
 **Minimum requirement:** both 1× and 2× must succeed for the submission
@@ -288,22 +346,34 @@ to pass validation.
 
 ---
 
-## requests.jsonl Format
+## Datasets
 
-Each suite ships with a fixed `requests.jsonl` file. All platforms run
-against the exact same prompts to ensure comparability.
+Request datasets are stored in `datasets/` and shared across suites.
+Each dataset is versioned and immutable — changing prompts creates a new
+version rather than modifying the existing one.
 
-```jsonl
-{"request_id": 0, "prompt": "...", "input_tokens_approx": 245, "prompt_type": "conversational"}
-{"request_id": 1, "prompt": "...", "input_tokens_approx": 412, "prompt_type": "code_generation"}
+| Dataset | Used by | Prompts | Input p50 | Output p50 |
+|---|---|---|---|---|
+| `sharegpt_standard_v1` | Suite A, B, C, E | 500 | ~280 tokens | ~310 tokens |
+| `sharegpt_longctx_v1` | Suite D | 200 | ~28,000 tokens | ~300 tokens |
+
+Suite JSON files reference datasets by name:
+```json
+"dataset": "sharegpt_standard_v1"
 ```
 
-**These files must not be edited manually.** Changing the prompts invalidates
+### Request format
+
+Each line in `requests.jsonl`:
+
+```jsonl
+{"request_id": 0, "prompt": "...", "input_tokens": 245, "conversation_id": "sg_00001", "turn_index": 0, "prompt_type": "conversational"}
+```
+
+**These files must not be edited manually.** Changing prompts invalidates
 comparisons with existing results.
 
-Source dataset: `shibing624/sharegpt_gpt4`
-
-Prompt type distribution (Suite A/B):
+Prompt type distribution (sharegpt_standard_v1):
 ```
 conversational:  40%  — everyday dialogue, advice, Q&A
 summarization:   30%  — long input, short output
@@ -313,13 +383,16 @@ reasoning:       10%  — step-by-step analysis, math
 
 ---
 
-## Adding a New Suite
+## Adding a new suite
 
 1. Open a GitHub Issue using the "Request new suite" template
 2. Specify: model, chip count, scenarios, and rationale
 3. Maintainers review and add to the roadmap
-4. Internal data pipeline generates `requests.jsonl`
-5. Suite is published with at least one reference result
+4. Create `suites/suite_X/suite.json` referencing a shared dataset
+   (or add a new dataset to `datasets/`)
+5. If custom orchestration is needed, add `suites/suite_X/suite.py`
+   (see [DEVELOPMENT.md](../DEVELOPMENT.md) for the suite plugin interface)
+6. Submit a reference result on at least one chip before the suite
+   appears on the main leaderboard
 
-New suites require a reference result on at least one chip before
-they appear on the main leaderboard.
+See [DEVELOPMENT.md](../DEVELOPMENT.md) for the full guide.

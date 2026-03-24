@@ -3,6 +3,7 @@
   "description": "Quantization efficiency benchmark. Measures throughput and accuracy across BF16, FP8, W8A8, W8A16, and W4A16 precision formats using fixed pre-quantized checkpoints.",
   "base_model_id": "meta-llama/Llama-3.1-8B-Instruct",
   "model_revision":  "0e9e39f249a16976918f6564b8830bc894c89659",
+  "dataset": "sharegpt_standard_v1",
 
   "precision_model_map": {
     "BF16":  {

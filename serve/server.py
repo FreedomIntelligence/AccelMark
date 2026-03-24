@@ -43,6 +43,7 @@ from serve.adapter import (
 )
 from serve.capacity import format_capacity_log, load_capacity_estimate
 from runners.protocol import RunnerProtocol
+from runners.benchmark_runner import InferenceRequest
 
 logger = logging.getLogger("accelmark.serve")
 
@@ -169,15 +170,13 @@ async def chat_completions(
         """Acquire semaphore and call runner."""
         async with _state.semaphore:
             t0 = time.perf_counter()
-            result = await _state.runner.inference_fn_streaming(prompt)
+            result = await _state.runner.inference_fn_streaming(
+                InferenceRequest(prompt=prompt)
+            )
             elapsed_ms = round((time.perf_counter() - t0) * 1000)
 
-        # Reconstruct the text from InferenceResult
-        # inference_fn_streaming returns a single InferenceResult — content
-        # is not stored on it directly, so we use a sentinel approach:
-        # runners that want to expose the actual text should set result.text
-        content         = getattr(result, "text", "") or ""
-        prompt_tokens   = result.input_tokens or 0
+        content           = result.output_text or ""
+        prompt_tokens     = result.input_tokens or 0
         completion_tokens = result.output_tokens or 0
 
         logger.info(
@@ -195,18 +194,15 @@ async def chat_completions(
             yield make_sse_chunk(completion_id, _state.model_id,
                                  content=None, role="assistant")
 
-            if hasattr(_state.runner, "inference_fn_token_stream"):
-                # ── True token streaming ──────────────────────────────────
-                # Yield each token delta as it arrives from the runner.
-                # TTFT = time to first yield from the generator.
-                # Semaphore is held for the full stream duration so --workers
-                # limits concurrent streaming connections the same way it
-                # limits non-streaming requests.
+            # Try true token streaming — falls back to single-chunk if not supported
+            try:
                 async with _state.semaphore:
                     t0 = time.perf_counter()
-                    token_count  = 0
+                    token_count   = 0
                     first_yielded = False
-                    async for token in _state.runner.inference_fn_token_stream(prompt):
+                    async for token in _state.runner.inference_fn_token_stream(
+                        InferenceRequest(prompt=prompt)
+                    ):
                         if not first_yielded:
                             ttft_ms = round((time.perf_counter() - t0) * 1000)
                             logger.info(
@@ -222,10 +218,9 @@ async def chat_completions(
                         f"POST /v1/chat/completions [stream] | "
                         f"{token_count} tokens | {total_ms}ms total"
                     )
-            else:
-                # ── Single-chunk fallback ─────────────────────────────────
-                # Runner doesn't support token streaming — run inference
-                # and send the full response as one content chunk.
+            except NotImplementedError:
+                # Runner doesn't support token streaming — send full response
+                # as one content chunk.
                 content, prompt_tokens, completion_tokens = await _run_inference()
                 if content:
                     yield make_sse_chunk(completion_id, _state.model_id,
@@ -275,10 +270,12 @@ async def completions(
     async def _run():
         async with _state.semaphore:
             t0 = time.perf_counter()
-            result = await _state.runner.inference_fn_streaming(prompt)
+            result = await _state.runner.inference_fn_streaming(
+                InferenceRequest(prompt=prompt)
+            )
             elapsed_ms = round((time.perf_counter() - t0) * 1000)
 
-        content           = getattr(result, "text", "") or ""
+        content           = result.output_text or ""
         prompt_tokens     = result.input_tokens or 0
         completion_tokens = result.output_tokens or 0
 
@@ -293,13 +290,14 @@ async def completions(
             yield make_sse_chunk(completion_id, _state.model_id,
                                  content=None, role="assistant")
 
-            if hasattr(_state.runner, "inference_fn_token_stream"):
-                # True token streaming
+            try:
                 async with _state.semaphore:
-                    async for token in _state.runner.inference_fn_token_stream(prompt):
+                    async for token in _state.runner.inference_fn_token_stream(
+                        InferenceRequest(prompt=prompt)
+                    ):
                         yield make_sse_chunk(completion_id, _state.model_id,
                                              content=token)
-            else:
+            except NotImplementedError:
                 # Single-chunk fallback
                 content, _, _ = await _run()
                 if content:

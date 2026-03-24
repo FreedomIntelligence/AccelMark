@@ -14,10 +14,10 @@ no re-configuration, no separate deployment stack.
 pip install -r serve/requirements.txt
 
 # Option A — use a benchmark suite (model + params come from suite.json)
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --serve
 
 # Option B — specify the model directly, no suite required
-python run.py --runner nvidia_vllm_bc2ddb31 --model meta-llama/Llama-3.1-8B-Instruct --serve
+python run.py --runner nvidia_vllm_6e78e779 --model meta-llama/Llama-3.1-8B-Instruct --serve
 
 # Test it
 curl http://localhost:8000/health
@@ -36,7 +36,7 @@ pip install -r serve/requirements.txt
 You also need the runner's own dependencies installed:
 
 ```bash
-pip install -r runners/nvidia_vllm_bc2ddb31/requirements.txt
+pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
 ```
 
 ---
@@ -48,7 +48,7 @@ There are two ways to specify the model and generation parameters:
 ### Option A — suite-based (benchmark config as source of truth)
 
 ```bash
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --serve
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --serve
 ```
 
 The suite's `model_id`, `output_tokens_max`, and `max_model_len` are used automatically.
@@ -56,7 +56,7 @@ The suite's `model_id`, `output_tokens_max`, and `max_model_len` are used automa
 ### Option B — model flag (no suite required)
 
 ```bash
-python run.py --runner nvidia_vllm_bc2ddb31 \
+python run.py --runner nvidia_vllm_6e78e779 \
     --model meta-llama/Llama-3.1-8B-Instruct \
     --serve
 ```
@@ -64,7 +64,7 @@ python run.py --runner nvidia_vllm_bc2ddb31 \
 ### Full example with all options
 
 ```bash
-python run.py --runner nvidia_vllm_bc2ddb31 \
+python run.py --runner nvidia_vllm_6e78e779 \
     --suite suite_A \
     --model meta-llama/Llama-3.1-8B-Instruct \
     --model-path /path/to/local/weights \
@@ -102,7 +102,7 @@ Explicit `--max-tokens` / `--max-model-len` always override suite values.
 ## Startup output
 
 ```
-Runner:  VLLMRunner (nvidia_vllm_bc2ddb31)
+Runner:  VLLMRunner (nvidia_vllm_6e78e779)
 Suite:   suite_A
 Model:   meta-llama/Meta-Llama-3-8B-Instruct
 Path:    /models/Meta-Llama-3-8B-Instruct
@@ -110,7 +110,7 @@ Params:  max_tokens=2048
 
 2026-03-22 10:41:03 | INFO  | ============================================================
 2026-03-22 10:41:03 | INFO  | AccelMark Serve
-2026-03-22 10:41:03 | INFO  |   Runner    : nvidia_vllm_bc2ddb31
+2026-03-22 10:41:03 | INFO  |   Runner    : nvidia_vllm_6e78e779
 2026-03-22 10:41:03 | INFO  |   Framework : vLLM 0.6.6
 2026-03-22 10:41:03 | INFO  |   Model     : meta-llama/Meta-Llama-3-8B-Instruct
 2026-03-22 10:41:03 | INFO  |   Endpoint  : http://0.0.0.0:8000
@@ -127,7 +127,7 @@ Capacity estimates come from prior benchmark results for this runner ID.
 Run a benchmark suite first to populate them:
 
 ```bash
-python run.py --runner nvidia_vllm_bc2ddb31 --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario all
 ```
 
 ---
@@ -146,7 +146,7 @@ curl http://localhost:8000/health
 {
   "status": "ok",
   "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "implementation_id": "nvidia_vllm_bc2ddb31",
+  "implementation_id": "nvidia_vllm_6e78e779",
   "uptime_seconds": 42
 }
 ```
@@ -167,7 +167,7 @@ curl http://localhost:8000/v1/models
       "id": "meta-llama/Meta-Llama-3-8B-Instruct",
       "object": "model",
       "created": 1742636463,
-      "owned_by": "nvidia_vllm_bc2ddb31"
+      "owned_by": "nvidia_vllm_6e78e779"
     }
   ]
 }
@@ -284,7 +284,7 @@ Without `--api-key`, the server accepts all requests with no auth.
 **Streaming format:** The server uses SSE (server-sent events) format
 compatible with the OpenAI spec. Responses are currently sent as a single
 chunk rather than token-by-token. True token streaming requires runner-level
-support — see the roadmap in `docs/DEVELOPMENT.md`.
+support — see the roadmap in `DEVELOPMENT.md`.
 
 **Runners without streaming:** Runners that set `SUPPORTS_STREAMING = False`
 cannot be used with `--serve`. The server will refuse to start and print

@@ -1,0 +1,55 @@
+# configs/models_local.yaml
+#
+# Map canonical HuggingFace model IDs to local paths on this machine.
+# This file is gitignored — never commit local paths to the repo.
+#
+# The model_id key is the canonical identifier from suite.json.
+# It is used as the grouping key on the leaderboard — do not change it.
+# It does NOT force you to download from HuggingFace; it is just a key.
+#
+# Fields:
+#   local_path   (required) — absolute path to model weights on this machine
+#   model_name   (optional) — actual model identifier if using a different
+#                             variant than the suite standard. Leave unset
+#                             if using the canonical weights.
+#   note         (optional) — free-text explanation shown on the leaderboard.
+#                             Use when model_name is set to explain why.
+#
+# Examples:
+
+models:
+  # Standard: same weights as the suite declares, just stored locally
+  meta-llama/Meta-Llama-3-8B-Instruct:
+    local_path: /data/models/llama3-8b
+
+  # Converted format: same model, different file format (e.g. MindIR, MLX)
+  # model_name is not needed — same weights, different format
+  # (set self._model_format in your runner's load_model() instead)
+  meta-llama/Meta-Llama-3-70B-Instruct:
+    local_path: /data/models/llama3-70b-mindir
+
+  # Different variant: contributor uses Mixtral as a 70B-class substitute.
+  # Set model_name so reviewers and the leaderboard know what was actually used.
+  # meta-llama/Meta-Llama-3-70B-Instruct:
+  #   local_path: /data/models/mixtral-8x7b
+  #   model_name: mistralai/Mixtral-8x7B-Instruct-v0.1
+  #   note: Mixtral-8x7B used as 70B-class substitute — comparable MoE parameter count
+
+  # Suite C quantized checkpoints
+  RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8:
+    local_path: /models/Meta-Llama-3.1-8B-Instruct-FP8
+    note: "FP8 quantized by RedHatAI using llm-compressor. Weights and activations in FP8. Native speedup on H100/MI300X; computed in BF16 on A100."
+
+  RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8:
+    local_path: /models/Meta-Llama-3.1-8B-Instruct-quantized.w8a8
+    note: "INT8 quantized by RedHatAI using llm-compressor (compressed-tensors). Both weights and activations quantized to INT8."
+
+  RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16:
+    local_path: /models/Meta-Llama-3.1-8B-Instruct-quantized.w8a16
+    note: "INT8 weight-only quantization by RedHatAI using llm-compressor. Weights INT8, activations FP16."
+
+  RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16:
+    local_path: /models/Meta-Llama-3.1-8B-Instruct-quantized.w4a16
+    note: "INT4 weight-only quantization by RedHatAI using AWQ. Weights INT4, activations FP16."
+
+

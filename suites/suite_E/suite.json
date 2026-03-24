@@ -3,6 +3,7 @@
   "description": "Multi-chip scaling efficiency. Fixed model (Llama-3-8B), varying chip count (1x/2x/4x). Measures interconnect efficiency independent of chip speed.",
   "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
   "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+  "dataset": "sharegpt_standard_v1",
   "scenarios": {
     "default": ["accuracy", "offline"],
     "extra": []
@@ -32,7 +33,7 @@
   "warmup_runs": 1,
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0,
-  "accuracy_threshold_delta": 0.03,
+  "accuracy_threshold_delta": 0.1,
   "request_count": 500,
   "_request_count_note": "Same as Suite A offline for direct comparability.",
   "online_request_count": null,

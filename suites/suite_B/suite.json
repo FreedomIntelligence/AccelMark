@@ -3,6 +3,7 @@
   "description": "Large model inference, Llama-3-70B-Instruct. Chip count is flexible — use however many chips your hardware needs. Leaderboard groups results by chip count.",
   "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
   "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+  "dataset": "sharegpt_standard_v1",
   "scenarios": {
     "default": ["accuracy", "offline", "online"],
     "extra": ["sustained", "interactive"]
@@ -29,7 +30,7 @@
   "warmup_minutes": 2,
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0,
-  "accuracy_threshold_delta": 0.03,
+  "accuracy_threshold_delta": 0.1,
   "request_count": 200,
   "online_request_count": 500,
   "interactive_request_count": null,

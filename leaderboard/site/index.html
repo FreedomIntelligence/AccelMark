@@ -485,7 +485,7 @@
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem 2rem;margin-top:0.75rem">
     <div><span style="color:#58a6ff;font-weight:500">Suite A</span> — Single chip, Llama-3-8B. How fast is this chip at inference? Primary metric: offline tokens/sec.</div>
     <div><span style="color:#56d364;font-weight:500">Suite B</span> — Flexible chips, Llama-3-70B. Can this chip serve large models? Tests multi-chip setups required for 70B.</div>
-    <div><span style="color:#d29922;font-weight:500">Suite C</span> — Single chip, Llama-3-8B. Quantization speed/quality tradeoff across BF16, INT8, INT4.</div>
+    <div><span style="color:#d29922;font-weight:500">Suite C</span> — Single chip, Llama-3-8B. Quantization speed/quality tradeoff across BF16, FP8, W8A8, W8A16, W4A16.</div>
     <div><span style="color:#a78bfa;font-weight:500">Suite D</span> — Single chip, Llama-3.1-8B. How does this chip handle 32K-token long-context inputs?</div>
     <div><span style="color:#1D9E75;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
   </div>
@@ -560,8 +560,8 @@
           <th onclick="sortBy('suite')">Suite</th>
           <th onclick="sortBy('scenario')">Scenario</th>
           <th onclick="sortBy('primary_metric')">Performance</th>
-          <th onclick="sortBy('quant_int8_speedup')" data-col="int8_speedup">INT8 speedup</th>
-          <th onclick="sortBy('quant_int4_speedup')" data-col="int4_speedup">INT4 speedup</th>
+          <th onclick="sortBy('quant_int8_speedup')" data-col="int8_speedup">W8A16 speedup</th>
+          <th onclick="sortBy('quant_int4_speedup')" data-col="int4_speedup">W4A16 speedup</th>
           <th onclick="sortBy('scaling_efficiency_2x')" data-col="scaling_2x">2× eff.</th>
           <th onclick="sortBy('scaling_efficiency_4x')" data-col="scaling_4x">4× eff.</th>
           <th onclick="sortBy('sustained_throughput')" data-col="sustained" title="Mean tokens/sec over sustained run">Sustained tok/s</th>
@@ -781,7 +781,7 @@
           ${suitePill(row.suite)}
         </div>
         <div style="margin-top:0.25rem">
-          ${row.is_suite_level ? `
+          ${row.is_suite_level && row.suite !== 'suite_C' ? `
             <div class="card-speed">${row.offline_throughput
               ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
               : '—'}</div>
@@ -813,11 +813,7 @@
                     : ''}
             </div>
         ` : ''}
-        ${row.suite === 'suite_C' ? `
-            <div class="card-speed">${row.quant_throughput
-                ? row.quant_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
-                : '—'}</div>
-            <div class="card-speed-label">tok/s (${row.quant_best_precision || 'best format'})</div>
+        ${row.suite === 'suite_C' && (row.quant_int8_speedup || row.quant_int4_speedup) ? `
             <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
                 ${row.quant_int8_speedup ? 'W8A16: ' + row.quant_int8_speedup.toFixed(2) + '× faster' : ''}
                 ${row.quant_int4_speedup ? ' · W4A16: ' + row.quant_int4_speedup.toFixed(2) + '× faster' : ''}
@@ -921,16 +917,20 @@
         <td>${row.vendor || '—'}</td>
         <td>${row.chip_count || 1}</td>
         <td>${formatFramework(row)}</td>
-        <td>${row.model || '—'}</td>
+        <td title="${row.model_name ? 'Actual: ' + row.model_name : ''}">
+          ${row.model || '—'}
+          ${row.model_name
+            ? ' <span style="color:#d29922;font-size:0.75rem" title="Contributor used a different model variant: ' + row.model_name + '">*</span>'
+            : ''}</td>
         <td>${row.precision || '—'}${row.precision_fallback
             ? ' <span style="color:#d29922;font-size:0.75rem" title="Suite requires BF16; hardware uses FP16">⚠</span>'
             : ''}${row.precision_emulated
-            ? ` <span style="color:#8b949e;font-size:0.75rem" title="Requested ${row.precision} but framework computed in ${row.effective_dtype}">~</span>`
+            ? ` <span style="color:#8b949e;font-size:0.75rem" title="Requested ${row.precision} — computed as ${row.effective_dtype}">~</span>`
             : ''}</td>
         <td>${suitePill(row.suite) || '—'}</td>
         <td>${scenarioPill(row) || '—'}</td>
         <td class="metric-primary">${
-          row.is_suite_level
+          (row.is_suite_level && row.suite !== 'suite_C')
             ? `<div>${row.offline_throughput
                 ? row.offline_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
                   + ' <small style="color:#8b949e">tok/s</small>'
@@ -1070,21 +1070,42 @@
       detailSection('Model', [
         detailRow('Model ID', d.model_id, { mono: true }),
         detailRow('Revision', d.model_revision, { mono: true }),
+        row.detail.model_name
+            ? detailRow(
+                'Actual model',
+                row.detail.model_name
+                + ' <span style="color:#d29922;font-size:0.8em">(substituted variant)</span>',
+                { html: true }
+              )
+            : null,
+        row.detail.model_note
+            ? detailRow('Model note', row.detail.model_note)
+            : null,
         detailRow('Architecture', d.model_arch),
         detailRow('Parameters', d.model_params_b, { format: v => v + 'B' }),
         detailRow('Precision', d.model_precision),
-        row.effective_dtype
-            ? detailRow('Compute dtype',
-                row.effective_dtype
+        row.detail.model_effective_dtype
+            ? detailRow(
+                'Compute dtype',
+                row.detail.model_effective_dtype
                 + (row.precision_emulated
-                    ? ` <span style="color:#8b949e;font-size:0.8em">(${row.precision} weights computed as ${row.effective_dtype})</span>`
+                    ? ` <span style="color:#8b949e;font-size:0.8em">(${row.precision} weights, ${row.detail.model_effective_dtype} compute)</span>`
                     : ''),
-                { html: true })
+                { html: true }
+              )
             : null,
-        row.quantization_method
-            ? detailRow('Quantization', row.quantization_method)
+        row.detail.model_quant_method
+            ? detailRow('Quantization', row.detail.model_quant_method)
             : null,
         detailRow('Format', d.model_format),
+        row.detail.model_source === 'local'
+            ? detailRow(
+                'Model source',
+                'local override'
+                + ' <span style="color:#8b949e;font-size:0.8em" title="Model loaded from local path in models_local.yaml, not directly from HuggingFace">ℹ</span>',
+                { html: true }
+              )
+            : null,
       ]),
       detailSection('Run settings', [
         d.run_scenarios ? detailRow('Scenarios', d.run_scenarios.join(', ')) : null,
@@ -1564,10 +1585,10 @@
         </thead>
         <tbody>
             ${viz.precisions.map((prec, i) => {
-                const thr  = viz.throughputs[i];
-                const spd  = viz.speedups[i];
+                const thr  = viz.throughput[i];
+                const spd  = viz.speedup[i];
                 const acc  = viz.accuracies[i];
-                const qe   = viz.quality_effs[i];
+                const qe   = viz.quality_efficiency[i];
                 const valid = viz.acc_valid[i];
                 const accColor = valid === false ? '#f85149'
                                : valid === true  ? '#56d364' : '#8b949e';
@@ -1605,7 +1626,7 @@
             labels: viz.precisions,
             datasets: [{
                 label: 'Throughput',
-                data: viz.throughputs,
+                data: viz.throughput,
                 backgroundColor: [C.teal, C.blue, C.amber, C.coral, C.green],
             }],
         },

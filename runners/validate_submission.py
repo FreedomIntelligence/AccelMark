@@ -59,24 +59,24 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
     # accuracy.valid for inference suites
     scenario = result.get("task", {}).get("scenario")
     if scenario != "training":
-        accuracy = result.get("accuracy", {})
-        if not accuracy.get("valid", False) and not accuracy.get("notes"):
-            failures.append(
-                "accuracy.valid is false but accuracy.notes is empty. "
-                "Explain why accuracy is below threshold, or fix the precision configuration."
-            )
+        accuracy = result.get("accuracy")
+        # Suite C stores accuracy per-format in metrics.quantization; top-level accuracy is null
+        if accuracy is not None:
+            if not accuracy.get("valid", False) and not accuracy.get("notes"):
+                failures.append(
+                    "accuracy.valid is false but accuracy.notes is empty. "
+                    "Explain why accuracy is below threshold, or fix the precision configuration."
+                )
 
-    # referenced files must exist
+    # referenced files must exist — search recursively under result_dir
     meta = result.get("meta", {})
-    scenario_subdirs = ["offline", "online", "interactive", "training", "1x", "2x", "4x", "8x"]
     for field in ["reproduce_script", "env_info_file", "log_file"]:
         ref = meta.get(field)
         if not ref:
             continue
-        ref_name = Path(ref).name
-        if (Path(ref).exists()
-                or (result_dir / ref_name).exists()
-                or any((result_dir / s / ref_name).exists() for s in scenario_subdirs)):
+        ref_path = Path(ref)
+        ref_name = ref_path.name
+        if ref_path.exists() or any(result_dir.rglob(ref_name)):
             continue
         failures.append(f"meta.{field} references '{ref}' which does not exist")
 
@@ -218,31 +218,22 @@ def find_env_info(submission_dir: Path) -> Path | None:
 def check_accuracy(submission_dir: Path, result: dict) -> list[str]:
     errors = []
 
-    # Check top-level first
-    acc_path = submission_dir / "accuracy.json"
-    if not acc_path.exists():
-        # For suite-level runs, check accuracy/ subdirectory (--scenario all)
-        acc_path = submission_dir / "accuracy" / "accuracy.json"
-    if not acc_path.exists():
-        # Legacy: check scenario subdirs
-        for scenario in ["offline", "online", "interactive"]:
-            scenario_acc = submission_dir / scenario / "accuracy.json"
-            if scenario_acc.exists():
-                acc_path = scenario_acc
-                break
+    # Find all accuracy.json files anywhere under the submission directory
+    candidates = list(submission_dir.rglob("accuracy.json"))
 
-    if not acc_path.exists():
+    if not candidates:
         errors.append("accuracy.json not found — run --scenario accuracy first")
         return errors
 
-    with open(acc_path) as f:
-        acc = json.load(f)
-
-    if not acc.get("valid"):
-        errors.append(
-            f"accuracy.valid is false (score={acc.get('subset_score')}) "
-            f"— model output quality check failed"
-        )
+    for acc_path in candidates:
+        with open(acc_path) as f:
+            acc = json.load(f)
+        if not acc.get("valid"):
+            rel = acc_path.relative_to(submission_dir)
+            errors.append(
+                f"{rel}: accuracy.valid is false (score={acc.get('subset_score')}) "
+                f"— model output quality check failed"
+            )
     return errors
 
 

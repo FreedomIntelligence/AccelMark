@@ -35,7 +35,7 @@ def _precision_to_dtype(precision: str) -> str:
         "W8A16": "float16",
         "W4A16": "float16",
     }
-    return _MAP.get(precision.upper(), "")
+    return _MAP.get((precision or "").upper(), "")
 
 
 def _get_suite_precision_required(suite_id: str) -> str:
@@ -92,14 +92,14 @@ def load_results() -> list[dict]:
 
 def extract_detail(result: dict) -> dict:
     """Full detail object for the modal panel, grouped by category."""
-    chip        = result.get("chip", {})
-    software    = result.get("software", {})
-    model       = result.get("model", {})
-    task        = result.get("task", {})
-    accuracy    = result.get("accuracy", {})
-    meta        = result.get("meta", {})
-    parallelism = task.get("parallelism", {})
-    env         = result.get("_env_info", {})
+    chip        = result.get("chip") or {}
+    software    = result.get("software") or {}
+    model       = result.get("model") or {}
+    task        = result.get("task") or {}
+    accuracy    = result.get("accuracy") or {}
+    meta        = result.get("meta") or {}
+    parallelism = task.get("parallelism") or {}
+    env         = result.get("_env_info") or {}
 
     # CPU string
     cpu_info = env.get("cpu", {})
@@ -146,12 +146,17 @@ def extract_detail(result: dict) -> dict:
         "sw_python":            software.get("python_version"),
         "sw_pytorch":           env.get("pytorch_version"),
         # Model
-        "model_id":        model.get("model_id"),
-        "model_revision":  model.get("model_revision"),
-        "model_arch":      model.get("architecture"),
-        "model_params_b":  model.get("parameter_count_b"),
-        "model_precision": model.get("precision"),
-        "model_format":    model.get("model_format"),
+        "model_id":              model.get("model_id"),
+        "model_revision":        model.get("model_revision"),
+        "model_name":            model.get("model_name"),        # ← new
+        "model_note":            model.get("model_note"),        # ← new
+        "model_source":          model.get("model_source"),      # ← new
+        "model_arch":            model.get("architecture"),
+        "model_params_b":        model.get("parameter_count_b"),
+        "model_precision":       model.get("precision"),
+        "model_effective_dtype": model.get("effective_dtype"),
+        "model_quant_method":    model.get("quantization_method"),
+        "model_format":          model.get("model_format"),
         # Run settings
         "run_scenarios":   task.get("scenarios_run"),
         "run_chip_counts": task.get("chip_counts_run"),
@@ -314,26 +319,40 @@ def extract_viz(result: dict, metrics: dict) -> dict:
         }
 
     if suite == "suite_C":
-        results_by_precision = metrics.get("quantization", {}).get(
-            "results_by_precision", []
+        quantization = metrics.get("quantization", {})
+        entries      = quantization.get("results_by_precision", [])
+        precisions, throughputs, speedups, quality_effs = [], [], [], []
+        accuracies, acc_valid, acc_deltas = [], [], []
+        effective_dtypes, quant_methods   = [], []
+        for e in entries:
+            precisions.append(e.get("precision", ""))
+            throughputs.append(e.get("best_throughput_tokens_per_sec"))
+            speedups.append(e.get("speedup_vs_bf16"))
+            quality_effs.append(e.get("quality_efficiency"))
+            accuracies.append(e.get("accuracy_score"))
+            acc_valid.append(e.get("accuracy_valid"))
+            acc_deltas.append(e.get("accuracy_baseline_delta"))
+            effective_dtypes.append(e.get("effective_dtype"))
+            quant_methods.append(e.get("quantization_method"))
+        # Best quality efficiency for primary metric
+        best_qe = max((q for q in quality_effs if q), default=None)
+        bf16_thr = next(
+            (throughputs[i] for i, p in enumerate(precisions) if p == "BF16"),
+            None
         )
         return {
-            "type":       "suite_C",
-            "precisions": [r["precision"] for r in results_by_precision],
-            "throughputs": [r.get("best_throughput_tokens_per_sec") for r in results_by_precision],
-            "speedups":   [r.get("speedup_vs_bf16") for r in results_by_precision],
-            "accuracies": [r.get("accuracy_score") for r in results_by_precision],
-            "acc_valid":  [r.get("accuracy_valid") for r in results_by_precision],
-            "acc_deltas": [r.get("accuracy_baseline_delta") for r in results_by_precision],
-            "quality_effs": [r.get("quality_efficiency") for r in results_by_precision],
-            "model_ids":  [r.get("model_id") for r in results_by_precision],
-            "effective_dtypes":     [r.get("effective_dtype") for r in results_by_precision],
-            "quantization_methods": [r.get("quantization_method") for r in results_by_precision],
-            "bf16_throughput": next(
-                (r.get("best_throughput_tokens_per_sec")
-                 for r in results_by_precision if r["precision"] == "BF16"),
-                None
-            ),
+            "type":               "suite_C",
+            "precisions":         precisions,
+            "throughput":         throughputs,
+            "speedup":            speedups,
+            "quality_efficiency": quality_effs,
+            "accuracies":         accuracies,
+            "acc_valid":          acc_valid,
+            "acc_deltas":         acc_deltas,
+            "effective_dtypes":   effective_dtypes,
+            "quantization_methods": quant_methods,
+            "best_quality_eff":   best_qe,
+            "bf16_throughput":    bf16_thr,
         }
 
     if suite == "suite_E":
@@ -381,11 +400,11 @@ def extract_row(result: dict) -> dict:
     chip     = result.get("chip", {})
     software = result.get("software", {})
     model    = result.get("model", {})
-    task     = result.get("task", {})
-    metrics  = result.get("metrics", {})
-    accuracy = result.get("accuracy", {})
-    meta     = result.get("meta", {})
-    derived  = metrics.get("derived", {})
+    task     = result.get("task") or {}
+    metrics  = result.get("metrics") or {}
+    accuracy = result.get("accuracy") or {}
+    meta     = result.get("meta") or {}
+    derived  = metrics.get("derived") or {}
     is_suite_level = result.get("_is_suite_level", False)
     suite_id       = result.get("suite_id", "")
 
@@ -433,7 +452,7 @@ def extract_row(result: dict) -> dict:
 
     # ── Primary metric ────────────────────────────────────────────────────────
     scenario = task.get("scenario", "offline")
-    if is_suite_level and suite_id != "suite_E":
+    if is_suite_level and suite_id not in ("suite_E", "suite_C"):
         primary_metric       = offline_throughput
         primary_metric_label = "tokens/sec (offline)"
     elif scenario == "offline":
@@ -480,41 +499,48 @@ def extract_row(result: dict) -> dict:
             primary_metric_label = "tokens/sec (1x baseline)"
 
     # ── Suite C quantization ──────────────────────────────────────────────────
-    quant_throughput       = None
-    quant_best_precision   = None
-    quant_quality_eff      = None
     quant_bf16_throughput  = None
-    quant_int8_speedup     = None
-    quant_int4_speedup     = None
+    quant_best_throughput  = None
+    quant_best_precision   = None
+    quant_int8_speedup     = None   # W8A16 tier (best of W8A8/W8A16)
+    quant_int4_speedup     = None   # W4A16 tier
+    quant_quality_eff      = None   # best quality_efficiency across all formats
 
-    quant = metrics.get("quantization", {})
-    if quant:
-        results_by_precision = quant.get("results_by_precision", [])
+    quantization = metrics.get("quantization")
+    if quantization:
         best_qe = None
-        for r in results_by_precision:
-            thr  = r.get("best_throughput_tokens_per_sec")
-            qe   = r.get("quality_efficiency")
-            prec = r.get("precision", "")
+        for entry in quantization.get("results_by_precision", []):
+            p   = entry.get("precision", "")
+            thr = entry.get("best_throughput_tokens_per_sec")
+            spd = entry.get("speedup_vs_bf16")
+            qe  = entry.get("quality_efficiency")
 
-            if prec == "BF16":
+            if p == "BF16":
                 quant_bf16_throughput = thr
-            elif prec in ("W8A8", "W8A16"):
-                # Use W8A16 as the "int8-tier" speedup if available,
-                # fall back to W8A8
-                if quant_int8_speedup is None or prec == "W8A16":
-                    quant_int8_speedup = r.get("speedup_vs_bf16")
-            elif prec == "W4A16":
-                quant_int4_speedup = r.get("speedup_vs_bf16")
+            elif p in ("W8A8", "W8A16"):
+                # Use W8A16 as "int8-tier" speedup if available, fall back to W8A8
+                if quant_int8_speedup is None or p == "W8A16":
+                    quant_int8_speedup = spd
+            elif p == "W4A16":
+                quant_int4_speedup = spd
 
+            # Track best throughput across all precision formats
+            if thr and (quant_best_throughput is None or thr > quant_best_throughput):
+                quant_best_throughput = thr
+                quant_best_precision  = p
+
+            # Track best quality_efficiency across all formats
             if qe and (best_qe is None or qe > best_qe):
-                best_qe              = qe
-                quant_quality_eff    = qe
-                quant_throughput     = thr
-                quant_best_precision = prec
+                best_qe           = qe
+                quant_quality_eff = qe
 
-        if quant_throughput:
-            primary_metric       = quant_throughput
-            primary_metric_label = f"tok/s ({quant_best_precision or 'best format'})"
+        # Primary metric for Suite C: best throughput across all precision formats
+        if quant_best_throughput:
+            primary_metric       = quant_best_throughput
+            primary_metric_label = f"tokens/sec ({quant_best_precision})"
+        elif quant_bf16_throughput:
+            primary_metric       = quant_bf16_throughput
+            primary_metric_label = "tokens/sec (BF16 baseline)"
 
     # ── Efficiency ────────────────────────────────────────────────────────────
     memory_gb_per_chip     = chip.get("memory_gb_per_chip", 0)
@@ -567,6 +593,10 @@ def extract_row(result: dict) -> dict:
         "precision_emulated": precision_emulated,
         "effective_dtype":    effective_dtype,
         "quantization_method": quantization_method,
+        "model_source":  model.get("model_source", "huggingface"),
+        "model_name":    model.get("model_name"),
+        "model_format":  model.get("model_format"),
+        "architecture":  model.get("architecture"),
         "suite":              suite_id,
         "scenario":           "all" if is_suite_level else scenario,
         # Primary
@@ -596,12 +626,12 @@ def extract_row(result: dict) -> dict:
         "scaling_efficiency_4x":   scaling_efficiency_4x,
         "scaling_base_throughput": scaling_base_throughput,
         # Suite C
-        "quant_best_precision":  quant_best_precision,
-        "quant_throughput":      quant_throughput,
-        "quant_quality_eff":     quant_quality_eff,
-        "quant_bf16_throughput": quant_bf16_throughput,
-        "quant_int8_speedup":    quant_int8_speedup,
-        "quant_int4_speedup":    quant_int4_speedup,
+        "quant_bf16_throughput":  quant_bf16_throughput,
+        "quant_best_throughput":  quant_best_throughput,
+        "quant_best_precision":   quant_best_precision,
+        "quant_int8_speedup":     quant_int8_speedup,
+        "quant_int4_speedup":     quant_int4_speedup,
+        "quant_quality_eff":      quant_quality_eff,
         # Sustained
         "sustained_throughput":    sustained_throughput,
         "throttle_ratio":          throttle_ratio,
@@ -621,129 +651,229 @@ def extract_row(result: dict) -> dict:
 
 def generate_api(results: list[dict], output_dir: Path) -> None:
     """
-    Generate static JSON for external tooling.
-      api/rank.json   — per-submission ranking
-      api/chips.json  — chip summary list
-      api/index.json  — chip lookup index
+    Generate static JSON API for external tooling (OpenClaw Skill etc.).
+
+      api/rank.json   — per-submission ranking within chip+suite group
+      api/chips.json  — chip summary list (best offline throughput)
+      api/index.json  — chip lookup with per-suite best metrics
+      api/suites.json — suite metadata for discovery
     """
     api_dir = output_dir / "api"
     api_dir.mkdir(exist_ok=True)
 
-    by_chip: dict[str, list[tuple[str, float]]] = defaultdict(list)
+    # Group by chip+suite for fair per-suite ranking
+    by_chip_suite: dict[tuple, list] = defaultdict(list)
+    # Also track chip-level best across all suites for chips.json
+    by_chip: dict[str, list] = defaultdict(list)
 
     for r in results:
         chip_name       = r.get("chip", {}).get("name", "Unknown")
+        suite_id        = r.get("suite_id", "unknown")
         submission_name = r.get("_submission_name", "unknown")
-        best_thr        = None
+        tier            = r.get("_tier", "community")
 
+        # Primary metric per result
         offline = r.get("metrics", {}).get("offline")
+        best_thr = None
         if offline:
-            rows  = offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])
-            valid = [row for row in rows if not row.get("oom") and row.get("throughput_tokens_per_sec")]
+            rows  = offline.get("results_by_concurrency") or \
+                    offline.get("results_by_batch_size", [])
+            valid = [row for row in rows
+                     if not row.get("oom") and row.get("throughput_tokens_per_sec")]
             if valid:
                 best_thr = max(row["throughput_tokens_per_sec"] for row in valid)
 
-        # Suite E: fall back to scaling 1x entry
+        # Suite E fallback
         if best_thr is None:
             scaling = r.get("metrics", {}).get("scaling", {})
             if scaling:
-                best_thr = scaling.get("base_throughput_tokens_per_sec") or scaling.get("base_throughput_1x")
+                best_thr = scaling.get("base_throughput_tokens_per_sec")
                 if not best_thr:
                     for entry in scaling.get("results_by_chip_count", []):
                         if entry.get("chip_count") == 1:
                             best_thr = entry.get("best_throughput_tokens_per_sec")
                             break
 
+        # Suite C: use best quality_efficiency as primary
+        if best_thr is None:
+            quant = r.get("metrics", {}).get("quantization", {})
+            if quant:
+                qes = [e.get("quality_efficiency")
+                       for e in quant.get("results_by_precision", [])
+                       if e.get("quality_efficiency")]
+                if qes:
+                    best_thr = max(qes)
+
         if not best_thr:
             continue
-        by_chip[chip_name].append((submission_name, best_thr))
 
-    # rank.json
+        by_chip_suite[(chip_name, suite_id)].append((submission_name, best_thr, tier))
+        by_chip[chip_name].append((submission_name, best_thr, suite_id, tier))
+
+    # ── rank.json ─────────────────────────────────────────────────────────────
     rank_data: dict[str, dict] = {}
-    for chip_name, entries in by_chip.items():
+    for (chip_name, suite_id), entries in by_chip_suite.items():
         sorted_entries = sorted(entries, key=lambda x: x[1], reverse=True)
         total = len(sorted_entries)
-        for rank_idx, (submission_name, thr) in enumerate(sorted_entries):
+        for rank_idx, (submission_name, metric, tier) in enumerate(sorted_entries):
             rank = rank_idx + 1
             rank_data[submission_name] = {
-                "chip_name":  chip_name,
-                "rank":       rank,
-                "total":      total,
-                "percentile": round((total - rank) / total * 100, 1) if total > 1 else 100.0,
-                "best_throughput_tokens_per_sec": thr,
+                "chip_name":    chip_name,
+                "suite_id":     suite_id,
+                "tier":         tier,
+                "rank":         rank,
+                "total":        total,
+                "percentile":   round((total - rank) / total * 100, 1)
+                                if total > 1 else 100.0,
+                "primary_metric": metric,
             }
     with open(api_dir / "rank.json", "w") as f:
         json.dump(rank_data, f, indent=2)
 
-    # chips.json
+    # ── chips.json ────────────────────────────────────────────────────────────
     chips = []
+    chip_bests: dict[str, float] = {}
     for chip_name, entries in by_chip.items():
-        throughputs = [thr for _, thr in entries]
+        throughputs = [thr for _, thr, _, _ in entries]
+        best        = max(throughputs)
+        chip_bests[chip_name] = best
         chips.append({
             "name":                             chip_name,
             "submission_count":                 len(entries),
-            "best_throughput_tokens_per_sec":   max(throughputs),
+            "best_throughput_tokens_per_sec":   best,
             "median_throughput_tokens_per_sec": round(statistics.median(throughputs), 1),
         })
     chips.sort(key=lambda x: x["best_throughput_tokens_per_sec"], reverse=True)
     with open(api_dir / "chips.json", "w") as f:
         json.dump(chips, f, indent=2)
 
-    # index.json
+    # ── index.json ────────────────────────────────────────────────────────────
+    # Per-chip lookup with best metric per suite
     chip_index: dict[str, dict] = {}
-    for chip_name, entries in by_chip.items():
-        throughputs = [thr for _, thr in entries]
+    for chip_name in by_chip:
         chip_index[chip_name] = {
-            "submission_count":                 len(entries),
-            "best_throughput_tokens_per_sec":   max(throughputs),
-            "median_throughput_tokens_per_sec": round(statistics.median(throughputs), 1),
-            "p25_throughput_tokens_per_sec":    round(
-                sorted(throughputs)[len(throughputs) // 4], 1
-            ) if len(throughputs) >= 4 else None,
+            "best_throughput_tokens_per_sec": chip_bests[chip_name],
+            "suites": {},
         }
 
     for r in results:
-        chip_name   = r.get("chip", {}).get("name", "Unknown")
+        chip_name = r.get("chip", {}).get("name", "Unknown")
+        suite_id  = r.get("suite_id", "unknown")
         if chip_name not in chip_index:
             continue
-        online      = r.get("metrics", {}).get("online")
-        interactive = r.get("metrics", {}).get("interactive")
-        scaling     = r.get("metrics", {}).get("scaling")
 
+        metrics   = r.get("metrics", {})
+        online    = metrics.get("online")
+        iv        = metrics.get("interactive")
+        scaling   = metrics.get("scaling")
+        sustained = metrics.get("sustained")
+
+        suite_entry = chip_index[chip_name]["suites"].setdefault(suite_id, {})
+
+        # Offline throughput
+        offline = metrics.get("offline")
+        if offline:
+            rows  = offline.get("results_by_concurrency") or \
+                    offline.get("results_by_batch_size", [])
+            valid = [row for row in rows
+                     if not row.get("oom") and row.get("throughput_tokens_per_sec")]
+            if valid:
+                thr = max(row["throughput_tokens_per_sec"] for row in valid)
+                cur = suite_entry.get("best_throughput_tokens_per_sec")
+                if cur is None or thr > cur:
+                    suite_entry["best_throughput_tokens_per_sec"] = round(thr, 1)
+
+        # Online
         if online:
             qps = online.get("max_valid_qps")
             if qps is not None:
-                cur = chip_index[chip_name].get("best_online_max_qps")
+                cur = suite_entry.get("best_online_max_qps")
                 if cur is None or qps > cur:
-                    chip_index[chip_name]["best_online_max_qps"] = qps
+                    suite_entry["best_online_max_qps"] = qps
 
-        if interactive:
-            ttft = interactive.get("ttft_ms_p99")
+        # Interactive
+        if iv:
+            ttft = iv.get("ttft_ms_p99")
             if ttft is not None:
-                cur = chip_index[chip_name].get("best_interactive_ttft_p99_ms")
+                cur = suite_entry.get("best_interactive_ttft_p99_ms")
                 if cur is None or ttft < cur:
-                    chip_index[chip_name]["best_interactive_ttft_p99_ms"] = round(ttft, 1)
+                    suite_entry["best_interactive_ttft_p99_ms"] = round(ttft, 1)
 
+        # Scaling (Suite E)
         if scaling:
             for entry in scaling.get("results_by_chip_count", []):
                 count = entry.get("chip_count")
                 eff   = entry.get("scaling_efficiency")
                 if count == 2 and eff:
-                    chip_index[chip_name]["best_scaling_efficiency_2x"] = eff
+                    suite_entry["best_scaling_efficiency_2x"] = eff
                 elif count == 4 and eff:
-                    chip_index[chip_name]["best_scaling_efficiency_4x"] = eff
+                    suite_entry["best_scaling_efficiency_4x"] = eff
 
-    for chip_name in chip_index:
-        chip_index[chip_name].setdefault("best_online_max_qps", None)
-        chip_index[chip_name].setdefault("best_interactive_ttft_p99_ms", None)
+        # Sustained
+        if sustained:
+            s_thr    = sustained.get("sustained_throughput_tokens_per_sec")
+            throttle = sustained.get("throttle_ratio")
+            if s_thr is not None:
+                cur = suite_entry.get("best_sustained_throughput_tokens_per_sec")
+                if cur is None or s_thr > cur:
+                    suite_entry["best_sustained_throughput_tokens_per_sec"] = round(s_thr, 1)
+            if throttle is not None:
+                suite_entry["throttle_ratio"] = throttle
+
+        # Suite C quality efficiency
+        quant = metrics.get("quantization")
+        if quant:
+            qes = [(e.get("precision"), e.get("quality_efficiency"))
+                   for e in quant.get("results_by_precision", [])
+                   if e.get("quality_efficiency")]
+            if qes:
+                best_qe_entry = max(qes, key=lambda x: x[1])
+                suite_entry["best_quality_efficiency"]        = best_qe_entry[1]
+                suite_entry["best_quality_efficiency_format"] = best_qe_entry[0]
 
     with open(api_dir / "index.json", "w") as f:
         json.dump(chip_index, f, indent=2)
 
+    # ── suites.json ───────────────────────────────────────────────────────────
+    # Static metadata about each suite for discovery
+    suites_meta = {}
+    for suite_dir in sorted(Path("suites").iterdir()):
+        if not suite_dir.is_dir():
+            continue
+        suite_json = suite_dir / "suite.json"
+        if not suite_json.exists():
+            continue
+        try:
+            with open(suite_json) as f:
+                s = json.load(f)
+            suite_id = s.get("suite_id", suite_dir.name)
+            scenarios_cfg = s.get("scenarios", {})
+            if isinstance(scenarios_cfg, list):
+                default_scenarios = scenarios_cfg
+                extra_scenarios   = []
+            else:
+                default_scenarios = scenarios_cfg.get("default", [])
+                extra_scenarios   = scenarios_cfg.get("extra", [])
+            suites_meta[suite_id] = {
+                "suite_id":          suite_id,
+                "description":       s.get("description", ""),
+                "model_id":          s.get("model_id") or s.get("base_model_id"),
+                "precision":         s.get("precision_required", "BF16"),
+                "default_scenarios": default_scenarios,
+                "extra_scenarios":   extra_scenarios,
+                "dataset":           s.get("dataset"),
+            }
+        except Exception as e:
+            print(f"Warning: could not read {suite_json}: {e}")
+
+    with open(api_dir / "suites.json", "w") as f:
+        json.dump(suites_meta, f, indent=2)
+
     print(f"API files written to {api_dir}/")
-    print(f"  rank.json:  {len(rank_data)} submissions indexed")
-    print(f"  chips.json: {len(chips)} chips listed")
-    print(f"  index.json: {len(chip_index)} chips in lookup table")
+    print(f"  rank.json:   {len(rank_data)} submissions indexed")
+    print(f"  chips.json:  {len(chips)} chips listed")
+    print(f"  index.json:  {len(chip_index)} chips in lookup table")
+    print(f"  suites.json: {len(suites_meta)} suites documented")
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

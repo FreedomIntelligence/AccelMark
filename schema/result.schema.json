@@ -35,7 +35,7 @@
         },
         "count": { "type": "integer", "minimum": 1 },
         "memory_gb_per_chip": { "type": "number", "minimum": 0 },
-        "interconnect_intra_node": { "type": "string" },
+        "interconnect_intra_node": { "type": ["string", "null"] },
         "interconnect_inter_node": { "type": ["string", "null"] },
         "_count_note": {
           "type": ["string", "null"],
@@ -66,8 +66,9 @@
         "model_id": { "type": "string" },
         "model_revision": { "type": "string" },
         "architecture": {
-          "type": "string",
-          "enum": ["dense","moe","vlm","linear_transformer","ttt","other"]
+          "type": ["string", "null"],
+          "enum": ["dense", "moe", null],
+          "description": "Model architecture family. 'dense' for standard transformer, 'moe' for mixture-of-experts models."
         },
         "parameter_count_b": { "type": "number", "minimum": 0 },
         "precision": {
@@ -83,7 +84,23 @@
           "type": ["string", "null"],
           "description": "Weight quantization method used. Describes how weights are stored in memory: 'fp8', 'awq', 'gptq', 'w8a8', 'w8a16', 'bitsandbytes', or null for full-precision runs."
         },
-        "model_format": { "type": "string" },
+        "model_format": {
+          "type": ["string", "null"],
+          "description": "Weight file format used by the runner. 'HuggingFace original' for standard .safetensors/.bin weights. Other values: 'TensorRT engine', 'MindIR', 'MLX', 'GGUF', 'ONNX'."
+        },
+        "model_source": {
+          "type": ["string", "null"],
+          "enum": ["huggingface", "local", null],
+          "description": "Whether the canonical HuggingFace weights were used directly, or a local path override from models_local.yaml was applied."
+        },
+        "model_name": {
+          "type": ["string", "null"],
+          "description": "Actual model identifier used if different from model_id. Null means the canonical model_id weights were used. Set via model_name in models_local.yaml when substituting a different model variant."
+        },
+        "model_note": {
+          "type": ["string", "null"],
+          "description": "Free-text note from contributor explaining model substitution or local variant. Set via 'note' field in models_local.yaml."
+        },
         "_note": {
           "type": ["string", "null"],
           "description": "Human-readable note about the model field. Only present for Suite C."
@@ -109,7 +126,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["offline","online","interactive","sustained"]
+            "enum": ["offline","online","interactive","sustained","accuracy"]
           },
           "description": "List of scenarios run. Used for suite-level submissions (--scenario all)."
         },
@@ -122,6 +139,11 @@
           "type": "array",
           "items": {"type": "string"},
           "description": "Precision levels tested. Only present for Suite C submissions."
+        },
+        "precision_levels_skipped": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Precision levels skipped (e.g. not supported). Only present for Suite C submissions."
         },
         "parallelism_note": {
           "type": ["string", "null"],
@@ -306,13 +328,25 @@
                 "properties": {
                   "precision": {
                     "type": "string",
-                    "enum": ["BF16", "INT8", "INT4"]
+                    "enum": ["BF16", "FP8", "W8A8", "W8A16", "W4A16", "INT8", "INT4"]
+                  },
+                  "model_id": {
+                    "type": ["string", "null"],
+                    "description": "Model checkpoint used for this precision level."
                   },
                   "best_throughput_tokens_per_sec": {
                     "type": ["number", "null"]
                   },
                   "accuracy_score": {
                     "type": ["number", "null"]
+                  },
+                  "accuracy_baseline_delta": {
+                    "type": ["number", "null"],
+                    "description": "accuracy_score minus the baseline score for this format."
+                  },
+                  "accuracy_valid": {
+                    "type": ["boolean", "null"],
+                    "description": "True if accuracy is within threshold of baseline. Null if baseline not set."
                   },
                   "quality_efficiency": {
                     "type": ["number", "null"],
@@ -321,6 +355,14 @@
                   "speedup_vs_bf16": {
                     "type": ["number", "null"],
                     "description": "Throughput ratio vs BF16 baseline. 1.5 = 50% faster than BF16."
+                  },
+                  "effective_dtype": {
+                    "type": ["string", "null"],
+                    "description": "Actual compute dtype used by the framework for this precision level."
+                  },
+                  "quantization_method": {
+                    "type": ["string", "null"],
+                    "description": "Weight quantization method used for this precision level."
                   },
                   "results_by_concurrency": {"type": "array"},
                   "result_dir": {"type": "string"}
@@ -366,23 +408,29 @@
     },
 
     "accuracy": {
-      "type": "object",
-      "required": ["subset_score","baseline_delta","valid"],
-      "additionalProperties": false,
-      "properties": {
-        "subset_score": { "type": ["number","null"], "minimum": 0, "maximum": 1 },
-        "baseline_delta": { "type": ["number","null"] },
-        "valid": { "type": "boolean" },
-        "framework": {
-          "type": ["string","null"],
-          "description": "Framework used for accuracy check."
-        },
-        "precision": {
-          "type": ["string","null"],
-          "description": "Precision used for accuracy check."
-        },
-        "notes": { "type": ["string","null"] }
-      }
+      "description": "Top-level accuracy summary. Null for Suite C (per-format accuracy is in metrics.quantization.results_by_precision).",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["subset_score","baseline_delta","valid"],
+          "additionalProperties": false,
+          "properties": {
+            "subset_score": { "type": ["number","null"], "minimum": 0, "maximum": 1 },
+            "baseline_delta": { "type": ["number","null"] },
+            "valid": { "type": "boolean" },
+            "framework": {
+              "type": ["string","null"],
+              "description": "Framework used for accuracy check."
+            },
+            "precision": {
+              "type": ["string","null"],
+              "description": "Precision used for accuracy check."
+            },
+            "notes": { "type": ["string","null"] }
+          }
+        }
+      ]
     },
 
     "meta": {
@@ -431,6 +479,17 @@
           "type": ["object","null"],
           "description": "Paths to per-precision output directories. Only present for Suite C submissions.",
           "additionalProperties": {"type": "string"}
+        },
+        "precision_model_map": {
+          "type": ["object","null"],
+          "description": "Map of precision level to checkpoint info. Only present for Suite C submissions.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "model_id":       { "type": "string" },
+              "model_revision": { "type": ["string","null"] }
+            }
+          }
         }
       }
     }
