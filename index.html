@@ -813,13 +813,7 @@
                     : ''}
             </div>
         ` : ''}
-        ${row.suite === 'suite_C' ? `
-            <div class="card-speed">${row.quant_best_throughput
-                ? row.quant_best_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
-                : (row.quant_bf16_throughput
-                    ? row.quant_bf16_throughput.toLocaleString(undefined, {maximumFractionDigits: 0})
-                    : '—')}</div>
-            <div class="card-speed-label">tok/s (${row.quant_best_precision || 'best format'})</div>
+        ${row.suite === 'suite_C' && (row.quant_int8_speedup || row.quant_int4_speedup) ? `
             <div style="margin-top:0.5rem;font-size:0.82rem;color:#8b949e">
                 ${row.quant_int8_speedup ? 'W8A16: ' + row.quant_int8_speedup.toFixed(2) + '× faster' : ''}
                 ${row.quant_int4_speedup ? ' · W4A16: ' + row.quant_int4_speedup.toFixed(2) + '× faster' : ''}
