@@ -1,0 +1,77 @@
+{
+  "suite_A": {
+    "suite_id": "suite_A",
+    "description": "Single chip inference, Llama-3-8B-Instruct. Minimum required suite for leaderboard entry.",
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline",
+      "online",
+      "interactive"
+    ],
+    "extra_scenarios": [
+      "sustained"
+    ],
+    "dataset": "sharegpt_standard_v1"
+  },
+  "suite_B": {
+    "suite_id": "suite_B",
+    "description": "Large model inference, Llama-3-70B-Instruct. Chip count is flexible \u2014 use however many chips your hardware needs. Leaderboard groups results by chip count.",
+    "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "extra_scenarios": [
+      "sustained",
+      "interactive"
+    ],
+    "dataset": "sharegpt_standard_v1"
+  },
+  "suite_C": {
+    "suite_id": "suite_C",
+    "description": "Quantization efficiency benchmark. Measures throughput and accuracy across BF16, FP8, W8A8, W8A16, and W4A16 precision formats using fixed pre-quantized checkpoints.",
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline"
+    ],
+    "extra_scenarios": [
+      "online",
+      "sustained"
+    ],
+    "dataset": "sharegpt_standard_v1"
+  },
+  "suite_D": {
+    "suite_id": "suite_D",
+    "description": "Single chip long-context inference, Llama-3.1-8B-Instruct (128K context). OOM at higher concurrency levels is expected and recorded.",
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline",
+      "interactive"
+    ],
+    "extra_scenarios": [
+      "sustained",
+      "online"
+    ],
+    "dataset": "sharegpt_longctx_v1"
+  },
+  "suite_E": {
+    "suite_id": "suite_E",
+    "description": "Multi-chip scaling efficiency. Fixed model (Llama-3-8B), varying chip count (1x/2x/4x). Measures interconnect efficiency independent of chip speed.",
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline"
+    ],
+    "extra_scenarios": [],
+    "dataset": "sharegpt_standard_v1"
+  }
+}
