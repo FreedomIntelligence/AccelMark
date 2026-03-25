@@ -621,6 +621,9 @@ def extract_row(result: dict) -> dict:
         "submitted_by":     meta.get("submitted_by"),
         "reproduce_script": meta.get("reproduce_script"),
         "notes":            meta.get("notes"),
+        "run_id":           meta.get("run_id"),
+        "run_name":         meta.get("run_name"),
+        "flagged":          meta.get("flagged"),
         # Suite E
         "scaling_efficiency_2x":   scaling_efficiency_2x,
         "scaling_efficiency_4x":   scaling_efficiency_4x,
@@ -883,6 +886,33 @@ def main():
     print(f"Loaded {len(results)} results.")
 
     rows = [extract_row(r) for r in results]
+
+    # Deduplicate: for each run_id keep only the best result (highest primary metric).
+    # Results without run_id (older submissions) are always included as-is.
+    _seen: dict = {}
+    _deduped: list = []
+
+    for row in rows:
+        rid = row.get("run_id")
+        if not rid:
+            _deduped.append(row)
+            continue
+
+        suite_id = row.get("suite", "")
+        if suite_id == "suite_C":
+            metric = row.get("quant_quality_eff") or 0
+        elif suite_id == "suite_E":
+            metric = row.get("scaling_efficiency_4x") or row.get("scaling_efficiency_2x") or 0
+        else:
+            metric = row.get("offline_throughput") or 0
+
+        if rid not in _seen or metric > _seen[rid]["metric"]:
+            _seen[rid] = {"row": row, "metric": metric}
+
+    for entry in _seen.values():
+        _deduped.append(entry["row"])
+
+    rows = _deduped
 
     SITE_DIR.mkdir(parents=True, exist_ok=True)
     out_path = SITE_DIR / "leaderboard.js"

@@ -162,6 +162,10 @@
       "offline": "results/community/tesla_v100spcie32gbx1_suite_A_nvidia_vllm_6e78e779/offline",
       "online": "results/community/tesla_v100spcie32gbx1_suite_A_nvidia_vllm_6e78e779/online",
       "interactive": "results/community/tesla_v100spcie32gbx1_suite_A_nvidia_vllm_6e78e779/interactive"
-    }
+    },
+    "run_id": "60fda9ef",
+    "run_name": "tesla_v100s_pcie_32gbx1_suite_A_nvidia_vllm_6e78e779_60fda9ef",
+    "time": null,
+    "flagged": null
   }
 }

@@ -104,4 +104,10 @@ else:
     print(f"| Interactive TTFT p99 | {round(ttft, 1) if ttft is not None else dash} ms |")
 print(f"| Accuracy valid | {acc_val} |")
 print(f"| Submitted by | {meta.get('submitted_by', dash)} |")
-print(f"| Date | {meta.get('date', dash)} |")
+date_str = meta.get('date', dash)
+time_str = meta.get('time', '')
+print(f"| Date | {date_str}{' ' + time_str if time_str else ''} |")
+print(f"| Run ID | `{meta.get('run_id', dash)}` |")
+print(f"| Run name | `{meta.get('run_name', dash)}` |")
+if meta.get('flagged'):
+    print(f"| ⚠️ Flagged | {meta['flagged']} |")

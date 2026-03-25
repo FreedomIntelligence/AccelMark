@@ -206,6 +206,10 @@
       "1": "1x",
       "2": "2x",
       "4": "4x"
-    }
+    },
+    "run_id": "130ad7bb",
+    "run_name": "nvidia_a100_sxm4_80gbx4_suite_E_nvidia_vllm_6e78e779_130ad7bb",
+    "time": null,
+    "flagged": null
   }
 }

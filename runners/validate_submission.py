@@ -8,6 +8,7 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -126,6 +127,48 @@ def check_soft_warnings(result: dict) -> list[str]:
             )
 
     return warnings
+
+
+def check_run_id_integrity(result: dict) -> list[str]:
+    """
+    Verify meta.run_id matches a recomputation from the result's own fields.
+    Catches manual edits to result.json that forget to update run_id.
+    Silently skips results that don't have run_id (older submissions).
+    """
+    meta          = result.get("meta", {})
+    stored_run_id = meta.get("run_id")
+
+    if not stored_run_id:
+        return []  # Old result without run_id — skip
+
+    chip       = result.get("chip", {})
+    sw         = result.get("software", {})
+    model      = result.get("model", {})
+    chip_count = chip.get("count", 1)
+
+    key = {
+        "chip_name":         chip.get("name", "unknown"),
+        "chip_memory_gb":    chip.get("memory_gb_per_chip", 0),
+        "chip_count":        chip_count,
+        "interconnect":      chip.get("interconnect_intra_node") if chip_count > 1 else None,
+        "runner_id":         result.get("implementation_id", "unknown"),
+        "framework_version": sw.get("framework_version", "unknown"),
+        "suite_id":          result.get("suite_id", "unknown"),
+        "model_id":          model.get("model_id", "unknown"),
+        "precision":         model.get("precision", "BF16"),
+        "submitted_by":      meta.get("submitted_by", "unknown"),
+    }
+
+    raw      = json.dumps(key, sort_keys=True)
+    expected = hashlib.sha256(raw.encode()).hexdigest()[:8]
+
+    if stored_run_id != expected:
+        return [
+            f"meta.run_id mismatch — stored '{stored_run_id}' "
+            f"but recomputed '{expected}'. "
+            f"result.json may have been manually edited after the run."
+        ]
+    return []
 
 
 def compute_derived(result: dict) -> dict:
@@ -260,6 +303,7 @@ def main():
     if not all_errors:
         all_errors.extend(check_hard_failures(result, result_dir))
         all_warnings.extend(check_soft_warnings(result))
+        all_errors.extend(check_run_id_integrity(result))
         all_errors.extend(check_suite_e(result_dir, result))
         result = compute_derived(result)
         # Write back computed fields

@@ -52,20 +52,25 @@ jobs:
               return;
             }
 
-            // Build submission directory name — matches results/verified/ convention:
-            // {chip}_{suite}_{runner_id}
-            const chip = (result.chip?.name || 'unknown')
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-|-$/g, '')
-              .slice(0, 30);
-            const suite = result.suite_id || 'unknown';
-            const runner = result.implementation_id || 'unknown';
-            const dirName = `${chip}_${suite}_${runner}`;
+            // Use run_name from result.json — computed deterministically by benchmark_runner.
+            // Falls back to constructing from parts for older results that predate this field.
+            let dirName = result.meta?.run_name;
+            if (!dirName) {
+              const chip   = (result.chip?.name || 'unknown')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_|_$/g, '');
+              const count  = result.chip?.count || 1;
+              const suite  = result.suite_id || 'unknown';
+              const runner = result.implementation_id || 'unknown';
+              const runId  = result.meta?.run_id || 'unknown';
+              dirName = `${chip}x${count}_${suite}_${runner}_${runId}`;
+            }
 
             core.setOutput('dir_name', dirName);
             core.setOutput('issue_number', issueNumber);
             core.setOutput('result_json', JSON.stringify(result));
+            core.setOutput('run_id', result.meta?.run_id || '');
 
             console.log(`Submission directory: ${dirName}`);
 
@@ -89,32 +94,38 @@ jobs:
           chip = result.get('chip', {})
           software = result.get('software', {})
 
-          env = {
-              'collected_at': result.get('meta', {}).get('date', '2026-01-01') + 'T00:00:00Z',
-              'accelerators': [{
-                  'index': 0,
-                  'name': chip.get('name', 'Unknown'),
-                  'memory_gb': chip.get('memory_gb_per_chip', 0),
-                  'driver_version': software.get('driver_version', 'unknown'),
-                  'firmware_version': None,
-              }],
-              'accelerator_topology': None,
-              'cpu': {
-                  'model': 'unknown',
-                  'physical_cores': 1,
-                  'logical_cores': 1,
-                  'numa_nodes': 1,
-              },
-              'system_memory_gb': 0,
-              'pcie_generation': 'unknown',
-              'cpu_accelerator_bandwidth_gbs': None,
-              'network_interfaces': None,
-              'kernel_version': 'unknown',
-              'runtime_version': software.get('runtime_version', 'unknown'),
-          }
-
-          with open('$DIR/env_info.json', 'w') as f:
-              json.dump(env, f, indent=2)
+          env = result.get('environment')
+          if not env:
+              # fallback for old results (keep existing reconstruction code here)
+              env = {
+                  'collected_at': result.get('meta', {}).get('date', '2026-01-01') + 'T00:00:00Z',
+                  'accelerators': [{
+                      'index': 0,
+                      'name': chip.get('name', 'Unknown'),
+                      'memory_gb': chip.get('memory_gb_per_chip', 0),
+                      'driver_version': software.get('driver_version', 'unknown'),
+                      'firmware_version': None,
+                  }],
+                  'accelerator_topology': None,
+                  'cpu': {
+                      'model': 'unknown',
+                      'physical_cores': 1,
+                      'logical_cores': 1,
+                      'numa_nodes': 1,
+                  },
+                  'system_memory_gb': 0,
+                  'pcie_generation': 'unknown',
+                  'cpu_accelerator_bandwidth_gbs': None,
+                  'network_interfaces': None,
+                  'kernel_version': 'unknown',
+                  'runtime_version': software.get('runtime_version', 'unknown'),
+              }
+              with open('$DIR/env_info.json', 'w') as f:
+                  json.dump(env, f, indent=2)
+          else:
+              with open(f'{DIR}/env_info.json', 'w') as f:
+                  json.dump(env, f, indent=2)
+              print('env_info.json extracted from result.json')
 
           print('env_info.json created')
 
@@ -130,6 +141,66 @@ jobs:
           else:
               print('No accuracy block in result.json — skipping accuracy.json')
           "
+
+      - name: Check for duplicate submission
+        id: duplicate_check
+        run: |
+          RUN_ID="${{ steps.extract.outputs.run_id }}"
+
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "unknown" ]; then
+            echo "No run_id in submission — skipping duplicate check"
+            echo "is_duplicate=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Search all existing community result.json files for same run_id
+          EXISTING=""
+          for f in $(find results/community -name "result.json" 2>/dev/null); do
+              MATCH=$(python3 -c "import json,sys; r=json.load(open(sys.argv[1])); print('yes' if r.get('meta',{}).get('run_id')=='$RUN_ID' else '')" "$f" 2>/dev/null || echo "")
+
+            if [ "$MATCH" = "yes" ]; then
+              EXISTING="$f"
+              break
+            fi
+          done
+
+          if [ -n "$EXISTING" ]; then
+            echo "Found existing result with run_id=$RUN_ID at: $EXISTING"
+            echo "existing_path=$EXISTING" >> $GITHUB_OUTPUT
+            echo "is_duplicate=true" >> $GITHUB_OUTPUT
+          else
+            echo "No duplicate found for run_id=$RUN_ID"
+            echo "is_duplicate=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Handle duplicate submission
+        if: steps.duplicate_check.outputs.is_duplicate == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING="${{ steps.duplicate_check.outputs.existing_path }}"
+          ISSUE="${{ steps.extract.outputs.issue_number }}"
+          EXISTING_DIR=$(dirname "$EXISTING")
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+
+          NEW_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open('$DIR/result.json')); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" 2>/dev/null || echo "unknown")
+
+          OLD_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open('$EXISTING')); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" 2>/dev/null || echo "unknown")
+
+          echo "Existing scenarios: $OLD_SCENARIOS"
+          echo "New scenarios:      $NEW_SCENARIOS"
+
+          if [ "$NEW_SCENARIOS" = "$OLD_SCENARIOS" ]; then
+            # Same scenarios = true duplicate, reject
+            gh issue comment "$ISSUE" \
+              --body "Duplicate submission detected. A result with the same hardware, software, suite, and submitter already exists at \`${EXISTING_DIR}\` with scenarios: \`${OLD_SCENARIOS}\`. If this is intentional (e.g. after a framework update), update \`meta.framework_version\` in your result.json and resubmit."
+            echo "Rejected: duplicate with same scenarios"
+            exit 1
+          else
+            # Different scenarios = partial update, warn but continue
+            gh issue comment "$ISSUE" \
+              --body "Note: An existing result with the same run_id was found at \`${EXISTING_DIR}\` (scenarios: \`${OLD_SCENARIOS}\`). This new submission has scenarios: \`${NEW_SCENARIOS}\`. Continuing — this looks like an update."
+          fi
 
       - name: Run validation
         id: validate

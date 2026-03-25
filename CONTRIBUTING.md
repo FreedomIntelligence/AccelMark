@@ -20,15 +20,14 @@ pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name or GitHub username
 
-# 3. Run the benchmark (~46 min on A100)
+# 3. Run the benchmark (~50 min on A100)
 #    Accuracy gate runs automatically before the benchmark starts.
-#    Output directory is auto-named: results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_6e78e779
+#    Output directory is auto-named using run_name, e.g.:
+#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f
 python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
 
-# 4. Submit
-ls results/community/
-python runners/validate_submission.py --dir results/community/<your_submission_dir>
-# Then open a GitHub Issue using the "Community Submission" template
+# 4. Submit — open a GitHub Issue and paste your result.json
+# https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
 ```
 
 That's it. The CI bot handles the rest.
@@ -109,7 +108,7 @@ or `--scenario offline` (or any other scenario name) to run a single scenario.
 # Override the output directory if needed
 python run.py --runner nvidia_vllm_6e78e779 \
     --suite suite_A \
-    --output-dir ./results/verified/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_6e78e779
+    --output-dir ./results/verified/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f
 ```
 
 ### Run a single scenario
@@ -380,7 +379,9 @@ If a result looks wrong:
 2. Include: the submission name, what looks wrong, and ideally your own
    run on the same hardware as evidence
 
-Maintainers will investigate and may move the result to `flagged/`.
+Maintainers will investigate. If confirmed suspicious, the result's `meta.flagged`
+field will be set to a reason string and it will appear with a ⚠️ badge on the
+leaderboard.
 
 ---
 

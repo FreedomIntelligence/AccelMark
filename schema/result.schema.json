@@ -441,6 +441,23 @@
         "submitted_by": { "type": "string" },
         "submission_type": { "type": "string", "enum": ["individual","vendor","research"] },
         "date": { "type": "string", "format": "date" },
+        "time": {
+          "type": ["string", "null"],
+          "description": "Benchmark start time HH:MM:SS"
+        },
+        "run_id": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{8}$",
+          "description": "8-char hex hash of hardware+software+suite+submitter config. Deterministic."
+        },
+        "run_name": {
+          "type": ["string", "null"],
+          "description": "Directory name: {chip}x{count}_{suite_id}_{runner_id}_{run_id}"
+        },
+        "flagged": {
+          "type": ["string", "null"],
+          "description": "Null for valid results. Maintainer sets to reason string if result is suspicious."
+        },
         "reproduce_script": { "type": "string" },
         "env_info_file": { "type": "string" },
         "log_file": { "type": ["string","null"] },

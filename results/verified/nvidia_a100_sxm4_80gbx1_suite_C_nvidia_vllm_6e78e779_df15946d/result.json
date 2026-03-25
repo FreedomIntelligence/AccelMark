@@ -405,6 +405,10 @@
         "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
         "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e"
       }
-    }
+    },
+    "run_id": "df15946d",
+    "run_name": "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_6e78e779_df15946d",
+    "time": null,
+    "flagged": null
   }
 }

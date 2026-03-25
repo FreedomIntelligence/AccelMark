@@ -455,6 +455,10 @@
       "interactive": "results/verified/nvidia_a100sxm480gbx1_suite_D_nvidia_vllm_6e78e779/interactive",
       "sustained": "results/verified/nvidia_a100sxm480gbx1_suite_D_nvidia_vllm_6e78e779/sustained",
       "online": "results/verified/nvidia_a100sxm480gbx1_suite_D_nvidia_vllm_6e78e779/online"
-    }
+    },
+    "run_id": "a8bf812d",
+    "run_name": "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm_6e78e779_a8bf812d",
+    "time": null,
+    "flagged": null
   }
 }

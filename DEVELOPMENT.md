@@ -72,7 +72,7 @@ AccelMarkLoadGen.run(inference_fn)          ← loadgen handles all timing
     ↓  returns metrics dict
 BenchmarkRunner._build_result_json()       ← assembles result.json
     ↓  writes
-results/community/{name}/result.json
+results/community/{run_name}/result.json   ← run_name is deterministic hash-based
 
 GitHub Actions
     ↓  on push to results/
@@ -81,6 +81,19 @@ leaderboard/generate.py                    ← reads all result.json files
 leaderboard/site/leaderboard.js
 leaderboard/site/api/index.json            ← queried by OpenClaw Skill
 ```
+
+**Output directory naming** — the output directory is named using `run_name`,
+a deterministic string computed from the hardware + software + suite + submitter
+config. Example:
+
+```
+results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f
+                  └──chip──────────────┘ └suite┘ └──runner──────────────┘ └run_id┘
+```
+
+The last 8 characters (`c2bcf41f`) are the `run_id` — an 8-char hex hash that
+uniquely identifies this configuration. See `_compute_run_id()` in
+`benchmark_runner.py` for the hash inputs.
 
 ### Key design principle
 
@@ -829,6 +842,18 @@ Key constraints:
 - `accuracy.valid` must be `true` for verified tier
 - `submitted_by` must be non-empty
 - `metrics` fields that are null are allowed (power, memory)
+
+**`meta` fields for run identity and status:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `meta.run_id` | string\|null | 8-char hex hash of hardware+software+suite+submitter. Deterministic — same config always produces same `run_id`. Used for duplicate detection. |
+| `meta.run_name` | string\|null | Full directory name: `{chip}x{count}_{suite}_{runner}_{run_id}`. Used as the output directory name. |
+| `meta.time` | string\|null | Benchmark start time HH:MM:SS. |
+| `meta.flagged` | string\|null | Null for normal results. Maintainer sets to a reason string if result is suspicious — triggers ⚠️ badge on leaderboard. |
+
+These fields are optional in the schema for backward compatibility with older results.
+New benchmark runs populate all four automatically.
 
 When adding new fields to result.json, update the schema to allow them.
 Use `"type": ["your_type", "null"]` to make fields optional.

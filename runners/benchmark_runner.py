@@ -477,6 +477,78 @@ class BenchmarkRunner(ABC):
         except Exception:
             return None
 
+    def _compute_run_id(self, args, suite: dict, env_info: dict) -> str:
+        """
+        Compute 8-char hex hash identifying this hardware+software+suite+submitter config.
+        Deterministic — same config always produces same run_id.
+        Used for duplicate detection in CI and leaderboard.
+
+        Hash key includes:
+          - chip name, memory, count, interconnect  (hardware identity)
+          - runner_id, framework_version            (software identity)
+          - suite_id, model_id, precision           (benchmark identity)
+          - submitted_by                            (submitter identity)
+
+        Suite C: uses suite.precision_required ("BF16") — one run_id for all quantized formats.
+        Suite E: chip_count = tp_size * pp_size (max chips tested).
+        """
+        accel   = env_info.get("accelerators", [{}])[0]
+        profile = self._load_submitter_profile()
+
+        tp_size    = getattr(args, "tensor_parallel_size", 1)
+        pp_size    = getattr(args, "pipeline_parallel_size", 1)
+        chip_count = tp_size * pp_size
+
+        # Interconnect is only meaningful for multi-chip runs
+        interconnect = None
+        if chip_count > 1:
+            interconnect = (env_info.get("intra_node_interconnect")
+                            or accel.get("interconnect_intra_node"))
+
+        key = {
+            # Hardware
+            "chip_name":      accel.get("name", "unknown"),
+            "chip_memory_gb": accel.get("memory_gb", 0),
+            "chip_count":     chip_count,
+            "interconnect":   interconnect,
+            # Software
+            "runner_id":         self._compute_implementation_id() or "unknown",
+            "framework_version": self._get_framework_version(),
+            # Benchmark
+            "suite_id":  suite["suite_id"],
+            "model_id":  suite.get("model_id", "unknown"),
+            "precision": suite.get("precision_required", "BF16"),
+            # Submitter
+            "submitted_by": profile.get("submitted_by", "unknown"),
+        }
+
+        raw = json.dumps(key, sort_keys=True)
+        return hashlib.sha256(raw.encode()).hexdigest()[:8]
+
+    def _compute_run_name(self, args, suite: dict, env_info: dict) -> str:
+        """
+        Build human-readable directory name for this benchmark run.
+        Format: {chip_slug}x{count}_{suite_id}_{runner_id}_{run_id}
+        Example: nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_a3f2c1b8
+
+        Stored in meta.run_name and used as the output directory name.
+        Deterministic — same config always produces same run_name.
+        """
+        accelerators = env_info.get("accelerators", [])
+        chip_full    = accelerators[0].get("name", "unknown") if accelerators else "unknown"
+        chip_slug    = re.sub(r"[^a-z0-9_]", "", re.sub(r"[ /\-]+", "_", chip_full.lower())) or "gpu"
+
+        tp_size    = getattr(args, "tensor_parallel_size", 1)
+        pp_size    = getattr(args, "pipeline_parallel_size", 1)
+        chip_count = tp_size * pp_size
+        chip_part  = f"{chip_slug}x{chip_count}"
+
+        suite_id  = suite["suite_id"]
+        runner_id = self._compute_implementation_id() or "unknown"
+        run_id    = self._compute_run_id(args, suite, env_info)
+
+        return f"{chip_part}_{suite_id}_{runner_id}_{run_id}"
+
     # ── Entry point ───────────────────────────────────────────────────────────
 
     def main(self) -> None:
@@ -1221,6 +1293,7 @@ class BenchmarkRunner(ABC):
             "suite_id": base_result["suite_id"],
             "implementation_id": base_result.get("implementation_id"),
             "chip": base_result["chip"],
+            "environment": base_result["environment"],
             "software": base_result["software"],
             "model": base_result["model"],
             "task": {
@@ -1678,6 +1751,7 @@ class BenchmarkRunner(ABC):
             "suite_id": suite["suite_id"],
             "implementation_id": self._compute_implementation_id(),
             "chip": chip_info,
+            "environment": env_info,
             "software": {
                 "framework": self._get_framework_name(),
                 "framework_version": self._get_framework_version(),
@@ -1728,6 +1802,10 @@ class BenchmarkRunner(ABC):
                 "submitted_by": profile.get("submitted_by", ""),
                 "submission_type": profile.get("submission_type", "individual"),
                 "date": date.today().isoformat(),
+                "time": datetime.now().strftime("%H:%M:%S"),
+                "run_id":   self._compute_run_id(args, suite, env_info),
+                "run_name": self._compute_run_name(args, suite, env_info),
+                "flagged":  None,
                 "reproduce_script": Path(sys.argv[0]).resolve().relative_to(_REPO_ROOT).as_posix(),
                 "env_info_file": env_info_file,
                 "log_file": "run.log",
@@ -2097,32 +2175,27 @@ class BenchmarkRunner(ABC):
         )
 
     def _generate_output_dir(self, args, env_info: dict) -> str:
-        # Chip: full name, lowercase, all non-alphanumeric stripped
-        accelerators = env_info.get("accelerators", [])
-        chip_full = accelerators[0].get("name", "unknown") if accelerators else "unknown"
-        chip_clean = re.sub(r"[^a-z0-9_]", "", re.sub(r" +", "_", chip_full.lower())) or "gpu"
-        count = getattr(args, "tensor_parallel_size", 1) * getattr(args, "pipeline_parallel_size", 1)
-        chip_part = f"{chip_clean}x{count}"
-
-        # Suite: keep canonical form (e.g. "suite_A")
-        suite_part = args.suite
-
-        # Runner ID: prefer content-hash ID; fall back to platform + random hex with a warning
-        impl_id = self._compute_implementation_id()
-        if impl_id is None:
-            rand_id = hashlib.sha256(os.urandom(4)).hexdigest()[:8]
-            runner_part = f"unknown_{rand_id}"
+        """
+        Generate the output directory path using run_name (deterministic hash-based name).
+        Warns if runner has no valid implementation_id.
+        """
+        if self._compute_implementation_id() is None:
             print(
-                f"Warning: runner has no valid implementation_id. "
-                f"Each runner should have a content-hash ID (see runners/hash_runner.py). "
-                f"Using temporary ID '{runner_part}' for this run."
+                "Warning: runner has no valid implementation_id. "
+                "Each runner should have a content-hash ID (see runners/hash_runner.py). "
+                "run_name will use 'unknown' as runner_id."
             )
-        else:
-            runner_part = impl_id
 
-        dir_name = f"{chip_part}_{suite_part}_{runner_part}"
-        tier = getattr(args, "tier", "community")
-        return str(Path("results") / tier / dir_name)
+        suite_path = _REPO_ROOT / "suites" / args.suite / "suite.json"
+        try:
+            with open(suite_path) as f:
+                suite = json.load(f)
+        except Exception:
+            suite = {"suite_id": args.suite}
+
+        run_name = self._compute_run_name(args, suite, env_info)
+        tier     = getattr(args, "tier", "community")
+        return str(Path("results") / tier / run_name)
 
     def _collect_env_preview(self) -> dict:
         """Quickly collect env info for output dir naming. Returns empty dict on failure."""
