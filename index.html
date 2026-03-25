@@ -126,6 +126,18 @@
     }
 
     .chip-name { font-weight: 500; }
+    .badge-flagged {
+      display: inline-block;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 11px;
+      margin-left: 6px;
+      cursor: help;
+      vertical-align: middle;
+    }
     .empty-state {
       text-align: center;
       padding: 4rem 2rem;
@@ -913,7 +925,7 @@
       const isVendor = row.submitted_by && row.submitted_by.includes('[vendor]');
 
       tr.innerHTML = `
-        <td class="chip-name">${row.chip || '—'}</td>
+        <td class="chip-name">${row.chip || '—'}${row.flagged ? `<span class="badge-flagged" title="${row.flagged}">⚠️ flagged</span>` : ''}</td>
         <td>${row.vendor || '—'}</td>
         <td>${row.chip_count || 1}</td>
         <td>${formatFramework(row)}</td>

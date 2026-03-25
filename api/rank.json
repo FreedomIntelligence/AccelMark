@@ -1,5 +1,5 @@
 {
-  "nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_6e78e779": {
+  "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_A",
     "tier": "verified",
@@ -8,7 +8,7 @@
     "percentile": 100.0,
     "primary_metric": 5255.02
   },
-  "nvidia_a100sxm480gbx1_suite_C_nvidia_vllm_6e78e779": {
+  "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_6e78e779_df15946d": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_C",
     "tier": "verified",
@@ -17,7 +17,7 @@
     "percentile": 100.0,
     "primary_metric": 3757.2
   },
-  "nvidia_a100sxm480gbx1_suite_D_nvidia_vllm_6e78e779": {
+  "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm_6e78e779_a8bf812d": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_D",
     "tier": "verified",
@@ -26,16 +26,7 @@
     "percentile": 100.0,
     "primary_metric": 7028.58
   },
-  "nvidia_a100sxm480gbx1_suite_E_nvidia_vllm_6e78e779": {
-    "chip_name": "NVIDIA A100-SXM4-80GB",
-    "suite_id": "suite_E",
-    "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
-    "primary_metric": 6045.34
-  },
-  "nvidia_a100sxm480gbx4_suite_B_nvidia_vllm_6e78e779": {
+  "nvidia_a100_sxm4_80gbx4_suite_B_nvidia_vllm_6e78e779_e3b1ef1a": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_B",
     "tier": "verified",
@@ -44,7 +35,16 @@
     "percentile": 100.0,
     "primary_metric": 2780.1
   },
-  "tesla-v100s-pcie-32gb_suite_A_nvidia_vllm_6e78e779": {
+  "nvidia_a100_sxm4_80gbx4_suite_E_nvidia_vllm_6e78e779_130ad7bb": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 6045.34
+  },
+  "tesla_v100s_pcie_32gbx1_suite_A_nvidia_vllm_6e78e779_60fda9ef": {
     "chip_name": "Tesla V100S-PCIE-32GB",
     "suite_id": "suite_A",
     "tier": "community",

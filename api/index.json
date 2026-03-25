@@ -20,13 +20,13 @@
         "best_sustained_throughput_tokens_per_sec": 52.3,
         "throttle_ratio": 0.845
       },
-      "suite_E": {
-        "best_scaling_efficiency_2x": 0.649,
-        "best_scaling_efficiency_4x": 0.396
-      },
       "suite_B": {
         "best_throughput_tokens_per_sec": 2780.1,
         "best_online_max_qps": 2
+      },
+      "suite_E": {
+        "best_scaling_efficiency_2x": 0.649,
+        "best_scaling_efficiency_4x": 0.396
       }
     }
   },
