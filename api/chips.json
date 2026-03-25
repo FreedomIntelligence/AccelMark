@@ -4,5 +4,11 @@
     "submission_count": 5,
     "best_throughput_tokens_per_sec": 7028.58,
     "median_throughput_tokens_per_sec": 5255.0
+  },
+  {
+    "name": "Tesla V100S-PCIE-32GB",
+    "submission_count": 1,
+    "best_throughput_tokens_per_sec": 2104.49,
+    "median_throughput_tokens_per_sec": 2104.5
   }
 ]

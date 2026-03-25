@@ -2122,5 +2122,184 @@ const LEADERBOARD_DATA = [
       "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_6e78e779/runner.py"
     },
     "implementation_id": "nvidia_vllm_6e78e779"
+  },
+  {
+    "submission": "tesla-v100s-pcie-32gb_suite_A_offline_2026-03-24",
+    "tier": "community",
+    "is_suite_level": true,
+    "chip": "Tesla V100S-PCIE-32GB",
+    "vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb_per_chip": 32,
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "precision": "FP16",
+    "precision_fallback": true,
+    "precision_emulated": false,
+    "effective_dtype": "float16",
+    "quantization_method": null,
+    "model_source": "local",
+    "model_name": null,
+    "model_format": "HuggingFace original",
+    "architecture": "dense",
+    "suite": "suite_A",
+    "scenario": "all",
+    "primary_metric": 2104.49,
+    "primary_metric_label": "tokens/sec (offline)",
+    "tokens_per_sec_per_chip": 2104.5,
+    "offline_throughput": 2104.49,
+    "online_max_qps": 0,
+    "interactive_ttft_p99": 212.13,
+    "peak_memory_gb": 26.94,
+    "memory_utilization_pct": 84.2,
+    "memory_efficiency_toks_per_gb": 78.1,
+    "min_price_usd_per_hr": null,
+    "cost_efficiency_toks_per_dollar_hr": null,
+    "tokens_per_watt": null,
+    "accuracy_valid": true,
+    "accuracy_score": 0.61,
+    "date": "2026-03-24",
+    "submitted_by": "Zhang Zhiyuan",
+    "reproduce_script": "runners/nvidia_vllm_6e78e779/runner.py",
+    "notes": null,
+    "scaling_efficiency_2x": null,
+    "scaling_efficiency_4x": null,
+    "scaling_base_throughput": null,
+    "quant_bf16_throughput": null,
+    "quant_best_throughput": null,
+    "quant_best_precision": null,
+    "quant_int8_speedup": null,
+    "quant_int4_speedup": null,
+    "quant_quality_eff": null,
+    "sustained_throughput": null,
+    "throttle_ratio": null,
+    "throttle_onset_minute": null,
+    "ttft_p99_drift_ms": null,
+    "sustained_concurrency": null,
+    "detail": {
+      "hw_chip": "Tesla V100S-PCIE-32GB",
+      "hw_vendor": "NVIDIA",
+      "hw_count": 1,
+      "hw_memory_gb": 32,
+      "hw_interconnect_intra": null,
+      "hw_interconnect_inter": null,
+      "hw_cpu": "unknown, 1 cores",
+      "hw_system_memory_gb": 0,
+      "hw_pcie": "unknown",
+      "hw_network": null,
+      "sw_framework": "vLLM",
+      "sw_framework_version": "0.6.6.post1",
+      "sw_driver": "565.57.01",
+      "sw_runtime": "CUDA 12.1",
+      "sw_os": "Ubuntu 22.04.4 LTS",
+      "sw_python": "3.10.18",
+      "sw_pytorch": null,
+      "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+      "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+      "model_name": null,
+      "model_note": null,
+      "model_source": "local",
+      "model_arch": "dense",
+      "model_params_b": 8,
+      "model_precision": "FP16",
+      "model_effective_dtype": "float16",
+      "model_quant_method": null,
+      "model_format": "HuggingFace original",
+      "run_scenarios": [
+        "offline",
+        "online",
+        "interactive"
+      ],
+      "run_chip_counts": null,
+      "run_num_runs": 3,
+      "run_tp": 1,
+      "run_pp": 1,
+      "run_dp": 1,
+      "acc_score": 0.61,
+      "acc_baseline_delta": null,
+      "acc_valid": true,
+      "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
+      "meta_submitted_by": "Zhang Zhiyuan",
+      "meta_submission_type": "individual",
+      "meta_date": "2026-03-24",
+      "meta_reproduce_script": "runners/nvidia_vllm_6e78e779/runner.py",
+      "meta_elapsed_min": 78.8,
+      "meta_model_load_sec": 61.6,
+      "meta_start_time": "2026-03-24T09:51:55.981227+00:00",
+      "meta_notes": null
+    },
+    "viz": {
+      "type": "suite_A",
+      "offline": {
+        "labels": [
+          "8",
+          "32",
+          "128"
+        ],
+        "throughput": [
+          2104.49,
+          2089.47,
+          2104.39
+        ],
+        "memory_gb": [
+          26.94,
+          26.94,
+          26.94
+        ]
+      },
+      "online": {
+        "labels": [
+          "5",
+          "25",
+          "100"
+        ],
+        "ttft_p50": [
+          253.04,
+          4366.3,
+          16360.05
+        ],
+        "ttft_p90": [
+          17654.65,
+          68350.05,
+          85466.6
+        ],
+        "tpot_p50": [
+          142.52,
+          139.27,
+          134.37
+        ],
+        "sla_met": [
+          false,
+          false,
+          false
+        ],
+        "max_valid_qps": 0
+      },
+      "interactive": {
+        "ttft_p50": 124.71,
+        "ttft_p90": 180.13,
+        "ttft_p99": 212.13,
+        "tpot_p50": 24.65,
+        "tpot_p90": 25.57,
+        "tpot_p99": 25.91
+      },
+      "sustained": null
+    },
+    "impl": {
+      "id": "nvidia_vllm_6e78e779",
+      "platform": "nvidia",
+      "name": "vLLM on NVIDIA (reference implementation)",
+      "framework": "vLLM",
+      "submitted_by": "JuhaoLiang1997",
+      "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A\u2013E). Standard vLLM configuration, no custom patches.",
+      "notes": "Adds effective_dtype and quantization_method transparency fields; updated Suite C precision mapping (FP8/W8A8/W8A16/W4A16 via dtype=auto).",
+      "created": "2026-03-23",
+      "supersedes": null,
+      "deprecated_by": null,
+      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_6e78e779",
+      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_6e78e779/runner.py"
+    },
+    "implementation_id": "nvidia_vllm_6e78e779"
   }
 ];

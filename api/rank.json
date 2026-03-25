@@ -43,5 +43,14 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 2780.1
+  },
+  "tesla-v100s-pcie-32gb_suite_A_offline_2026-03-24": {
+    "chip_name": "Tesla V100S-PCIE-32GB",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 2104.49
   }
 }
