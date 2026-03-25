@@ -30,7 +30,7 @@ jobs:
         run: |
           BASE_FILES="benchmark_runner.py collect_env.py validate_submission.py \
                       validate_runners.py hash_runner.py meta.schema.json \
-                      protocol.py __init__.py __pycache__"
+                      protocol.py template __init__.py __pycache__"
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
           FOLDERS=""
           while IFS= read -r f; do

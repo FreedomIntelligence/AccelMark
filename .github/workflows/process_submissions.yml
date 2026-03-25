@@ -52,16 +52,16 @@ jobs:
               return;
             }
 
-            // Build submission directory name
+            // Build submission directory name — matches results/verified/ convention:
+            // {chip}_{suite}_{runner_id}
             const chip = (result.chip?.name || 'unknown')
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, '-')
               .replace(/^-|-$/g, '')
               .slice(0, 30);
             const suite = result.suite_id || 'unknown';
-            const scenario = result.task?.scenario || 'offline';
-            const date = result.meta?.date || new Date().toISOString().split('T')[0];
-            const dirName = `${chip}_${suite}_${scenario}_${date}`;
+            const runner = result.implementation_id || 'unknown';
+            const dirName = `${chip}_${suite}_${runner}`;
 
             core.setOutput('dir_name', dirName);
             core.setOutput('issue_number', issueNumber);
@@ -74,11 +74,10 @@ jobs:
           DIR="results/community/${{ steps.extract.outputs.dir_name }}"
           mkdir -p "$DIR"
 
-          # Write result.json
+          # Write result.json, set meta.log_file to null (local artifact, not submitted)
           echo '${{ steps.extract.outputs.result_json }}' | python -m json.tool > "$DIR/result.json"
-
-          # Create placeholder files that validate_submission.py requires
-          echo "Submitted via OpenClaw AccelMark Skill (Issue #${{ steps.extract.outputs.issue_number }})" > "$DIR/run.log"
+          python3 -c "import json; f=open('$DIR/result.json'); r=json.load(f); f.close(); r.get('meta',{}).update({'log_file':None}); open('$DIR/result.json','w').write(json.dumps(r,indent=2))"
+          echo "meta.log_file set to null"
 
           # Create minimal env_info.json from chip data in result
           python3 -c "
@@ -118,6 +117,18 @@ jobs:
               json.dump(env, f, indent=2)
 
           print('env_info.json created')
+
+          # Create accuracy/accuracy.json from the accuracy block in result.json
+          # validate_submission.py requires this file — the data is already in result.json
+          import os
+          acc = result.get('accuracy')
+          if acc:
+              os.makedirs('$DIR/accuracy', exist_ok=True)
+              with open('$DIR/accuracy/accuracy.json', 'w') as f:
+                  json.dump(acc, f, indent=2)
+              print('accuracy/accuracy.json created')
+          else:
+              print('No accuracy block in result.json — skipping accuracy.json')
           "
 
       - name: Run validation
@@ -130,55 +141,58 @@ jobs:
             echo "valid=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create PR if valid
+      - name: Commit files and create PR
         if: steps.validate.outputs.valid == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const dirName = '${{ steps.extract.outputs.dir_name }}';
-            const issueNumber = '${{ steps.extract.outputs.issue_number }}';
-            const branchName = `submission/${dirName}`;
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+          BRANCH="submission/${{ steps.extract.outputs.dir_name }}"
+          ISSUE="${{ steps.extract.outputs.issue_number }}"
 
-            // Create branch
-            const { data: ref } = await github.rest.git.getRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'heads/main',
-            });
+          # Configure git
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            await github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/heads/${branchName}`,
-              sha: ref.object.sha,
-            });
+          # Create and switch to submission branch
+          git checkout -b "$BRANCH"
 
-            // Create PR
-            const { data: pr } = await github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `[community] ${dirName}`,
-              body: `Auto-generated from Issue #${issueNumber}\n\nSubmitted via OpenClaw AccelMark Skill.\n\nCloses #${issueNumber}`,
-              head: branchName,
-              base: 'main',
-            });
+          # Stage the result files written in the previous step
+          # Note: run.log is gitignored intentionally — not committed
+          git add "$DIR/result.json" "$DIR/env_info.json"
+          # accuracy/accuracy.json may exist if accuracy data was in result.json
+          [ -f "$DIR/accuracy/accuracy.json" ] && git add "$DIR/accuracy/accuracy.json" || true
 
-            // Comment on issue
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: parseInt(issueNumber),
-              body: `✅ Validation passed! PR created: ${pr.html_url}\n\nYour result will appear on the leaderboard after review.`,
-            });
+          # Commit
+          git commit -m "community: add submission from issue #${ISSUE}"
+
+          # Delete remote branch if it exists from a previous failed run, then push fresh
+          git push origin --delete "$BRANCH" 2>/dev/null || true
+          git push origin "$BRANCH"
+
+          # Generate summary table and build PR body file
+          python3 runners/gen_pr_summary.py "$DIR/result.json" > /tmp/pr_summary.md
+
+          printf "Auto-generated from Issue #%s\n\n## Submission summary\n\n" "$ISSUE" > /tmp/pr_body.md
+          cat /tmp/pr_summary.md >> /tmp/pr_body.md
+          printf "\nCloses #%s" "$ISSUE" >> /tmp/pr_body.md
+
+          # Create PR (or get existing one if already created)
+          PR_URL=$(gh pr create \
+            --title "[community] ${{ steps.extract.outputs.dir_name }}" \
+            --body-file /tmp/pr_body.md \
+            --base main \
+            --head "$BRANCH" 2>/dev/null) || \
+          PR_URL=$(gh pr view "$BRANCH" --json url -q .url)
+
+          # Comment on the issue with PR link
+          gh issue comment "$ISSUE" --body "Validation passed. PR created: ${PR_URL} — your result will appear on the leaderboard after the PR is reviewed and merged."
+
 
       - name: Comment failure on issue
         if: steps.validate.outputs.valid == 'false'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: parseInt('${{ steps.extract.outputs.issue_number }}'),
-              body: `❌ Validation failed. Your submission has schema errors.\n\nSee the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.\n\nCommon fixes:\n- Make sure \`num_runs >= 3\`\n- Make sure \`accuracy.valid\` is set\n- Check that all required fields are present`,
-            });
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ steps.extract.outputs.issue_number }}" \
+            --body "Validation failed. See the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details. Fix the errors and ask a maintainer to re-apply the community-submission label to retry."
