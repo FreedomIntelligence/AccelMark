@@ -2124,7 +2124,7 @@ const LEADERBOARD_DATA = [
     "implementation_id": "nvidia_vllm_6e78e779"
   },
   {
-    "submission": "tesla-v100s-pcie-32gb_suite_A_offline_2026-03-24",
+    "submission": "tesla-v100s-pcie-32gb_suite_A_nvidia_vllm_6e78e779",
     "tier": "community",
     "is_suite_level": true,
     "chip": "Tesla V100S-PCIE-32GB",
