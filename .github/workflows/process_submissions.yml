@@ -52,7 +52,7 @@ jobs:
               return;
             }
 
-            // Use run_name from result.json — computed deterministically by benchmark_runner.
+            // Use run_name from result.json - computed deterministically by benchmark_runner.
             // Falls back to constructing from parts for older results that predate this field.
             let dirName = result.meta?.run_name;
             if (!dirName) {
@@ -130,7 +130,7 @@ jobs:
           print('env_info.json created')
 
           # Create accuracy/accuracy.json from the accuracy block in result.json
-          # validate_submission.py requires this file — the data is already in result.json
+          # validate_submission.py requires this file - the data is already in result.json
           import os
           acc = result.get('accuracy')
           if acc:
@@ -139,7 +139,7 @@ jobs:
                   json.dump(acc, f, indent=2)
               print('accuracy/accuracy.json created')
           else:
-              print('No accuracy block in result.json — skipping accuracy.json')
+              print('No accuracy block in result.json - skipping accuracy.json')
           "
 
       - name: Check for duplicate submission
@@ -148,7 +148,7 @@ jobs:
           RUN_ID="${{ steps.extract.outputs.run_id }}"
 
           if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "unknown" ]; then
-            echo "No run_id in submission — skipping duplicate check"
+            echo "No run_id in submission - skipping duplicate check"
             echo "is_duplicate=false" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -199,7 +199,7 @@ jobs:
           else
             # Different scenarios = partial update, warn but continue
             gh issue comment "$ISSUE" \
-              --body "Note: An existing result with the same run_id was found at \`${EXISTING_DIR}\` (scenarios: \`${OLD_SCENARIOS}\`). This new submission has scenarios: \`${NEW_SCENARIOS}\`. Continuing — this looks like an update."
+              --body "Note: An existing result with the same run_id was found at \`${EXISTING_DIR}\` (scenarios: \`${OLD_SCENARIOS}\`). This new submission has scenarios: \`${NEW_SCENARIOS}\`. Continuing - this looks like an update."
           fi
 
       - name: Run validation
@@ -229,7 +229,7 @@ jobs:
           git checkout -b "$BRANCH"
 
           # Stage the result files written in the previous step
-          # Note: run.log is gitignored intentionally — not committed
+          # Note: run.log is gitignored intentionally - not committed
           git add "$DIR/result.json" "$DIR/env_info.json"
           # accuracy/accuracy.json may exist if accuracy data was in result.json
           [ -f "$DIR/accuracy/accuracy.json" ] && git add "$DIR/accuracy/accuracy.json" || true
@@ -257,7 +257,7 @@ jobs:
           PR_URL=$(gh pr view "$BRANCH" --json url -q .url)
 
           # Comment on the issue with PR link
-          gh issue comment "$ISSUE" --body "Validation passed. PR created: ${PR_URL} — your result will appear on the leaderboard after the PR is reviewed and merged."
+          gh issue comment "$ISSUE" --body "Validation passed. PR created: ${PR_URL} - your result will appear on the leaderboard after the PR is reviewed and merged."
 
 
       - name: Comment failure on issue
