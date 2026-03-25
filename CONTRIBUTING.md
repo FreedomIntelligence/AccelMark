@@ -218,7 +218,7 @@ Sustained adds ~30 min to any suite that supports it.
 
 ### Accuracy gate (automatic)
 
-When you run the suite (with or without `--scenario all`), accuracy runs automatically as the **first step**.
+When you run the suite, accuracy runs automatically as the **first step**.
 If accuracy fails, the benchmark is aborted.
 
 ```
@@ -247,41 +247,28 @@ framework, same precision, same inference stack.
 **Resuming an interrupted run:** Re-running the same command resumes from
 where it stopped. Completed steps are skipped automatically.
 
-### Step 1: Validate
-
-```bash
-ls results/community/
-python runners/validate_submission.py \
-    --dir results/community/nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_6e78e779
-```
-
-**Files required for submission:**
-
-```
-<submission_dir>/
-  result.json          # merged suite result — required
-  env_info.json        # hardware environment — required
-  accuracy/
-    accuracy.json      # accuracy gate result — required
-  offline/result.json
-  online/result.json
-  interactive/result.json
-```
-
-`run.log`, `samples.jsonl`, and `accuracy_outputs.jsonl` are gitignored
-and stay on your machine — they are not part of the submission.
-
-### Step 2: Open a GitHub Issue
+### Step 1: Open a GitHub Issue
 
 Go to [Issues → New → Community Submission](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
 
-Paste the contents of your `result.json` into the issue body and attach
-`env_info.json`. The CI bot will validate, create a PR, and update the
-leaderboard automatically.
+Paste the full contents of your `result.json` into the code block and submit.
 
-### Step 3: Done
+> **The CI bot validates your result automatically** — no need to run
+> `validate_submission.py` locally first. If validation fails, the bot
+> comments on your issue explaining what to fix.
 
-Your result appears on the **Community** tab immediately after CI merges the PR.
+> **Why paste instead of attach?** The CI bot reads `result.json` directly
+> from the issue body. File attachments are not accessible to GitHub Actions.
+
+### Step 2: Done
+
+The CI bot will:
+1. Validate your `result.json` against the schema
+2. Open a PR with your result files
+3. Comment on your issue with a link to the PR
+
+Your result appears on the **Community** tab after the maintainer reviews
+and merges the PR — usually within a day or two.
 
 ---
 
