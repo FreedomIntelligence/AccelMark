@@ -130,7 +130,7 @@ def extract_detail(result: dict) -> dict:
         "hw_chip":               chip.get("name"),
         "hw_vendor":             chip.get("vendor"),
         "hw_count":              chip.get("count"),
-        "hw_memory_gb":          chip.get("memory_gb_per_chip"),
+        "hw_memory_gb":          chip.get("memory_gb"),
         "hw_interconnect_intra": intra,
         "hw_interconnect_inter": chip.get("interconnect_inter_node"),
         "hw_cpu":                cpu_str,
@@ -543,7 +543,7 @@ def extract_row(result: dict) -> dict:
             primary_metric_label = "tokens/sec (BF16 baseline)"
 
     # ── Efficiency ────────────────────────────────────────────────────────────
-    memory_gb_per_chip     = chip.get("memory_gb_per_chip", 0)
+    memory_gb_per_chip     = chip.get("memory_gb", 0)
     memory_efficiency      = (
         round(offline_throughput / peak_memory_gb, 1)
         if offline_throughput and peak_memory_gb and peak_memory_gb > 0 else None
@@ -584,7 +584,7 @@ def extract_row(result: dict) -> dict:
         "chip":               chip_full_name,
         "vendor":             chip.get("vendor"),
         "chip_count":         chip.get("count", 1),
-        "memory_gb_per_chip": memory_gb_per_chip,
+        "memory_gb": memory_gb_per_chip,
         "framework":          software.get("framework"),
         "framework_version":  software.get("framework_version"),
         "model":              model.get("model_id", "").split("/")[-1],

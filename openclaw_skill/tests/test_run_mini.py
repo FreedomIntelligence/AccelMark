@@ -168,7 +168,7 @@ def test_build_result_json_apple_vendor():
 
 def test_build_result_json_chip_memory():
     result = build_result_json(_nvidia_env(memory_gb=24), _standard_config(), _benchmark_result())
-    assert result["chip"]["memory_gb_per_chip"] == 24.0
+    assert result["chip"]["memory_gb"] == 24.0
 
 
 def test_build_result_json_metrics_passthrough():

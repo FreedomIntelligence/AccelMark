@@ -508,7 +508,7 @@ class BenchmarkRunner(ABC):
         key = {
             # Hardware
             "chip_name":      accel.get("name", "unknown"),
-            "chip_memory_gb": accel.get("memory_gb", 0),
+            "chip_memory_gb": round(float(accel.get("memory_gb", 0))),
             "chip_count":     chip_count,
             "interconnect":   interconnect,
             # Software
@@ -1736,7 +1736,7 @@ class BenchmarkRunner(ABC):
                 "name":                   a.get("name", "Unknown"),
                 "vendor":                 a.get("vendor", suite.get("chip", {}).get("vendor", "Unknown")),
                 "count":                  total_chips,
-                "memory_gb_per_chip":     a.get("memory_gb", None),
+                "memory_gb":     a.get("memory_gb", None),
                 "interconnect_intra_node": intra_node,
                 "interconnect_inter_node": a.get("interconnect_inter_node", None),
             }

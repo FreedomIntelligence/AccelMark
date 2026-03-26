@@ -194,7 +194,7 @@ def build_result_json(env: dict, config: MiniSuiteConfig, benchmark_result: dict
             "name": chip_name,
             "vendor": vendor,
             "count": len(accelerators) if accelerators else 1,
-            "memory_gb_per_chip": memory_gb,
+            "memory_gb": memory_gb,
             "interconnect_intra_node": "unknown",
             "interconnect_inter_node": None,
         },
@@ -255,7 +255,7 @@ def build_result_json(env: dict, config: MiniSuiteConfig, benchmark_result: dict
 def format_benchmark_report(result: dict, config: MiniSuiteConfig, ranking: dict | None) -> str:
     """Format a human-readable benchmark report for chat display."""
     chip_name = result["chip"]["name"]
-    memory_gb = result["chip"]["memory_gb_per_chip"]
+    memory_gb = result["chip"]["memory_gb"]
     model_display = config.model_id.split("/")[-1]
     precision = "BF16" if config.quantization is None else config.quantization
     framework_display = result["software"]["framework"]

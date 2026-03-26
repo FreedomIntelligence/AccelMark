@@ -6,7 +6,7 @@
     "name": "Tesla V100S-PCIE-32GB",
     "vendor": "NVIDIA",
     "count": 1,
-    "memory_gb_per_chip": 32,
+    "memory_gb": 32,
     "interconnect_intra_node": null,
     "interconnect_inter_node": null
   },

@@ -32,7 +32,7 @@ def _make_result(chip_name: str = "NVIDIA RTX 4090", throughputs=(4210, 6124, 68
         "mode": "benchmark",
         "schema_version": "1.0",
         "suite_id": "mini-standard",
-        "chip": {"name": chip_name, "vendor": "NVIDIA", "count": 1, "memory_gb_per_chip": 24.0},
+        "chip": {"name": chip_name, "vendor": "NVIDIA", "count": 1, "memory_gb": 24.0},
         "software": {"framework": "vLLM", "framework_version": "0.6.6"},
         "model": {"model_id": "meta-llama/Meta-Llama-3-8B-Instruct", "precision": "BF16"},
         "metrics": {

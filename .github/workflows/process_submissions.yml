@@ -74,74 +74,6 @@ jobs:
 
             console.log(`Submission directory: ${dirName}`);
 
-      - name: Write result files
-        run: |
-          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
-          mkdir -p "$DIR"
-
-          # Write result.json, set meta.log_file to null (local artifact, not submitted)
-          echo '${{ steps.extract.outputs.result_json }}' | python -m json.tool > "$DIR/result.json"
-          python3 -c "import json; f=open('$DIR/result.json'); r=json.load(f); f.close(); r.get('meta',{}).update({'log_file':None}); open('$DIR/result.json','w').write(json.dumps(r,indent=2))"
-          echo "meta.log_file set to null"
-
-          # Create minimal env_info.json from chip data in result
-          python3 -c "
-          import json, sys
-
-          with open('$DIR/result.json') as f:
-              result = json.load(f)
-
-          chip = result.get('chip', {})
-          software = result.get('software', {})
-
-          env = result.get('environment')
-          if not env:
-              # fallback for old results (keep existing reconstruction code here)
-              env = {
-                  'collected_at': result.get('meta', {}).get('date', '2026-01-01') + 'T00:00:00Z',
-                  'accelerators': [{
-                      'index': 0,
-                      'name': chip.get('name', 'Unknown'),
-                      'memory_gb': chip.get('memory_gb_per_chip', 0),
-                      'driver_version': software.get('driver_version', 'unknown'),
-                      'firmware_version': None,
-                  }],
-                  'accelerator_topology': None,
-                  'cpu': {
-                      'model': 'unknown',
-                      'physical_cores': 1,
-                      'logical_cores': 1,
-                      'numa_nodes': 1,
-                  },
-                  'system_memory_gb': 0,
-                  'pcie_generation': 'unknown',
-                  'cpu_accelerator_bandwidth_gbs': None,
-                  'network_interfaces': None,
-                  'kernel_version': 'unknown',
-                  'runtime_version': software.get('runtime_version', 'unknown'),
-              }
-              with open('$DIR/env_info.json', 'w') as f:
-                  json.dump(env, f, indent=2)
-          else:
-              with open(f'{DIR}/env_info.json', 'w') as f:
-                  json.dump(env, f, indent=2)
-              print('env_info.json extracted from result.json')
-
-          print('env_info.json created')
-
-          # Create accuracy/accuracy.json from the accuracy block in result.json
-          # validate_submission.py requires this file - the data is already in result.json
-          import os
-          acc = result.get('accuracy')
-          if acc:
-              os.makedirs('$DIR/accuracy', exist_ok=True)
-              with open('$DIR/accuracy/accuracy.json', 'w') as f:
-                  json.dump(acc, f, indent=2)
-              print('accuracy/accuracy.json created')
-          else:
-              print('No accuracy block in result.json - skipping accuracy.json')
-          "
-
       - name: Check for duplicate submission
         id: duplicate_check
         run: |
@@ -154,10 +86,10 @@ jobs:
           fi
 
           # Search all existing community result.json files for same run_id
+          # NOTE: runs BEFORE Write result files so $DIR does not exist yet
           EXISTING=""
           for f in $(find results/community -name "result.json" 2>/dev/null); do
               MATCH=$(python3 -c "import json,sys; r=json.load(open(sys.argv[1])); print('yes' if r.get('meta',{}).get('run_id')=='$RUN_ID' else '')" "$f" 2>/dev/null || echo "")
-
             if [ "$MATCH" = "yes" ]; then
               EXISTING="$f"
               break
@@ -181,26 +113,89 @@ jobs:
           EXISTING="${{ steps.duplicate_check.outputs.existing_path }}"
           ISSUE="${{ steps.extract.outputs.issue_number }}"
           EXISTING_DIR=$(dirname "$EXISTING")
-          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
 
-          NEW_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open('$DIR/result.json')); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" 2>/dev/null || echo "unknown")
+          # New scenarios from step output (file not written yet)
+          NEW_SCENARIOS=$(python3 -c "import json,sys; r=json.loads(sys.argv[1]); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" '${{ steps.extract.outputs.result_json }}' 2>/dev/null || echo "unknown")
 
-          OLD_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open('$EXISTING')); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" 2>/dev/null || echo "unknown")
+          OLD_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open(sys.argv[1])); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" "$EXISTING" 2>/dev/null || echo "unknown")
 
           echo "Existing scenarios: $OLD_SCENARIOS"
           echo "New scenarios:      $NEW_SCENARIOS"
 
           if [ "$NEW_SCENARIOS" = "$OLD_SCENARIOS" ]; then
-            # Same scenarios = true duplicate, reject
             gh issue comment "$ISSUE" \
               --body "Duplicate submission detected. A result with the same hardware, software, suite, and submitter already exists at \`${EXISTING_DIR}\` with scenarios: \`${OLD_SCENARIOS}\`. If this is intentional (e.g. after a framework update), update \`meta.framework_version\` in your result.json and resubmit."
             echo "Rejected: duplicate with same scenarios"
             exit 1
           else
-            # Different scenarios = partial update, warn but continue
             gh issue comment "$ISSUE" \
               --body "Note: An existing result with the same run_id was found at \`${EXISTING_DIR}\` (scenarios: \`${OLD_SCENARIOS}\`). This new submission has scenarios: \`${NEW_SCENARIOS}\`. Continuing - this looks like an update."
           fi
+
+      - name: Write result files
+        run: |
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+          mkdir -p "$DIR"
+
+          # Write result.json, set meta.log_file to null (local artifact, not submitted)
+          echo '${{ steps.extract.outputs.result_json }}' | python -m json.tool > "$DIR/result.json"
+          python3 -c "import json; f=open('$DIR/result.json'); r=json.load(f); f.close(); r.get('meta',{}).update({'log_file':None}); open('$DIR/result.json','w').write(json.dumps(r,indent=2))"
+          echo "meta.log_file set to null"
+
+          # Create env_info.json - extract from environment block if present, else reconstruct
+          python3 -c "
+          import json, sys
+
+          with open('$DIR/result.json') as f:
+              result = json.load(f)
+
+          chip = result.get('chip', {})
+          software = result.get('software', {})
+
+          env = result.get('environment')
+          if not env:
+              # fallback for old results without environment block
+              env = {
+                  'collected_at': result.get('meta', {}).get('date', '2026-01-01') + 'T00:00:00Z',
+                  'accelerators': [{
+                      'index': 0,
+                      'name': chip.get('name', 'Unknown'),
+                      'memory_gb': chip.get('memory_gb', 0),
+                      'driver_version': software.get('driver_version', 'unknown'),
+                      'firmware_version': None,
+                  }],
+                  'accelerator_topology': None,
+                  'cpu': {
+                      'model': 'unknown',
+                      'physical_cores': 1,
+                      'logical_cores': 1,
+                      'numa_nodes': 1,
+                  },
+                  'system_memory_gb': 0,
+                  'pcie_generation': 'unknown',
+                  'cpu_accelerator_bandwidth_gbs': None,
+                  'network_interfaces': None,
+                  'kernel_version': 'unknown',
+                  'runtime_version': software.get('runtime_version', 'unknown'),
+              }
+              print('env_info.json reconstructed from chip data')
+          else:
+              print('env_info.json extracted from result.json')
+
+          with open('$DIR/env_info.json', 'w') as f:
+              json.dump(env, f, indent=2)
+
+          # Create accuracy/accuracy.json from the accuracy block in result.json
+          import os
+          acc = result.get('accuracy')
+          if acc:
+              os.makedirs('$DIR/accuracy', exist_ok=True)
+              with open('$DIR/accuracy/accuracy.json', 'w') as f:
+                  json.dump(acc, f, indent=2)
+              print('accuracy/accuracy.json created')
+          else:
+              print('No accuracy block in result.json - skipping accuracy.json')
+          "
 
       - name: Run validation
         id: validate

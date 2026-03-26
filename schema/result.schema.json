@@ -22,9 +22,14 @@
       "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$"
     },
 
+    "environment": {
+        "type": ["object", "null"],
+        "description": "Full hardware/software environment snapshot from collect_env.py"
+    },
+
     "chip": {
       "type": "object",
-      "required": ["name", "vendor", "count", "memory_gb_per_chip", "interconnect_intra_node"],
+      "required": ["name", "vendor", "count", "memory_gb", "interconnect_intra_node"],
       "additionalProperties": false,
       "properties": {
         "name": { "type": "string" },
@@ -34,7 +39,7 @@
                    "Enflame","MetaX","Iluvatar","Apple","Qualcomm","Other"]
         },
         "count": { "type": "integer", "minimum": 1 },
-        "memory_gb_per_chip": { "type": "number", "minimum": 0 },
+        "memory_gb": { "type": "number", "minimum": 0 },
         "interconnect_intra_node": { "type": ["string", "null"] },
         "interconnect_inter_node": { "type": ["string", "null"] },
         "_count_note": {
