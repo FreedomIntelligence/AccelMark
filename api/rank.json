@@ -1,5 +1,5 @@
 {
-  "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f": {
+  "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_e3ff4778": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_A",
     "tier": "verified",
@@ -8,7 +8,7 @@
     "percentile": 100.0,
     "primary_metric": 5255.02
   },
-  "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_6e78e779_df15946d": {
+  "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_6e78e779_7299140a": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_C",
     "tier": "verified",
@@ -17,7 +17,7 @@
     "percentile": 100.0,
     "primary_metric": 3757.2
   },
-  "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm_6e78e779_a8bf812d": {
+  "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm_6e78e779_12bc1378": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_D",
     "tier": "verified",
@@ -26,7 +26,7 @@
     "percentile": 100.0,
     "primary_metric": 7028.58
   },
-  "nvidia_a100_sxm4_80gbx4_suite_B_nvidia_vllm_6e78e779_e3b1ef1a": {
+  "nvidia_a100_sxm4_80gbx4_suite_B_nvidia_vllm_6e78e779_ad1900f1": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_B",
     "tier": "verified",
@@ -35,7 +35,7 @@
     "percentile": 100.0,
     "primary_metric": 2780.1
   },
-  "nvidia_a100_sxm4_80gbx4_suite_E_nvidia_vllm_6e78e779_130ad7bb": {
+  "nvidia_a100_sxm4_80gbx4_suite_E_nvidia_vllm_6e78e779_2bc57a1e": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_E",
     "tier": "verified",
