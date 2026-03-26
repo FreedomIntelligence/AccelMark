@@ -30,6 +30,18 @@
       }
     }
   },
+  "NVIDIA A800-SXM4-80GB": {
+    "best_throughput_tokens_per_sec": 5707.79,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 5707.8,
+        "best_online_max_qps": 5,
+        "best_interactive_ttft_p99_ms": 64.2,
+        "best_sustained_throughput_tokens_per_sec": 527.2,
+        "throttle_ratio": 0.879
+      }
+    }
+  },
   "Tesla V100S-PCIE-32GB": {
     "best_throughput_tokens_per_sec": 2104.49,
     "suites": {
