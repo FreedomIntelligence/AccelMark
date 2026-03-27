@@ -1,0 +1,40 @@
+# AccelMark — Ascend NPU vllm-ascend runner dependencies
+#
+# Prerequisites (install before pip packages):
+#   1. CANN toolkit — download from https://www.hiascend.com/software/cann
+#      Match the CANN version to your Ascend NPU driver version.
+#   2. torch_npu — Huawei's PyTorch extension for Ascend NPU
+#      Install instructions: https://gitee.com/ascend/pytorch
+#
+# Then install this runner's Python dependencies:
+#   pip install -r runners/ascend_vllm_ascend_43650c71/requirements.txt
+
+# LLM inference — vllm-ascend community fork
+# Install from PyPI:
+#   pip install vllm-ascend
+# Or from source for the latest CANN-compatible build:
+#   pip install git+https://github.com/vllm-project/vllm-ascend.git
+vllm-ascend>=0.6.0
+
+# Transformers (for tokenizer)
+transformers==4.46.3
+tokenizers>=0.20.0
+huggingface-hub>=0.25.0
+accelerate>=0.34.0
+
+# AccelMark dependencies
+numpy>=1.24.0
+jsonschema>=4.0.0
+psutil>=5.9.0
+tqdm>=4.66.0
+
+# Async support
+aiohttp>=3.9.0
+
+# Config file parsing
+pyyaml>=6.0
+
+# Note: torch and torch_npu are installed as part of the CANN/Ascend NPU
+# environment setup and should NOT be pinned here to avoid version conflicts
+# with your CANN toolkit version. Install them separately following Huawei's
+# documentation for your specific NPU model and CANN version.

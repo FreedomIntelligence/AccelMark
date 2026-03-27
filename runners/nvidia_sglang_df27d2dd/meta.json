@@ -1,0 +1,10 @@
+{
+  "id":           "nvidia_sglang_df27d2dd",
+  "platform":     "nvidia",
+  "name":         "SGLang on NVIDIA",
+  "framework":    "SGLang",
+  "submitted_by": "JuhaoLiang1997",
+  "description":  "AccelMark runner for NVIDIA GPUs using SGLang. Supports all suites (A–E). Enables direct throughput and latency comparison between SGLang and vLLM on the same hardware.",
+  "notes":        "Uses sglang.Engine for offline/accuracy and sglang.AsyncEngine for online/interactive/sustained. Output tokens counted via tokenizer encode due to SGLang returning decoded text rather than token IDs.",
+  "created":      "2026-03-27"
+}

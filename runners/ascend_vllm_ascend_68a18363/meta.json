@@ -1,0 +1,10 @@
+{
+  "id":           "ascend_vllm_ascend_68a18363",
+  "platform":     "ascend",
+  "name":         "vllm-ascend on Huawei Ascend NPU",
+  "framework":    "vllm-ascend",
+  "submitted_by": "JuhaoLiang1997",
+  "description":  "AccelMark runner for Huawei Ascend 910B/910C NPUs using vllm-ascend (vLLM community fork for CANN). Supports Suite A–E. NPU memory queried via torch_npu. FP8 excluded: not supported on current Ascend 910B/910C hardware.",
+  "notes":        "vllm-ascend preserves the standard vLLM Python API — inference code is identical to the NVIDIA vLLM runner. Distributed teardown uses HCCL via torch.distributed. Memory stats via torch_npu.npu.",
+  "created":      "2026-03-27"
+}
