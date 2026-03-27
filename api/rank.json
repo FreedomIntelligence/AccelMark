@@ -62,6 +62,15 @@
     "percentile": 100.0,
     "primary_metric": 4203
   },
+  "nvidia_a800_sxm4_80gbx1_suite_D_nvidia_vllm_6e78e779_e1e75700": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 7109.54
+  },
   "nvidia_a800_sxm4_80gbx1_suite_E_nvidia_vllm_6e78e779_57cc8cdf": {
     "chip_name": "NVIDIA A800-SXM4-80GB",
     "suite_id": "suite_E",

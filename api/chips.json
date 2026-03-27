@@ -1,15 +1,15 @@
 [
   {
+    "name": "NVIDIA A800-SXM4-80GB",
+    "submission_count": 4,
+    "best_throughput_tokens_per_sec": 7109.54,
+    "median_throughput_tokens_per_sec": 6217.4
+  },
+  {
     "name": "NVIDIA A100-SXM4-80GB",
     "submission_count": 5,
     "best_throughput_tokens_per_sec": 7028.58,
     "median_throughput_tokens_per_sec": 5255.0
-  },
-  {
-    "name": "NVIDIA A800-SXM4-80GB",
-    "submission_count": 3,
-    "best_throughput_tokens_per_sec": 6727.07,
-    "median_throughput_tokens_per_sec": 5707.8
   },
   {
     "name": "Tesla V100S-PCIE-32GB",

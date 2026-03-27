@@ -32,7 +32,7 @@
     }
   },
   "NVIDIA A800-SXM4-80GB": {
-    "best_throughput_tokens_per_sec": 6727.07,
+    "best_throughput_tokens_per_sec": 7109.54,
     "suites": {
       "suite_A": {
         "best_throughput_tokens_per_sec": 5707.8,
@@ -44,6 +44,13 @@
       "suite_C": {
         "best_quality_efficiency": 4203,
         "best_quality_efficiency_format": "W8A8"
+      },
+      "suite_D": {
+        "best_throughput_tokens_per_sec": 7109.5,
+        "best_online_max_qps": 0,
+        "best_interactive_ttft_p99_ms": 4092.7,
+        "best_sustained_throughput_tokens_per_sec": 53,
+        "throttle_ratio": 0.786
       },
       "suite_E": {
         "best_throughput_tokens_per_sec": 6727.1,
