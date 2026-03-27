@@ -56,7 +56,7 @@ jobs:
             runner_path="runners/$folder"
             [ -d "$runner_path" ] || continue
             echo "::group::Validating $folder"
-            if ! python runners/validate_runners.py "$runner_path"; then
+            if ! python runners/validate_runners.py --dir "$runner_path"; then
               echo "::error file=runners/$folder/meta.json::Validation failed for $folder"
               FAILED=1
             fi

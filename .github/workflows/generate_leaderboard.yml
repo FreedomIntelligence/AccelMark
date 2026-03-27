@@ -28,31 +28,7 @@ jobs:
         run: pip install jsonschema
 
       - name: Validate all runner meta.json files and hashes
-        run: |
-          set -e
-          FAILED=0
-          CHECKED=0
-          BASE_FILES="benchmark_runner.py collect_env.py validate_submission.py \
-                      validate_runners.py hash_runner.py meta.schema.json \
-                      protocol.py __init__.py __pycache__"
-          for runner_path in runners/*/; do
-            [ -d "$runner_path" ] || continue
-            folder=$(basename "$runner_path")
-            is_base=false
-            for base in $BASE_FILES; do
-              [ "$folder" = "$base" ] && is_base=true && break
-            done
-            [ "$is_base" = "true" ] && continue
-            CHECKED=$((CHECKED + 1))
-            echo "::group::Validating $folder"
-            if ! python runners/validate_runners.py "$runner_path"; then
-              echo "::error file=runners/$folder/meta.json::Validation failed for $folder"
-              FAILED=1
-            fi
-            echo "::endgroup::"
-          done
-          echo "Checked $CHECKED runner folder(s)."
-          [ $FAILED -eq 0 ] || exit 1
+        run: python runners/validate_runners.py
 
   generate:
     name: Generate and deploy leaderboard

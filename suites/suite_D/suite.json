@@ -4,7 +4,7 @@
   "model_id": "meta-llama/Llama-3.1-8B-Instruct",
   "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
   "dataset": "sharegpt_longctx_v1",
-  "max_model_len": 40000,
+  "max_model_len": 33792,
   "scenarios": {
     "default": ["accuracy", "offline", "interactive"],
     "extra": ["sustained", "online"]
