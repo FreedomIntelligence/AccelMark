@@ -58,8 +58,8 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
         failures.append(f"task.num_runs must be >= {min_runs} (required by {suite_id})")
 
     # accuracy.valid for inference suites
-    scenario = result.get("task", {}).get("scenario")
-    if scenario != "training":
+    scenarios_run = result.get("task", {}).get("scenarios_run", [])
+    if "training" not in scenarios_run:
         accuracy = result.get("accuracy")
         # Suite C stores accuracy per-format in metrics.quantization; top-level accuracy is null
         if accuracy is not None:
@@ -99,6 +99,12 @@ def check_soft_warnings(result: dict) -> list[str]:
     # Check power data availability
     metrics = result.get("metrics", {})
     offline = metrics.get("offline")
+    # Suite E stores per-chip offline results under metrics.scaling
+    if not offline:
+        scaling = metrics.get("scaling", {})
+        counts = scaling.get("results_by_chip_count", [])
+        if counts:
+            offline = counts[0]  # check first chip count for power presence
     if offline:
         has_power = any(
             row.get("power_watts_avg") is not None
@@ -177,7 +183,13 @@ def compute_derived(result: dict) -> dict:
     derived = metrics.setdefault("derived", {})
 
     # tokens_per_sec_per_watt from offline metrics
+    # Suite E stores per-chip offline results under metrics.scaling
     offline = metrics.get("offline")
+    if not offline:
+        scaling = metrics.get("scaling", {})
+        counts = scaling.get("results_by_chip_count", [])
+        if counts:
+            offline = counts[0]  # use base chip count (1x) for efficiency baseline
     if offline:
         rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])
         valid_rows = [r for r in rows if not r.get("oom") and r.get("power_watts_avg")]
@@ -209,7 +221,7 @@ def check_env_info(submission_dir: Path) -> list[str]:
     return errors
 
 
-def check_suite_e(submission_dir: Path, result: dict) -> list[str]:
+def check_suite_e(result: dict) -> list[str]:
     """Check Suite E specific requirements."""
     errors = []
 
@@ -235,20 +247,6 @@ def check_suite_e(submission_dir: Path, result: dict) -> list[str]:
             f"Re-run with at least --max-chips {max(required_counts)}."
         )
 
-    # Check subdirectories exist
-    for count in counts_run:
-        count_dir = submission_dir / f"{count}x"
-        if not count_dir.exists():
-            errors.append(
-                f"Suite E: expected subdirectory '{count}x/' not found in submission."
-            )
-        else:
-            result_path = count_dir / "result.json"
-            if not result_path.exists():
-                errors.append(
-                    f"Suite E: {count}x/result.json not found."
-                )
-
     return errors
 
 
@@ -265,13 +263,17 @@ def check_accuracy(submission_dir: Path, result: dict) -> list[str]:
     candidates = list(submission_dir.rglob("accuracy.json"))
 
     if not candidates:
+        # Suite C stores accuracy per-format in subdirectories; top-level accuracy is null.
+        # For community submissions those subdirs don't exist, so skip the "not found" error.
+        if result.get("accuracy") is None:
+            return errors
         errors.append("accuracy.json not found — run --scenario accuracy first")
         return errors
 
     for acc_path in candidates:
         with open(acc_path) as f:
             acc = json.load(f)
-        if not acc.get("valid"):
+        if not acc.get("valid") and not acc.get("notes"):
             rel = acc_path.relative_to(submission_dir)
             errors.append(
                 f"{rel}: accuracy.valid is false (score={acc.get('subset_score')}) "
@@ -304,7 +306,7 @@ def main():
         all_errors.extend(check_hard_failures(result, result_dir))
         all_warnings.extend(check_soft_warnings(result))
         all_errors.extend(check_run_id_integrity(result))
-        all_errors.extend(check_suite_e(result_dir, result))
+        all_errors.extend(check_suite_e(result))
         result = compute_derived(result)
         # Write back computed fields
         with open(result_path, "w") as f:

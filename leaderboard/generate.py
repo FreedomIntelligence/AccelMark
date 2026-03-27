@@ -804,6 +804,19 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
 
         # Scaling (Suite E)
         if scaling:
+            base_thr = (
+                scaling.get("base_throughput_tokens_per_sec") or
+                next(
+                    (e.get("best_throughput_tokens_per_sec")
+                     for e in scaling.get("results_by_chip_count", [])
+                     if e.get("chip_count") == 1),
+                    None
+                )
+            )
+            if base_thr is not None:
+                cur = suite_entry.get("best_throughput_tokens_per_sec")
+                if cur is None or base_thr > cur:
+                    suite_entry["best_throughput_tokens_per_sec"] = round(base_thr, 1)
             for entry in scaling.get("results_by_chip_count", []):
                 count = entry.get("chip_count")
                 eff   = entry.get("scaling_efficiency")

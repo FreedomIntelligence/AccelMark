@@ -195,6 +195,7 @@ jobs:
               print('accuracy/accuracy.json created')
           else:
               print('No accuracy block in result.json - skipping accuracy.json')
+
           "
 
       - name: Run validation
