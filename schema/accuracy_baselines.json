@@ -33,5 +33,11 @@
     "revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
     "bf16_baseline_score": 0.72,
     "notes": "Measured on A100x4, vLLM 0.6.6.post1, CUDA 12.1"
+  },
+  "Qwen/Qwen2.5-0.5B-Instruct": {
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "fp16_baseline_score": 0.37,
+    "bf16_baseline_score": 0.41,
+    "notes": "Measured on A100 SXM4 40GB, vLLM 0.6.6.post1, CUDA 12.1"
   }
 }

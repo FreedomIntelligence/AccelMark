@@ -14,6 +14,7 @@ AI accelerators apples-to-apples.
 | [Suite C](#suite-c) | Llama-3.1-8B-Instruct | 1 | offline | Quantization efficiency (BF16/FP8/W8A8/W8A16/W4A16) |
 | [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline, interactive | Long-context inference (32K tokens) |
 | [Suite E](#suite-e) | Llama-3-8B-Instruct | 1×/2×/4×/8× | offline | Multi-chip scaling efficiency |
+| [Suite F](#suite-f) | Qwen2.5-0.5B-Instruct | 1 (recommended) | offline, online, interactive | Consumer/edge single-GPU inference |
 
 ---
 
@@ -40,6 +41,9 @@ Times on other hardware will differ.
 | E | offline (1×) | 500 | ~10 min | |
 | E | offline (2×) | 500 | ~8 min | |
 | E | offline (4×) | 500 | ~6 min | **~24 min** |
+| F | offline | 200 | ~1 min | |
+| F | online | 500 | ~4 min | |
+| F | interactive | 100 | ~2 min | **~7 min** |
 
 ¹ Measured on NVIDIA A100 SXM4 80 GB with vLLM as reference. Recorded in `meta.benchmark_elapsed_minutes` of each result.json.
 
@@ -386,6 +390,7 @@ version rather than modifying the existing one.
 |---|---|---|---|---|
 | `sharegpt_standard_v1` | Suite A, B, C, E | 500 | ~280 tokens | ~310 tokens |
 | `sharegpt_longctx_v1` | Suite D | 200 | ~28,000 tokens | ~300 tokens |
+| `sharegpt_edge_v1` | Suite F | 500 | ~95 tokens | ~150 tokens |
 
 Suite JSON files reference datasets by name:
 ```json
@@ -412,6 +417,79 @@ reasoning:       10%  — step-by-step analysis, math
 ```
 
 ---
+
+---
+
+## Suite F
+
+**Consumer/edge single-GPU inference**
+
+```
+Model:     Qwen/Qwen2.5-0.5B-Instruct
+Chips:     1 (recommended — no hard constraint)
+Precision: BF16 (auto-fallback to FP16 on pre-Ampere)
+```
+
+Suite F is designed for consumer and edge GPUs: RTX 3090, RTX 4090, A10, L4,
+and pre-Ampere hardware including V100 and T4. The model (0.5B parameters,
+~1 GB in FP16) fits comfortably on any GPU with 4+ GB VRAM.
+
+**Precision handling**
+`precision_required: BF16` with `allowed_precisions: [BF16, FP16]`. Ampere+ GPUs
+(RTX 3090/4090, A100, H100) use BF16 natively. Pre-Ampere GPUs (V100, T4, RTX 20xx)
+automatically fall back to FP16 via `allowed_precisions` — no warning, no flag, since
+FP16 is an explicitly accepted precision for this suite. Results are labeled with
+the actual precision used.
+
+**Why Qwen2.5-0.5B?**
+- Smallest practical instruction-tuned model with full vLLM support since v0.4.0
+- Fits in 4 GB VRAM in FP16 — accessible to the widest range of consumer hardware
+- Stable `Qwen2ForCausalLM` architecture avoids newer-vLLM-only features
+- Apache 2.0 licensed
+
+**Accuracy note:** Absolute MMLU score for a 0.5B model is ~0.35–0.40, well below
+larger models. The accuracy gate exists to detect broken quantization or misconfigured
+precision — not to evaluate model quality. The threshold (±0.10) is intentionally
+wider than datacenter suites.
+
+### Scenarios
+
+Same structure as Suite A — offline, online, and interactive. Concurrency levels
+are smaller (4/16/64 vs 8/32/128) because a 0.5B model saturates consumer GPUs
+at lower concurrency.
+
+```
+concurrency_levels:    [4, 16, 64]
+online_qps_levels:     [2, 10, 40]
+online_sla_ttft_ms:    500
+request_count:         200 (offline), 500 (online), 100 (interactive)
+num_runs:              3 + 1 warmup
+```
+
+### Running Suite F
+
+```bash
+# Standard run (Ampere+)
+python runners/nvidia_vllm_6e78e779/runner.py --suite suite_F
+
+# Pre-Ampere GPU (V100, T4, RTX 20xx) — required flag
+python runners/nvidia_vllm_6e78e779/runner.py --suite suite_F --enforce-eager
+
+# Single scenario
+python runners/nvidia_vllm_6e78e779/runner.py --suite suite_F --scenario offline
+```
+
+For runner-specific hardware compatibility details (including pre-Ampere guidance),
+see `runners/nvidia_vllm_6e78e779/README.md`.
+
+### Multi-chip note
+
+Suite F does not enforce a single-chip constraint. Developers are free to run
+with TP > 1. However, Suite F is designed for single-chip consumer hardware —
+multi-chip results over PCIe will show poor scaling efficiency and reflect
+the interconnect bottleneck rather than GPU capability. For apples-to-apples
+consumer comparisons, submit single-chip results.
+
 
 ## Adding a new suite
 

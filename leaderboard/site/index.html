@@ -233,6 +233,7 @@
     .suite-pill.suite_C { background: #2d1f00; color: #d29922; }
     .suite-pill.suite_D { background: #1e1040; color: #a78bfa; }
     .suite-pill.suite_E { background: #062d1e; color: #1D9E75; }
+    .suite-pill.suite_F { background: #2d1a2e; color: #c084fc; }
 
     /* ── Scenario pill ────────────────────────────────────────── */
     .scenario-pill {
@@ -258,6 +259,7 @@
     .card.suite_C { border-top-color: #d29922; }
     .card.suite_D { border-top-color: #a78bfa; }
     .card.suite_E { border-top-color: #1D9E75; }
+    .card.suite_F { border-top-color: #c084fc; }
 
     /* ── Modal suite top border ───────────────────────────────── */
     .modal.suite_A { border-top: 3px solid #58a6ff; }
@@ -265,6 +267,7 @@
     .modal.suite_C { border-top: 3px solid #d29922; }
     .modal.suite_D { border-top: 3px solid #a78bfa; }
     .modal.suite_E { border-top: 3px solid #1D9E75; }
+    .modal.suite_F { border-top: 3px solid #c084fc; }
 
     /* ── Detail modal ─────────────────────────────────────── */
     .modal-backdrop {
@@ -463,6 +466,7 @@
     .stat-chip-value.teal  { color: #1D9E75; }
     .stat-chip-value.amber { color: #d29922; }
     .stat-chip-value.coral { color: #D85A30; }
+    .stat-chip-value.purple { color: #c084fc; }
 
     .sla-row {
       display: flex;
@@ -544,6 +548,7 @@
     <option value="suite_C">Suite C — quantization tradeoff</option>
     <option value="suite_D">Suite D — long context (32K)</option>
     <option value="suite_E">Suite E — multi-chip scaling</option>
+    <option value="suite_F">Suite F — consumer/edge inference</option>
   </select>
   <input id="search" type="text" placeholder="Search chip or model…" style="width:200px">
   <div class="view-toggle">
@@ -1305,6 +1310,7 @@
     else if (viz.type === 'suite_C') renderSuiteC(container, viz, row);
     else if (viz.type === 'suite_D') renderSuiteD(container, viz, row);
     else if (viz.type === 'suite_E') renderSuiteE(container, viz, row);
+    else if (viz.type === 'suite_F') renderSuiteF(container, viz, row);
     else if (viz.type === 'sustained') renderSustained(container, viz, row);
     else container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">Visualization coming soon.</div>';
 
@@ -1737,6 +1743,86 @@
         },
         options: baseOpts('tok/s per chip', v => v ? v.toLocaleString(undefined,{maximumFractionDigits:0}) : '')
       }));
+    }
+  }
+
+  // Suite F ─────────────────────────────────────────────────
+  function renderSuiteF(el, viz, row) {
+    // ── Offline throughput ──
+    if (viz.offline && viz.offline.labels.length) {
+      el.appendChild(sectionTitle('Offline — throughput by concurrency'));
+      el.appendChild(statChips([
+        { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'purple' },
+        { label: 'Peak memory', value: row.peak_memory_gb ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
+        { label: 'Memory util.', value: row.memory_utilization_pct ? row.memory_utilization_pct.toFixed(1) + '%' : null },
+      ]));
+      const { wrap, canvas } = mkCanvas('viz-offline', 180);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: viz.offline.labels,
+          datasets: [{
+            label: 'Throughput (tok/s)',
+            data: viz.offline.throughput,
+            backgroundColor: '#c084fc99',
+            borderColor: '#c084fc',
+            borderWidth: 1,
+            borderRadius: 3,
+          }]
+        },
+        options: baseOpts('tokens / sec', v => v.toLocaleString(), 'concurrency')
+      }));
+    }
+
+    // ── Online latency ──
+    if (viz.online && viz.online.labels.length) {
+      el.appendChild(sectionTitle('Online — TTFT & TPOT by QPS'));
+      const slaDiv = document.createElement('div');
+      slaDiv.style.cssText = 'margin-bottom:10px;font-size:12px;';
+      viz.online.labels.forEach((qps, i) => {
+        const pass = viz.online.sla_met[i];
+        slaDiv.innerHTML += `<span class="sla-row" style="display:inline-flex;margin-right:12px">
+          <span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>
+          <span style="color:#8b949e">${qps} QPS</span>
+          <span style="color:${pass ? C.green : C.red}">${pass ? 'SLA met' : 'SLA fail'}</span>
+        </span>`;
+      });
+      el.appendChild(slaDiv);
+
+      const { wrap, canvas } = mkCanvas('viz-online', 200);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: viz.online.labels,
+          datasets: [
+            { label: 'TTFT p50', data: viz.online.ttft_p50, borderColor: '#c084fc', backgroundColor: '#c084fc33', tension: 0.3, pointRadius: 4, fill: false },
+            { label: 'TTFT p90', data: viz.online.ttft_p90, borderColor: C.coral, backgroundColor: C.coral+'33', tension: 0.3, pointRadius: 4, fill: false, borderDash: [4,3] },
+            { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal, backgroundColor: C.teal+'33', tension: 0.3, pointRadius: 4, fill: false },
+          ]
+        },
+        options: baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms', 'target QPS')
+      }));
+      const leg = document.createElement('div');
+      leg.style.cssText = 'display:flex;gap:16px;margin-top:6px;font-size:11px;color:#8b949e;';
+      leg.innerHTML = `
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:#c084fc;display:inline-block"></span>TTFT p50</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.coral};display:inline-block"></span>TTFT p90</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>TPOT p50</span>`;
+      el.appendChild(leg);
+    }
+
+    // ── Interactive ──
+    if (viz.interactive && viz.interactive.ttft_p50 != null) {
+      el.appendChild(sectionTitle('Interactive — single request latency'));
+      el.appendChild(statChips([
+        { label: 'TTFT p50', value: viz.interactive.ttft_p50 != null ? viz.interactive.ttft_p50.toFixed(1) + ' ms' : null, cls: 'purple' },
+        { label: 'TTFT p90', value: viz.interactive.ttft_p90 != null ? viz.interactive.ttft_p90.toFixed(1) + ' ms' : null },
+        { label: 'TTFT p99', value: viz.interactive.ttft_p99 != null ? viz.interactive.ttft_p99.toFixed(1) + ' ms' : null },
+        { label: 'TPOT p50', value: viz.interactive.tpot_p50 != null ? viz.interactive.tpot_p50.toFixed(1) + ' ms' : null, cls: 'green' },
+        { label: 'TPOT p99', value: viz.interactive.tpot_p99 != null ? viz.interactive.tpot_p99.toFixed(1) + ' ms' : null },
+      ]));
     }
   }
 

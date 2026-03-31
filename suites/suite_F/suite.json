@@ -1,0 +1,43 @@
+{
+  "suite_id": "suite_F",
+  "description": "Consumer/edge single-GPU inference. Qwen2.5-0.5B-Instruct. Designed for GPUs with ≥4 GB VRAM. No chip count requirement — single-chip is the intended use case.",
+  "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+  "dataset": "sharegpt_edge_v1",
+  "scenarios": {
+      "default": ["accuracy", "offline", "online", "interactive"],
+      "extra": ["sustained"]
+  },
+  "sustained_concurrency": 32,
+  "duration_minutes": 15,
+  "sample_interval_seconds": 60,
+  "precision_required": "BF16",
+  "allowed_precisions": ["FP16", "BF16"],
+  "_precision_note": "FP16 is required so pre-Ampere GPUs (V100, T4, RTX 20xx) can participate without precision fallback warnings. Ampere+ runners will naturally use BF16 via allowed_precisions.",
+  "request_distribution": {
+    "input_tokens_p25": 40,
+    "input_tokens_p50": 95,
+    "input_tokens_p75": 200,
+    "input_tokens_p99": 600,
+    "output_tokens_p50": 150,
+    "output_tokens_p99": 400,
+    "source": "shibing624/sharegpt_gpt4 (short-turn filtered)"
+  },
+  "output_tokens_max": 256,
+  "concurrency_levels": [4, 16, 64],
+  "_concurrency_levels_note": "Smaller than Suite A — consumer GPUs saturate at lower concurrency with a 0.5B model.",
+  "online_qps_levels": [2, 10, 40],
+  "online_sla_ttft_ms": 500,
+  "online_sla_ttft_ms_relaxed": 2000,
+  "num_runs": 3,
+  "warmup_runs": 1,
+  "warmup_minutes": 1,
+  "online_warmup_runs": 0,
+  "interactive_warmup_runs": 0,
+  "accuracy_threshold_delta": 0.1,
+  "_accuracy_note": "Qwen2.5-0.5B scores ~0.35–0.40 on MMLU by design (small model). The threshold detects broken quantization or misconfigured precision, not model quality.",
+  "request_count": 200,
+  "_request_count_note": "Same as Suite A offline for direct run-time comparability.",
+  "online_request_count": 500,
+  "interactive_request_count": 100
+}

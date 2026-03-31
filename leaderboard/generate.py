@@ -372,6 +372,19 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "throughput_per_chip": per_chip,
         }
 
+    if suite == "suite_F":
+        rows = _offline_rows()
+        return {
+            "type": "suite_F",
+            "offline": {
+                "labels":     _concurrency_labels(rows),
+                "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
+                "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+            },
+            "online":      _online_block(),
+            "interactive": _interactive_block(),
+        }
+
     if metrics.get("sustained"):
         sustained = metrics.get("sustained", {})
         samples   = sustained.get("samples", [])
@@ -452,7 +465,7 @@ def extract_row(result: dict) -> dict:
 
     # ── Primary metric ────────────────────────────────────────────────────────
     scenario = task.get("scenario", "offline")
-    if is_suite_level and suite_id not in ("suite_E", "suite_C"):
+    if is_suite_level and suite_id not in ("suite_E", "suite_C", "suite_F"):
         primary_metric       = offline_throughput
         primary_metric_label = "tokens/sec (offline)"
     elif scenario == "offline":
@@ -916,6 +929,8 @@ def main():
             metric = row.get("quant_quality_eff") or 0
         elif suite_id == "suite_E":
             metric = row.get("scaling_efficiency_4x") or row.get("scaling_efficiency_2x") or 0
+        elif suite_id == "suite_F":
+            metric = row.get("offline_throughput") or 0
         else:
             metric = row.get("offline_throughput") or 0
 
