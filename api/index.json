@@ -5,7 +5,9 @@
       "suite_F": {
         "best_throughput_tokens_per_sec": 8948.8,
         "best_online_max_qps": 10,
-        "best_interactive_ttft_p99_ms": 34.0
+        "best_interactive_ttft_p99_ms": 34.0,
+        "best_sustained_throughput_tokens_per_sec": 1697.7,
+        "throttle_ratio": 0.936
       }
     }
   },
