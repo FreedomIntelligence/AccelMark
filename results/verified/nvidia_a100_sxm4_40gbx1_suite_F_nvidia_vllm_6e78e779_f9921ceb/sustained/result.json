@@ -85,110 +85,18 @@
     "model_format": "HuggingFace original"
   },
   "task": {
-    "scenarios_run": [
-      "offline",
-      "online",
-      "interactive",
-      "sustained"
-    ],
+    "scenario": "sustained",
+    "num_runs": 3,
+    "warmup_runs": 1,
     "parallelism": {
       "tensor_parallel_size": 1,
       "pipeline_parallel_size": 1,
       "expert_parallel_size": 1,
       "data_parallel_size": 1
     },
-    "num_runs": 3
+    "extra_config": null
   },
   "metrics": {
-    "derived": {},
-    "offline": {
-      "results_by_concurrency": [
-        {
-          "client_concurrency": 4,
-          "throughput_tokens_per_sec": 8930.97,
-          "throughput_tokens_per_sec_per_chip": 8930.97,
-          "elapsed_seconds_median": 7.0,
-          "peak_memory_gb": 33.3,
-          "power_watts_avg": null,
-          "power_watts_peak": null,
-          "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
-        },
-        {
-          "client_concurrency": 16,
-          "throughput_tokens_per_sec": 8948.8,
-          "throughput_tokens_per_sec_per_chip": 8948.8,
-          "elapsed_seconds_median": 7.0,
-          "peak_memory_gb": 33.3,
-          "power_watts_avg": null,
-          "power_watts_peak": null,
-          "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
-        },
-        {
-          "client_concurrency": 64,
-          "throughput_tokens_per_sec": 8807.65,
-          "throughput_tokens_per_sec_per_chip": 8807.65,
-          "elapsed_seconds_median": 7.1,
-          "peak_memory_gb": 33.3,
-          "power_watts_avg": null,
-          "power_watts_peak": null,
-          "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
-        }
-      ]
-    },
-    "online": {
-      "max_valid_qps": 10,
-      "results_by_qps": [
-        {
-          "target_qps": 2,
-          "achieved_qps": 2.0,
-          "ttft_ms_p50": 32.02,
-          "ttft_ms_p90": 58.07,
-          "ttft_ms_p99": 89.53,
-          "tpot_ms_p50": 5.03,
-          "tpot_ms_p90": 5.98,
-          "tpot_ms_p99": 7.59,
-          "elapsed_seconds_median": 258.2,
-          "sla_met": true
-        },
-        {
-          "target_qps": 10,
-          "achieved_qps": 10.0,
-          "ttft_ms_p50": 74.48,
-          "ttft_ms_p90": 143.24,
-          "ttft_ms_p99": 205.47,
-          "tpot_ms_p50": 31.29,
-          "tpot_ms_p90": 54.09,
-          "tpot_ms_p99": 73.05,
-          "elapsed_seconds_median": 54.6,
-          "sla_met": true
-        },
-        {
-          "target_qps": 40,
-          "achieved_qps": 40.0,
-          "ttft_ms_p50": 866.83,
-          "ttft_ms_p90": 19823.9,
-          "ttft_ms_p99": 20977.07,
-          "tpot_ms_p50": 96.09,
-          "tpot_ms_p90": 137.89,
-          "tpot_ms_p99": 399.59,
-          "elapsed_seconds_median": 40.5,
-          "sla_met": false
-        }
-      ]
-    },
-    "interactive": {
-      "ttft_ms_p50": 29.66,
-      "ttft_ms_p90": 31.56,
-      "ttft_ms_p99": 34.03,
-      "tpot_ms_p50": 4.17,
-      "tpot_ms_p90": 4.26,
-      "tpot_ms_p99": 4.35,
-      "peak_memory_gb": null,
-      "elapsed_seconds_median": 90.5
-    },
     "sustained": {
       "sustained_concurrency": 32,
       "duration_minutes": 15,
@@ -343,18 +251,16 @@
     }
   },
   "accuracy": {
-    "subset_score": 0.4,
-    "baseline_delta": -0.01,
-    "valid": true,
-    "framework": "vLLM",
-    "precision": "BF16",
-    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
   },
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
     "date": "2026-03-31",
-    "time": "08:39:22",
+    "time": "10:00:04",
     "run_id": "f9921ceb",
     "run_name": "nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_6e78e779_f9921ceb",
     "flagged": null,
@@ -363,16 +269,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-03-31T08:37:57.040854+00:00",
-    "benchmark_end_time": "2026-03-31T08:39:22.376281+00:00",
-    "benchmark_elapsed_minutes": 38.4,
-    "model_load_seconds": 55.2,
-    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'interactive', 'sustained'] scenarios.",
-    "scenario_dirs": {
-      "offline": "results/verified/nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_6e78e779_f9921ceb/offline",
-      "online": "results/verified/nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_6e78e779_f9921ceb/online",
-      "interactive": "results/verified/nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_6e78e779_f9921ceb/interactive",
-      "sustained": "results/verified/nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_6e78e779_f9921ceb/sustained"
-    }
+    "benchmark_start_time": "2026-03-31T09:44:58.039421+00:00",
+    "benchmark_end_time": "2026-03-31T10:00:04.021936+00:00",
+    "benchmark_elapsed_minutes": 15.1,
+    "model_load_seconds": 41.7
   }
 }

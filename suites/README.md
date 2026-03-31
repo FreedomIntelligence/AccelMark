@@ -42,10 +42,11 @@ Times on other hardware will differ.
 | E | offline (2×) | 500 | ~8 min | |
 | E | offline (4×) | 500 | ~6 min | **~24 min** |
 | F | offline | 200 | ~1 min | |
-| F | online | 500 | ~4 min | |
-| F | interactive | 100 | ~2 min | **~7 min** |
+| F | online | 500 | ~18 min | |
+| F | interactive | 100 | ~5 min | **~27 min** |
 
 ¹ Measured on NVIDIA A100 SXM4 80 GB with vLLM as reference. Recorded in `meta.benchmark_elapsed_minutes` of each result.json.
+² Suite F measured on NVIDIA A100 SXM4 40 GB with vLLM 0.6.6.post1. Online is dominated by QPS=2 (low-rate Poisson arrival with 500 requests takes ~4 min per run × 3 runs).
 
 > **Sustained scenario** (extra, opt-in): adds ~30 min to any suite that supports it.
 > Run with `--scenario sustained`. Not included in default suite runs.
