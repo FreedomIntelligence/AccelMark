@@ -73,5 +73,21 @@
     ],
     "extra_scenarios": [],
     "dataset": "sharegpt_standard_v1"
+  },
+  "suite_F": {
+    "suite_id": "suite_F",
+    "description": "Consumer/edge single-GPU inference. Qwen2.5-0.5B-Instruct. Designed for GPUs with \u22654 GB VRAM. No chip count requirement \u2014 single-chip is the intended use case.",
+    "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline",
+      "online",
+      "interactive"
+    ],
+    "extra_scenarios": [
+      "sustained"
+    ],
+    "dataset": "sharegpt_edge_v1"
   }
 }

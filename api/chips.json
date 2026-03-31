@@ -1,5 +1,11 @@
 [
   {
+    "name": "NVIDIA A100-SXM4-40GB",
+    "submission_count": 1,
+    "best_throughput_tokens_per_sec": 8948.8,
+    "median_throughput_tokens_per_sec": 8948.8
+  },
+  {
     "name": "NVIDIA A800-SXM4-80GB",
     "submission_count": 4,
     "best_throughput_tokens_per_sec": 7109.54,
