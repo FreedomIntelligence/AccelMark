@@ -383,6 +383,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             },
             "online":      _online_block(),
             "interactive": _interactive_block(),
+            "sustained":   _sustained_block(),
         }
 
     if metrics.get("sustained"):
