@@ -1,0 +1,53 @@
+{
+  "collected_at": "2026-03-31T08:34:23.581278+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": "\tGPU0\tNIC0\tNIC1\tNIC2\tNIC3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tSYS\tSYS\tSYS\tNODE\t64-127,192-254\t1\t\tN/A\nNIC0\tSYS\t X \tPIX\tNODE\tSYS\t\t\t\t\nNIC1\tSYS\tPIX\t X \tNODE\tSYS\t\t\t\t\nNIC2\tSYS\tNODE\tNODE\t X \tSYS\t\t\t\t\nNIC3\tNODE\tSYS\tSYS\tSYS\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n  NIC3: mlx5_3\n\n",
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "AMD EPYC 7742 64-Core Processor",
+    "physical_cores": 128,
+    "logical_cores": 255,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 1007.7,
+  "pcie_generation": "PCIe Gen 4",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_1",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_3",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.4 LTS",
+  "python_version": "3.10.18",
+  "kernel_version": "5.15.0-60-generic",
+  "runtime_version": "CUDA 12.1",
+  "pytorch_version": "2.5.1+cu121"
+}

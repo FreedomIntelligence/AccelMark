@@ -35,6 +35,10 @@ models:
   #   model_name: mistralai/Mixtral-8x7B-Instruct-v0.1
   #   note: Mixtral-8x7B used as 70B-class substitute — comparable MoE parameter count
 
+  # Suite F — consumer/edge benchmark
+  Qwen/Qwen2.5-0.5B-Instruct:
+    local_path: /data/models/Qwen2.5-0.5B-Instruct
+
   # Suite C quantized checkpoints
   RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8:
     local_path: /models/Meta-Llama-3.1-8B-Instruct-FP8
