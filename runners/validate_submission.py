@@ -70,8 +70,10 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
                 )
 
     # referenced files must exist — search recursively under result_dir
+    # Note: log_file (run.log) and samples_file (samples.jsonl) are gitignored
+    # and will never be present in a PR submission — do not check them here.
     meta = result.get("meta", {})
-    for field in ["reproduce_script", "env_info_file", "log_file"]:
+    for field in ["reproduce_script", "env_info_file"]:
         ref = meta.get(field)
         if not ref:
             continue
