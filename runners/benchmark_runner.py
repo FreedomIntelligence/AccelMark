@@ -491,6 +491,8 @@ class BenchmarkRunner(ABC):
 
         Suite C: uses suite.precision_required ("BF16") — one run_id for all quantized formats.
         Suite E: chip_count = tp_size * pp_size (max chips tested).
+        Precision: uses effective runtime precision (e.g. FP16 on V100), not suite.precision_required.
+          This ensures the hash matches what check_run_id_integrity() recomputes from model.precision.
         """
         accel   = env_info.get("accelerators", [{}])[0]
         profile = self._load_submitter_profile()
@@ -505,6 +507,15 @@ class BenchmarkRunner(ABC):
             interconnect = (env_info.get("intra_node_interconnect")
                             or accel.get("interconnect_intra_node"))
 
+        # Use effective precision if already resolved (e.g. FP16 fallback on V100),
+        # otherwise fall back to suite.precision_required. This must match what
+        # _build_result_json() writes to model.precision, which is what
+        # check_run_id_integrity() reads back during validation.
+        effective_precision = (
+            getattr(self, "_effective_precision", None)
+            or suite.get("precision_required", "BF16")
+        )
+
         key = {
             # Hardware
             "chip_name":      accel.get("name", "unknown"),
@@ -517,7 +528,7 @@ class BenchmarkRunner(ABC):
             # Benchmark
             "suite_id":  suite["suite_id"],
             "model_id":  suite.get("model_id", "unknown"),
-            "precision": suite.get("precision_required", "BF16"),
+            "precision": effective_precision,
             # Submitter
             "submitted_by": profile.get("submitted_by", "unknown"),
         }
@@ -558,6 +569,15 @@ class BenchmarkRunner(ABC):
 
         # Collect env info early — used for output dir naming and written to task dir
         env_info = self._collect_env_preview()
+
+        # Resolve precision before generating the output dir so that the folder
+        # name and run_id use the actual runtime precision (e.g. FP16 on V100)
+        # rather than suite.precision_required. This keeps the directory name,
+        # run_id, and result.json model.precision all consistent.
+        if getattr(args, "precision", None):
+            self._effective_precision = args.precision.upper()
+        else:
+            self._effective_precision = self._resolve_precision(suite, env_info)
 
         # Resolve output dir
         if args.output_dir is None:
@@ -1981,12 +2001,15 @@ class BenchmarkRunner(ABC):
             )
             sys.exit(1)
 
-        # ── Step 4: pick best precision ───────────────────────────────────────
-        # Prefer the suite's required precision if available.
-        # Otherwise take the first item in effective (runner/detection preference order).
-        resolved = required if required in effective else effective[0]
-
-        if resolved != required:
+        # ── Step 4: pick precision ────────────────────────────────────────────
+        # Use precision_required if the hardware supports it — it is the target,
+        # not a floor. Only fall back to another allowed precision when required
+        # is unavailable, and always warn in that case regardless of direction
+        # (downgrade BF16→FP16 or upgrade FP16→BF16 are both deviations from spec).
+        if required in effective:
+            resolved = required
+        else:
+            resolved = effective[0]
             print(
                 f"\nWarning: '{required}' not available "
                 f"on {chip_name or 'this hardware'} "
