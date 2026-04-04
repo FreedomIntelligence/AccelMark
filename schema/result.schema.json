@@ -176,7 +176,6 @@
 
     "metrics": {
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "offline": {
           "type": ["object","null"],

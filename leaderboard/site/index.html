@@ -1595,14 +1595,17 @@
         return;
     }
 
+    const PREC_COLORS = { BF16: C.teal, FP8: C.blue, W8A8: C.amber, W8A16: C.coral, W4A16: C.green };
+    function precColor(p) { return PREC_COLORS[p] || C.gray; }
+
     function _precToDtype(p) {
         return {BF16:'bfloat16',FP16:'float16',FP8:'float8_e4m3fn',
                 W8A8:'int8',W8A16:'float16',W4A16:'float16'}[p] || '';
     }
 
-    el.appendChild(sectionTitle('Quantization efficiency'));
+    // ── Section 1: Offline — quantization efficiency table + chart ──────
+    el.appendChild(sectionTitle('Offline — quantization efficiency'));
 
-    // Per-format table
     const table = document.createElement('table');
     table.style.cssText = 'width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:1rem';
     table.innerHTML = `
@@ -1649,7 +1652,7 @@
     `;
     el.appendChild(table);
 
-    // Throughput bar chart
+    // Throughput grouped bar: one bar per format, color-coded
     const { wrap: w1, canvas: c1 } = mkCanvas('viz-suitec-thr', 200);
     el.appendChild(w1);
     _activeCharts.push(new Chart(c1, {
@@ -1659,15 +1662,177 @@
             datasets: [{
                 label: 'Throughput',
                 data: viz.throughput,
-                backgroundColor: [C.teal, C.blue, C.amber, C.coral, C.green],
+                backgroundColor: viz.precisions.map(p => precColor(p) + '99'),
+                borderColor:     viz.precisions.map(p => precColor(p)),
+                borderWidth: 1, borderRadius: 3,
             }],
         },
-        options: baseOpts(
-            'tokens / sec',
-            v => v.toLocaleString(undefined, {maximumFractionDigits: 0}),
-            'precision'
-        ),
+        options: baseOpts('tokens / sec', v => v.toLocaleString(undefined,{maximumFractionDigits:0}), 'precision'),
     }));
+
+    // ── Section 2: Online — TTFT p99 by QPS, one line per format ─────────
+    if (viz.online_by_precision && viz.online_by_precision.length) {
+        el.appendChild(sectionTitle('Online — TTFT p99 by QPS across formats (extra scenario)'));
+
+        // Summary chips: max_valid_qps per format
+        el.appendChild(statChips(
+            viz.online_by_precision.map(fp => ({
+                label: fp.precision + ' max QPS',
+                value: fp.max_valid_qps != null ? fp.max_valid_qps + ' QPS' : '—',
+                cls:   fp.max_valid_qps ? 'blue' : null,
+            }))
+        ));
+
+        // Multi-line chart: x=QPS level, y=TTFT p99, one line per format
+        const qpsLabels = viz.online_by_precision[0].qps_labels;
+        const slaMs = row.detail && row.detail.run_scenarios ? null : null; // not easily available here
+        const { wrap: w2, canvas: c2 } = mkCanvas('viz-suitec-online', 240);
+        el.appendChild(w2);
+        _activeCharts.push(new Chart(c2, {
+            type: 'line',
+            data: {
+                labels: qpsLabels,
+                datasets: viz.online_by_precision.map(fp => ({
+                    label:           fp.precision,
+                    data:            fp.ttft_p99,
+                    borderColor:     precColor(fp.precision),
+                    backgroundColor: precColor(fp.precision) + '22',
+                    pointBackgroundColor: fp.sla_met.map((met, i) =>
+                        met === false ? '#f85149' : precColor(fp.precision)
+                    ),
+                    pointRadius: 5,
+                    tension: 0.2,
+                    fill: false,
+                })),
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, labels: { color: C.text, font: { size: 11 }, boxWidth: 12 } },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const fp = viz.online_by_precision[ctx.datasetIndex];
+                                const sla = fp.sla_met[ctx.dataIndex];
+                                const v = ctx.parsed.y;
+                                return fp.precision + ': ' + (v != null ? v.toFixed(0) + 'ms' : '—') +
+                                       (sla === false ? ' ✗ SLA' : sla === true ? ' ✓' : '');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid },
+                         title: { display: true, text: 'target QPS', color: C.text, font: { size: 11 } } },
+                    y: { ticks: { color: C.text, font: { size: 11 }, callback: v => v + 'ms' },
+                         grid: { color: C.grid },
+                         title: { display: true, text: 'TTFT p99 (ms)', color: C.text, font: { size: 11 } } },
+                }
+            }
+        }));
+        const onlineLeg = document.createElement('div');
+        onlineLeg.style.cssText = 'font-size:11px;color:#8b949e;margin-top:4px';
+        onlineLeg.textContent = 'Red dots = SLA missed. Lines show TTFT p99 vs QPS load per quantization format.';
+        el.appendChild(onlineLeg);
+    }
+
+    // ── Section 3: Sustained — throughput over time per format ───────────
+    if (viz.sustained_by_precision && viz.sustained_by_precision.length) {
+        el.appendChild(sectionTitle('Sustained — throughput stability across formats (extra scenario)'));
+
+        // Summary: sustained throughput + throttle ratio per format
+        el.appendChild(statChips(
+            viz.sustained_by_precision.map(fp => ({
+                label: fp.precision + ' throttle',
+                value: fp.throttle_ratio != null ? fp.throttle_ratio.toFixed(3) : '—',
+                cls:   fp.throttle_ratio >= 0.9 ? 'green' : fp.throttle_ratio >= 0.8 ? 'amber' : 'coral',
+            }))
+        ));
+        el.appendChild(statChips(
+            viz.sustained_by_precision.map(fp => ({
+                label: fp.precision + ' sustained',
+                value: fp.sustained_throughput_tokens_per_sec != null
+                    ? fp.sustained_throughput_tokens_per_sec.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s'
+                    : '—',
+            }))
+        ));
+
+        // Multi-line chart: x=minute, y=throughput, one line per format
+        // Use post-warmup samples only for the chart (is_warmup=false)
+        const minuteLabels = viz.sustained_by_precision[0].minutes
+            .filter((_, i) => !viz.sustained_by_precision[0].is_warmup[i]);
+        const { wrap: w3, canvas: c3 } = mkCanvas('viz-suitec-sus', 220);
+        el.appendChild(w3);
+        _activeCharts.push(new Chart(c3, {
+            type: 'line',
+            data: {
+                labels: minuteLabels,
+                datasets: viz.sustained_by_precision.map(fp => {
+                    const postWarmup = fp.throughput.filter((_, i) => !fp.is_warmup[i]);
+                    return {
+                        label:           fp.precision,
+                        data:            postWarmup,
+                        borderColor:     precColor(fp.precision),
+                        backgroundColor: precColor(fp.precision) + '11',
+                        pointRadius: 2,
+                        tension: 0.2,
+                        fill: false,
+                    };
+                }),
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, labels: { color: C.text, font: { size: 11 }, boxWidth: 12 } },
+                },
+                scales: {
+                    x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid },
+                         title: { display: true, text: 'minute', color: C.text, font: { size: 11 } } },
+                    y: { ticks: { color: C.text, font: { size: 11 },
+                                  callback: v => v.toLocaleString(undefined,{maximumFractionDigits:0}) },
+                         grid: { color: C.grid },
+                         title: { display: true, text: 'tok/s', color: C.text, font: { size: 11 } } },
+                }
+            }
+        }));
+
+        // Throttle ratio comparison bar
+        el.appendChild(sectionTitle('Throttle ratio by format (1.0 = no degradation)'));
+        const { wrap: w4, canvas: c4 } = mkCanvas('viz-suitec-throttle', 140);
+        el.appendChild(w4);
+        _activeCharts.push(new Chart(c4, {
+            type: 'bar',
+            data: {
+                labels: viz.sustained_by_precision.map(fp => fp.precision),
+                datasets: [{
+                    label: 'Throttle ratio',
+                    data: viz.sustained_by_precision.map(fp => fp.throttle_ratio),
+                    backgroundColor: viz.sustained_by_precision.map(fp =>
+                        fp.throttle_ratio >= 0.9 ? C.teal + '99'
+                        : fp.throttle_ratio >= 0.8 ? C.amber + '99'
+                        : C.coral + '99'
+                    ),
+                    borderColor: viz.sustained_by_precision.map(fp =>
+                        fp.throttle_ratio >= 0.9 ? C.teal
+                        : fp.throttle_ratio >= 0.8 ? C.amber : C.coral
+                    ),
+                    borderWidth: 1, borderRadius: 3,
+                }],
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
+                    y: { min: 0, max: 1.05,
+                         ticks: { color: C.text, font: { size: 11 }, callback: v => v.toFixed(2) },
+                         grid: { color: C.grid } },
+                }
+            }
+        }));
+    }
   }
 
   // Suite E ─────────────────────────────────────────────────

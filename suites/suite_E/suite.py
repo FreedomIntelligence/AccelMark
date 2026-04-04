@@ -57,6 +57,20 @@ def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
     skip_gate       = getattr(args, "skip_accuracy_gate", False)
     platform_script = sys.argv[0]
 
+    # Always set _chip_count to max_chips here — this is the authoritative
+    # setter for Suite E regardless of how the run was invoked (fresh run,
+    # resume with --output-dir, etc.). main() sets it too when output-dir
+    # is auto-generated (for the folder name), but when --output-dir is
+    # passed explicitly (resume case) that block is skipped, so we must
+    # set it here. Safe because subprocesses never enter _run_suite_e
+    # (they dispatch via --scenario offline → the else branch in run()).
+    br._chip_count = max_chips
+
+    # Compute run_id/run_name once here as the authoritative suite-level
+    # identity — always reflects max_chips regardless of invocation style.
+    suite_run_id   = br._compute_run_id(args, suite, env_info)
+    suite_run_name = br._compute_run_name(args, suite, env_info)
+
     if not chip_counts:
         print(f"Error: max_chips={max_chips} too low. Min: {min(required_counts)}")
         raise SystemExit(1)
@@ -81,6 +95,10 @@ def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
     if "accuracy" in _default_scenarios_e:
         acc_dir  = base_dir / "accuracy"
         acc_dir.mkdir(parents=True, exist_ok=True)
+        # accuracy.json is written to {output_dir}/accuracy/accuracy.json by
+        # _run_single_scenario (it appends "accuracy/" internally). So the
+        # subprocess gets --output-dir base_dir, not acc_dir, to avoid
+        # double-nesting (accuracy/accuracy/accuracy.json).
         acc_path = acc_dir / "accuracy.json"
 
         if acc_path.exists():
@@ -106,7 +124,7 @@ def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
                 sys.executable, platform_script,
                 "--suite",    args.suite,
                 "--scenario", "accuracy",
-                "--output-dir", str(acc_dir),
+                "--output-dir", str(base_dir),
                 "--tensor-parallel-size", "1",
             ]
             if getattr(args, "model_path", None):
@@ -139,9 +157,26 @@ def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
               f"{acc_result.get('subset_score') if acc_result else '?'}\n")
 
     # ── Step 2: Run chip counts ───────────────────────────────────────────
-    for count in chip_counts:
+    # Run from max to min so the highest-chip result is available first.
+    # Merge logic still uses min chip count as the scaling baseline.
+    for count in sorted(chip_counts, reverse=True):
         count_dir = base_dir / f"{count}x"
         count_dir.mkdir(parents=True, exist_ok=True)
+
+        # Skip if this chip count already has a completed result.json
+        count_result_path = count_dir / "result.json"
+        if count_result_path.exists():
+            try:
+                with open(count_result_path) as f:
+                    json.load(f)  # validate it's parseable
+                print(
+                    f"\n  {count}× already done — skipping "
+                    f"(found {count_result_path})"
+                )
+                results_summary.append((count, "SUCCESS", str(count_dir)))
+                continue
+            except Exception as e:
+                print(f"  Warning: existing {count_result_path} unreadable ({e}) — re-running.")
 
         print(f"\n{'='*60}")
         print(f"  Running {count}× chips")
@@ -202,11 +237,9 @@ def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
         print("All chip counts failed — no result.json merged.")
         return
 
-    # Report max chips tested to base class for run_id and result.json
-    br._chip_count = max(chip_counts) if chip_counts else 1
-
     _merge_suite_e_results(br, base_dir, suite, successful, total_elapsed,
-                           accuracy=acc_result)
+                           accuracy=acc_result, run_id=suite_run_id,
+                           run_name=suite_run_name, env_info=env_info)
 
 
 def _merge_suite_e_results(
@@ -216,6 +249,9 @@ def _merge_suite_e_results(
     successful_counts: list,
     total_elapsed_minutes: float,
     accuracy=None,
+    run_id: str = None,
+    run_name: str = None,
+    env_info: dict = None,
 ) -> None:
     """Merge per-chip-count results into one Suite E result with scaling efficiency."""
     count_results = {}
@@ -274,13 +310,26 @@ def _merge_suite_e_results(
             "result_dir":                       f"{count}x",
         })
 
+    max_count = max(successful_counts)
+
+    # Resolve interconnect from env_info for multi-chip merged result.
+    # base_result comes from the 1x subprocess which always has
+    # interconnect_intra_node=null (single chip). Override it here when
+    # the suite actually ran with multiple chips.
+    _intra = None
+    if max_count > 1 and env_info:
+        _accel = (env_info.get("accelerators") or [{}])[0]
+        _intra = (env_info.get("intra_node_interconnect")
+                  or _accel.get("interconnect_intra_node"))
+
     merged = {
         "schema_version":    "1.0",
         "suite_id":          "suite_E",
         "implementation_id": base_result.get("implementation_id"),
         "chip": {
             **base_result["chip"],
-            "count": max(successful_counts),
+            "count": max_count,
+            "interconnect_intra_node": _intra,
             "_count_note": (
                 "Maximum chip count used in this suite. "
                 "See task.chip_counts_run for all counts tested."
@@ -312,8 +361,17 @@ def _merge_suite_e_results(
         }),
         "meta": {
             **base_result["meta"],
-            "benchmark_elapsed_minutes": total_elapsed_minutes,
-            "benchmark_elapsed_minutes_note": "Total across all chip counts.",
+            # Always use the suite-level run_id/run_name computed before
+            # subprocess dispatch with max_chips — not the 1x subprocess's values.
+            "run_id":   run_id   or base_result["meta"].get("run_id"),
+            "run_name": run_name or base_result["meta"].get("run_name"),
+            "benchmark_elapsed_minutes": round(
+                sum(
+                    (count_results[c].get("meta", {}).get("benchmark_elapsed_minutes") or 0)
+                    for c in count_results
+                ), 1
+            ),
+            "benchmark_elapsed_minutes_note": "Sum of per-chip-count benchmark_elapsed_minutes (excludes sleep gaps, orchestrator overhead, and skipped counts).",
             "chip_count_dirs": {
                 str(c): f"{c}x" for c in sorted(count_results.keys())
             },

@@ -547,9 +547,12 @@ class BenchmarkRunner(ABC):
             # Submitter
             "submitted_by": profile.get("submitted_by", "unknown"),
         }
+        
 
         raw = json.dumps(key, sort_keys=True)
-        return hashlib.sha256(raw.encode()).hexdigest()[:8]
+        run_id = hashlib.sha256(raw.encode()).hexdigest()[:8]
+        print(f"Generate new run_id from {key}\nGenerated run_id: {run_id}")
+        return run_id
 
     def _compute_run_name(self, args, suite: dict, env_info: dict) -> str:
         """
@@ -591,6 +594,35 @@ class BenchmarkRunner(ABC):
             self._effective_precision = args.precision.upper()
         else:
             self._effective_precision = self._resolve_precision(suite, env_info)
+
+        # Resolve _chip_count before generating the output dir so the folder
+        # name reflects the correct chip count for multi-chip suites.
+        # Guarded by args.output_dir is None — only runs for fresh top-level
+        # invocations where the folder name is auto-generated. Subprocesses
+        # and resume runs always have --output-dir set explicitly, so this
+        # block is safely skipped for them. Suite plugins (e.g. suite_E)
+        # also set br._chip_count authoritatively inside their orchestrator
+        # for run_id/run_name correctness on resume.
+        #
+        # Priority ladder:
+        #   1. chip_counts_all (Suite E style) — max count from suite list
+        #      that fits within available hardware (or --max-chips override)
+        #   2. required_chips == "auto" (Suite B style) — all available GPUs
+        #   3. required_chips == N (int) — exactly N
+        #   4. default — 1 (getattr fallback in _compute_run_id)
+        if args.output_dir is None:
+            _suite_chip_counts_all = suite.get("chip_counts_all")
+            _suite_required_chips  = suite.get("required_chips")
+            _explicit_max_chips    = getattr(args, "max_chips", None)
+
+            if _suite_chip_counts_all:
+                _detected = len(env_info.get("accelerators", []))
+                _hw_max   = _explicit_max_chips or (_detected if _detected > 0 else max(_suite_chip_counts_all))
+                self._chip_count = max(c for c in _suite_chip_counts_all if c <= _hw_max)
+            elif _suite_required_chips == "auto":
+                self._chip_count = self._get_chip_count()
+            elif isinstance(_suite_required_chips, int) and _suite_required_chips > 0:
+                self._chip_count = _suite_required_chips
 
         # Resolve output dir
         if args.output_dir is None:
@@ -805,8 +837,7 @@ class BenchmarkRunner(ABC):
             _fmt_entry = _precision_model_map.get((_precision_arg or "").upper(), {})
             model_id = (
                 _fmt_entry.get("model_id")
-                or suite.get("model_id")
-                or suite.get("base_model_id", "")
+                or suite.get("model_id", "unknown")
             )
             effective_model_path = self._resolve_model_path(
                 model_id, getattr(args, "model_path", None)
@@ -883,8 +914,7 @@ class BenchmarkRunner(ABC):
         _fmt_entry = _precision_model_map.get((_precision_arg or "").upper(), {})
         model_id = (
             _fmt_entry.get("model_id")
-            or suite.get("model_id")
-            or suite.get("base_model_id", "")
+            or suite.get("model_id", "unknown")
         )
         effective_model_path = self._resolve_model_path(
             model_id, getattr(args, "model_path", None)
@@ -1160,7 +1190,7 @@ class BenchmarkRunner(ABC):
 
             # Load model for accuracy check
             # Model stays loaded for first benchmark scenario
-            model_id = suite.get("model_id") or suite.get("base_model_id", "")
+            model_id = suite.get("model_id", "unknown")
             effective_model_path = self._resolve_model_path(
                 model_id, getattr(args, "model_path", None)
             )
@@ -1400,7 +1430,12 @@ class BenchmarkRunner(ABC):
                 if r.get("metrics", {}).get(key):
                     merged_metrics[key] = r["metrics"][key]
 
-        total_elapsed = total_elapsed_minutes or round(scenario_elapsed, 1)
+        # Always sum per-scenario elapsed times rather than using the orchestrator
+        # wall-clock (total_elapsed_minutes). Summation is more accurate: it excludes
+        # 10s sleep gaps between scenarios, orchestrator overhead, and model load time
+        # (already captured in model_load_seconds). It also remains correct for
+        # incremental runs where scenarios were added one at a time.
+        total_elapsed = round(scenario_elapsed, 1) if scenario_elapsed else (total_elapsed_minutes or 0.0)
 
         # Load accuracy from accuracy/accuracy.json
         accuracy = None
@@ -1589,13 +1624,12 @@ class BenchmarkRunner(ABC):
         # below baseline. Scoring ABOVE baseline is always valid.
         precision = getattr(self, "_effective_precision", "BF16")
         # For Suite C, the baseline lives under the quantized checkpoint's model_id
-        # (e.g. RedHatAI/...-quantized.w8a8), not the suite base_model_id.
+        # (e.g. RedHatAI/...-quantized.w8a8), not the suite-level model_id.
         _precision_model_map = suite.get("precision_model_map", {})
         model_id = (
             (_precision_model_map.get(precision) or {}).get("model_id")
             or getattr(self, "_resolved_model_id", None)
-            or suite.get("model_id")
-            or suite.get("base_model_id", "")
+            or suite.get("model_id", "unknown")
         )
         baseline_score = self._load_accuracy_baseline_for_format(model_id, precision)
         delta = round(score - baseline_score, 4) if baseline_score is not None else None
@@ -1872,7 +1906,7 @@ class BenchmarkRunner(ABC):
 
         # For Suite C subprocesses, --precision is set and precision_model_map holds
         # the actual quantized checkpoint. Use it so each per-format result.json records
-        # the real model_id/revision (e.g. RedHatAI/...-FP8), not base_model_id.
+        # the real model_id/revision (e.g. RedHatAI/...-FP8), not the suite-level model_id.
         _result_precision = (
             getattr(self, "_effective_precision", None)
             or getattr(args, "precision", None)
@@ -1882,8 +1916,26 @@ class BenchmarkRunner(ABC):
         )
         _result_model_id = (
             _pm_entry.get("model_id")
-            or suite.get("model_id")
-            or suite.get("base_model_id", "")
+            or suite.get("model_id", "unknown")
+        )
+        _result_model_revision = (
+            _pm_entry.get("model_revision")
+            or suite.get("model_revision", "unknown")
+        )
+
+        # For Suite C subprocesses, --precision is set and precision_model_map holds
+        # the actual quantized checkpoint. Use it so each per-format result.json records
+        # the real model_id/revision (e.g. RedHatAI/...-FP8), not the suite-level model_id.
+        _result_precision = (
+            getattr(self, "_effective_precision", None)
+            or getattr(args, "precision", None)
+        )
+        _pm_entry = suite.get("precision_model_map", {}).get(
+            (_result_precision or "").upper(), {}
+        )
+        _result_model_id = (
+            _pm_entry.get("model_id")
+            or suite.get("model_id", "unknown")
         )
         _result_model_revision = (
             _pm_entry.get("model_revision")

@@ -35,8 +35,8 @@
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.1,
-  "request_count": 500,
-  "_request_count_note": "Same as Suite A offline for direct comparability.",
+  "request_count": 150,
+  "_request_count_note": "Reduced from 500 to 150: scaling efficiency is a relative metric (speedup vs 1x baseline), so high absolute sample counts are unnecessary. 150 req \u00d7 3 runs is statistically sufficient for stable throughput comparison across chip counts.",
   "online_request_count": null,
   "interactive_request_count": null
 }

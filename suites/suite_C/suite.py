@@ -27,7 +27,7 @@ def run(br, args, suite: dict, env_info: dict) -> None:
     - anything else → single scenario/precision subprocess, use generic path
     """
     if args.scenario in ("default", "all") and getattr(args, "precision", None) is None:
-        _run_suite_c(br, args, suite)
+        _run_suite_c(br, args, suite, env_info)
     elif args.scenario in ("default", "all"):
         # Per-precision subprocess — run actual scenarios via the generic multi-scenario path
         br._run_all_scenarios(args, suite)
@@ -37,7 +37,7 @@ def run(br, args, suite: dict, env_info: dict) -> None:
         br._run_single_scenario(args, suite)
 
 
-def _run_suite_c(br, args, suite: dict) -> None:
+def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
     """
     Run Suite C: per-format accuracy + offline benchmark for each
     supported quantization format.
@@ -54,6 +54,12 @@ def _run_suite_c(br, args, suite: dict) -> None:
     """
     base_dir     = Path(args.output_dir)
     base_dir.mkdir(parents=True, exist_ok=True)
+
+    # Compute run_id/run_name once here — before any subprocess dispatch —
+    # using the suite-level model_id (base model) and current settings.
+    # This is the authoritative identity for the whole Suite C run.
+    suite_run_id   = br._compute_run_id(args, suite, env_info)
+    suite_run_name = br._compute_run_name(args, suite, env_info)
 
     precision_model_map  = suite.get("precision_model_map", {})
     all_precisions       = suite.get("precision_levels", ["BF16"])
@@ -88,8 +94,8 @@ def _run_suite_c(br, args, suite: dict) -> None:
         fmt_info     = precision_model_map.get(precision)
         if fmt_info is None:
             if precision == "BF16":
-                # BF16 baseline: fall back to base_model_id — expected
-                fmt_model_id = suite.get("base_model_id")
+                # BF16 baseline: fall back to model_id — expected
+                fmt_model_id = suite.get("model_id")
             else:
                 # Quantized format with no model mapping — refuse to silently
                 # run the base model under a quantized precision label
@@ -101,10 +107,25 @@ def _run_suite_c(br, args, suite: dict) -> None:
                 )
                 continue
         else:
-            fmt_model_id = fmt_info.get("model_id") or suite.get("base_model_id")
+            fmt_model_id = fmt_info.get("model_id") or suite.get("model_id")
 
         precision_dir = base_dir / precision.lower()
         precision_dir.mkdir(parents=True, exist_ok=True)
+
+        # Skip if this precision already has a completed result.json
+        precision_result_path = precision_dir / "result.json"
+        if precision_result_path.exists():
+            try:
+                with open(precision_result_path) as f:
+                    json.load(f)  # validate parseable
+                print(
+                    f"\n  {precision} already done — skipping "
+                    f"(found {precision_result_path})"
+                )
+                results_summary.append((precision, "SUCCESS", str(precision_dir)))
+                continue
+            except Exception as e:
+                print(f"  Warning: existing {precision_result_path} unreadable ({e}) — re-running.")
 
         print(f"\n{'='*60}")
         print(f"  Precision: {precision}")
@@ -176,7 +197,8 @@ def _run_suite_c(br, args, suite: dict) -> None:
     successful = [p for p, status, _ in results_summary if status == "SUCCESS"]
     if successful:
         _merge_suite_c_results(br, base_dir, suite, successful, total_elapsed,
-                               skipped=skipped)
+                               skipped=skipped, run_id=suite_run_id,
+                               run_name=suite_run_name)
 
 
 def _merge_suite_c_results(
@@ -186,6 +208,8 @@ def _merge_suite_c_results(
     successful_precisions: list,
     total_elapsed_minutes: float,
     skipped: list = None,
+    run_id: str = None,
+    run_name: str = None,
 ) -> None:
     """
     Merge per-precision results into one Suite C result.json.
@@ -285,10 +309,21 @@ def _merge_suite_c_results(
         })
 
     # Determine scenarios from suite config
-    default_scenarios, _ = br._parse_scenarios_config(suite)
-    scenarios_run = [s for s in default_scenarios if s != "accuracy"]
-    if "accuracy" in default_scenarios:
-        scenarios_run = ["accuracy"] + scenarios_run
+    default_scenarios, extra_scenarios = br._parse_scenarios_config(suite)
+    all_suite_scenarios = default_scenarios + [
+        s for s in extra_scenarios if s not in default_scenarios
+    ]
+    # Detect which scenarios actually ran across the precision subfolders
+    scenarios_run = []
+    for s in all_suite_scenarios:
+        if s == "accuracy":
+            if any((base_dir / p.lower() / "accuracy" / "accuracy.json").exists()
+                   for p in successful_precisions):
+                scenarios_run.append(s)
+        else:
+            if any((base_dir / p.lower() / s).exists()
+                   for p in successful_precisions):
+                scenarios_run.append(s)
 
     # Build scenario_dirs for all successful precisions
     scenario_dirs = {}
@@ -300,6 +335,65 @@ def _merge_suite_c_results(
             if scenario_dir.exists():
                 scenario_dirs[f"{precision.lower()}/{scenario}"] = str(scenario_dir)
 
+    # ── Collect per-format online metrics ─────────────────────────────────
+    quantization_online = None
+    if "online" in scenarios_run:
+        online_by_precision = []
+        for precision in successful_precisions:
+            p_online = base_dir / precision.lower() / "online" / "result.json"
+            if p_online.exists():
+                try:
+                    with open(p_online) as f:
+                        p_result = json.load(f)
+                    online_metrics = p_result.get("metrics", {}).get("online", {})
+                    if online_metrics:
+                        online_by_precision.append({
+                            "precision":      precision,
+                            "max_valid_qps":  online_metrics.get("max_valid_qps"),
+                            "results_by_qps": online_metrics.get("results_by_qps", []),
+                        })
+                except Exception as e:
+                    print(f"  Warning: could not load {p_online}: {e}")
+        if online_by_precision:
+            quantization_online = {"results_by_precision": online_by_precision}
+
+    # ── Collect per-format sustained metrics ──────────────────────────────
+    quantization_sustained = None
+    if "sustained" in scenarios_run:
+        sustained_by_precision = []
+        for precision in successful_precisions:
+            p_sus = base_dir / precision.lower() / "sustained" / "result.json"
+            if p_sus.exists():
+                try:
+                    with open(p_sus) as f:
+                        p_result = json.load(f)
+                    sus_metrics = p_result.get("metrics", {}).get("sustained", {})
+                    if sus_metrics:
+                        sustained_by_precision.append({
+                            "precision":                        precision,
+                            "sustained_throughput_tokens_per_sec": sus_metrics.get("sustained_throughput_tokens_per_sec"),
+                            "throttle_ratio":                   sus_metrics.get("throttle_ratio"),
+                            "throttle_onset_minute":            sus_metrics.get("throttle_onset_minute"),
+                            "ttft_p99_drift_ms":                sus_metrics.get("ttft_p99_drift_ms"),
+                            "sustained_concurrency":            sus_metrics.get("sustained_concurrency"),
+                            "duration_minutes":                 sus_metrics.get("duration_minutes"),
+                            "samples":                          sus_metrics.get("samples", []),
+                        })
+                except Exception as e:
+                    print(f"  Warning: could not load {p_sus}: {e}")
+        if sustained_by_precision:
+            quantization_sustained = {"results_by_precision": sustained_by_precision}
+
+    # ── Build metrics block ────────────────────────────────────────────────
+    metrics_block = {
+        "quantization": {"results_by_precision": quant_results},
+        "derived": {},
+    }
+    if quantization_online:
+        metrics_block["quantization_online"] = quantization_online
+    if quantization_sustained:
+        metrics_block["quantization_sustained"] = quantization_sustained
+
     merged = {
         "schema_version":    "1.0",
         "suite_id":          "suite_C",
@@ -308,9 +402,9 @@ def _merge_suite_c_results(
         "software":          base_result["software"],
         "model": {
             **base_result["model"],
-            "model_id": suite.get("base_model_id",
+            "model_id": suite.get("model_id",
                                   base_result["model"].get("model_id", "")),
-            "_note": ("base_model_id. Each precision level uses its own "
+            "_note": ("suite model_id. Each precision level uses its own "
                       "quantized checkpoint."),
         },
         "task": {
@@ -321,15 +415,21 @@ def _merge_suite_c_results(
             "num_runs":                 suite.get("num_runs", 3),
             "extra_config":             base_result["task"].get("extra_config"),
         },
-        "metrics": {
-            "quantization": {"results_by_precision": quant_results},
-            "derived": {},
-        },
+        "metrics": metrics_block,
         "accuracy": None,
         "meta": {
             **base_result["meta"],
-            "benchmark_elapsed_minutes": total_elapsed_minutes,
-            "benchmark_elapsed_minutes_note": "Total across all precision levels.",
+            # Always use the suite-level run_id/run_name computed before
+            # subprocess dispatch — not the BF16 subprocess's values.
+            "run_id":   run_id   or base_result["meta"].get("run_id"),
+            "run_name": run_name or base_result["meta"].get("run_name"),
+            "benchmark_elapsed_minutes": round(
+                sum(
+                    (precision_results[p].get("meta", {}).get("benchmark_elapsed_minutes") or 0)
+                    for p in successful_precisions if p in precision_results
+                ), 1
+            ),
+            "benchmark_elapsed_minutes_note": "Sum of per-precision benchmark_elapsed_minutes (excludes sleep gaps and orchestrator overhead).",
             "precision_dirs":     {p: p.lower() for p in successful_precisions},
             "scenario_dirs":      scenario_dirs,
             "precision_model_map": {

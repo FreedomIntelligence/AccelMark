@@ -6,8 +6,8 @@
   "dataset": "sharegpt_longctx_v1",
   "max_model_len": 30208,
   "scenarios": {
-    "default": ["accuracy", "offline", "interactive"],
-    "extra": ["sustained", "online"]
+    "default": ["accuracy", "offline"],
+    "extra": ["interactive", "sustained", "online"]
   },
   "precision_required": "BF16",
   "allowed_precisions": ["BF16", "FP16"],
@@ -16,11 +16,11 @@
     "input_tokens_p50": 28650,
     "input_tokens_p75": 29210,
     "input_tokens_p99": 29932,
-    "output_tokens_p50": 512,
-    "output_tokens_p99": 512,
+    "output_tokens_p50": 256,
+    "output_tokens_p99": 256,
     "source": "shibing624/sharegpt_gpt4"
   },
-  "output_tokens_max": 512,
+  "output_tokens_max": 256,
   "concurrency_levels": [1, 4],
   "_concurrency_levels_note": "Client-side concurrency for long-context requests. Lower values used because ~28K-token requests are memory-intensive.",
   "online_qps_levels": [0.5, 1, 2],
@@ -32,10 +32,10 @@
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.1,
-  "request_count": 100,
-  "_request_count_note": "offline uses 100, interactive uses 50, online uses 50 (controlled in loadgen).",
-  "online_request_count": 50,
-  "interactive_request_count": 50,
+  "request_count": 50,
+  "_request_count_note": "offline uses request_count (50; long-context ~28K tokens, each run takes ~220s, 50 reqs \u00d7 3 = 150s/run is statistically sufficient for throughput), interactive uses interactive_request_count (100; each request ~11s sequential, 100 reqs \u00d7 2 runs \u2248 37 min; p90 is the primary tail metric for Suite D interactive due to long-context cost \u2014 p95 at 100 reqs is rank 95 which is marginal), online (extra) uses online_request_count (200, minimum for robust p95 at low QPS)",
+  "online_request_count": 200,
+  "interactive_request_count": 100,
   "sustained_concurrency": 8,
   "duration_minutes": 30,
   "sample_interval_seconds": 60

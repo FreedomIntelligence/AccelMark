@@ -334,12 +334,47 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             acc_deltas.append(e.get("accuracy_baseline_delta"))
             effective_dtypes.append(e.get("effective_dtype"))
             quant_methods.append(e.get("quantization_method"))
-        # Best quality efficiency for primary metric
         best_qe = max((q for q in quality_effs if q), default=None)
         bf16_thr = next(
             (throughputs[i] for i, p in enumerate(precisions) if p == "BF16"),
             None
         )
+
+        # ── Online cross-format data ──────────────────────────────────────
+        online_by_precision = None
+        q_online = metrics.get("quantization_online", {})
+        if q_online:
+            online_by_precision = []
+            for e in q_online.get("results_by_precision", []):
+                qps_rows = e.get("results_by_qps", [])
+                online_by_precision.append({
+                    "precision":     e.get("precision", ""),
+                    "max_valid_qps": e.get("max_valid_qps"),
+                    "qps_labels":    [str(r.get("target_qps", "")) for r in qps_rows],
+                    "ttft_p50":      [r.get("ttft_ms_p50") for r in qps_rows],
+                    "ttft_p99":      [r.get("ttft_ms_p99") for r in qps_rows],
+                    "sla_met":       [r.get("sla_met") for r in qps_rows],
+                })
+
+        # ── Sustained cross-format data ───────────────────────────────────
+        sustained_by_precision = None
+        q_sus = metrics.get("quantization_sustained", {})
+        if q_sus:
+            sustained_by_precision = []
+            for e in q_sus.get("results_by_precision", []):
+                samples = e.get("samples", [])
+                sustained_by_precision.append({
+                    "precision":                          e.get("precision", ""),
+                    "sustained_throughput_tokens_per_sec": e.get("sustained_throughput_tokens_per_sec"),
+                    "throttle_ratio":                     e.get("throttle_ratio"),
+                    "throttle_onset_minute":              e.get("throttle_onset_minute"),
+                    "ttft_p99_drift_ms":                  e.get("ttft_p99_drift_ms"),
+                    "duration_minutes":                   e.get("duration_minutes"),
+                    "minutes":    [s["minute"] for s in samples],
+                    "throughput": [s["throughput_tokens_per_sec"] for s in samples],
+                    "is_warmup":  [s.get("is_warmup", False) for s in samples],
+                })
+
         return {
             "type":               "suite_C",
             "precisions":         precisions,
@@ -353,6 +388,8 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "quantization_methods": quant_methods,
             "best_quality_eff":   best_qe,
             "bf16_throughput":    bf16_thr,
+            "online_by_precision":    online_by_precision,
+            "sustained_by_precision": sustained_by_precision,
         }
 
     if suite == "suite_E":

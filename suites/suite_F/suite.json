@@ -24,10 +24,10 @@
     "source": "shibing624/sharegpt_gpt4 (short-turn filtered)"
   },
   "max_model_len": 2048,
-  "output_tokens_max": 512,
+  "output_tokens_max": 256,
   "concurrency_levels": [4, 16, 64],
   "_concurrency_levels_note": "Smaller than Suite A — consumer GPUs saturate at lower concurrency with a 0.5B model.",
-  "online_qps_levels": [2, 10, 40],
+  "online_qps_levels": [10, 40],
   "online_sla_ttft_ms": 500,
   "online_sla_ttft_ms_relaxed": 2000,
   "num_runs": 3,
@@ -38,7 +38,7 @@
   "accuracy_threshold_delta": 0.1,
   "_accuracy_note": "Qwen2.5-0.5B scores ~0.35–0.40 on MMLU by design (small model). The threshold detects broken quantization or misconfigured precision, not model quality.",
   "request_count": 200,
-  "_request_count_note": "Same as Suite A offline for direct run-time comparability.",
-  "online_request_count": 500,
-  "interactive_request_count": 100
+  "_request_count_note": "offline uses request_count (200; Qwen2.5-0.5B is fast, runtime is negligible), online uses online_request_count (300, robust p99), interactive uses interactive_request_count (150, robust p95)",
+  "online_request_count": 300,
+  "interactive_request_count": 150
 }

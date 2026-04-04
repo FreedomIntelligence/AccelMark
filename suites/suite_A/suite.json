@@ -5,8 +5,8 @@
   "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
   "dataset": "sharegpt_standard_v1",
   "scenarios": {
-    "default": ["accuracy", "offline", "online", "interactive"],
-    "extra": ["sustained"]
+    "default": ["accuracy", "offline", "online"],
+    "extra": ["interactive", "sustained"]
   },
   "precision_required": "BF16",
   "allowed_precisions": ["BF16", "FP16"],
@@ -32,10 +32,10 @@
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0 ,
   "accuracy_threshold_delta": 0.1,
-  "request_count": 200,
-  "_request_count_note": "offline uses 200, online/interactive uses 500 (controlled in loadgen)",
-  "online_request_count": 500,
-  "interactive_request_count": 100,
+  "request_count": 100,
+  "_request_count_note": "offline uses request_count (100), online uses online_request_count (300, minimum for robust p99), interactive uses interactive_request_count (150, minimum for robust p95)",
+  "online_request_count": 300,
+  "interactive_request_count": 150,
   "sustained_concurrency": 8,
   "duration_minutes": 30,
   "sample_interval_seconds": 60

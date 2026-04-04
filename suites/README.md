@@ -9,10 +9,10 @@ AI accelerators apples-to-apples.
 
 | Suite | Model | Chips | Scenarios | Purpose |
 |-------|-------|-------|-----------|---------|
-| [Suite A](#suite-a) | Llama-3-8B-Instruct | 1 | offline, online, interactive | Standard single-chip inference. **Required for leaderboard entry.** |
+| [Suite A](#suite-a) | Llama-3-8B-Instruct | 1 | offline, online (+ interactive, sustained extra) | Standard single-chip inference. **Required for leaderboard entry.** |
 | [Suite B](#suite-b) | Llama-3-70B-Instruct | flexible | offline, online (+ interactive, sustained extra) | Large model multi-chip inference |
 | [Suite C](#suite-c) | Llama-3.1-8B-Instruct | 1 | offline (+ online, sustained extra) | Quantization efficiency (BF16/FP8/W8A8/W8A16/W4A16) |
-| [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline, interactive | Long-context inference (~28K input tokens) |
+| [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline (+ interactive, online, sustained extra) | Long-context inference (~28K input tokens) |
 | [Suite E](#suite-e) | Llama-3-8B-Instruct | 1×/2×/4×/8× | offline | Multi-chip scaling efficiency |
 | [Suite F](#suite-f) | Qwen2.5-0.5B-Instruct | 1 (recommended) | offline, online, interactive | Consumer/edge single-GPU inference |
 
@@ -24,31 +24,49 @@ The table below shows measured wall-clock times on a **single NVIDIA A100 SXM4 8
 recorded in `meta.benchmark_elapsed_minutes` of each submitted result.json.
 Times on other hardware will differ.
 
-| Suite | Scenario | Request Count | Measured Time¹ | Total |
-|-------|----------|---------------|----------------|-------|
-| A | offline | 200 | ~5 min | |
-| A | online | 500 | ~22 min | |
-| A | interactive | 100 | ~23 min | **~50 min** |
-| B | offline | 200 | ~9 min | |
-| B | online | 500 | ~60 min | **~69 min** |
-| C | offline (BF16) | 200 | ~9 min | |
-| C | offline (FP8) | 200 | ~9 min | |
-| C | offline (W8A8) | 200 | ~8 min | |
-| C | offline (W8A16) | 200 | ~10 min | |
-| C | offline (W4A16) | 200 | ~9 min | **~45 min** |
-| D | offline | 100 | ~47 min | |
-| D | interactive | 50 | ~13 min | **~60 min** |
-| E | offline (1×) | 500 | ~10 min | |
-| E | offline (2×) | 500 | ~8 min | |
-| E | offline (4×) | 500 | ~6 min | **~24 min** |
-| F | offline | 200 | ~1 min | |
-| F | online | 500 | ~18 min | |
-| F | interactive | 100 | ~5 min | **~27 min** |
+Times below are measured wall-clock on **NVIDIA A100-SXM4-80GB** with vLLM 0.6.6.
+`benchmark_elapsed_minutes` in each result.json is the **sum of per-scenario benchmark times**
+(excludes model load and sleep gaps between scenarios).
 
-¹ Measured on NVIDIA A100 SXM4 80 GB with vLLM as reference. Recorded in `meta.benchmark_elapsed_minutes` of each result.json.
-² Suite F measured on NVIDIA A100 SXM4 40 GB with vLLM 0.6.6.post1. Online is dominated by QPS=2 (low-rate Poisson arrival with 500 requests takes ~4 min per run × 3 runs).
+Default scenarios only:
 
-> **Sustained scenario** (extra, opt-in): typically adds ~30 minutes wall time on datacenter suites (A–E); Suite F uses a **15-minute** sustained profile. Run with `--scenario sustained`. Not included in default suite runs.
+| Suite | Scenario | rc | Formula | Wall time |
+|-------|----------|----|---------|-----------|
+| A | offline | 100 | 10s/run × 4 × 3 conc | ~2 min |
+| A | online | 300 | Σ(elapsed × 3) / 3 QPS | ~7 min |
+| A | *(interactive — extra)* | 150 | 659s/run × 3 runs | *(~33 min)* |
+| A | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
+| | | | **Suite A default total** | **~13 min** |
+| B | offline | 100 | 21s/run × 4 × 3 conc | ~4 min |
+| B | online | 200 | Σ(elapsed × 3) / 4 QPS | ~23 min |
+| B | *(interactive — extra)* | 50 | 780s/run × 3 runs | *(~39 min)* |
+| B | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
+| | | | **Suite B default total** | **~26 min** |
+| C | offline (×5 formats) | 100 | 17s/run × 4 × 4 conc × 5 fmt | ~27 min |
+| C | *(online — extra)* | 300 | Σ(elapsed × 3) / 4 QPS | *(~11 min)* |
+| C | *(sustained — extra)* | — | 31 min fixed | *(~31 min)* |
+| | | | **Suite C default total** | **~31 min** |
+| D | offline | 50 | 220s/run × 3 × 2 conc | ~22 min |
+| D | *(interactive — extra)* | 100 | 1124s/run × 2 runs | *(~37 min)* |
+| D | *(online — extra)* | 200 | Σ(elapsed × 2) / 3 QPS | *(~24 min)* |
+| D | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
+| | | | **Suite D default total** | **~26 min** |
+| E | offline (1×/2×/4×) | 150 | per-chip runs × 4 × 3 conc | ~13 min |
+| | | | **Suite E default total** | **~17 min** |
+| F | offline | 200 | 8s/run × 4 × 3 conc | ~2 min |
+| F | online | 300 | Σ(elapsed × 3) / 2 QPS | ~7 min |
+| F | interactive | 150 | 94s/run × 3 runs | ~5 min |
+| F | *(sustained — extra)* | — | 17 min fixed | *(~17 min)* |
+| | | | **Suite F default total** | **~14 min** |
+
+**Total default (all suites):** ~110 min · **Total all-scenarios:** ~430 min
+
+`rc` = request count per run. `elapsed` = `elapsed_seconds_median` from result.json (one run).
+Formula for offline: `elapsed × (num_runs + 1 warmup) × num_concurrency_levels`.
+Formula for online/interactive: `elapsed × num_runs` (no warmup run).
+Times in italics are extra scenarios — run with `--scenario all`.
+
+> **Sustained scenario** (extra, opt-in): adds ~30 min on datacenter suites (A–E); Suite F uses a **15-minute** profile. Run with `--scenario sustained` or `--scenario all`. Not included in default suite runs.
 
 ---
 
@@ -57,14 +75,18 @@ Times on other hardware will differ.
 Counts are defined per suite in `suites/<suite_id>/suite.json`. Typical patterns:
 
 ```
-offline:      Often 200 requests (Suites A, B, C, F) — throughput is a bulk metric
-              Suite D: 100 (long context). Suite E: 500 (scaling comparability).
+offline:      rc=100 (A, B, C); rc=50 (D, long-context); rc=150 (E, scaling); rc=200 (F, fast model)
 
-online:       Often 500 per QPS level (A, B, C, F) — enough samples for stable p99
-              Suite D: 50 (long context).
+online:       orc=300 (A, C, F) — robust p99 at practical QPS levels
+              orc=200 (B, D)    — 70B/long-context; p95 is primary tail metric
 
-interactive:  Often 100 (A, F); Suite D: 50. Serial execution (one at a time).
+interactive:  irc=150 (A, F); irc=100 (D, long-context p90 primary); irc=50 (B, 70B decode ~15s/req)
+              Serial execution — one request at a time. interactive_warmup_runs=0 for all suites.
 ```
+
+> Total wall time = `elapsed_seconds_median × num_runs` (interactive/online per QPS)
+> or `elapsed_seconds_median × (num_runs + warmup_runs) × num_concurrency_levels` (offline).
+> `elapsed_seconds_median` in result.json is **one run**, not the full suite.
 
 Always use the suite’s `request_count`, `online_request_count`, and
 `interactive_request_count` fields as the source of truth.
@@ -88,7 +110,7 @@ vLLM's internal scheduler handles batching.
 
 ```
 concurrency_levels: [8, 32, 128]   — client-side concurrency (requests sent simultaneously)
-request_count: 200
+request_count: 100
 num_runs: 3 + 1 warmup
 Primary metric: throughput_tokens_per_sec (input + output tokens)
 ```
@@ -101,7 +123,7 @@ Requests arrive following a Poisson process (realistic service traffic).
 ```
 online_qps_levels: [5, 25, 100]
 online_sla_ttft_ms: 500    — p99 TTFT must be < 500ms to pass
-online_request_count: 500
+online_request_count: 300
 num_runs: 3 (no warmup)
 Primary metric: max_valid_qps
 ```
@@ -113,9 +135,11 @@ Primary metric: max_valid_qps
 Measures single-request latency in isolation (no concurrency).
 
 ```
-interactive_request_count: 100
+interactive_request_count: 150
 num_runs: 3 (no warmup)
 Primary metrics: ttft_ms_p50, ttft_ms_p99
+
+> Interactive is an **extra** scenario for Suite A. Run with `--scenario all` or `--scenario interactive`.
 ```
 
 ### Accuracy scenario
@@ -143,8 +167,7 @@ sample_interval_seconds: 60  — throughput snapshot every minute
 warmup_minutes: 2
 ```
 
-**A100 reference result:** 504 tok/s sustained, throttle ratio 0.87,
-throttle onset at minute 12.
+**A100 reference result:** 527 tok/s sustained, throttle ratio 0.91, no throttle onset detected.
 
 Key output metrics:
 - `sustained_throughput_tokens_per_sec` — average post-warmup throughput
@@ -210,7 +233,7 @@ not model version differences.
 | **Default scenarios** | accuracy, offline |
 | **Extra scenarios** | online, sustained |
 | **Primary metric** | `quality_efficiency` (best across all formats) |
-| **Run time** | ~45 min on A100 (default scenarios, all 5 formats) |
+| **Run time** | ~31 min on A100 (default scenarios, all 5 formats) |
 
 ### Precision formats
 
@@ -222,7 +245,7 @@ not model version differences.
 | W8A16 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16` | ±0.03 | INT8 weights, FP16 activations |
 | W4A16 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16` | ±0.05 | INT4 weights (AWQ), FP16 activations |
 
-Each format runs against the same 200 prompts with concurrency levels
+Each format runs against the same 100 prompts with concurrency levels
 `[1, 4, 16, 64]` from `suite_C/suite.json` (not the same sweep as Suite A’s
 `[8, 32, 128]`). Format availability depends on the runner's `SUPPORTED_QUANTIZATIONS`
 declaration — unsupported formats are skipped automatically.
@@ -311,7 +334,7 @@ so runs remain reproducible and within practical memory limits on common GPUs.
 
 ```
 concurrency_levels: [1, 4]
-request_count: 100
+request_count: 50
 num_runs: 2 + 1 warmup
 Primary metric: throughput_tokens_per_sec
 ```
@@ -322,6 +345,26 @@ which is compute-bound and tests raw FLOPS more than memory bandwidth.
 **OOM on some batch sizes is expected and recorded as valid data.**
 A chip that OOMs at batch_size=4 but succeeds at batch_size=1 will show
 `"oom": true` for that row — useful information, not a failure.
+
+### Interactive scenario (extra)
+
+```
+interactive_request_count: 100   — each request ~11s sequential at 28K context
+num_runs: 2 (no warmup)
+Primary metrics: ttft_ms_p50, ttft_ms_p90   — p90 is primary; p95 marginal at 100 reqs
+```
+
+Interactive is **extra** for Suite D: 100 reqs × 2 runs ≈ 37 min — expensive at 28K context.
+Run with `--scenario all` or `--scenario interactive`.
+
+### Online scenario (extra)
+
+```
+online_qps_levels: [0.5, 1, 2]
+online_request_count: 200
+```
+
+Extra due to cost: QPS=0.5 alone takes ~13 min (rate-bound: 200 reqs / 0.5 QPS × 2 runs).
 
 ### Sustained scenario (extra)
 
@@ -362,7 +405,7 @@ scaling_efficiency = N_chip_throughput / (1_chip_throughput × N)
 
 ```
 concurrency_levels: [8, 32, 128]
-request_count: 500
+request_count: 150
 num_runs: 3 + 1 warmup
 chip_counts_required: [1, 2]
 chip_counts_optional: [4, 8]
@@ -463,9 +506,11 @@ at lower concurrency.
 
 ```
 concurrency_levels:    [4, 16, 64]
-online_qps_levels:     [2, 10, 40]
+online_qps_levels:     [10, 40]       — QPS=2 excluded; rate-bound at 0.5B scale, below practical range
 online_sla_ttft_ms:    500
-request_count:         200 (offline), 500 (online), 100 (interactive)
+online_request_count:  300
+request_count:         200 (offline)
+interactive_request_count: 150
 num_runs:              3 + 1 warmup
 ```
 

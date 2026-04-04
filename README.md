@@ -14,7 +14,7 @@
 
 | | The problem | AccelMark's answer |
 |---|---|---|
-| **MLPerf** | Rigorous but slow — only large vendors participate | Community runs often finish in under an hour (e.g. Suite A ~50 min; Suite F much shorter) |
+| **MLPerf** | Rigorous but slow — only large vendors participate | Community runs often finish quickly (e.g. Suite A default ~13 min; Suite D default ~26 min; full all-scenarios run ~7 h) |
 | **Vendor whitepapers** | Different setups make cross-vendor comparison impossible | Fixed schema + shared LoadGen = apples-to-apples |
 | **Most benchmarks** | Cover only NVIDIA and only throughput | NVIDIA, AMD, Huawei Ascend, Apple Silicon — throughput, latency, scaling, quantization |
 
@@ -32,7 +32,7 @@ pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name
 
-# 3. Run the benchmark (~50 min on A100)
+# 3. Run the benchmark (~17 min on A100)
 python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
 
 # 4. Submit — open a GitHub Issue and paste your result.json
@@ -50,7 +50,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 | **A** | Llama-3-8B | 1 | How fast is this chip at inference? | Offline tokens/sec |
 | **B** | Llama-3-70B | flexible | Can this chip serve large models? | Offline tokens/sec |
 | **C** | Llama-3.1-8B | 1 | Quantization speed/quality tradeoff? | Speedup vs BF16 |
-| **D** | Llama-3.1-8B | 1 | How does this chip handle 28K-token inputs? | Interactive TTFT p99 |
+| **D** | Llama-3.1-8B | 1 | How does this chip handle long-context (28K) inputs? | Offline tokens/sec |
 | **E** | Llama-3-8B | 1×/2×/4×/8× | How well does this chip scale? | Scaling efficiency |
 | **F** | Qwen2.5-0.5B | 1 | How fast is this consumer/edge GPU? | Offline tokens/sec |
 
