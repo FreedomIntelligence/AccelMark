@@ -48,7 +48,7 @@
   },
   "suite_D": {
     "suite_id": "suite_D",
-    "description": "Single chip long-context inference, Llama-3.1-8B-Instruct (128K context). OOM at higher concurrency levels is expected and recorded.",
+    "description": "Single chip long-context inference, Llama-3.1-8B-Instruct (~28K context). OOM at higher concurrency levels is expected and recorded.",
     "model_id": "meta-llama/Llama-3.1-8B-Instruct",
     "precision": "BF16",
     "default_scenarios": [
