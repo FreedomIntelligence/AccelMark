@@ -10,6 +10,8 @@
   },
   "precision_required": "BF16",
   "allowed_precisions": ["BF16", "FP16"],
+  "required_chips": "auto",
+  "_required_chips_note": "Suite B needs the full GPU count to fit the 70B model. Set to 'auto' so runners use all available GPUs when no --tensor-parallel-size flag or yaml config is set.",
   "request_distribution": {
     "input_tokens_p25": 120,
     "input_tokens_p50": 280,

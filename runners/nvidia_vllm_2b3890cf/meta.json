@@ -1,0 +1,11 @@
+{
+  "id": "nvidia_vllm_2b3890cf",
+  "platform": "nvidia",
+  "name": "vLLM on NVIDIA (reference implementation)",
+  "framework": "vLLM",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A–F). Standard vLLM configuration, no custom patches.",
+  "supersedes_chain": [],
+  "notes": "Decouple runners from suite and scenario knowledge — load_model() uses use_async from parallelism dict instead of checking scenario name.",
+  "created": "2026-04-03"
+}

@@ -28,19 +28,16 @@ jobs:
       - name: Detect changed runner folders
         id: changed
         run: |
-          BASE_FILES="benchmark_runner.py collect_env.py validate_submission.py \
-                      validate_runners.py hash_runner.py meta.schema.json \
-                      protocol.py template __init__.py __pycache__"
+          # Runner folders always match the schema pattern: {platform}_{name}_{8hexchars}
+          # Filter on that regex instead of an allowlist — nothing to keep in sync.
           CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
           FOLDERS=""
           while IFS= read -r f; do
             if echo "$f" | grep -qE '^runners/[^/]+/'; then
               folder=$(echo "$f" | cut -d'/' -f2)
-              is_base=false
-              for base in $BASE_FILES; do
-                [ "$folder" = "$base" ] && is_base=true && break
-              done
-              [ "$is_base" = "false" ] && FOLDERS="$FOLDERS $folder"
+              if echo "$folder" | grep -qE '^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$'; then
+                FOLDERS="$FOLDERS $folder"
+              fi
             fi
           done <<< "$CHANGED"
           FOLDERS=$(echo "$FOLDERS" | tr ' ' '\n' | sort -u | grep -v '^$' | tr '\n' ' ')

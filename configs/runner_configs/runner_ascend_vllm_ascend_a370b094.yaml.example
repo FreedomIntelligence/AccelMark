@@ -1,0 +1,27 @@
+# AccelMark runner config — ascend_vllm_ascend_68a18363 (vllm-ascend on Ascend NPU)
+#
+# Copy this file to runner_ascend_vllm_ascend_68a18363.yaml (remove .example suffix)
+# and edit as needed for your hardware.
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults ────────────────────────────────────────────────────────────
+
+# Tensor parallel size — number of NPUs to use (default: 1)
+tensor_parallel_size: 1
+
+# Disable graph compilation (default: false).
+enforce_eager: false
+
+# Maximum number of sequences in a batch (default: 512).
+max_num_seqs: 512
+
+# Pass-through kwargs forwarded directly to vllm-ascend LLM() / AsyncEngineArgs().
+# engine_kwargs:
+#   block_size: 16
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+
+suites:
+  suite_D:
+    max_num_seqs: 64

@@ -145,7 +145,7 @@ if __name__ == "__main__":
     MyFrameworkRunner().main()
 ```
 
-See the [reference implementation](nvidia_vllm_6e78e779/runner.py) and
+See the [reference implementation](nvidia_vllm_2b3890cf/runner.py) and
 [DEVELOPMENT.md](../DEVELOPMENT.md) for a full working example.
 
 ### Step 2 — Compute the hash and name your folder
@@ -230,7 +230,7 @@ Override these class attributes in your runner to declare what the framework sup
 | `SUPPORTS_STREAMING` | `True` | Set `False` if no token streaming API — TTFT cannot be measured, online/interactive/sustained scenarios are skipped |
 | `SUPPORTS_BATCHING` | `True` | Set `False` if serial only (e.g. mlx-lm) — offline runs one prompt at a time |
 | `SUPPORTS_ONLINE` | `True` | Set `False` if framework cannot handle concurrent requests |
-| `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism — `--tensor-parallel-size` is ignored |
+| `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism — tensor_parallel_size from runner config and CLI is ignored; runner always uses 1 chip |
 | `SUPPORTED_PRECISIONS` | `["bf16", "fp16", "fp32"]` | Maximum compute precisions on capable hardware. Hardware detection automatically restricts this (V100 → FP16, MI100 → FP16, M1 → FP16). Only restrict below the default if your framework genuinely cannot use a precision regardless of hardware. |
 | `SUPPORTED_QUANTIZATIONS` | `[]` | Quantization formats supported for Suite C. Use uppercase strings: `"FP8"`, `"W8A8"`, `"W8A16"`, `"W4A16"`. BF16 is always supported and does not need to be listed. Empty list means this runner skips all quantized formats in Suite C. |
 
@@ -319,7 +319,7 @@ mv runners/nvidia_vllm_tmp runners/nvidia_vllm_b3f29a11
 
 # 4. Update the new folder's meta.json
 #    Set "id" to the new folder name
-#    Add "supersedes": "nvidia_vllm_0ac7f5ba"
+#    Add "supersedes_chain": ["nvidia_vllm_0ac7f5ba"]  (prepend new entry on each subsequent update)
 
 # 5. Add "deprecated_by" to the OLD folder's meta.json
 #    "deprecated_by": "nvidia_vllm_b3f29a11"
@@ -345,22 +345,24 @@ Use `run.py` at the repo root to run any runner:
 python run.py --list
 
 # Run the default benchmark (offline + online + interactive + accuracy)
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
 
 # Run a specific scenario only
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario offline
 
 # Run extra scenarios (e.g. sustained load test)
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario sustained
 
 # Run everything including extras
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario all
 
-# Multi-GPU
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_B --tensor-parallel-size 4
+# Multi-GPU (--tensor-parallel-size is a runner-specific flag, not a base class flag)
+# Can also be set via tensor_parallel_size: 4 in
+# configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_B --tensor-parallel-size 4
 
 # Use a local model path
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --model-path /path/to/model
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --model-path /path/to/model
 ```
 
 Results are written to `results/community/{chip}_{suite}_{runner_id}/`.
@@ -377,7 +379,7 @@ OpenAI-compatible inference server:
 ```bash
 pip install -r serve/requirements.txt
 
-python run.py --runner nvidia_vllm_6e78e779 --serve --port 8000
+python run.py --runner nvidia_vllm_2b3890cf --serve --port 8000
 ```
 
 See [serve/README.md](../serve/README.md) for full documentation.

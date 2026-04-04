@@ -17,6 +17,6 @@ producing a distribution representative of interactive consumer inference worklo
 
 ## Difference from sharegpt_standard_v1
 
-`sharegpt_standard_v1` (used by Suites A–E) has p50 input ~280 tokens and p50 output ~310 tokens.
+`sharegpt_standard_v1` (Suites A, B, C, and E) has p50 input ~280 tokens and p50 output ~310 tokens.
 `sharegpt_edge_v1` uses shorter prompts to keep benchmark runtime practical on consumer GPUs
 and to reflect the latency-sensitive interactive use cases they are typically deployed for.

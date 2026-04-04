@@ -1,0 +1,31 @@
+# AccelMark runner config — amd_vllm_rocm_d65c6686 (vLLM-ROCm on AMD)
+#
+# Copy this file to runner_amd_vllm_rocm_d65c6686.yaml (remove .example suffix)
+# and edit as needed for your hardware.
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults ────────────────────────────────────────────────────────────
+
+# Tensor parallel size — number of GPUs to use (default: 1)
+tensor_parallel_size: 1
+
+# Disable HIP graph compilation (ROCm equivalent of enforce_eager).
+enforce_eager: false
+
+# Maximum number of sequences in a batch (default: 512).
+max_num_seqs: 512
+
+# Fraction of GPU memory for the KV cache (default: 0.90).
+gpu_memory_utilization: 0.90
+
+# Pass-through kwargs forwarded directly to vLLM LLM() / AsyncEngineArgs().
+# engine_kwargs:
+#   swap_space: 8
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+
+suites:
+  suite_D:
+    max_num_seqs: 64
+    gpu_memory_utilization: 0.85

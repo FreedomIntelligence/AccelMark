@@ -10,9 +10,9 @@ AI accelerators apples-to-apples.
 | Suite | Model | Chips | Scenarios | Purpose |
 |-------|-------|-------|-----------|---------|
 | [Suite A](#suite-a) | Llama-3-8B-Instruct | 1 | offline, online, interactive | Standard single-chip inference. **Required for leaderboard entry.** |
-| [Suite B](#suite-b) | Llama-3-70B-Instruct | flexible | offline, online | Large model multi-chip inference |
-| [Suite C](#suite-c) | Llama-3.1-8B-Instruct | 1 | offline | Quantization efficiency (BF16/FP8/W8A8/W8A16/W4A16) |
-| [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline, interactive | Long-context inference (32K tokens) |
+| [Suite B](#suite-b) | Llama-3-70B-Instruct | flexible | offline, online (+ interactive, sustained extra) | Large model multi-chip inference |
+| [Suite C](#suite-c) | Llama-3.1-8B-Instruct | 1 | offline (+ online, sustained extra) | Quantization efficiency (BF16/FP8/W8A8/W8A16/W4A16) |
+| [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline, interactive | Long-context inference (~28K input tokens) |
 | [Suite E](#suite-e) | Llama-3-8B-Instruct | 1×/2×/4×/8× | offline | Multi-chip scaling efficiency |
 | [Suite F](#suite-f) | Qwen2.5-0.5B-Instruct | 1 (recommended) | offline, online, interactive | Consumer/edge single-GPU inference |
 
@@ -48,32 +48,26 @@ Times on other hardware will differ.
 ¹ Measured on NVIDIA A100 SXM4 80 GB with vLLM as reference. Recorded in `meta.benchmark_elapsed_minutes` of each result.json.
 ² Suite F measured on NVIDIA A100 SXM4 40 GB with vLLM 0.6.6.post1. Online is dominated by QPS=2 (low-rate Poisson arrival with 500 requests takes ~4 min per run × 3 runs).
 
-> **Sustained scenario** (extra, opt-in): adds ~30 min to any suite that supports it.
-> Run with `--scenario sustained`. Not included in default suite runs.
+> **Sustained scenario** (extra, opt-in): typically adds ~30 minutes wall time on datacenter suites (A–E); Suite F uses a **15-minute** sustained profile. Run with `--scenario sustained`. Not included in default suite runs.
 
 ---
 
 ## Request Count Design
 
-Each scenario uses a different request count, optimized for statistical
-reliability within the time budget:
+Counts are defined per suite in `suites/<suite_id>/suite.json`. Typical patterns:
 
 ```
-offline:      200 requests
-              ├── Throughput is a bulk metric — 200 requests is enough
-              │   for a stable median across 3 runs
-              └── More requests don't improve accuracy meaningfully
+offline:      Often 200 requests (Suites A, B, C, F) — throughput is a bulk metric
+              Suite D: 100 (long context). Suite E: 500 (scaling comparability).
 
-online:       500 requests per QPS level
-              ├── p99 latency needs enough samples to be reliable
-              │   (p99 of 500 = the 495th value, statistically stable)
-              └── Each QPS level runs 3 times for median
+online:       Often 500 per QPS level (A, B, C, F) — enough samples for stable p99
+              Suite D: 50 (long context).
 
-interactive:  100 requests
-              ├── Serial execution (one at a time) — 100 is the limit
-              │   before the time budget is exceeded
-              └── p99 of 100 = the 99th value, acceptable for latency
+interactive:  Often 100 (A, F); Suite D: 50. Serial execution (one at a time).
 ```
+
+Always use the suite’s `request_count`, `online_request_count`, and
+`interactive_request_count` fields as the source of truth.
 
 ---
 
@@ -93,7 +87,7 @@ Measures maximum throughput when all requests are sent at once.
 vLLM's internal scheduler handles batching.
 
 ```
-concurrency_levels: [1, 4, 16, 64]   — client-side concurrency (requests sent simultaneously)
+concurrency_levels: [8, 32, 128]   — client-side concurrency (requests sent simultaneously)
 request_count: 200
 num_runs: 3 + 1 warmup
 Primary metric: throughput_tokens_per_sec (input + output tokens)
@@ -131,9 +125,11 @@ as the benchmark. Runs automatically as the first step when running a suite.
 
 ```
 accuracy_questions: 100
-accuracy_threshold_delta: 0.03  — valid if score ≥ BF16_baseline − 0.03
+accuracy_threshold_delta: 0.10  — valid if score ≥ baseline − 0.10 (see suite.json)
 Primary metric: subset_score (fraction correct)
 ```
+
+Suite C uses per-format `accuracy_thresholds` in `suite_C/suite.json` instead of a single delta.
 
 ### Sustained scenario (extra)
 
@@ -158,7 +154,7 @@ Key output metrics:
 Run explicitly with `--scenario sustained`. Not part of the default run.
 
 ```bash
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario sustained
 ```
 
 ---
@@ -173,8 +169,9 @@ Chips:     flexible — use however many your hardware requires
 Precision: BF16
 ```
 
-Same scenario structure as Suite A (offline + online) at 70B scale.
-The chip count is flexible — use however many chips your hardware needs.
+Default scenarios match Suite A’s **offline + online** workload at 70B scale.
+Optional **interactive** and **sustained** scenarios are defined in `suite_B/suite.json`
+(`scenarios.extra`). The chip count is flexible — use however many chips your hardware needs.
 
 **Scaling efficiency** vs Suite A (reference: N chips used for Suite B):
 ```
@@ -200,7 +197,8 @@ occupies most GPU memory, leaving less room for KV cache than the 8B model.
 
 > *"How much faster does quantization make this chip, and what quality is lost?"*
 
-Suite C runs the same workload as Suite A at five precision formats using
+Suite C runs a similar offline workload to Suite A (same dataset, `output_tokens_max` 512)
+at five precision formats using
 fixed pre-quantized HuggingFace checkpoints. All formats use the same
 Llama-3.1-8B base model — accuracy differences reflect quantization only,
 not model version differences.
@@ -224,8 +222,9 @@ not model version differences.
 | W8A16 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16` | ±0.03 | INT8 weights, FP16 activations |
 | W4A16 | `RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16` | ±0.05 | INT4 weights (AWQ), FP16 activations |
 
-Each format runs against the same 200 prompts with the same concurrency
-sweep. Format availability depends on the runner's `SUPPORTED_QUANTIZATIONS`
+Each format runs against the same 200 prompts with concurrency levels
+`[1, 4, 16, 64]` from `suite_C/suite.json` (not the same sweep as Suite A’s
+`[8, 32, 128]`). Format availability depends on the runner's `SUPPORTED_QUANTIZATIONS`
 declaration — unsupported formats are skipped automatically.
 
 ### Metrics
@@ -284,7 +283,7 @@ models:
 ### Running Suite C
 
 ```bash
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_C
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_C
 ```
 
 Runs all supported formats in sequence. Each format is a separate subprocess
@@ -297,15 +296,18 @@ for clean GPU state. BF16 always runs first as the baseline.
 **Long-context inference**
 
 ```
-Model:         meta-llama/Llama-3.1-8B-Instruct  (128K context window)
+Model:         meta-llama/Llama-3.1-8B-Instruct  (128K native context window)
 Chips:         1
 Precision:     BF16
-Input tokens:  ~32,000
+max_model_len: 30208   (KV budget for this benchmark)
+Input tokens:  p50 ~28,650 (dataset sharegpt_longctx_v1; p99 ~29,932)
 Output tokens: up to 256
 ```
 
 Tests the chip's ability to handle long-context workloads. Llama-3.1-8B
-is used (not 3.0) because it natively supports 128K context.
+is used (not 3.0) because it natively supports 128K context. The suite caps
+`max_model_len` at 30,208 and uses prompts near **~28K** tokens (not full 32K)
+so runs remain reproducible and within practical memory limits on common GPUs.
 
 ```
 concurrency_levels: [1, 4]
@@ -314,7 +316,7 @@ num_runs: 2 + 1 warmup
 Primary metric: throughput_tokens_per_sec
 ```
 
-Long-context inference is dominated by the **prefill phase** (32K input tokens),
+Long-context inference is dominated by the **prefill phase** (~28K input tokens),
 which is compute-bound and tests raw FLOPS more than memory bandwidth.
 
 **OOM on some batch sizes is expected and recorded as valid data.**
@@ -330,7 +332,7 @@ duration_minutes: 30
 
 **A100 reference result:** 52 tok/s sustained, throttle ratio 0.85,
 throttle onset at minute 13. Low absolute throughput is expected due to
-the 32K input token prefill overhead — what matters is the throttle ratio
+the ~28K input token prefill overhead — what matters is the throttle ratio
 relative to peak.
 
 ---
@@ -359,10 +361,11 @@ scaling_efficiency = N_chip_throughput / (1_chip_throughput × N)
 ```
 
 ```
-concurrency_levels: [1, 4, 16, 64]
+concurrency_levels: [8, 32, 128]
 request_count: 500
 num_runs: 3 + 1 warmup
 chip_counts_required: [1, 2]
+chip_counts_optional: [4, 8]
 chip_counts_all: [1, 2, 4, 8]
 ```
 
@@ -370,10 +373,10 @@ chip_counts_all: [1, 2, 4, 8]
 
 ```bash
 # 4-chip machine
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_E --max-chips 4
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_E --max-chips 4
 
 # 8-chip machine
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_E --max-chips 8
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_E --max-chips 8
 ```
 
 **Minimum requirement:** both 1× and 2× must succeed for the submission
@@ -390,7 +393,7 @@ version rather than modifying the existing one.
 | Dataset | Used by | Prompts | Input p50 | Output p50 |
 |---|---|---|---|---|
 | `sharegpt_standard_v1` | Suite A, B, C, E | 500 | ~280 tokens | ~310 tokens |
-| `sharegpt_longctx_v1` | Suite D | 200 | ~28,000 tokens | ~300 tokens |
+| `sharegpt_longctx_v1` | Suite D | 200 | p50 ~28,650 tokens | up to 256 (suite cap) |
 | `sharegpt_edge_v1` | Suite F | 500 | ~95 tokens | ~150 tokens |
 
 Suite JSON files reference datasets by name:
@@ -419,8 +422,6 @@ reasoning:       10%  — step-by-step analysis, math
 
 ---
 
----
-
 ## Suite F
 
 **Consumer/edge single-GPU inference**
@@ -436,7 +437,8 @@ and pre-Ampere hardware including V100 and T4. The model (0.5B parameters,
 ~1 GB in FP16) fits comfortably on any GPU with 4+ GB VRAM.
 
 **Precision handling**
-`precision_required: BF16` with `allowed_precisions: [BF16, FP16]`. Ampere+ GPUs
+`precision_required: BF16` with `allowed_precisions: [FP16, BF16]` (order matches
+`suite_F/suite.json`). Ampere+ GPUs
 (RTX 3090/4090, A100, H100) use BF16 natively. Pre-Ampere GPUs (V100, T4, RTX 20xx)
 automatically fall back to FP16 via `allowed_precisions` — no warning, no flag, since
 FP16 is an explicitly accepted precision for this suite. Results are labeled with
@@ -467,21 +469,36 @@ request_count:         200 (offline), 500 (online), 100 (interactive)
 num_runs:              3 + 1 warmup
 ```
 
+### Sustained scenario (extra)
+
+Shorter wall time than datacenter suites so consumer GPUs stay within a practical budget.
+
+```
+sustained_concurrency: 32
+duration_minutes: 15
+sample_interval_seconds: 60
+warmup_minutes: 1
+```
+
+Run with `--scenario sustained`. Not part of the default run.
+
 ### Running Suite F
 
 ```bash
 # Standard run (Ampere+)
-python runners/nvidia_vllm_6e78e779/runner.py --suite suite_F
+python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F
 
 # Pre-Ampere GPU (V100, T4, RTX 20xx) — required flag
-python runners/nvidia_vllm_6e78e779/runner.py --suite suite_F --enforce-eager
+python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F --enforce-eager
+# Or set persistently: enforce_eager: true in
+# configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml under suites.suite_F
 
 # Single scenario
-python runners/nvidia_vllm_6e78e779/runner.py --suite suite_F --scenario offline
+python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F --scenario offline
 ```
 
 For runner-specific hardware compatibility details (including pre-Ampere guidance),
-see `runners/nvidia_vllm_6e78e779/README.md`.
+see `runners/nvidia_vllm_2b3890cf/README.md`.
 
 ### Multi-chip note
 

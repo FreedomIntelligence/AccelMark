@@ -40,10 +40,14 @@
       "type": ["string", "null"],
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
     },
-    "supersedes": {
-      "type": ["string", "null"],
-      "description": "ID of the runner this one replaces. Optional.",
-      "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$"
+    "supersedes_chain": {
+      "type": ["array", "null"],
+      "description": "Ordered ancestry of superseded runner IDs, from most-recent to oldest. supersedes_chain[0] is the immediate predecessor. Allows the validator to resolve results that reference any runner in the lineage across multiple generations. May be empty for founding runners with no predecessors.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$"
+      },
+      "minItems": 0
     },
     "deprecated_by": {
       "type": ["string", "null"],

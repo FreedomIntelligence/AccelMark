@@ -36,10 +36,12 @@ AccelMark/
 │   ├── suite_B/suite.json + requests.jsonl
 │   ├── suite_C/suite.json + suite.py + requests.jsonl
 │   ├── suite_D/suite.json + requests.jsonl
-│   └── suite_E/suite.json + suite.py + requests.jsonl
+│   ├── suite_E/suite.json + suite.py + requests.jsonl
+│   └── suite_F/suite.json + requests.jsonl
 ├── datasets/
 │   ├── sharegpt_standard_v1/requests.jsonl  ← 500 prompts, ~280/310 tok
-│   └── sharegpt_longctx_v1/requests.jsonl   ← 200 prompts, ~28K input tok
+│   ├── sharegpt_longctx_v1/requests.jsonl   ← 200 prompts, ~28K input tok (Suite D)
+│   └── sharegpt_edge_v1/requests.jsonl      ← 500 prompts, short-turn (Suite F)
 ├── serve/
 │   ├── server.py           ← FastAPI OpenAI-compatible API
 │   ├── adapter.py          ← Pydantic request/response models
@@ -87,7 +89,7 @@ a deterministic string computed from the hardware + software + suite + submitter
 config. Example:
 
 ```
-results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f
+results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_c2bcf41f
                   └──chip──────────────┘ └suite┘ └──runner──────────────┘ └run_id┘
 ```
 
@@ -288,7 +290,7 @@ Override these class attributes to declare what your framework supports:
 | `SUPPORTS_STREAMING` | `True` | Set `False` if framework has no token streaming API. TTFT will not be measured for online/interactive/sustained. |
 | `SUPPORTS_BATCHING` | `True` | Set `False` if framework is serial only (e.g. mlx-lm). Offline runs requests one-by-one. |
 | `SUPPORTS_ONLINE` | `True` | Set `False` if framework cannot handle concurrent requests. Online scenario is skipped. |
-| `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism. `--tensor-parallel-size` is ignored. |
+| `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism. tensor_parallel_size from runner config and CLI is ignored. |
 | `SUPPORTED_PRECISIONS` | `["bf16", "fp16", "fp32"]` | Maximum compute precisions on capable hardware. Hardware detection automatically restricts this at runtime. See *Precision resolution* below. |
 
 ### Example: Apple Silicon (no batching, no streaming)
@@ -490,13 +492,13 @@ Copy the closest existing suite and modify. Required fields:
   },
   "output_tokens_max": 512,
   "concurrency_levels": [8, 32, 128],
-  "online_qps_levels": [5, 10, 25, 50, 100],
+  "online_qps_levels": [5, 25, 100],
   "online_sla_ttft_ms": 500,
   "num_runs": 3,
   "warmup_runs": 1,
   "online_warmup_runs": 0,
   "interactive_warmup_runs": 0,
-  "accuracy_threshold_delta": 0.03,
+  "accuracy_threshold_delta": 0.1,
   "request_count": 200,
   "online_request_count": 500,
   "interactive_request_count": 100
@@ -542,7 +544,7 @@ Dataset format (one JSON object per line):
 Run the accuracy check on reference hardware (A100) and record the score:
 
 ```bash
-python run.py --runner nvidia_vllm_6e78e779 \
+python run.py --runner nvidia_vllm_2b3890cf \
     --suite suite_X \
     --scenario accuracy \
     --model-path /path/to/model
@@ -615,14 +617,23 @@ suites/
 ├── suite_A/
 │   ├── suite.json        ← no suite.py needed
 │   └── requests.jsonl
+├── suite_B/
+│   ├── suite.json
+│   └── requests.jsonl
 ├── suite_C/
 │   ├── suite.json
 │   ├── suite.py          ← custom quantization orchestration
 │   └── requests.jsonl
-└── suite_E/
+├── suite_D/
+│   ├── suite.json
+│   └── requests.jsonl    ← long-context; no suite.py
+├── suite_E/
+│   ├── suite.json
+│   ├── suite.py          ← custom scaling orchestration
+│   └── requests.jsonl
+└── suite_F/
     ├── suite.json
-    ├── suite.py          ← custom scaling orchestration
-    └── requests.jsonl
+    └── requests.jsonl    ← consumer/edge; no suite.py
 ```
 
 ### Required interface
@@ -870,14 +881,14 @@ Use `"type": ["your_type", "null"]` to make fields optional.
 Before opening a PR that adds a new runner, validate it locally:
 
 ```bash
-python runners/validate_runners.py runners/nvidia_vllm_6e78e779/
+python runners/validate_runners.py runners/nvidia_vllm_2b3890cf/
 ```
 
 This validates a single runner folder and tells you clearly whether it is
 ready to submit:
 
 ```
-Validating: nvidia_vllm_6e78e779/
+Validating: nvidia_vllm_2b3890cf/
 ==================================================
 Files:
   ✓ runner.py
@@ -895,7 +906,7 @@ Duplicate check:
   ✓ No existing runner with this ID
 
 ==================================================
-✓ PASSED — nvidia_vllm_6e78e779 is ready to submit
+✓ PASSED — nvidia_vllm_2b3890cf is ready to submit
 ==================================================
 ```
 
@@ -907,11 +918,10 @@ Duplicate check:
 | `meta.json` schema | Validates required fields: `id`, `platform`, `name`, `framework`, `submitted_by`, `description` |
 | `meta.id == folder name` | The ID in metadata must exactly match the folder name |
 | No duplicate IDs | Checks that no existing runner in `runners/` shares the same ID |
-| `supersedes` target exists | Warning if the referenced old runner folder is not found |
 | `deprecated_by` target exists | Warning if the referenced new runner folder is not found |
 
 `requirements.txt` absence is a warning, not an error.
-`supersedes` and `deprecated_by` cross-reference failures are also warnings —
+`deprecated_by` cross-reference failures are also warnings —
 the referenced folder may not be merged yet when validating locally.
 
 **Hash mismatch** is the most common failure after editing `runner.py` without
@@ -921,14 +931,14 @@ renaming the folder. The error message tells you exactly what to do:
   ✗ Hash mismatch.
       Folder ends with : e0859b3c
       runner.py hashes to: 6e78e779
-      Rename folder to: nvidia_vllm_6e78e779
+      Rename folder to: nvidia_vllm_2b3890cf
 ```
 
 To compute the correct name before creating a new runner folder:
 
 ```bash
 python runners/hash_runner.py path/to/your/runner.py
-# → nvidia_vllm_6e78e779
+# → nvidia_vllm_2b3890cf
 ```
 
 CI runs the same validator across all runner folders automatically on every PR.
@@ -945,27 +955,27 @@ point to the exact code that produced them.
 ```bash
 # Make your changes, then compute the new ID
 python runners/hash_runner.py runners/nvidia_vllm_old_hash/runner.py
-# → nvidia_vllm_6e78e779
+# → nvidia_vllm_2b3890cf
 ```
 
 **Step 2: Create the new runner folder**
 
 ```bash
-cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_6e78e779
-# Apply your edits to runners/nvidia_vllm_6e78e779/runner.py
+cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_2b3890cf
+# Apply your edits to runners/nvidia_vllm_2b3890cf/runner.py
 ```
 
 **Step 3: Update `meta.json` in the new folder**
 
 ```json
 {
-  "id":           "nvidia_vllm_6e78e779",
+  "id":           "nvidia_vllm_2b3890cf",
   "platform":     "nvidia",
   "name":         "vLLM on NVIDIA (reference implementation)",
   "framework":    "vLLM",
   "submitted_by": "JuhaoLiang1997",
   "description":  "...",
-  "supersedes":   "nvidia_vllm_old_hash",
+  "supersedes_chain": ["nvidia_vllm_old_hash"],
   "notes":        null,
   "created":      "YYYY-MM-DD"
 }
@@ -978,15 +988,15 @@ cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_6e78e779
 ```json
 {
   "id":            "nvidia_vllm_old_hash",
-  "deprecated_by": "nvidia_vllm_6e78e779",
-  "notes":         "Deprecated — use nvidia_vllm_6e78e779. Fixed edge case in release_resources()."
+  "deprecated_by": "nvidia_vllm_2b3890cf",
+  "notes":         "Deprecated — use nvidia_vllm_2b3890cf. Fixed edge case in release_resources()."
 }
 ```
 
 **Step 5: Validate and submit**
 
 ```bash
-python runners/validate_runners.py runners/nvidia_vllm_6e78e779/
+python runners/validate_runners.py runners/nvidia_vllm_2b3890cf/
 ```
 
 Open a PR that includes both the new folder and the updated old `meta.json`.
@@ -1028,7 +1038,7 @@ python run.py --runner your_platform_{hash8} --help
 ```bash
 # Run with minimal requests to test the pipeline end-to-end
 # Temporarily reduce request_count for testing only
-python run.py --runner nvidia_vllm_6e78e779 \
+python run.py --runner nvidia_vllm_2b3890cf \
     --suite suite_A \
     --scenario offline \
     --output-dir /tmp/accelmark_test/

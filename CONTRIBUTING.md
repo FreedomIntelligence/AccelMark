@@ -14,7 +14,7 @@ in the leaderboard and submitting your results.
 # 1. Clone and install
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
-pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
+pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
 
 # 2. Set your name (one-time setup)
 cp configs/submitter.yaml.example configs/submitter.yaml
@@ -23,8 +23,8 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 # 3. Run the benchmark (~50 min on A100)
 #    Accuracy gate runs automatically before the benchmark starts.
 #    Output directory is auto-named using run_name, e.g.:
-#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
+#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_c2bcf41f
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
 
 # 4. Submit — open a GitHub Issue and paste your result.json
 # https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
@@ -41,7 +41,7 @@ That's it. The CI bot handles the rest.
 Each runner ships its own `requirements.txt`. Install for the runner you want to use:
 
 ```bash
-pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
+pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
 ```
 
 To see all available runners and their install commands:
@@ -94,7 +94,7 @@ need `--model-path` on the command line.
 ### Recommended: run the full suite
 
 ```bash
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
 ```
 
 This runs the suite's default scenarios (accuracy gate → offline → online → interactive)
@@ -106,24 +106,24 @@ or `--scenario offline` (or any other scenario name) to run a single scenario.
 
 ```bash
 # Override the output directory if needed
-python run.py --runner nvidia_vllm_6e78e779 \
+python run.py --runner nvidia_vllm_2b3890cf \
     --suite suite_A \
-    --output-dir ./results/verified/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_c2bcf41f
+    --output-dir ./results/verified/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_c2bcf41f
 ```
 
 ### Run a single scenario
 
 ```bash
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario offline
 ```
 
 ### Multi-chip (Suite B and above)
 
 ```bash
 # Suite B: Llama-3-70B on 4 chips
-python run.py --runner nvidia_vllm_6e78e779 \
+python run.py --runner nvidia_vllm_2b3890cf \
     --suite suite_B \
-    --tensor-parallel-size 4
+    --tensor-parallel-size 4  # (or set tensor_parallel_size: 4 in the runner config yaml)
 ```
 
 Suite B does not require a specific chip count — use however many chips
@@ -141,13 +141,28 @@ and measures how efficiently throughput scales. Specify the maximum chip count
 you want to test:
 
 ```bash
-python run.py --runner nvidia_vllm_6e78e779 \
-    --suite suite_E \
-    --max-chips 4
+python run.py --runner nvidia_vllm_2b3890cf \
+    --suite suite_E
 ```
+
+Set the chip count range via `tensor_parallel_size` in the runner config yaml,
+or pass `--tensor-parallel-size` directly to the runner.
 
 Suite E handles the scaling automatically — it runs at 1×, 2×, and 4× chips
 sequentially and computes `scaling_efficiency = N_chip_throughput / (1_chip_throughput × N)`.
+
+### Suite F: consumer / edge
+
+Suite F uses **Qwen2.5-0.5B-Instruct** and short prompts (`sharegpt_edge_v1`).
+It is aimed at single-GPU consumer hardware (≥4 GB VRAM). On pre-Ampere GPUs,
+use `--enforce-eager` with the NVIDIA vLLM runner — see
+[runners/nvidia_vllm_2b3890cf/README.md](runners/nvidia_vllm_2b3890cf/README.md).
+
+```bash
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_F
+```
+
+Full specs: [suites/README.md](suites/README.md#suite-f).
 
 **Note on `concurrency` vs batch size:** The offline scenario sweeps
 *client-side concurrency* (how many requests the load generator fires
@@ -159,7 +174,7 @@ Results report `concurrency` values, not batch sizes.
 ### With a local model path
 
 ```bash
-python run.py --runner nvidia_vllm_6e78e779 \
+python run.py --runner nvidia_vllm_2b3890cf \
     --suite suite_A \
     --model-path /path/to/local/model
 ```
@@ -175,7 +190,7 @@ python run.py --runner nvidia_vllm_6e78e779 \
 | **offline** | tokens/sec | Max throughput when the GPU is fully loaded |
 | **online** | max valid QPS | How many users/sec this chip can serve within a latency SLA |
 | **interactive** | TTFT p99 | Single-user latency when the system is idle |
-| **sustained** | sustained tok/s + throttle ratio | Whether throughput degrades over a 30-minute run under constant load |
+| **sustained** | sustained tok/s + throttle ratio | Whether throughput degrades over a long fixed-concurrency run (typically 30 min; Suite F uses 15 min) |
 | **accuracy** | subset score | Model output quality against an MMLU baseline |
 
 Which scenarios are included in the default run and which are extras depends on
@@ -209,7 +224,7 @@ See [suites/README.md](suites/README.md) for full details on all suites and metr
 | D | ~60 min | Long-context |
 | E | ~24 min | Up to 4× scaling |
 
-Sustained adds ~30 min to any suite that supports it.
+Sustained adds about **30 minutes** on most suites; **Suite F** uses a **15-minute** sustained profile (`suite_F/suite.json`).
 
 ---
 
@@ -228,7 +243,7 @@ If accuracy fails, the benchmark is aborted.
 
 Score: 62/100 = 0.6200
 Baseline: 0.6000
-Delta: +0.0200 (min allowed: -0.03)
+Delta: +0.0200 (min allowed: -0.10 — matches `accuracy_threshold_delta` in many suites; Suite C uses per-format thresholds)
 Valid: True
 
   ✓ Accuracy gate passed: 0.62 (delta=0.02, valid=True)
@@ -252,7 +267,7 @@ Go to [Issues → New → Community Submission](https://github.com/JuhaoLiang199
 
 Paste the full contents of your `result.json` into the code block and submit.
 
-> **The CI bot validates your result automatically** — no need to run
+> **The CI bot validates your result automatically** — recommend to run
 > `validate_submission.py` locally first. If validation fails, the bot
 > comments on your issue explaining what to fix.
 
@@ -296,7 +311,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir /your/path/Meta-Llama-3-8B-Instruct
 
 # Use a local copy
-python run.py --runner nvidia_vllm_6e78e779 --model-path /your/path/...
+python run.py --runner nvidia_vllm_2b3890cf --model-path /your/path/...
 ```
 
 If your local copy was downloaded at a different revision, add a note in
@@ -403,5 +418,8 @@ leaderboard.
 - Vendor employees may submit results for their own chips (shown with a Vendor badge);
   disclose affiliation by tagging `[vendor]` in your submitter name
 - Results submitted with `--enforce-eager` are valid but noted — they may
-  underrepresent true hardware capability
+  underrepresent true hardware capability. `--enforce-eager` is a runner-specific
+  flag (not a base `run.py` flag); it can also be set permanently via
+  `enforce_eager: true` in the runner config yaml at
+  `configs/runner_configs/runner_<id>.yaml`.
 - Results submitted with `--skip-accuracy-gate` are permanently flagged

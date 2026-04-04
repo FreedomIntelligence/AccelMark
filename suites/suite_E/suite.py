@@ -22,32 +22,49 @@ def run(br, args, suite: dict, env_info: dict) -> None:
     - anything else → single scenario (offline/accuracy), use generic path
     """
     if args.scenario in ("default", "all"):
-        _run_suite_e(br, args, suite)
+        _run_suite_e(br, args, suite, env_info)
     else:
         br._setup_logging(args.output_dir)
         br._run_single_scenario(args, suite)
 
 
-def _run_suite_e(br, args, suite: dict) -> None:
+def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
     """Run Suite E: accuracy gate first, then offline at multiple chip counts."""
     base_dir = Path(args.output_dir)
     base_dir.mkdir(parents=True, exist_ok=True)
 
     all_counts      = suite.get("chip_counts_all", [1, 2, 4, 8])
     required_counts = suite.get("chip_counts_required", [1, 2])
-    max_chips       = getattr(args, "max_chips", None) or 4
+
+    # max_chips resolution:
+    #   1. Explicit --max-chips CLI flag (from runner or user)
+    #   2. Auto-detect from env_info accelerators list
+    #   3. Fall back to max in suite.json chip_counts_all
+    _explicit_max = getattr(args, "max_chips", None)
+    if _explicit_max:
+        max_chips    = _explicit_max
+        _chips_source = f"--max-chips={_explicit_max}"
+    else:
+        _detected = len(env_info.get("accelerators", []))
+        if _detected > 0:
+            max_chips    = _detected
+            _chips_source = f"auto-detected {_detected} GPU(s)"
+        else:
+            max_chips    = max(all_counts)
+            _chips_source = f"suite.json default"
+
     chip_counts     = [c for c in all_counts if c <= max_chips]
     skip_gate       = getattr(args, "skip_accuracy_gate", False)
     platform_script = sys.argv[0]
 
     if not chip_counts:
-        print(f"Error: --max-chips {max_chips} too low. Min: {min(required_counts)}")
+        print(f"Error: max_chips={max_chips} too low. Min: {min(required_counts)}")
         raise SystemExit(1)
 
     missing_required = [c for c in required_counts if c not in chip_counts]
     if missing_required:
         print(f"Warning: required counts {missing_required} excluded "
-              f"by --max-chips={max_chips}.")
+              f"(max_chips={max_chips}).")
 
     results_summary = []
     total_start     = time.perf_counter()
@@ -55,7 +72,7 @@ def _run_suite_e(br, args, suite: dict) -> None:
 
     print(f"\n{'='*60}")
     print(f"  Suite E — Scaling Efficiency Benchmark")
-    print(f"  Chip counts: {chip_counts}")
+    print(f"  Chip counts to test: {chip_counts}  (max_chips={max_chips} — {_chips_source})")
     print(f"  Base output: {base_dir}")
     print(f"{'='*60}\n")
 
@@ -135,13 +152,25 @@ def _run_suite_e(br, args, suite: dict) -> None:
             "--suite",    args.suite,
             "--scenario", "offline",
             "--output-dir", str(count_dir),
-            "--tensor-parallel-size", str(count),
             "--skip-accuracy-gate",
+            # Suite E always sets tensor_parallel_size = chip count for this iteration.
+            "--tensor-parallel-size", str(count),
         ]
         if getattr(args, "model_path", None):
             cmd += ["--model-path", args.model_path]
-        if getattr(args, "enforce_eager", False):
-            cmd += ["--enforce-eager"]
+
+        # Append runner-specific extra args, skipping --tensor-parallel-size
+        # since we already set it above for this specific chip count.
+        extra = br.get_extra_subprocess_args(args)
+        skip_next = False
+        for token in extra:
+            if token == "--tensor-parallel-size":
+                skip_next = True
+                continue
+            if skip_next:
+                skip_next = False
+                continue
+            cmd.append(token)
 
         print(f"  Command: {' '.join(cmd)}\n")
 
@@ -172,6 +201,9 @@ def _run_suite_e(br, args, suite: dict) -> None:
     if not successful:
         print("All chip counts failed — no result.json merged.")
         return
+
+    # Report max chips tested to base class for run_id and result.json
+    br._chip_count = max(chip_counts) if chip_counts else 1
 
     _merge_suite_e_results(br, base_dir, suite, successful, total_elapsed,
                            accuracy=acc_result)

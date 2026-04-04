@@ -1,10 +1,10 @@
 {
   "suite_id": "suite_D",
-  "description": "Single chip long-context inference, Llama-3.1-8B-Instruct (128K context). OOM at higher concurrency levels is expected and recorded.",
+  "description": "Single chip long-context inference, Llama-3.1-8B-Instruct (~28K context). OOM at higher concurrency levels is expected and recorded.",
   "model_id": "meta-llama/Llama-3.1-8B-Instruct",
   "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
   "dataset": "sharegpt_longctx_v1",
-  "max_model_len": 33792,
+  "max_model_len": 30208,
   "scenarios": {
     "default": ["accuracy", "offline", "interactive"],
     "extra": ["sustained", "online"]
@@ -12,17 +12,17 @@
   "precision_required": "BF16",
   "allowed_precisions": ["BF16", "FP16"],
   "request_distribution": {
-    "input_tokens_p25": 32202,
-    "input_tokens_p50": 32705,
-    "input_tokens_p75": 33290,
-    "input_tokens_p99": 35768,
+    "input_tokens_p25": 28245,
+    "input_tokens_p50": 28650,
+    "input_tokens_p75": 29210,
+    "input_tokens_p99": 29932,
     "output_tokens_p50": 256,
     "output_tokens_p99": 256,
     "source": "shibing624/sharegpt_gpt4"
   },
   "output_tokens_max": 256,
   "concurrency_levels": [1, 4],
-  "_concurrency_levels_note": "Client-side concurrency for long-context requests. Lower values used because 32K-token requests are memory-intensive.",
+  "_concurrency_levels_note": "Client-side concurrency for long-context requests. Lower values used because ~28K-token requests are memory-intensive.",
   "online_qps_levels": [0.5, 1, 2],
   "online_sla_ttft_ms": 5000,
   "online_sla_ttft_ms_relaxed": 10000,

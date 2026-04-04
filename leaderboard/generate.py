@@ -211,7 +211,7 @@ def extract_impl(result: dict) -> dict | None:
         "description":  meta.get("description"),
         "notes":        meta.get("notes"),
         "created":      meta.get("created"),
-        "supersedes":   meta.get("supersedes"),
+        "supersedes_chain": meta.get("supersedes_chain"),
         "deprecated_by": meta.get("deprecated_by"),
         "github_url":   f"https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/{impl_id}",
         "runner_url":   f"https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/{impl_id}/runner.py",

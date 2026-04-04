@@ -14,7 +14,7 @@
 
 | | The problem | AccelMark's answer |
 |---|---|---|
-| **MLPerf** | Rigorous but slow — only large vendors participate | Anyone with a GPU submits in under an hour |
+| **MLPerf** | Rigorous but slow — only large vendors participate | Community runs often finish in under an hour (e.g. Suite A ~50 min; Suite F much shorter) |
 | **Vendor whitepapers** | Different setups make cross-vendor comparison impossible | Fixed schema + shared LoadGen = apples-to-apples |
 | **Most benchmarks** | Cover only NVIDIA and only throughput | NVIDIA, AMD, Huawei Ascend, Apple Silicon — throughput, latency, scaling, quantization |
 
@@ -26,14 +26,14 @@
 # 1. Clone and install
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
-pip install -r runners/nvidia_vllm_6e78e779/requirements.txt
+pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
 
 # 2. One-time setup
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name
 
 # 3. Run the benchmark (~50 min on A100)
-python run.py --runner nvidia_vllm_6e78e779 --suite suite_A
+python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
 
 # 4. Submit — open a GitHub Issue and paste your result.json
 # https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
@@ -49,9 +49,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 |-------|-------|-------|-------------------|----------------|
 | **A** | Llama-3-8B | 1 | How fast is this chip at inference? | Offline tokens/sec |
 | **B** | Llama-3-70B | flexible | Can this chip serve large models? | Offline tokens/sec |
-| **C** | Llama-3-8B | 1 | Quantization speed/quality tradeoff? | Speedup vs BF16 |
-| **D** | Llama-3.1-8B | 1 | How does this chip handle 32K-token inputs? | Interactive TTFT p99 |
+| **C** | Llama-3.1-8B | 1 | Quantization speed/quality tradeoff? | Speedup vs BF16 |
+| **D** | Llama-3.1-8B | 1 | How does this chip handle 28K-token inputs? | Interactive TTFT p99 |
 | **E** | Llama-3-8B | 1×/2×/4×/8× | How well does this chip scale? | Scaling efficiency |
+| **F** | Qwen2.5-0.5B | 1 | How fast is this consumer/edge GPU? | Offline tokens/sec |
 
 See [suites/README.md](suites/README.md) for full specs, time budgets, SLA definitions, and metric descriptions.
 
@@ -59,13 +60,16 @@ See [suites/README.md](suites/README.md) for full specs, time budgets, SLA defin
 
 ## Supported platforms
 
-| Platform | Framework | A | B | C | D | E |
-|----------|-----------|:-:|:-:|:-:|:-:|:-:|
-| NVIDIA (H100/A100/A800) | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ |
-| NVIDIA (H100/A100) | TensorRT-LLM | ✓ | — | — | — | — |
-| AMD (MI300X) | vLLM ROCm | ✓ | — | — | — | — |
-| Huawei Ascend | MindIE | ✓ | — | — | — | — |
-| Apple Silicon | mlx-lm | ✓ | — | — | — | — |
+Reference runners live under `runners/` (see each folder’s `meta.json`). Checkmarks mark suites **implemented and runnable** with that runner in this repository.
+
+| Hardware | Runner folder | Framework | A | B | C | D | E | F |
+|----------|---------------|-----------|:-:|:-:|:-:|:-:|:-:|:-:|
+| NVIDIA GPU | `nvidia_vllm_2b3890cf` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| NVIDIA GPU | `nvidia_sglang_9f42fabb` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AMD GPU | `amd_vllm_rocm_523da458` | vLLM (ROCm) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Huawei Ascend NPU | `ascend_vllm_ascend_a370b094` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+
+Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 
 Adding a new platform? See [CONTRIBUTING.md#adding-support-for-a-new-platform](CONTRIBUTING.md#adding-support-for-a-new-platform).
 

@@ -42,8 +42,39 @@ def validate_schema(data: dict, schema: dict, label: str) -> list[str]:
     return errors
 
 
-def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
-    failures = []
+def _find_runner_successor(old_runner_id: str) -> str | None:
+    """
+    Scan runners/ for a meta.json whose supersedes_chain contains old_runner_id.
+
+    supersedes_chain is an ordered list of all ancestor runner IDs from
+    most-recent to oldest, so a single membership test covers any generation
+    depth.  For example, if the lineage is A → B → C and only C exists, C's
+    supersedes_chain is ["B", "A"], so both A and B resolve to C.
+
+    Returns the successor runner ID, or None if not found.
+    """
+    runners_dir = REPO_ROOT / "runners"
+    if not runners_dir.is_dir():
+        return None
+    for meta_path in runners_dir.glob("*/meta.json"):
+        try:
+            meta = json.loads(meta_path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        chain = meta.get("supersedes_chain") or []
+        if old_runner_id in chain:
+            return meta.get("id")
+    return None
+
+
+def check_hard_failures(result: dict, result_dir: Path) -> tuple[list[str], list[str]]:
+    """
+    Returns (failures, extra_warnings) where failures are hard errors and
+    extra_warnings are warnings that were downgraded from would-be hard errors
+    (e.g. a reproduce_script path referencing a superseded runner).
+    """
+    failures       = []
+    extra_warnings = []
 
     # num_runs >= 3
     suite_id = result.get("suite_id")
@@ -72,7 +103,13 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
     # referenced files must exist — search recursively under result_dir
     # Note: log_file (run.log) and samples_file (samples.jsonl) are gitignored
     # and will never be present in a PR submission — do not check them here.
+    #
+    # Special case for reproduce_script: if it points to a runner that has been
+    # superseded (identified via the successor's meta.json supersedes_chain),
+    # downgrade the missing-file error to a warning.
+    # env_info_file is always a hard error when missing — it is not runner-versioned.
     meta = result.get("meta", {})
+
     for field in ["reproduce_script", "env_info_file"]:
         ref = meta.get(field)
         if not ref:
@@ -81,6 +118,20 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
         ref_name = ref_path.name
         if ref_path.exists() or any(result_dir.rglob(ref_name)):
             continue
+
+        if field == "reproduce_script":
+            # Check whether this is a superseded runner path (runners/<old_id>/runner.py)
+            ref_parts = ref_path.parts   # e.g. ('runners', 'nvidia_vllm_6e78e779', 'runner.py')
+            old_runner_id = ref_parts[-2] if len(ref_parts) >= 2 else None
+            successor = _find_runner_successor(old_runner_id) if old_runner_id else None
+            if successor:
+                extra_warnings.append(
+                    f"meta.reproduce_script references '{ref}' which no longer exists — "
+                    f"runner '{old_runner_id}' has been superseded by '{successor}'. "
+                    f"This result was produced with the older runner and is still valid."
+                )
+                continue   # downgraded: not a hard error
+
         failures.append(f"meta.{field} references '{ref}' which does not exist")
 
     # model_revision must not be placeholder
@@ -88,7 +139,7 @@ def check_hard_failures(result: dict, result_dir: Path) -> list[str]:
     if "TO_BE_LOCKED" in model_revision or model_revision == "":
         failures.append("model.model_revision must be set to an actual git commit hash")
 
-    return failures
+    return failures, extra_warnings
 
 
 def check_soft_warnings(result: dict) -> list[str]:
@@ -129,10 +180,18 @@ def check_soft_warnings(result: dict) -> list[str]:
     else:
         runner_dir = REPO_ROOT / "runners" / impl_id
         if not runner_dir.exists():
-            warnings.append(
-                f"implementation_id '{impl_id}' does not match any folder in runners/. "
-                "Check the ID or submit your runner first."
-            )
+            successor = _find_runner_successor(impl_id)
+            if successor:
+                warnings.append(
+                    f"implementation_id '{impl_id}' no longer exists — "
+                    f"it has been superseded by '{successor}'. "
+                    "This result is still valid; future runs should use the newer runner."
+                )
+            else:
+                warnings.append(
+                    f"implementation_id '{impl_id}' does not match any folder in runners/. "
+                    "Check the ID or submit your runner first."
+                )
 
     return warnings
 
@@ -305,7 +364,9 @@ def main():
     all_errors.extend(validate_schema(result, result_schema, "result.json"))
 
     if not all_errors:
-        all_errors.extend(check_hard_failures(result, result_dir))
+        hard_failures, downgraded_warnings = check_hard_failures(result, result_dir)
+        all_errors.extend(hard_failures)
+        all_warnings.extend(downgraded_warnings)
         all_warnings.extend(check_soft_warnings(result))
         all_errors.extend(check_run_id_integrity(result))
         all_errors.extend(check_suite_e(result))

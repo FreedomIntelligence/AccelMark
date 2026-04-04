@@ -7,24 +7,26 @@ Usage:
     python run.py --list
 
     # Run a benchmark
-    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario all
+    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario all
 
-    # Run a benchmark on multi-le chip
-    python run.py --runner nvidia_vllm_6e78e779 --suite suite_B --scenario all --tensor-parallel-size 4
+    # Run a benchmark on multiple chips
+    # Set tensor_parallel_size in configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml
+    # or pass --tensor-parallel-size directly (supported by runners that accept it)
+    python run.py --runner nvidia_vllm_2b3890cf --suite suite_B --scenario all --tensor-parallel-size 4
 
     # Serve — using a suite for model + generation params
-    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --serve
+    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --serve
 
     # Serve — specifying the model directly (no suite required)
-    python run.py --runner nvidia_vllm_6e78e779 --model meta-llama/Llama-3.1-8B-Instruct --serve
+    python run.py --runner nvidia_vllm_2b3890cf --model meta-llama/Llama-3.1-8B-Instruct --serve
 
     # Serve — suite as base, override model and tune params
-    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --serve \\
+    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --serve \\
         --model meta-llama/Llama-3.1-8B-Instruct \\
         --max-tokens 4096 --port 8080 --workers 8 --api-key secret
 
     # All flags after --runner <id> are passed through to the runner unchanged (non-serve mode)
-    python run.py --runner nvidia_vllm_6e78e779 --suite suite_A --scenario offline --output-dir ./my_result
+    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario offline --output-dir ./my_result
 """
 
 import argparse
@@ -114,8 +116,8 @@ def cmd_list(args) -> int:
     for platform in sorted(by_platform):
         print(f"  {platform.upper()}")
         for rid, meta in by_platform[platform]:
-            deprecated_by = meta.get("deprecated_by")
-            supersedes    = meta.get("supersedes")
+            deprecated_by    = meta.get("deprecated_by")
+            supersedes_chain = meta.get("supersedes_chain") or []
 
             status = ""
             if deprecated_by and show_all:
@@ -124,8 +126,8 @@ def cmd_list(args) -> int:
             print(f"    {rid}{status}")
             print(f"      {meta.get('name', rid)}")
             print(f"      {meta.get('description', '')}")
-            if supersedes:
-                print(f"      Replaces: {supersedes}")
+            if supersedes_chain:
+                print(f"      Replaces: {supersedes_chain[0]}")
             req_path = RUNNERS_DIR / rid / "requirements.txt"
             if req_path.exists():
                 print(f"      Install: pip install -r runners/{rid}/requirements.txt")
@@ -167,9 +169,9 @@ def cmd_run(runner_id: str, runner_args: list[str]) -> int:
             print(f"Runner:  {meta.get('name', runner_id)}")
             print(f"ID:      {runner_id}")
             print(f"By:      {meta.get('submitted_by', '—')}")
-            supersedes = meta.get("supersedes")
-            if supersedes:
-                print(f"Replaces: {supersedes}")
+            supersedes_chain = meta.get("supersedes_chain") or []
+            if supersedes_chain:
+                print(f"Replaces: {supersedes_chain[0]}")
             print()
         except Exception:
             pass
@@ -189,7 +191,6 @@ def cmd_serve(
     model_path: str | None,
     max_tokens: int,
     max_model_len: int | None,
-    tp_size: int,
     port: int,
     host: str,
     workers: int,
@@ -292,8 +293,14 @@ def cmd_serve(
           + (f"  max_model_len={suite['max_model_len']}" if suite.get("max_model_len") else ""))
     print()
     try:
+        # Serve mode bypasses parse_args(), so load runner config directly here.
+        # This populates self._runner_config so load_model() can read named fields
+        # and engine_kwargs exactly as it does in benchmark mode.
+        _serve_cfg = runner._load_runner_config(suite_id)
+        runner._runner_config = _serve_cfg
+        _tp = _serve_cfg.get("tensor_parallel_size", 1)
         runner.load_model(effective_model_path, suite, {
-            "tensor_parallel_size":   tp_size,
+            "tensor_parallel_size":   _tp,
             "pipeline_parallel_size": 1,
             "expert_parallel_size":   1,
             "data_parallel_size":     1,
@@ -337,8 +344,6 @@ def _parse_serve_args(runner_args: list[str]) -> argparse.Namespace:
                         help=f"Max output tokens per request (default: {_SERVE_DEFAULT_MAX_TOKENS})")
     parser.add_argument("--max-model-len",        type=int, default=None, dest="max_model_len",
                         help="Max model context length — leave unset to let the framework decide")
-    parser.add_argument("--tensor-parallel-size", type=int, default=1, dest="tp_size",
-                        help="Tensor-parallel size / number of GPUs (default: 1)")
     parser.add_argument("--port",                 type=int, default=8000,
                         help="HTTP port to listen on (default: 8000)")
     parser.add_argument("--host",                 default="0.0.0.0",
@@ -394,7 +399,6 @@ def main() -> int:
             model_path=args.model_path,
             max_tokens=args.max_tokens,
             max_model_len=args.max_model_len,
-            tp_size=args.tp_size,
             port=args.port,
             host=args.host,
             workers=args.workers,

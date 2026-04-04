@@ -13,7 +13,7 @@
 
     "suite_id": {
       "type": "string",
-      "description": "Suite identifier. Standard suites: suite_A through suite_D. Mini suites: mini-nano, mini-mini, mini-standard, mini-pro. Custom: 'custom'."
+      "description": "Suite identifier. Standard suites: suite_A through suite_F. Mini suites: mini-nano, mini-mini, mini-standard, mini-pro. Custom: 'custom'."
     },
 
     "implementation_id": {

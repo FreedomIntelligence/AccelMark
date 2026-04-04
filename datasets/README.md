@@ -2,6 +2,14 @@
 
 Shared request datasets used across benchmark suites.
 
+| Dataset | Suites |
+|---------|--------|
+| `sharegpt_standard_v1` | A, B, C, E |
+| `sharegpt_longctx_v1` | D |
+| `sharegpt_edge_v1` | F |
+
+Each folder has its own `README.md` with token statistics and source notes.
+
 ## Directory naming
 
 ```

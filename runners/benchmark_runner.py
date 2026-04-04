@@ -110,7 +110,8 @@ class BenchmarkRunner(ABC):
 
     SUPPORTS_MULTI_CHIP: bool = True
     """True if tensor parallelism is supported.
-    If False, --tensor-parallel-size is ignored and always treated as 1."""
+    Set False if no tensor parallelism — tensor_parallel_size from runner config
+    and CLI is ignored; runner always uses 1 chip"""
 
     SUPPORTED_PRECISIONS: list[str] = ["bf16", "fp16", "fp32"]
     """
@@ -164,23 +165,34 @@ class BenchmarkRunner(ABC):
     # ── Abstract methods (must implement) ─────────────────────────────────────
 
     @abstractmethod
-    def load_model(self, model_path: str, suite: dict, parallelism: dict) -> None:
+    def load_model(self, model_path: str, parallelism: dict) -> None:
         """
         Load model weights into accelerator memory.
 
         Args:
             model_path:   Local path or HuggingFace model ID (already resolved
                           by _resolve_model_path()).
-            suite:        Parsed suite.json dict. Useful fields:
-                              suite["output_tokens_max"]  → max generation length
-                              suite["max_model_len"]      → context window limit
-            parallelism:  Dict of parallel sizes. Always contains these keys:
-                              "tensor_parallel_size":  int  (default 1)
-                              "pipeline_parallel_size": int  (default 1)
-                              "expert_parallel_size":  int  (default 1)
-                              "data_parallel_size":    int  (default 1)
+            parallelism:  Resolved engine configuration dict. Contains:
+                              "tensor_parallel_size":   int   (default 1)
+                              "pipeline_parallel_size":  int   (default 1)
+                              "expert_parallel_size":   int   (default 1)
+                              "data_parallel_size":     int   (default 1)
+                              "max_tokens":             int   — max generation tokens
+                              "max_model_len":          int|None — context window limit
+                              "use_async":              bool  — True when the scenario
+                                                         requires async streaming
+                                                         (online/interactive/sustained);
+                                                         False for offline/accuracy.
                           Read only the keys you need. New keys may be added
                           in future versions — ignore unknown keys.
+
+        Example:
+            def load_model(self, model_path, parallelism):
+                tp = parallelism["tensor_parallel_size"]
+                if parallelism["use_async"]:
+                    self.engine = AsyncEngine(model=model_path, tp=tp)
+                else:
+                    self.llm = LLM(model=model_path, tp=tp)
 
         Example:
             def load_model(self, model_path, suite, parallelism):
@@ -418,22 +430,27 @@ class BenchmarkRunner(ABC):
         """
         Return extra CLI args to pass when spawning scenario subprocesses.
 
-        Override in subclass if parse_args() adds custom arguments that must
-        be forwarded to each scenario subprocess in _run_all_scenarios().
+        Override in subclass to forward runner-specific flags to each scenario
+        subprocess spawned by _run_all_scenarios(). The base class subprocess
+        command includes only: --suite, --scenario, --output-dir, --tier,
+        --skip-accuracy-gate, --model-path (if set), --precision (if set).
 
-        The base class subprocess command includes all standard args
-        (--suite, --scenario, --output-dir, --tensor-parallel-size, --tier,
-        --model-path, --precision, --pipeline-parallel-size, --enforce-eager,
-        --expert-parallel-size, --data-parallel-size). Only add args here
-        that are NOT already in that list.
+        All runner-specific flags (parallelism, enforce_eager, etc.) MUST be
+        forwarded here. The base class no longer handles any of them.
+
+        Note: self._runner_config is NOT forwarded via subprocess args — each
+        subprocess reads the config yaml file independently on startup, which
+        is correct. Only flags that override config values need to be forwarded
+        (e.g. --tensor-parallel-size set explicitly on the CLI).
 
         Example:
             def get_extra_subprocess_args(self, args):
-                extra = []
-                if getattr(args, "max_num_seqs", None):
-                    extra += ["--max-num-seqs", str(args.max_num_seqs)]
-                if getattr(args, "quantization_config", None):
-                    extra += ["--quantization-config", args.quantization_config]
+                extra = [
+                    "--tensor-parallel-size",
+                    str(self._parallelism.get("tensor_parallel_size", 1)),
+                ]
+                if self._enforce_eager:
+                    extra += ["--enforce-eager"]
                 return extra
         """
         return []
@@ -490,16 +507,14 @@ class BenchmarkRunner(ABC):
           - submitted_by                            (submitter identity)
 
         Suite C: uses suite.precision_required ("BF16") — one run_id for all quantized formats.
-        Suite E: chip_count = tp_size * pp_size (max chips tested).
+        Suite E: chip_count is set to max chips tested by the suite plugin via self._chip_count.
         Precision: uses effective runtime precision (e.g. FP16 on V100), not suite.precision_required.
           This ensures the hash matches what check_run_id_integrity() recomputes from model.precision.
         """
         accel   = env_info.get("accelerators", [{}])[0]
         profile = self._load_submitter_profile()
 
-        tp_size    = getattr(args, "tensor_parallel_size", 1)
-        pp_size    = getattr(args, "pipeline_parallel_size", 1)
-        chip_count = tp_size * pp_size
+        chip_count = getattr(self, "_chip_count", 1)
 
         # Interconnect is only meaningful for multi-chip runs
         interconnect = None
@@ -540,7 +555,7 @@ class BenchmarkRunner(ABC):
         """
         Build human-readable directory name for this benchmark run.
         Format: {chip_slug}x{count}_{suite_id}_{runner_id}_{run_id}
-        Example: nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_6e78e779_a3f2c1b8
+        Example: nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_a3f2c1b8
 
         Stored in meta.run_name and used as the output directory name.
         Deterministic — same config always produces same run_name.
@@ -549,9 +564,7 @@ class BenchmarkRunner(ABC):
         chip_full    = accelerators[0].get("name", "unknown") if accelerators else "unknown"
         chip_slug    = re.sub(r"[^a-z0-9_]", "", re.sub(r"[ /\-]+", "_", chip_full.lower())) or "gpu"
 
-        tp_size    = getattr(args, "tensor_parallel_size", 1)
-        pp_size    = getattr(args, "pipeline_parallel_size", 1)
-        chip_count = tp_size * pp_size
+        chip_count = getattr(self, "_chip_count", 1)
         chip_part  = f"{chip_slug}x{chip_count}"
 
         suite_id  = suite["suite_id"]
@@ -603,7 +616,7 @@ class BenchmarkRunner(ABC):
         # If suites/{suite_id}/suite.py exists, delegate to it.
         # The plugin receives the full runner instance and calls base class
         # methods as needed (e.g. br._merge_scenario_results()).
-        # Suites without a suite.py (A, B, D, stress) use the generic path.
+        # Suites without a suite.py (A, B, D, F, stress) use the generic path.
         suite_script = _REPO_ROOT / "suites" / args.suite / "suite.py"
         if suite_script.exists():
             import importlib.util
@@ -620,6 +633,87 @@ class BenchmarkRunner(ABC):
             self._run_single_scenario(args, suite)
 
     # ── Argument parsing ──────────────────────────────────────────────────────
+
+    # ── Suite / parallelism helpers ───────────────────────────────────────────
+
+    def _get_chip_count(self) -> int:
+        """
+        Return the number of available accelerator chips for this platform.
+
+        Override in each runner to use the platform-appropriate API
+        (torch.cuda.device_count() for NVIDIA/AMD, torch_npu for Ascend, etc.).
+        The base implementation returns 1 as a safe default.
+        """
+        return 1
+
+    def get_suite_required_chips(self, suite_id: str | None) -> int | str | None:
+        """
+        Return the 'required_chips' field from a suite's suite.json.
+
+          "auto"  — suite wants all available accelerators (e.g. suite_B)
+          int     — suite wants exactly N chips
+          None    — field absent or suite_id unknown (caller defaults to 1)
+
+        Runners must not call this directly — use _resolve_tensor_parallel_size()
+        which applies the full priority ladder.
+        """
+        if not suite_id:
+            return None
+        try:
+            suite = self._load_suite(suite_id)
+            return suite.get("required_chips")
+        except Exception:
+            return None
+
+    def _resolve_tensor_parallel_size(self, cli_tp: int | None) -> tuple[int, str]:
+        """
+        Resolve tensor parallel size using the standard priority ladder:
+          CLI flag > yaml config > suite.json required_chips > default 1
+
+        Args:
+            cli_tp: value of --tensor-parallel-size from the runner's argparse,
+                    or None if the flag was not provided.
+
+        Returns:
+            (tp_size, source_str) where source_str is a human-readable label
+            for the print line shown at startup.
+        """
+        cfg = getattr(self, "_runner_config", {})
+        _cfg_tp = cfg.get("tensor_parallel_size")
+        _suite_chips = self.get_suite_required_chips(getattr(self, "_suite_id", None))
+
+        if cli_tp is not None:
+            return cli_tp, "cli"
+        elif _cfg_tp is not None:
+            return _cfg_tp, "config"
+        elif _suite_chips == "auto":
+            return self._get_chip_count(), "auto-detected"
+        elif isinstance(_suite_chips, int) and _suite_chips > 0:
+            return _suite_chips, f"suite.json required_chips={_suite_chips}"
+        else:
+            return 1, "default"
+
+    def format_prompt(self, prompt: str) -> str:
+        """
+        Apply the tokenizer's chat template to a raw prompt string.
+
+        Returns the formatted string if the tokenizer has a chat template,
+        otherwise returns the prompt unchanged. Runners that store their
+        tokenizer as self.tokenizer get this for free; runners without a
+        tokenizer attribute also return the prompt unchanged.
+        """
+        tokenizer = getattr(self, "tokenizer", None)
+        if tokenizer and getattr(tokenizer, "chat_template", None):
+            return tokenizer.apply_chat_template(
+                [{"role": "user", "content": prompt}],
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+        return prompt
+
+    def _format_prompt(self, prompt: str) -> str:
+        """Alias for format_prompt (kept for internal use)."""
+        return self.format_prompt(prompt)
 
     def parse_args(self) -> argparse.Namespace:
         """Parse CLI arguments. Override to add platform-specific args."""
@@ -666,18 +760,6 @@ class BenchmarkRunner(ABC):
             help="Transparency note for this model.")
         parser.add_argument("--model-name", default=None, dest="model_name",
             help="Actual model name override.")
-        parser.add_argument("--tensor-parallel-size", type=int, default=1,
-            help="Number of GPUs for tensor parallelism.")
-        parser.add_argument("--pipeline-parallel-size", type=int, default=1,
-            help="Number of pipeline parallel stages.")
-        parser.add_argument("--expert-parallel-size", type=int, default=1,
-            help="Number of expert parallel groups (for MoE models).")
-        parser.add_argument("--data-parallel-size", type=int, default=1,
-            help="Data parallel size. Most inference frameworks use 1.")
-        parser.add_argument("--max-chips", type=int, default=None,
-            help="Suite E only: maximum chip count to run.")
-        parser.add_argument("--enforce-eager", action="store_true", default=False,
-            help="Disable CUDAGraph/compilation. Use if you encounter errors.")
         parser.add_argument("--verbose", action="store_true", default=False,
             help="Show verbose framework logs.")
         parser.add_argument(
@@ -692,10 +774,15 @@ class BenchmarkRunner(ABC):
             ),
         )
 
-        args = parser.parse_args()
+        args, _ = parser.parse_known_args()
 
         # Suite-specific scenario validation happens in main() after suite is loaded.
         # See _validate_scenario_for_suite().
+
+        # Store suite_id so helpers (e.g. _resolve_tensor_parallel_size) can
+        # access it without runners needing to pass it explicitly.
+        self._suite_id = args.suite
+        self._runner_config = self._load_runner_config(args.suite)
 
         return args
 
@@ -719,10 +806,11 @@ class BenchmarkRunner(ABC):
                 self._model_note_override = args.model_note
             if getattr(args, "model_name", None):
                 self._model_name_override = args.model_name
-            tp_size = getattr(args, "tensor_parallel_size", 1)
-            pp_size = getattr(args, "pipeline_parallel_size", 1)
-            ep_size = getattr(args, "expert_parallel_size", 1)
-            dp_size = getattr(args, "data_parallel_size", 1)
+            _par    = getattr(self, "_parallelism", {})
+            tp_size = _par.get("tensor_parallel_size", 1)
+            pp_size = _par.get("pipeline_parallel_size", 1)
+            ep_size = _par.get("expert_parallel_size", 1)
+            dp_size = _par.get("data_parallel_size", 1)
 
             # Load env_info for precision resolution (search up to 2 levels)
             _acc_env_info: dict = {}
@@ -743,11 +831,14 @@ class BenchmarkRunner(ABC):
             t_load = time.perf_counter()
             self._current_scenario = "accuracy"
             self._advance_dist_port()
-            self.load_model(effective_model_path, suite, {
+            self.load_model(effective_model_path, {
                 "tensor_parallel_size":   tp_size,
                 "pipeline_parallel_size": pp_size,
                 "expert_parallel_size":   ep_size,
                 "data_parallel_size":     dp_size,
+                "max_tokens":             suite.get("output_tokens_max", 512),
+                "max_model_len":          suite.get("max_model_len"),
+                "use_async":              False,
             })
             print(f"Model loaded in {round(time.perf_counter() - t_load, 1)}s")
 
@@ -796,15 +887,11 @@ class BenchmarkRunner(ABC):
                 break
 
         # Load model
-        tp_size = getattr(args, "tensor_parallel_size", 1)
-        pp_size = getattr(args, "pipeline_parallel_size", 1)
-        ep_size = getattr(args, "expert_parallel_size", 1)
-        dp_size = getattr(args, "data_parallel_size", 1)
-        if not self.SUPPORTS_MULTI_CHIP and tp_size * pp_size > 1:
-            print(f"Warning: {self.__class__.__name__} does not support multi-chip. "
-                  f"Ignoring --tensor-parallel-size={tp_size}, --pipeline-parallel-size={pp_size}, using 1.")
-            tp_size = 1
-            pp_size = 1
+        _par    = getattr(self, "_parallelism", {})
+        tp_size = _par.get("tensor_parallel_size", 1)
+        pp_size = _par.get("pipeline_parallel_size", 1)
+        ep_size = _par.get("expert_parallel_size", 1)
+        dp_size = _par.get("data_parallel_size", 1)
 
         print(f"Loading {model_id}...")
         t_load_start = time.perf_counter()
@@ -819,11 +906,14 @@ class BenchmarkRunner(ABC):
             effective_precision = self._resolve_precision(suite, env_info)
         self._effective_precision = effective_precision
 
-        self.load_model(effective_model_path, suite, {
+        self.load_model(effective_model_path, {
             "tensor_parallel_size":   tp_size,
             "pipeline_parallel_size": pp_size,
             "expert_parallel_size":   ep_size,
             "data_parallel_size":     dp_size,
+            "max_tokens":             suite.get("output_tokens_max", 512),
+            "max_model_len":          suite.get("max_model_len"),
+            "use_async":              args.scenario not in ("offline", "accuracy"),
         })
         model_load_seconds = round(time.perf_counter() - t_load_start, 1)
         print(f"Model loaded in {model_load_seconds}s")
@@ -849,7 +939,7 @@ class BenchmarkRunner(ABC):
         # chip_count for throughput-per-chip calculation.
         # TP × PP = total chips. EP is within the TP group in current frameworks
         # (EP ≤ TP), so it does not multiply. DP = 1 for inference benchmarks.
-        chip_count = tp_size * pp_size
+        chip_count = getattr(self, "_chip_count", 1)
         loadgen = AccelMarkLoadGen(
             suite=suite,
             requests=inference_requests,
@@ -1059,10 +1149,11 @@ class BenchmarkRunner(ABC):
                 self._model_note_override = args.model_note
             if getattr(args, "model_name", None):
                 self._model_name_override = args.model_name
-            tp_size = getattr(args, "tensor_parallel_size", 1)
-            pp_size = getattr(args, "pipeline_parallel_size", 1)
-            ep_size = getattr(args, "expert_parallel_size", 1)
-            dp_size = getattr(args, "data_parallel_size", 1)
+            _par    = getattr(self, "_parallelism", {})
+            tp_size = _par.get("tensor_parallel_size", 1)
+            pp_size = _par.get("pipeline_parallel_size", 1)
+            ep_size = _par.get("expert_parallel_size", 1)
+            dp_size = _par.get("data_parallel_size", 1)
 
             # Load env_info for precision resolution — search up to parent dir
             _all_env_info: dict = {}
@@ -1086,11 +1177,14 @@ class BenchmarkRunner(ABC):
                 t_load = time.perf_counter()
                 self._current_scenario = "accuracy"
                 self._advance_dist_port()
-                self.load_model(effective_model_path, suite, {
+                self.load_model(effective_model_path, {
                     "tensor_parallel_size":   tp_size,
                     "pipeline_parallel_size": pp_size,
                     "expert_parallel_size":   ep_size,
                     "data_parallel_size":     dp_size,
+                    "max_tokens":             suite.get("output_tokens_max", 512),
+                    "max_model_len":          suite.get("max_model_len"),
+                    "use_async":              False,
                 })
                 print(f"Model loaded in {round(time.perf_counter() - t_load, 1)}s\n")
 
@@ -1164,29 +1258,20 @@ class BenchmarkRunner(ABC):
 
             cmd = [
                 sys.executable, platform_script,
-                "--suite",                args.suite,
-                "--scenario",             scenario,
-                "--output-dir",           str(base_dir),
-                "--tensor-parallel-size", str(getattr(args, "tensor_parallel_size", 1)),
-                "--tier",                 getattr(args, "tier", "community"),
+                "--suite",      args.suite,
+                "--scenario",   scenario,
+                "--output-dir", str(base_dir),
+                "--tier",       getattr(args, "tier", "community"),
                 "--skip-accuracy-gate",
             ]
             if getattr(args, "model_path", None):
                 cmd += ["--model-path", args.model_path]
             if getattr(args, "precision", None):
                 cmd += ["--precision", args.precision]
-            if getattr(args, "pipeline_parallel_size", 1) > 1:
-                cmd += ["--pipeline-parallel-size",
-                        str(args.pipeline_parallel_size)]
-            if getattr(args, "expert_parallel_size", 1) > 1:
-                cmd += ["--expert-parallel-size",
-                        str(args.expert_parallel_size)]
-            if getattr(args, "data_parallel_size", 1) > 1:
-                cmd += ["--data-parallel-size",
-                        str(args.data_parallel_size)]
-            if getattr(args, "enforce_eager", False):
-                cmd += ["--enforce-eager"]
-            # Runner-specific args (override get_extra_subprocess_args() to add more)
+            # All runner-specific flags (parallelism, enforce_eager, etc.) are forwarded
+            # here. Runners must override get_extra_subprocess_args() to add their flags.
+            # Note: self._runner_config is NOT forwarded — each subprocess reads the config
+            # yaml file independently on startup, which is the correct behavior.
             cmd += self.get_extra_subprocess_args(args)
 
             print(f"  Command: {' '.join(cmd)}\n")
@@ -1320,6 +1405,7 @@ class BenchmarkRunner(ABC):
                 "scenarios_run": scenarios_to_merge,
                 "parallelism": base_result["task"]["parallelism"],
                 "num_runs": suite.get("num_runs", 3),
+                "extra_config": base_result["task"].get("extra_config"),
             },
             "metrics": merged_metrics,
             "accuracy": accuracy or {
@@ -1742,12 +1828,10 @@ class BenchmarkRunner(ABC):
         accelerators = env_info.get("accelerators", [])
         if accelerators:
             a = accelerators[0]
-            tp_size_for_chip = getattr(args, "tensor_parallel_size", 1)
-            pp_size_for_chip = getattr(args, "pipeline_parallel_size", 1)
             # Total chips = TP × PP. Expert parallelism (EP) is within the TP
             # group in current frameworks (EP ≤ TP) so does not add chips.
             # Data parallelism = 1 for inference benchmarks.
-            total_chips = tp_size_for_chip * pp_size_for_chip
+            total_chips = getattr(self, "_chip_count", 1)
             # interconnect_intra_node: None for single-chip runs
             intra_node = None if total_chips <= 1 else (
                 env_info.get("intra_node_interconnect") or a.get("interconnect_intra_node")
@@ -1761,10 +1845,11 @@ class BenchmarkRunner(ABC):
                 "interconnect_inter_node": a.get("interconnect_inter_node", None),
             }
 
-        tp_size = getattr(args, "tensor_parallel_size", 1)
-        pp_size = getattr(args, "pipeline_parallel_size", 1)
-        ep_size = getattr(args, "expert_parallel_size", 1)
-        dp_size = getattr(args, "data_parallel_size", 1)
+        _par    = getattr(self, "_parallelism", {})
+        tp_size = _par.get("tensor_parallel_size", 1)
+        pp_size = _par.get("pipeline_parallel_size", 1)
+        ep_size = _par.get("expert_parallel_size", 1)
+        dp_size = _par.get("data_parallel_size", 1)
 
         return {
             "schema_version": "1.0",
@@ -1809,7 +1894,7 @@ class BenchmarkRunner(ABC):
                     "expert_parallel_size":   ep_size,
                     "data_parallel_size":     dp_size,
                 },
-                "extra_config": None,
+                "extra_config": getattr(self, "_runner_config", None) or None,
             },
             "metrics": metrics,
             "accuracy": {
@@ -2087,6 +2172,61 @@ class BenchmarkRunner(ABC):
 
         print(f"Logging to {log_path}")
 
+
+    def _load_runner_config(self, suite_id: str | None = None) -> dict:
+        """
+        Load runner-specific config from configs/runner_configs/runner_{id}.yaml.
+
+        Called automatically at the end of base class parse_args() so that
+        self._runner_config is populated before any runner subclass code runs.
+        Runners must never call this method directly — they read self._runner_config
+        which is already merged and ready.
+
+        Merges global defaults with suite-specific overrides for suite_id only.
+        The returned dict is flat — no 'suites' key, no other suite sections.
+        Returns {} if config file does not exist (graceful degradation).
+
+        engine_kwargs merge: if both global and suite-specific sections define
+        engine_kwargs, the two dicts are merged with suite-specific keys winning.
+
+        Merge priority (highest to lowest):
+            suite-specific section  >  global defaults  >  {}
+        """
+        impl_id = self._compute_implementation_id()
+        if not impl_id:
+            return {}
+
+        config_path = (
+            _REPO_ROOT / "configs" / "runner_configs" / f"runner_{impl_id}.yaml"
+        )
+        if not config_path.exists():
+            return {}
+
+        try:
+            import yaml
+            with open(config_path) as f:
+                raw = yaml.safe_load(f) or {}
+        except Exception as e:
+            print(f"Warning: could not load runner config {config_path}: {e}")
+            return {}
+
+        # Global defaults — all top-level keys except 'suites'
+        config = {k: v for k, v in raw.items() if k != "suites"}
+
+        # Suite-specific overrides
+        if suite_id:
+            suite_overrides = (raw.get("suites") or {}).get(suite_id) or {}
+            # Merge engine_kwargs specially: combine global + suite dicts,
+            # suite-specific keys win on collision
+            global_engine_kwargs = config.get("engine_kwargs") or {}
+            suite_engine_kwargs  = suite_overrides.get("engine_kwargs") or {}
+            # Apply all suite overrides (including engine_kwargs temporarily)
+            config.update(suite_overrides)
+            # Re-apply properly merged engine_kwargs
+            if global_engine_kwargs or suite_engine_kwargs:
+                config["engine_kwargs"] = {**global_engine_kwargs, **suite_engine_kwargs}
+
+        return config
 
     def _load_submitter_profile(self) -> dict:
         profile_path = _REPO_ROOT / "configs" / "submitter.yaml"

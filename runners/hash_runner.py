@@ -6,7 +6,7 @@ The ID is:  {folder_base}_{first8ofSHA256(runner.py)}
 
 Usage:
     # Compute ID for an existing runner
-    python runners/hash_runner.py runners/nvidia_vllm_6e78e779/
+    python runners/hash_runner.py runners/nvidia_vllm_2b3890cf/
 
     # Compute the correct ID before naming a new runner folder
     python runners/hash_runner.py path/to/new_runner_dir/

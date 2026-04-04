@@ -85,8 +85,23 @@ def _run_suite_c(br, args, suite: dict) -> None:
 
     # ── Run each precision format as a subprocess ─────────────────────────
     for precision in precisions_to_run:
-        fmt_info     = precision_model_map.get(precision, {})
-        fmt_model_id = fmt_info.get("model_id") or suite.get("base_model_id")
+        fmt_info     = precision_model_map.get(precision)
+        if fmt_info is None:
+            if precision == "BF16":
+                # BF16 baseline: fall back to base_model_id — expected
+                fmt_model_id = suite.get("base_model_id")
+            else:
+                # Quantized format with no model mapping — refuse to silently
+                # run the base model under a quantized precision label
+                print(f"  ✗ Skipping {precision}: no entry in precision_model_map "
+                      f"and it is not BF16. Add a pre-quantized model_id for this "
+                      f"format to suite.json precision_model_map.")
+                results_summary.append(
+                    (precision, "SKIPPED: missing precision_model_map entry", "")
+                )
+                continue
+        else:
+            fmt_model_id = fmt_info.get("model_id") or suite.get("base_model_id")
 
         precision_dir = base_dir / precision.lower()
         precision_dir.mkdir(parents=True, exist_ok=True)
@@ -110,18 +125,21 @@ def _run_suite_c(br, args, suite: dict) -> None:
 
         cmd = [
             sys.executable, platform_script,
-            "--suite",                args.suite,
-            "--scenario",             "default",
-            "--output-dir",           str(precision_dir),
-            "--tensor-parallel-size", str(getattr(args, "tensor_parallel_size", 1)),
-            "--precision",            precision,
-            "--model-path",           fmt_model_path,
+            "--suite",      args.suite,
+            "--scenario",   "default",
+            "--output-dir", str(precision_dir),
+            "--precision",  precision,
+            "--model-path", fmt_model_path,
             "--skip-accuracy-gate",
         ]
         if fmt_model_note:
             cmd += ["--model-note", fmt_model_note]
         if fmt_model_name:
             cmd += ["--model-name", fmt_model_name]
+        # Forward all runner-specific flags (parallelism, enforce_eager, etc.).
+        # Unlike Suite E, Suite C does not override tensor_parallel_size per-iteration
+        # so get_extra_subprocess_args() output is used as-is without filtering.
+        cmd += br.get_extra_subprocess_args(args)
 
         print(f"  Command: {' '.join(cmd)}\n")
 
@@ -203,9 +221,9 @@ def _merge_suite_c_results(
             continue
 
         r            = precision_results[precision]
-        fmt_model_id = (precision_model_map.get(precision, {}).get("model_id")
-                        or suite.get("base_model_id")
-                        or r.get("model", {}).get("model_id"))
+        fmt_map_entry = precision_model_map.get(precision, {})
+        fmt_model_id  = (fmt_map_entry.get("model_id")
+                         or r.get("model", {}).get("model_id"))
 
         rows = (
             r.get("metrics", {}).get("offline", {}).get("results_by_concurrency")
@@ -297,6 +315,7 @@ def _merge_suite_c_results(
             "precision_levels_skipped": skipped or [],
             "parallelism":              base_result["task"]["parallelism"],
             "num_runs":                 suite.get("num_runs", 3),
+            "extra_config":             base_result["task"].get("extra_config"),
         },
         "metrics": {
             "quantization": {"results_by_precision": quant_results},
