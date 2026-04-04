@@ -798,7 +798,16 @@ class BenchmarkRunner(ABC):
             self._setup_logging(str(output_dir))
 
             # Resolve and load model
-            model_id = suite.get("model_id") or suite.get("base_model_id", "")
+            # For Suite C subprocesses, --precision is set — use precision_model_map
+            # to get the actual checkpoint model_id for display and metadata.
+            _precision_arg = getattr(args, "precision", None)
+            _precision_model_map = suite.get("precision_model_map", {})
+            _fmt_entry = _precision_model_map.get((_precision_arg or "").upper(), {})
+            model_id = (
+                _fmt_entry.get("model_id")
+                or suite.get("model_id")
+                or suite.get("base_model_id", "")
+            )
             effective_model_path = self._resolve_model_path(
                 model_id, getattr(args, "model_path", None)
             )
@@ -866,7 +875,17 @@ class BenchmarkRunner(ABC):
         profile = self._load_submitter_profile()
 
         # Resolve model path
-        model_id = suite.get("model_id") or suite.get("base_model_id", "")
+        # For Suite C subprocesses, --precision is set and precision_model_map holds
+        # the actual checkpoint being loaded. Use it for the display label so the log
+        # doesn't show "Loading meta-llama/Llama-3.1-8B-Instruct..." when loading FP8.
+        _precision_arg = getattr(args, "precision", None)
+        _precision_model_map = suite.get("precision_model_map", {})
+        _fmt_entry = _precision_model_map.get((_precision_arg or "").upper(), {})
+        model_id = (
+            _fmt_entry.get("model_id")
+            or suite.get("model_id")
+            or suite.get("base_model_id", "")
+        )
         effective_model_path = self._resolve_model_path(
             model_id, getattr(args, "model_path", None)
         )
@@ -1851,6 +1870,26 @@ class BenchmarkRunner(ABC):
         ep_size = _par.get("expert_parallel_size", 1)
         dp_size = _par.get("data_parallel_size", 1)
 
+        # For Suite C subprocesses, --precision is set and precision_model_map holds
+        # the actual quantized checkpoint. Use it so each per-format result.json records
+        # the real model_id/revision (e.g. RedHatAI/...-FP8), not base_model_id.
+        _result_precision = (
+            getattr(self, "_effective_precision", None)
+            or getattr(args, "precision", None)
+        )
+        _pm_entry = suite.get("precision_model_map", {}).get(
+            (_result_precision or "").upper(), {}
+        )
+        _result_model_id = (
+            _pm_entry.get("model_id")
+            or suite.get("model_id")
+            or suite.get("base_model_id", "")
+        )
+        _result_model_revision = (
+            _pm_entry.get("model_revision")
+            or suite.get("model_revision", "unknown")
+        )
+
         return {
             "schema_version": "1.0",
             "suite_id": suite["suite_id"],
@@ -1866,17 +1905,13 @@ class BenchmarkRunner(ABC):
                 "python_version": env_info.get("python_version", "unknown"),
             },
             "model": {
-                "model_id":            suite.get("model_id") or suite.get("base_model_id", ""),
-                "model_revision":      suite.get("model_revision", "unknown"),
+                "model_id":            _result_model_id,
+                "model_revision":      _result_model_revision,
                 "model_name":          getattr(self, "_model_name_override", None),
                 "model_note":          getattr(self, "_model_note_override", None),
                 "model_source":        getattr(self, "_model_source", "huggingface"),
-                "architecture":        self._get_model_architecture(
-                                           suite.get("model_id") or suite.get("base_model_id", "")
-                                       ),
-                "parameter_count_b":   self._estimate_param_count(
-                                           suite.get("model_id") or suite.get("base_model_id", "")
-                                       ),
+                "architecture":        self._get_model_architecture(_result_model_id),
+                "parameter_count_b":   self._estimate_param_count(_result_model_id),
                 "precision":           getattr(self, "_effective_precision", None)
                                        or getattr(args, "precision", None)
                                        or suite.get("precision_required", "BF16"),

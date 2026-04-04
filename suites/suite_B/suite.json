@@ -21,6 +21,7 @@
     "output_tokens_p99": 1200,
     "source": "shibing624/sharegpt_gpt4"
   },
+  "max_model_len": 4096,
   "output_tokens_max": 512,
   "concurrency_levels": [8, 32, 128],
   "_concurrency_levels_note": "Client-side concurrency. See suite_A note.",

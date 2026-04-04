@@ -23,7 +23,8 @@
     "output_tokens_p99": 400,
     "source": "shibing624/sharegpt_gpt4 (short-turn filtered)"
   },
-  "output_tokens_max": 256,
+  "max_model_len": 2048,
+  "output_tokens_max": 512,
   "concurrency_levels": [4, 16, 64],
   "_concurrency_levels_note": "Smaller than Suite A — consumer GPUs saturate at lower concurrency with a 0.5B model.",
   "online_qps_levels": [2, 10, 40],

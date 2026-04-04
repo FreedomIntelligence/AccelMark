@@ -123,10 +123,14 @@ def _run_suite_c(br, args, suite: dict) -> None:
         br.__dict__.pop("_model_note_override", None)
         br.__dict__.pop("_model_name_override", None)
 
+        # Forward the user's --scenario so "all" actually runs extra scenarios.
+        # Subprocesses with --precision set go through br._run_all_scenarios(),
+        # which respects both default and extra scenario lists from suite.json.
+        subprocess_scenario = args.scenario if args.scenario == "all" else "default"
         cmd = [
             sys.executable, platform_script,
             "--suite",      args.suite,
-            "--scenario",   "default",
+            "--scenario",   subprocess_scenario,
             "--output-dir", str(precision_dir),
             "--precision",  precision,
             "--model-path", fmt_model_path,
