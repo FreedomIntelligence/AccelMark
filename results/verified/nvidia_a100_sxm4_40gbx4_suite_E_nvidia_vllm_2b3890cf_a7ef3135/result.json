@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_E",
+  "implementation_id": "nvidia_vllm_2b3890cf",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-40GB",
+    "vendor": "NVIDIA",
+    "count": 4,
+    "memory_gb": 40.0,
+    "interconnect_intra_node": "NVLink",
+    "interconnect_inter_node": null,
+    "_count_note": "Maximum chip count used in this suite. See task.chip_counts_run for all counts tested."
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline"
+    ],
+    "chip_counts_run": [
+      1,
+      2,
+      4
+    ],
+    "parallelism_note": "Each chip_count uses tensor_parallel_size=N",
+    "num_runs": 3
+  },
+  "metrics": {
+    "scaling": {
+      "base_chip_count": 1,
+      "base_throughput_tokens_per_sec": 5159.39,
+      "results_by_chip_count": [
+        {
+          "chip_count": 1,
+          "best_throughput_tokens_per_sec": 5159.39,
+          "throughput_tokens_per_sec_per_chip": 5159.39,
+          "scaling_efficiency": 1.0,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 5159.39,
+              "throughput_tokens_per_sec_per_chip": 5159.39,
+              "elapsed_seconds_median": 56.9,
+              "peak_memory_gb": 34.18,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 5114.02,
+              "throughput_tokens_per_sec_per_chip": 5114.02,
+              "elapsed_seconds_median": 57.4,
+              "peak_memory_gb": 34.18,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 5132.96,
+              "throughput_tokens_per_sec_per_chip": 5132.96,
+              "elapsed_seconds_median": 57.2,
+              "peak_memory_gb": 34.18,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "1x"
+        },
+        {
+          "chip_count": 2,
+          "best_throughput_tokens_per_sec": 7525.61,
+          "throughput_tokens_per_sec_per_chip": 3762.8,
+          "scaling_efficiency": 0.729,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 7525.61,
+              "throughput_tokens_per_sec_per_chip": 3762.8,
+              "elapsed_seconds_median": 39.0,
+              "peak_memory_gb": 32.73,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 7504.18,
+              "throughput_tokens_per_sec_per_chip": 3752.09,
+              "elapsed_seconds_median": 39.1,
+              "peak_memory_gb": 32.73,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 7485.49,
+              "throughput_tokens_per_sec_per_chip": 3742.74,
+              "elapsed_seconds_median": 39.2,
+              "peak_memory_gb": 32.73,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "2x"
+        },
+        {
+          "chip_count": 4,
+          "best_throughput_tokens_per_sec": 8982.51,
+          "throughput_tokens_per_sec_per_chip": 2245.63,
+          "scaling_efficiency": 0.435,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 8982.51,
+              "throughput_tokens_per_sec_per_chip": 2245.63,
+              "elapsed_seconds_median": 32.8,
+              "peak_memory_gb": 32.05,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 8954.31,
+              "throughput_tokens_per_sec_per_chip": 2238.58,
+              "elapsed_seconds_median": 32.9,
+              "peak_memory_gb": 32.05,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 8979.42,
+              "throughput_tokens_per_sec_per_chip": 2244.86,
+              "elapsed_seconds_median": 32.8,
+              "peak_memory_gb": 32.05,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "4x"
+        }
+      ]
+    },
+    "derived": {}
+  },
+  "accuracy": {
+    "subset_score": 0.6,
+    "baseline_delta": 0.01,
+    "valid": true,
+    "framework": "vLLM",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-04",
+    "time": "10:51:08",
+    "run_id": "a7ef3135",
+    "run_name": "nvidia_a100_sxm4_40gbx4_suite_E_nvidia_vllm_2b3890cf_a7ef3135",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_2b3890cf/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-04T10:39:42.863085+00:00",
+    "benchmark_end_time": "2026-04-04T10:51:08.078238+00:00",
+    "benchmark_elapsed_minutes": 25.8,
+    "model_load_seconds": 54.3,
+    "benchmark_elapsed_minutes_note": "Sum of per-chip-count benchmark_elapsed_minutes (excludes sleep gaps, orchestrator overhead, and skipped counts).",
+    "scenario_dirs": {
+      "offline": "results/verified/nvidia_a100_sxm4_40gbx1_suite_E_nvidia_vllm_2b3890cf_cdafde41/1x/offline"
+    },
+    "chip_count_dirs": {
+      "1": "1x",
+      "2": "2x",
+      "4": "4x"
+    }
+  }
+}
