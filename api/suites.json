@@ -7,10 +7,10 @@
     "default_scenarios": [
       "accuracy",
       "offline",
-      "online",
-      "interactive"
+      "online"
     ],
     "extra_scenarios": [
+      "interactive",
       "sustained"
     ],
     "dataset": "sharegpt_standard_v1"
@@ -53,10 +53,10 @@
     "precision": "BF16",
     "default_scenarios": [
       "accuracy",
-      "offline",
-      "interactive"
+      "offline"
     ],
     "extra_scenarios": [
+      "interactive",
       "sustained",
       "online"
     ],

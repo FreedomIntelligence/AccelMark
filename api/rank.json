@@ -1,1 +1,164 @@
-{}
+{
+  "nvidia_a100_sxm4_40gbx1_suite_A_nvidia_vllm_2b3890cf_4a4f4aed": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 4992.91
+  },
+  "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_2b3890cf_7e5e62fb": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_C",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3560.0
+  },
+  "nvidia_a100_sxm4_40gbx1_suite_D_nvidia_vllm_2b3890cf_63009849": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_D",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 4811.91
+  },
+  "nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_2b3890cf_610fd1fc": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 8992.58
+  },
+  "nvidia_a100_sxm4_40gbx4_suite_B_nvidia_vllm_2b3890cf_204b7243": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 454.77
+  },
+  "nvidia_a100_sxm4_40gbx4_suite_E_nvidia_vllm_2b3890cf_a7ef3135": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 5159.39
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_8a7655d2": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 4218.13
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_2b3890cf_ab38e669": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_C",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3228.8
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm_2b3890cf_e3282471": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_D",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 7812.08
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_vllm_2b3890cf_3ada078a": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 8472.82
+  },
+  "nvidia_a100_sxm4_80gbx4_suite_B_nvidia_vllm_2b3890cf_0d75785b": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 2145.7
+  },
+  "nvidia_a100_sxm4_80gbx4_suite_E_nvidia_vllm_2b3890cf_36e6d6bb": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 4881.5
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_35145afa": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 5732.08
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_C_nvidia_vllm_2b3890cf_0db5f6dd": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_C",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 4168.1
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_D_nvidia_vllm_2b3890cf_e3a17d3b": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_D",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 6604.47
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_vllm_2b3890cf_553ca500": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 11691.75
+  },
+  "nvidia_a800_sxm4_80gbx4_suite_B_nvidia_vllm_2b3890cf_3e518348": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 2842.88
+  },
+  "nvidia_a800_sxm4_80gbx4_suite_E_nvidia_vllm_2b3890cf_04bcab32": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 6776.71
+  }
+}
