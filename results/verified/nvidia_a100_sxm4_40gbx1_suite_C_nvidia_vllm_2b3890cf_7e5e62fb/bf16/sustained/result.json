@@ -1,0 +1,304 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_vllm_2b3890cf",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-40GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 40.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-04T08:23:52.552627+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA A100-SXM4-40GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 40.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA A100-SXM4-40GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 40.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA A100-SXM4-40GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 40.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA A100-SXM4-40GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 40.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tNIC0\tNIC1\tNIC2\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV12\tNV12\tNV12\tPXB\tPXB\tNODE\t0-31,64-95\t0\t\tN/A\nGPU1\tNV12\t X \tNV12\tNV12\tPXB\tPXB\tNODE\t0-31,64-95\t0\t\tN/A\nGPU2\tNV12\tNV12\t X \tNV12\tNODE\tNODE\tPXB\t0-31,64-95\t0\t\tN/A\nGPU3\tNV12\tNV12\tNV12\t X \tNODE\tNODE\tPXB\t0-31,64-95\t0\t\tN/A\nNIC0\tPXB\tPXB\tNODE\tNODE\t X \tPIX\tNODE\t\t\t\t\nNIC1\tPXB\tPXB\tNODE\tNODE\tPIX\t X \tNODE\t\t\t\t\nNIC2\tNODE\tNODE\tPXB\tPXB\tNODE\tNODE\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n\n",
+    "intra_node_interconnect": "NVLink",
+    "cpu": {
+      "model": "AMD EPYC 7532 32-Core Processor",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.7,
+    "pcie_generation": "PCIe Gen 4",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.1",
+    "pytorch_version": "2.5.1+cu121"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "sustained",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "enforce_eager": false
+    }
+  },
+  "metrics": {
+    "sustained": {
+      "sustained_concurrency": 8,
+      "duration_minutes": 15,
+      "warmup_minutes": 1,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 451.2,
+          "tokens_out": 27072,
+          "tokens_in": 0,
+          "requests_completed": 80,
+          "ttft_ms_p50": 47.2,
+          "ttft_ms_p99": 301.8
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 484.3,
+          "tokens_out": 29081,
+          "tokens_in": 0,
+          "requests_completed": 80,
+          "ttft_ms_p50": 41.4,
+          "ttft_ms_p99": 69.1
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 504.9,
+          "tokens_out": 30293,
+          "tokens_in": 0,
+          "requests_completed": 86,
+          "ttft_ms_p50": 46.1,
+          "ttft_ms_p99": 86.3
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 474.8,
+          "tokens_out": 28477,
+          "tokens_in": 0,
+          "requests_completed": 80,
+          "ttft_ms_p50": 43.6,
+          "ttft_ms_p99": 66.9
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 483.3,
+          "tokens_out": 28991,
+          "tokens_in": 0,
+          "requests_completed": 78,
+          "ttft_ms_p50": 41.7,
+          "ttft_ms_p99": 66.4
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 495.4,
+          "tokens_out": 29744,
+          "tokens_in": 0,
+          "requests_completed": 85,
+          "ttft_ms_p50": 46.1,
+          "ttft_ms_p99": 74.2
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 484.0,
+          "tokens_out": 29031,
+          "tokens_in": 0,
+          "requests_completed": 78,
+          "ttft_ms_p50": 43.8,
+          "ttft_ms_p99": 68.6
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 465.7,
+          "tokens_out": 27932,
+          "tokens_in": 0,
+          "requests_completed": 82,
+          "ttft_ms_p50": 44.5,
+          "ttft_ms_p99": 70.0
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 506.5,
+          "tokens_out": 30410,
+          "tokens_in": 0,
+          "requests_completed": 87,
+          "ttft_ms_p50": 46.3,
+          "ttft_ms_p99": 70.3
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 477.3,
+          "tokens_out": 28623,
+          "tokens_in": 0,
+          "requests_completed": 74,
+          "ttft_ms_p50": 46.6,
+          "ttft_ms_p99": 92.1
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 492.5,
+          "tokens_out": 29552,
+          "tokens_in": 0,
+          "requests_completed": 84,
+          "ttft_ms_p50": 42.1,
+          "ttft_ms_p99": 66.9
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 491.3,
+          "tokens_out": 29476,
+          "tokens_in": 0,
+          "requests_completed": 84,
+          "ttft_ms_p50": 42.3,
+          "ttft_ms_p99": 66.6
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 488.9,
+          "tokens_out": 29341,
+          "tokens_in": 0,
+          "requests_completed": 82,
+          "ttft_ms_p50": 40.9,
+          "ttft_ms_p99": 79.5
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 476.8,
+          "tokens_out": 28621,
+          "tokens_in": 0,
+          "requests_completed": 82,
+          "ttft_ms_p50": 41.0,
+          "ttft_ms_p99": 69.5
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 484.1,
+      "throttle_ratio": 0.891,
+      "throttle_onset_minute": 1.0,
+      "ttft_p99_drift_ms": -232.3
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-04",
+    "time": "13:26:30",
+    "run_id": "43e8fdb3",
+    "run_name": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_2b3890cf_43e8fdb3",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_2b3890cf/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-04T13:11:16.848193+00:00",
+    "benchmark_end_time": "2026-04-04T13:26:30.386688+00:00",
+    "benchmark_elapsed_minutes": 15.2,
+    "model_load_seconds": 36.3
+  }
+}
