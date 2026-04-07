@@ -7,26 +7,26 @@ Usage:
     python run.py --list
 
     # Run a benchmark
-    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario all
+    python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario all
 
     # Run a benchmark on multiple chips
-    # Set tensor_parallel_size in configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml
+    # Set tensor_parallel_size in configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml
     # or pass --tensor-parallel-size directly (supported by runners that accept it)
-    python run.py --runner nvidia_vllm_2b3890cf --suite suite_B --scenario all --tensor-parallel-size 4
+    python run.py --runner nvidia_vllm_47f5d58e --suite suite_B --scenario all --tensor-parallel-size 4
 
     # Serve — using a suite for model + generation params
-    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --serve
+    python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --serve
 
     # Serve — specifying the model directly (no suite required)
-    python run.py --runner nvidia_vllm_2b3890cf --model meta-llama/Llama-3.1-8B-Instruct --serve
+    python run.py --runner nvidia_vllm_47f5d58e --model meta-llama/Llama-3.1-8B-Instruct --serve
 
     # Serve — suite as base, override model and tune params
-    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --serve \\
+    python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --serve \\
         --model meta-llama/Llama-3.1-8B-Instruct \\
         --max-tokens 4096 --port 8080 --workers 8 --api-key secret
 
     # All flags after --runner <id> are passed through to the runner unchanged (non-serve mode)
-    python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario offline --output-dir ./my_result
+    python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario offline --output-dir ./my_result
 """
 
 import argparse

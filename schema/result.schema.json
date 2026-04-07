@@ -332,7 +332,7 @@
                 "properties": {
                   "precision": {
                     "type": "string",
-                    "enum": ["BF16", "FP8", "W8A8", "W8A16", "W4A16", "INT8", "INT4"]
+                    "enum": ["BF16", "FP16", "FP8", "W8A8", "W8A16", "W4A16", "INT8", "INT4"]
                   },
                   "model_id": {
                     "type": ["string", "null"],

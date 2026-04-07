@@ -145,7 +145,7 @@ if __name__ == "__main__":
     MyFrameworkRunner().main()
 ```
 
-See the [reference implementation](nvidia_vllm_2b3890cf/runner.py) and
+See the [reference implementation](nvidia_vllm_47f5d58e/runner.py) and
 [DEVELOPMENT.md](../DEVELOPMENT.md) for a full working example.
 
 ### Step 2 — Compute the hash and name your folder
@@ -345,24 +345,24 @@ Use `run.py` at the repo root to run any runner:
 python run.py --list
 
 # Run the default benchmark (offline + online + interactive + accuracy)
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
 # Run a specific scenario only
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario offline
 
 # Run extra scenarios (e.g. sustained load test)
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario sustained
 
 # Run everything including extras
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario all
 
 # Multi-GPU (--tensor-parallel-size is a runner-specific flag, not a base class flag)
 # Can also be set via tensor_parallel_size: 4 in
-# configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_B --tensor-parallel-size 4
+# configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_B --tensor-parallel-size 4
 
 # Use a local model path
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --model-path /path/to/model
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --model-path /path/to/model
 ```
 
 Results are written to `results/community/{chip}_{suite}_{runner_id}/`.
@@ -379,7 +379,7 @@ OpenAI-compatible inference server:
 ```bash
 pip install -r serve/requirements.txt
 
-python run.py --runner nvidia_vllm_2b3890cf --serve --port 8000
+python run.py --runner nvidia_vllm_47f5d58e --serve --port 8000
 ```
 
 See [serve/README.md](../serve/README.md) for full documentation.

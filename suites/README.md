@@ -177,7 +177,7 @@ Key output metrics:
 Run explicitly with `--scenario sustained`. Not part of the default run.
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario sustained
 ```
 
 ---
@@ -306,7 +306,7 @@ models:
 ### Running Suite C
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_C
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_C
 ```
 
 Runs all supported formats in sequence. Each format is a separate subprocess
@@ -416,10 +416,10 @@ chip_counts_all: [1, 2, 4, 8]
 
 ```bash
 # 4-chip machine
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_E --max-chips 4
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_E --max-chips 4
 
 # 8-chip machine
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_E --max-chips 8
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_E --max-chips 8
 ```
 
 **Minimum requirement:** both 1× and 2× must succeed for the submission
@@ -531,19 +531,19 @@ Run with `--scenario sustained`. Not part of the default run.
 
 ```bash
 # Standard run (Ampere+)
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_F
 
 # Pre-Ampere GPU (V100, T4, RTX 20xx) — required flag
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F --enforce-eager
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_F --enforce-eager
 # Or set persistently: enforce_eager: true in
-# configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml under suites.suite_F
+# configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml under suites.suite_F
 
 # Single scenario
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F --scenario offline
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_F --scenario offline
 ```
 
 For runner-specific hardware compatibility details (including pre-Ampere guidance),
-see `runners/nvidia_vllm_2b3890cf/README.md`.
+see `runners/nvidia_vllm_47f5d58e/README.md`.
 
 ### Multi-chip note
 

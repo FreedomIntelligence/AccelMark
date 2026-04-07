@@ -1,4 +1,4 @@
-# nvidia_vllm_2b3890cf — NVIDIA vLLM Runner
+# nvidia_vllm_47f5d58e — NVIDIA vLLM Runner
 
 AccelMark runner for NVIDIA GPUs using [vLLM](https://github.com/vllm-project/vllm).
 
@@ -67,17 +67,17 @@ newer at runtime. On Volta/Turing this causes a crash or OOM during CUDA graph c
 
 ```bash
 # Suite F on V100 or T4
-python runners/nvidia_vllm_2b3890cf/runner.py \
+python runners/nvidia_vllm_47f5d58e/runner.py \
     --suite suite_F \
     --enforce-eager
-# Or set persistently in configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml:
+# Or set persistently in configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml:
 # enforce_eager: true  (under global defaults or suites.suite_F)
 
 # Suite A on V100 (1× only — Suite E 2×/4× remain blocked on V100)
-python runners/nvidia_vllm_2b3890cf/runner.py \
+python runners/nvidia_vllm_47f5d58e/runner.py \
     --suite suite_A \
     --enforce-eager
-# Or set persistently in configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml:
+# Or set persistently in configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml:
 # enforce_eager: true  (under global defaults or suites.suite_A)
 ```
 
@@ -102,21 +102,21 @@ for single-chip consumer benchmarking on V100.
 
 ```bash
 # Run Suite F (consumer/edge benchmark)
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_F
 
 # Run Suite A (standard datacenter benchmark)
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_A
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_A
 
 # Run a single scenario
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F --scenario offline
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_F --scenario offline
 
 # Use a local model cache
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F \
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_F \
     --model-path /data/models/Qwen2.5-0.5B-Instruct
 
 # Pre-Ampere GPU (V100, T4, RTX 20xx)
-python runners/nvidia_vllm_2b3890cf/runner.py --suite suite_F --enforce-eager
-# Or set persistently in configs/runner_configs/runner_nvidia_vllm_2b3890cf.yaml:
+python runners/nvidia_vllm_47f5d58e/runner.py --suite suite_F --enforce-eager
+# Or set persistently in configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml:
 # enforce_eager: true  (under global defaults or suites.suite_F)
 ```
 

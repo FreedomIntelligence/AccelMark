@@ -14,7 +14,7 @@ in the leaderboard and submitting your results.
 # 1. Clone and install
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
-pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
+pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 
 # 2. Set your name (one-time setup)
 cp configs/submitter.yaml.example configs/submitter.yaml
@@ -23,8 +23,8 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 # 3. Run the benchmark (~50 min on A100)
 #    Accuracy gate runs automatically before the benchmark starts.
 #    Output directory is auto-named using run_name, e.g.:
-#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_c2bcf41f
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
+#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_52162d64
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
 # 4. Submit — open a GitHub Issue and paste your result.json
 # https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
@@ -41,7 +41,7 @@ That's it. The CI bot handles the rest.
 Each runner ships its own `requirements.txt`. Install for the runner you want to use:
 
 ```bash
-pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
+pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 ```
 
 To see all available runners and their install commands:
@@ -94,7 +94,7 @@ need `--model-path` on the command line.
 ### Recommended: run the full suite
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 ```
 
 This runs the suite's default scenarios (accuracy gate → offline → online → interactive)
@@ -106,22 +106,22 @@ or `--scenario offline` (or any other scenario name) to run a single scenario.
 
 ```bash
 # Override the output directory if needed
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --suite suite_A \
-    --output-dir ./results/verified/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_c2bcf41f
+    --output-dir ./results/verified/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_52162d64
 ```
 
 ### Run a single scenario
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario offline
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario offline
 ```
 
 ### Multi-chip (Suite B and above)
 
 ```bash
 # Suite B: Llama-3-70B on 4 chips
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --suite suite_B \
     --tensor-parallel-size 4  # (or set tensor_parallel_size: 4 in the runner config yaml)
 ```
@@ -141,7 +141,7 @@ and measures how efficiently throughput scales. Specify the maximum chip count
 you want to test:
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --suite suite_E
 ```
 
@@ -156,10 +156,10 @@ sequentially and computes `scaling_efficiency = N_chip_throughput / (1_chip_thro
 Suite F uses **Qwen2.5-0.5B-Instruct** and short prompts (`sharegpt_edge_v1`).
 It is aimed at single-GPU consumer hardware (≥4 GB VRAM). On pre-Ampere GPUs,
 use `--enforce-eager` with the NVIDIA vLLM runner — see
-[runners/nvidia_vllm_2b3890cf/README.md](runners/nvidia_vllm_2b3890cf/README.md).
+[runners/nvidia_vllm_47f5d58e/README.md](runners/nvidia_vllm_47f5d58e/README.md).
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_F
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_F
 ```
 
 Full specs: [suites/README.md](suites/README.md#suite-f).
@@ -174,7 +174,7 @@ Results report `concurrency` values, not batch sizes.
 ### With a local model path
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --suite suite_A \
     --model-path /path/to/local/model
 ```
@@ -311,7 +311,7 @@ huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct \
     --local-dir /your/path/Meta-Llama-3-8B-Instruct
 
 # Use a local copy
-python run.py --runner nvidia_vllm_2b3890cf --model-path /your/path/...
+python run.py --runner nvidia_vllm_47f5d58e --model-path /your/path/...
 ```
 
 If your local copy was downloaded at a different revision, add a note in

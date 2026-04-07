@@ -597,7 +597,7 @@ class BenchmarkRunner(ABC):
         """
         Build human-readable directory name for this benchmark run.
         Format: {chip_slug}x{count}_{suite_id}_{runner_id}_{run_id}
-        Example: nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_a3f2c1b8
+        Example: nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_a3f2c1b8
 
         Stored in meta.run_name and used as the output directory name.
         Deterministic — same config always produces same run_name.

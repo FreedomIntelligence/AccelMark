@@ -14,15 +14,15 @@ Usage:
     python runners/validate_runners.py
 
     # Validate a specific runner folder (name or path)
-    python runners/validate_runners.py --dir nvidia_vllm_2b3890cf
-    python runners/validate_runners.py --dir runners/nvidia_vllm_2b3890cf
-    python runners/validate_runners.py --dir /abs/path/to/nvidia_vllm_2b3890cf
+    python runners/validate_runners.py --dir nvidia_vllm_47f5d58e
+    python runners/validate_runners.py --dir runners/nvidia_vllm_47f5d58e
+    python runners/validate_runners.py --dir /abs/path/to/nvidia_vllm_47f5d58e
 
     # Dry-run rename (shows what would change, touches nothing)
-    python runners/validate_runners.py --dir nvidia_vllm_2b3890cf --rename --dry-run
+    python runners/validate_runners.py --dir nvidia_vllm_47f5d58e --rename --dry-run
 
     # Rename folder + update meta.json id to match correct hash
-    python runners/validate_runners.py --dir nvidia_vllm_2b3890cf --rename
+    python runners/validate_runners.py --dir nvidia_vllm_47f5d58e --rename
 """
 
 import argparse
@@ -95,9 +95,9 @@ def resolve_target_folder(dir_arg: str) -> Path:
     Resolve --dir to an absolute Path.
 
     Accepts three forms:
-      - bare folder name:   nvidia_vllm_2b3890cf
-      - relative path:      runners/nvidia_vllm_2b3890cf
-      - absolute path:      /home/user/AccelMark/runners/nvidia_vllm_2b3890cf
+      - bare folder name:   nvidia_vllm_47f5d58e
+      - relative path:      runners/nvidia_vllm_47f5d58e
+      - absolute path:      /home/user/AccelMark/runners/nvidia_vllm_47f5d58e
     """
     candidate = Path(dir_arg)
 
@@ -128,7 +128,7 @@ def do_rename(folder: Path, correct_hash: str, dry_run: bool) -> Path:
     parts      = folder.name.rsplit("_", 1)
     base       = parts[0]                          # e.g. "nvidia_vllm"
     old_name   = folder.name                       # e.g. "nvidia_vllm_deadbeef"
-    new_name   = f"{base}_{correct_hash}"          # e.g. "nvidia_vllm_2b3890cf"
+    new_name   = f"{base}_{correct_hash}"          # e.g. "nvidia_vllm_47f5d58e"
     new_folder = folder.parent / new_name
 
     meta_path  = folder / "meta.json"
@@ -204,7 +204,7 @@ parser.add_argument(
     default=None,
     help=(
         "Validate only this runner folder instead of all runners. "
-        "Accepts a bare folder name (e.g. nvidia_vllm_2b3890cf), "
+        "Accepts a bare folder name (e.g. nvidia_vllm_47f5d58e), "
         "a path relative to cwd, or an absolute path."
     ),
 )

@@ -89,11 +89,11 @@ a deterministic string computed from the hardware + software + suite + submitter
 config. Example:
 
 ```
-results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_c2bcf41f
+results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_52162d64
                   └──chip──────────────┘ └suite┘ └──runner──────────────┘ └run_id┘
 ```
 
-The last 8 characters (`c2bcf41f`) are the `run_id` — an 8-char hex hash that
+The last 8 characters (`52162d64`) are the `run_id` — an 8-char hex hash that
 uniquely identifies this configuration. See `_compute_run_id()` in
 `benchmark_runner.py` for the hash inputs.
 
@@ -544,7 +544,7 @@ Dataset format (one JSON object per line):
 Run the accuracy check on reference hardware (A100) and record the score:
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --suite suite_X \
     --scenario accuracy \
     --model-path /path/to/model
@@ -881,14 +881,14 @@ Use `"type": ["your_type", "null"]` to make fields optional.
 Before opening a PR that adds a new runner, validate it locally:
 
 ```bash
-python runners/validate_runners.py runners/nvidia_vllm_2b3890cf/
+python runners/validate_runners.py runners/nvidia_vllm_47f5d58e/
 ```
 
 This validates a single runner folder and tells you clearly whether it is
 ready to submit:
 
 ```
-Validating: nvidia_vllm_2b3890cf/
+Validating: nvidia_vllm_47f5d58e/
 ==================================================
 Files:
   ✓ runner.py
@@ -906,7 +906,7 @@ Duplicate check:
   ✓ No existing runner with this ID
 
 ==================================================
-✓ PASSED — nvidia_vllm_2b3890cf is ready to submit
+✓ PASSED — nvidia_vllm_47f5d58e is ready to submit
 ==================================================
 ```
 
@@ -931,14 +931,14 @@ renaming the folder. The error message tells you exactly what to do:
   ✗ Hash mismatch.
       Folder ends with : e0859b3c
       runner.py hashes to: 6e78e779
-      Rename folder to: nvidia_vllm_2b3890cf
+      Rename folder to: nvidia_vllm_47f5d58e
 ```
 
 To compute the correct name before creating a new runner folder:
 
 ```bash
 python runners/hash_runner.py path/to/your/runner.py
-# → nvidia_vllm_2b3890cf
+# → nvidia_vllm_47f5d58e
 ```
 
 CI runs the same validator across all runner folders automatically on every PR.
@@ -955,21 +955,21 @@ point to the exact code that produced them.
 ```bash
 # Make your changes, then compute the new ID
 python runners/hash_runner.py runners/nvidia_vllm_old_hash/runner.py
-# → nvidia_vllm_2b3890cf
+# → nvidia_vllm_47f5d58e
 ```
 
 **Step 2: Create the new runner folder**
 
 ```bash
-cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_2b3890cf
-# Apply your edits to runners/nvidia_vllm_2b3890cf/runner.py
+cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_47f5d58e
+# Apply your edits to runners/nvidia_vllm_47f5d58e/runner.py
 ```
 
 **Step 3: Update `meta.json` in the new folder**
 
 ```json
 {
-  "id":           "nvidia_vllm_2b3890cf",
+  "id":           "nvidia_vllm_47f5d58e",
   "platform":     "nvidia",
   "name":         "vLLM on NVIDIA (reference implementation)",
   "framework":    "vLLM",
@@ -988,15 +988,15 @@ cp -r runners/nvidia_vllm_old_hash runners/nvidia_vllm_2b3890cf
 ```json
 {
   "id":            "nvidia_vllm_old_hash",
-  "deprecated_by": "nvidia_vllm_2b3890cf",
-  "notes":         "Deprecated — use nvidia_vllm_2b3890cf. Fixed edge case in release_resources()."
+  "deprecated_by": "nvidia_vllm_47f5d58e",
+  "notes":         "Deprecated — use nvidia_vllm_47f5d58e. Fixed edge case in release_resources()."
 }
 ```
 
 **Step 5: Validate and submit**
 
 ```bash
-python runners/validate_runners.py runners/nvidia_vllm_2b3890cf/
+python runners/validate_runners.py runners/nvidia_vllm_47f5d58e/
 ```
 
 Open a PR that includes both the new folder and the updated old `meta.json`.
@@ -1038,7 +1038,7 @@ python run.py --runner your_platform_{hash8} --help
 ```bash
 # Run with minimal requests to test the pipeline end-to-end
 # Temporarily reduce request_count for testing only
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --suite suite_A \
     --scenario offline \
     --output-dir /tmp/accelmark_test/

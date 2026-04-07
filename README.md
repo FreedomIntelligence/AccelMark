@@ -26,14 +26,14 @@
 # 1. Clone and install
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
-pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
+pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 
 # 2. One-time setup
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name
 
 # 3. Run the benchmark (~17 min on A100)
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
 # 4. Submit — open a GitHub Issue and paste your result.json
 # https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
@@ -64,10 +64,10 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). Check
 
 | Hardware | Runner folder | Framework | A | B | C | D | E | F |
 |----------|---------------|-----------|:-:|:-:|:-:|:-:|:-:|:-:|
-| NVIDIA GPU | `nvidia_vllm_2b3890cf` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| NVIDIA GPU | `nvidia_sglang_9f42fabb` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| AMD GPU | `amd_vllm_rocm_523da458` | vLLM (ROCm) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Huawei Ascend NPU | `ascend_vllm_ascend_a370b094` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| NVIDIA GPU | `nvidia_sglang_6da83845` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AMD GPU | `amd_vllm_rocm_5355c2c6` | vLLM (ROCm) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Huawei Ascend NPU | `ascend_vllm_ascend_6ebe6ef9` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — |
 
 Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 

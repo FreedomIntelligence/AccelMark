@@ -14,10 +14,10 @@ no re-configuration, no separate deployment stack.
 pip install -r serve/requirements.txt
 
 # Option A — use a benchmark suite (model + params come from suite.json)
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --serve
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --serve
 
 # Option B — specify the model directly, no suite required
-python run.py --runner nvidia_vllm_2b3890cf --model meta-llama/Llama-3.1-8B-Instruct --serve
+python run.py --runner nvidia_vllm_47f5d58e --model meta-llama/Llama-3.1-8B-Instruct --serve
 
 # Test it
 curl http://localhost:8000/health
@@ -36,7 +36,7 @@ pip install -r serve/requirements.txt
 You also need the runner's own dependencies installed:
 
 ```bash
-pip install -r runners/nvidia_vllm_2b3890cf/requirements.txt
+pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 ```
 
 ---
@@ -48,7 +48,7 @@ There are two ways to specify the model and generation parameters:
 ### Option A — suite-based (benchmark config as source of truth)
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --serve
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --serve
 ```
 
 The suite's `model_id`, `output_tokens_max`, and `max_model_len` are used automatically.
@@ -56,7 +56,7 @@ The suite's `model_id`, `output_tokens_max`, and `max_model_len` are used automa
 ### Option B — model flag (no suite required)
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --model meta-llama/Llama-3.1-8B-Instruct \
     --serve
 ```
@@ -64,7 +64,7 @@ python run.py --runner nvidia_vllm_2b3890cf \
 ### Full example with all options
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf \
+python run.py --runner nvidia_vllm_47f5d58e \
     --suite suite_A \
     --model meta-llama/Llama-3.1-8B-Instruct \
     --model-path /path/to/local/weights \
@@ -102,7 +102,7 @@ Explicit `--max-tokens` / `--max-model-len` always override suite values.
 ## Startup output
 
 ```
-Runner:  VLLMRunner (nvidia_vllm_2b3890cf)
+Runner:  VLLMRunner (nvidia_vllm_47f5d58e)
 Suite:   suite_A
 Model:   meta-llama/Meta-Llama-3-8B-Instruct
 Path:    /models/Meta-Llama-3-8B-Instruct
@@ -110,7 +110,7 @@ Params:  max_tokens=2048
 
 2026-03-22 10:41:03 | INFO  | ============================================================
 2026-03-22 10:41:03 | INFO  | AccelMark Serve
-2026-03-22 10:41:03 | INFO  |   Runner    : nvidia_vllm_2b3890cf
+2026-03-22 10:41:03 | INFO  |   Runner    : nvidia_vllm_47f5d58e
 2026-03-22 10:41:03 | INFO  |   Framework : vLLM 0.6.6
 2026-03-22 10:41:03 | INFO  |   Model     : meta-llama/Meta-Llama-3-8B-Instruct
 2026-03-22 10:41:03 | INFO  |   Endpoint  : http://0.0.0.0:8000
@@ -127,7 +127,7 @@ Capacity estimates come from prior benchmark results for this runner ID.
 Run a benchmark suite first to populate them:
 
 ```bash
-python run.py --runner nvidia_vllm_2b3890cf --suite suite_A --scenario all
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario all
 ```
 
 ---
@@ -146,7 +146,7 @@ curl http://localhost:8000/health
 {
   "status": "ok",
   "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "implementation_id": "nvidia_vllm_2b3890cf",
+  "implementation_id": "nvidia_vllm_47f5d58e",
   "uptime_seconds": 42
 }
 ```
@@ -167,7 +167,7 @@ curl http://localhost:8000/v1/models
       "id": "meta-llama/Meta-Llama-3-8B-Instruct",
       "object": "model",
       "created": 1742636463,
-      "owned_by": "nvidia_vllm_2b3890cf"
+      "owned_by": "nvidia_vllm_47f5d58e"
     }
   ]
 }

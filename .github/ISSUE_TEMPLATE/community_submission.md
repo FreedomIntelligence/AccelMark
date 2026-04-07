@@ -5,7 +5,7 @@ title: "[Submission] <chip> — <suite> — <runner_id>"
 labels: community-submission
 ---
 
-<!-- Title format: [Submission] NVIDIA A100-SXM4-80GB — suite_A — nvidia_vllm_2b3890cf
+<!-- Title format: [Submission] NVIDIA A100-SXM4-80GB — suite_A — nvidia_vllm_47f5d58e
      The CI bot reads your result.json below, validates it, and opens a PR automatically. -->
 
 ```json
