@@ -12,15 +12,15 @@
     "median_throughput_tokens_per_sec": 4880.8
   },
   {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "submission_count": 6,
+    "best_throughput_tokens_per_sec": 9207.93,
+    "median_throughput_tokens_per_sec": 4573.3
+  },
+  {
     "name": "NVIDIA A100-SXM4-40GB",
     "submission_count": 6,
     "best_throughput_tokens_per_sec": 8634.51,
     "median_throughput_tokens_per_sec": 4175.6
-  },
-  {
-    "name": "NVIDIA A100-SXM4-80GB",
-    "submission_count": 6,
-    "best_throughput_tokens_per_sec": 8472.82,
-    "median_throughput_tokens_per_sec": 4549.8
   }
 ]

@@ -60,7 +60,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 4218.13
+    "primary_metric": 4265.11
   },
   "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_2b3890cf_ab38e669": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
@@ -87,7 +87,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 8472.82
+    "primary_metric": 9207.93
   },
   "nvidia_a100_sxm4_80gbx4_suite_B_nvidia_vllm_2b3890cf_0d75785b": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
