@@ -68,22 +68,38 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
     total_start          = time.time()
 
     # ── Resolve which formats this runner supports ────────────────────────
-    runner_quants     = [q.upper() for q in br.SUPPORTED_QUANTIZATIONS]
+    # Detect hardware-supported precisions to pick the right full-precision baseline.
+    # On Ampere+ (A100, A800, H20) this is ["BF16","FP16","FP32"].
+    # On V100/T4 (no BF16) this is ["FP16","FP32"].
+    hw_precisions     = br._detect_supported_precisions(env_info)
+    baseline_precision = "BF16" if "BF16" in hw_precisions else "FP16"
+
+    # runner_backends   = [b.lower() for b in br.SUPPORTED_QUANTIZATION_BACKENDS]
     precisions_to_run = []
-    skipped           = []
+    skipped           = []   # runner doesn't declare support for this backend
     for p in all_precisions:
-        if p == "BF16":
-            precisions_to_run.append(p)   # always run BF16
-        elif p in runner_quants:
+        if p == baseline_precision:
             precisions_to_run.append(p)
-        else:
+        elif p in ("BF16", "FP16"):
+            # The other full-precision baseline — skip silently, not the hw baseline.
             skipped.append(p)
+        else:
+            # # Quantized format — only gate on whether the runner declares support
+            # # for this backend. Hardware compatibility (e.g. FP8 on V100) is left
+            # # to the inference engine: if the hardware can't run it, the subprocess
+            # # fails with the engine's own error, which is recorded in the summary.
+            # fmt_entry = precision_model_map.get(p, {})
+            # backend   = (fmt_entry.get("engine_kwargs") or {}).get("quantization", "")
+            # if not backend or backend.lower() not in runner_backends:
+            #     skipped.append(p)
+            # else:
+            precisions_to_run.append(p)
 
     print(f"\n{'='*60}")
     print(f"  Suite C — Quantization Efficiency Benchmark")
     print(f"  Formats to run : {precisions_to_run}")
     if skipped:
-        print(f"  Skipped        : {skipped} (not in SUPPORTED_QUANTIZATIONS)")
+        print(f"  Skipped        : {skipped} (backend not in SUPPORTED_QUANTIZATION_BACKENDS)")
     print(f"  Base output    : {base_dir}")
     print(f"{'='*60}\n")
 
@@ -93,15 +109,15 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
     for precision in precisions_to_run:
         fmt_info     = precision_model_map.get(precision)
         if fmt_info is None:
-            if precision == "BF16":
-                # BF16 baseline: fall back to model_id — expected
+            if precision == baseline_precision:
+                # Full-precision baseline: fall back to suite model_id — expected
                 fmt_model_id = suite.get("model_id")
             else:
                 # Quantized format with no model mapping — refuse to silently
                 # run the base model under a quantized precision label
                 print(f"  ✗ Skipping {precision}: no entry in precision_model_map "
-                      f"and it is not BF16. Add a pre-quantized model_id for this "
-                      f"format to suite.json precision_model_map.")
+                      f"and it is not the baseline precision ({baseline_precision}). "
+                      f"Add a pre-quantized model_id for this format to suite.json precision_model_map.")
                 results_summary.append(
                     (precision, "SKIPPED: missing precision_model_map entry", "")
                 )
@@ -135,7 +151,7 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
         # Resolve local path for this format's model_id
         fmt_model_path = br._resolve_model_path(
             fmt_model_id,
-            getattr(args, "model_path", None) if precision == "BF16" else None,
+            getattr(args, "model_path", None) if precision == baseline_precision else None,
         )
         # Extract transparency fields set by _resolve_model_path() for this format
         fmt_model_note = getattr(br, "_model_note_override", None)
@@ -189,7 +205,7 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
         print(f"  [{icon}] {precision:6s} — {status}")
     if skipped:
         for p in skipped:
-            print(f"  [—] {p:6s} — skipped (not in SUPPORTED_QUANTIZATIONS)")
+            print(f"  [—] {p:6s} — skipped (backend not in SUPPORTED_QUANTIZATION_BACKENDS)")
     print()
 
     successful = [p for p, status, _ in results_summary if status == "SUCCESS"]
@@ -231,7 +247,7 @@ def _merge_suite_c_results(
         print("No precision results to merge")
         return
 
-    base_result = precision_results.get("BF16") or precision_results[
+    base_result = precision_results.get("BF16") or precision_results.get("FP16") or precision_results[
         next(iter(precision_results))
     ]
 
@@ -239,8 +255,16 @@ def _merge_suite_c_results(
     all_precisions      = suite.get("precision_levels",
                                     ["BF16", "FP8", "W8A8", "W8A16", "W4A16"])
 
-    quant_results = []
-    bf16_best     = None
+    # Determine which precision was the full-precision baseline for this run.
+    # Prefer BF16 if it was run; fall back to FP16 (V100 path).
+    baseline_precision = (
+        "BF16" if "BF16" in precision_results
+        else "FP16" if "FP16" in precision_results
+        else None
+    )
+
+    quant_results  = []
+    baseline_best  = None
 
     for precision in all_precisions:
         if precision not in precision_results:
@@ -264,13 +288,13 @@ def _merge_suite_c_results(
             default=None
         )
 
-        if precision == "BF16":
-            bf16_best = best
+        if precision == baseline_precision:
+            baseline_best = best
 
         speedup = (
-            round(best / bf16_best, 3)
-            if bf16_best and best and precision != "BF16"
-            else (1.0 if precision == "BF16" else None)
+            round(best / baseline_best, 3)
+            if baseline_best and best and precision != baseline_precision
+            else (1.0 if precision == baseline_precision else None)
         )
 
         acc_score = None

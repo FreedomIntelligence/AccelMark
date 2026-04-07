@@ -1,37 +1,57 @@
 {
   "suite_id": "suite_C",
-  "description": "Quantization efficiency benchmark. Measures throughput and accuracy across BF16, FP8, W8A8, W8A16, and W4A16 precision formats using fixed pre-quantized checkpoints.",
+  "description": "Quantization efficiency benchmark. Measures throughput and accuracy across BF16, FP16, FP8, W8A8, W8A16, and W4A16 precision formats using fixed pre-quantized checkpoints. FP16 is included as a hardware-compatibility baseline for pre-Ampere GPUs.",
   "model_id": "meta-llama/Llama-3.1-8B-Instruct",
   "model_revision":  "0e9e39f249a16976918f6564b8830bc894c89659",
   "dataset": "sharegpt_standard_v1",
   "max_model_len": 4096,
+  "precision_required": "BF16",
+  "allowed_precisions": ["BF16", "FP16"],
+  "_precision_note": "precision_required/allowed_precisions are used for run_id stability and as a safety net if _resolve_precision is called unexpectedly. The actual per-format precision is controlled by precision_model_map — each format runs as an explicit subprocess with --precision set.",
   "precision_model_map": {
     "BF16":  {
       "model_id": "meta-llama/Llama-3.1-8B-Instruct",
-      "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659"
+      "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "dtype_override": "bfloat16"
+    },
+    "FP16":  {
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "dtype_override": "float16",
+      "_note": "Same checkpoint as BF16 — dtype_override forces float16 compute. Required for pre-Ampere GPUs (V100, T4) that lack native BF16 support."
     },
     "FP8":   {
       "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8",
-      "model_revision": "12fd6884d2585dd4d020373e7f39f74507b31866"
+      "model_revision": "12fd6884d2585dd4d020373e7f39f74507b31866",
+      "engine_kwargs": {"quantization": "compressed-tensors"},
+      "_note": "Static per-tensor FP8 (weights + activations). Requires Ampere+ (A100, A800, H20). Skipped automatically on FP16-only hardware."
     },
     "W8A8":  {
       "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8",
-      "model_revision": "e2bfb7d92784ad7d1b606c2f9644d3cefb2ec708"
+      "model_revision": "e2bfb7d92784ad7d1b606c2f9644d3cefb2ec708",
+      "engine_kwargs": {"quantization": "compressed-tensors"},
+      "_note": "INT8 weights + INT8 activations via compressed-tensors. Exercises native int8 tensor cores."
     },
     "W8A16": {
       "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16",
-      "model_revision": "38e03ba250017bf8ed3eeecd3a744e21f6b994a9"
+      "model_revision": "38e03ba250017bf8ed3eeecd3a744e21f6b994a9",
+      "engine_kwargs": {"quantization": "compressed-tensors"},
+      "_note": "INT8 weights, FP16 activations. Weight-only quantization — reduces memory bandwidth, not compute dtype."
     },
     "W4A16": {
       "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
-      "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e"
+      "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e",
+      "engine_kwargs": {"quantization": "gptq"},
+      "_note": "INT4 weights, FP16 activations via GPTQ Marlin kernels. Weight-only quantization — larger memory saving than W8A16."
     }
   },
 
-  "precision_levels": ["BF16", "FP8", "W8A8", "W8A16", "W4A16"],
+  "precision_levels": ["BF16", "FP16", "FP8", "W8A8", "W8A16", "W4A16"],
+  "_precision_levels_note": "FP16 runs on all hardware including pre-Ampere. FP8 requires Ampere+ and is skipped automatically on FP16-only runners via SUPPORTED_QUANTIZATIONS.",
 
   "accuracy_thresholds": {
     "BF16":  0.03,
+    "FP16":  0.03,
     "FP8":   0.03,
     "W8A8":  0.04,
     "W8A16": 0.03,

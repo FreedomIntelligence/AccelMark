@@ -138,28 +138,31 @@ class BenchmarkRunner(ABC):
           SUPPORTED_PRECISIONS = ["bf16"]
     """
 
-    SUPPORTED_QUANTIZATIONS: list[str] = []
+    SUPPORTED_QUANTIZATION_BACKENDS: list[str] = []
     """
-    List of quantization formats this runner supports for Suite C.
-    Use uppercase strings matching suite_C precision_levels:
-      'FP8', 'W8A8', 'W8A16', 'W4A16'
+    List of quantization backend strings this runner's framework supports.
+    Values are the framework-level quantization identifiers passed to the engine
+    (e.g. vLLM's `quantization=` kwarg), NOT suite precision names.
 
-    BF16 is always supported and does not need to be listed here.
-    An empty list means the runner can run BF16 only — it will be skipped
-    for all quantized formats in Suite C.
+    Suite C uses this to filter precision_model_map entries: a format is runnable
+    if its engine_kwargs.quantization value appears in this list. This means adding
+    a new quantized format to suite.json requires no runner code changes — only the
+    suite's precision_model_map entry needs the correct engine_kwargs.quantization.
+
+    An empty list means the runner supports no quantized formats (BF16/FP16/FP32 only).
 
     Examples:
-      NVIDIA vLLM on H100 (full support including FP8):
-          SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]
+      NVIDIA vLLM (full support):
+          SUPPORTED_QUANTIZATION_BACKENDS = ["fp8", "compressed-tensors", "gptq_marlin"]
 
-      NVIDIA vLLM on A100 (no native FP8):
-          SUPPORTED_QUANTIZATIONS = ["w8a8", "w8a16", "w4a16"]
+      AMD ROCm vLLM (no FP8 on base MI250):
+          SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq_marlin"]
 
-      AMD ROCm vLLM (FP8 on MI300X only):
-          SUPPORTED_QUANTIZATIONS = ["w8a8", "w4a16"]
+      Ascend vllm-ascend:
+          SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq_marlin"]
 
       Apple MLX (no quantization support yet):
-          SUPPORTED_QUANTIZATIONS = []
+          SUPPORTED_QUANTIZATION_BACKENDS = []
     """
 
     # ── Abstract methods (must implement) ─────────────────────────────────────
@@ -903,6 +906,24 @@ class BenchmarkRunner(ABC):
                 effective_precision = self._resolve_precision(suite, _acc_env_info)
             self._effective_precision = effective_precision
 
+            # Inject dtype_override and engine_kwargs from precision_model_map entry
+            # so the runner can apply the correct quantization kernel and dtype.
+            self._precision_dtype_override  = _fmt_entry.get("dtype_override")
+            self._precision_engine_kwargs   = dict(_fmt_entry.get("engine_kwargs") or {})
+
+            # If the precision_model_map entry declares a quantization engine_kwarg, the
+            # runner will use dtype="auto", which lets vLLM default the compute dtype to
+            # BF16 internally. On pre-Ampere hardware (V100/T4) that doesn't support BF16
+            # this silently produces wrong results. If no dtype_override was already set
+            # by the suite entry and the hardware doesn't support BF16, force float16.
+            _entry_has_quantization = bool(
+                (_fmt_entry.get("engine_kwargs") or {}).get("quantization")
+            )
+            if (not self._precision_dtype_override
+                    and _entry_has_quantization
+                    and "BF16" not in self._detect_supported_precisions(_acc_env_info)):
+                self._precision_dtype_override = "float16"
+
             print(f"Loading {model_id} for accuracy check...")
             t_load = time.perf_counter()
             self._current_scenario = "accuracy"
@@ -990,6 +1011,24 @@ class BenchmarkRunner(ABC):
         else:
             effective_precision = self._resolve_precision(suite, env_info)
         self._effective_precision = effective_precision
+
+        # Inject dtype_override and engine_kwargs from precision_model_map entry
+        # so the runner can apply the correct quantization kernel and dtype.
+        self._precision_dtype_override  = _fmt_entry.get("dtype_override")
+        self._precision_engine_kwargs   = dict(_fmt_entry.get("engine_kwargs") or {})
+
+        # If the precision_model_map entry declares a quantization engine_kwarg, the
+        # runner will use dtype="auto", which lets vLLM default the compute dtype to
+        # BF16 internally. On pre-Ampere hardware (V100/T4) that doesn't support BF16
+        # this silently produces wrong results. If no dtype_override was already set
+        # by the suite entry and the hardware doesn't support BF16, force float16.
+        _entry_has_quantization = bool(
+            (_fmt_entry.get("engine_kwargs") or {}).get("quantization")
+        )
+        if (not self._precision_dtype_override
+                and _entry_has_quantization
+                and "BF16" not in self._detect_supported_precisions(env_info)):
+            self._precision_dtype_override = "float16"
 
         self.load_model(effective_model_path, {
             "tensor_parallel_size":   tp_size,

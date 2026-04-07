@@ -1,5 +1,5 @@
 {
-  "id": "nvidia_vllm_2b3890cf",
+  "id": "nvidia_vllm_47f5d58e",
   "platform": "nvidia",
   "name": "vLLM on NVIDIA (reference implementation)",
   "framework": "vLLM",

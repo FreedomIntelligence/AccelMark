@@ -1,0 +1,258 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "Tesla V100S-PCIE-32GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 32.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "FP16",
+    "effective_dtype": "float16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original",
+    "_note": "suite model_id. Each precision level uses its own quantized checkpoint."
+  },
+  "task": {
+    "scenarios_run": [
+      "accuracy",
+      "offline"
+    ],
+    "precision_levels_run": [
+      "FP16",
+      "FP8",
+      "W8A8",
+      "W8A16",
+      "W4A16"
+    ],
+    "precision_levels_skipped": [
+      "BF16"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": null
+  },
+  "metrics": {
+    "quantization": {
+      "results_by_precision": [
+        {
+          "precision": "FP16",
+          "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+          "best_throughput_tokens_per_sec": 1636.52,
+          "accuracy_score": 0.55,
+          "accuracy_baseline_delta": null,
+          "accuracy_valid": true,
+          "quality_efficiency": 900.1,
+          "speedup_vs_bf16": 1.0,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 1,
+              "throughput_tokens_per_sec": 1636.52,
+              "throughput_tokens_per_sec_per_chip": 1636.52,
+              "elapsed_seconds_median": 39.0,
+              "peak_memory_gb": 26.55,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 4,
+              "throughput_tokens_per_sec": 1634.19,
+              "throughput_tokens_per_sec_per_chip": 1634.19,
+              "elapsed_seconds_median": 39.1,
+              "peak_memory_gb": 26.55,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 16,
+              "throughput_tokens_per_sec": 1632.64,
+              "throughput_tokens_per_sec_per_chip": 1632.64,
+              "elapsed_seconds_median": 39.1,
+              "peak_memory_gb": 26.55,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 64,
+              "throughput_tokens_per_sec": 1629.6,
+              "throughput_tokens_per_sec_per_chip": 1629.6,
+              "elapsed_seconds_median": 39.2,
+              "peak_memory_gb": 26.55,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "fp16",
+          "effective_dtype": "float16",
+          "quantization_method": null
+        },
+        {
+          "precision": "W4A16",
+          "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+          "best_throughput_tokens_per_sec": 1376.91,
+          "accuracy_score": 0.56,
+          "accuracy_baseline_delta": -0.01,
+          "accuracy_valid": true,
+          "quality_efficiency": 771.1,
+          "speedup_vs_bf16": 0.841,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 1,
+              "throughput_tokens_per_sec": 1376.52,
+              "throughput_tokens_per_sec_per_chip": 1376.52,
+              "elapsed_seconds_median": 45.9,
+              "peak_memory_gb": 26.64,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 4,
+              "throughput_tokens_per_sec": 1376.91,
+              "throughput_tokens_per_sec_per_chip": 1376.91,
+              "elapsed_seconds_median": 45.9,
+              "peak_memory_gb": 26.64,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 16,
+              "throughput_tokens_per_sec": 1375.44,
+              "throughput_tokens_per_sec_per_chip": 1375.44,
+              "elapsed_seconds_median": 45.9,
+              "peak_memory_gb": 26.64,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 64,
+              "throughput_tokens_per_sec": 1368.97,
+              "throughput_tokens_per_sec_per_chip": 1368.97,
+              "elapsed_seconds_median": 46.2,
+              "peak_memory_gb": 26.64,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "w4a16",
+          "effective_dtype": "float16",
+          "quantization_method": "gptq"
+        }
+      ]
+    },
+    "derived": {}
+  },
+  "accuracy": null,
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-07",
+    "time": "15:17:02",
+    "run_id": "08687137",
+    "run_name": "tesla_v100s_pcie_32gbx1_suite_C_nvidia_vllm_47f5d58e_08687137",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-07T15:06:35.209392+00:00",
+    "benchmark_end_time": "2026-04-07T15:17:02.318742+00:00",
+    "benchmark_elapsed_minutes": 22.8,
+    "model_load_seconds": 60.4,
+    "benchmark_elapsed_minutes_note": "Sum of per-precision benchmark_elapsed_minutes (excludes sleep gaps and orchestrator overhead).",
+    "scenario_dirs": {
+      "fp16/offline": "results/verified/tesla_v100s_pcie_32gbx1_suite_C_nvidia_vllm_47f5d58e_08687137/fp16/offline",
+      "fp8/offline": "results/verified/tesla_v100s_pcie_32gbx1_suite_C_nvidia_vllm_47f5d58e_08687137/fp8/offline",
+      "w8a8/offline": "results/verified/tesla_v100s_pcie_32gbx1_suite_C_nvidia_vllm_47f5d58e_08687137/w8a8/offline",
+      "w8a16/offline": "results/verified/tesla_v100s_pcie_32gbx1_suite_C_nvidia_vllm_47f5d58e_08687137/w8a16/offline",
+      "w4a16/offline": "results/verified/tesla_v100s_pcie_32gbx1_suite_C_nvidia_vllm_47f5d58e_08687137/w4a16/offline"
+    },
+    "precision_dirs": {
+      "FP16": "fp16",
+      "FP8": "fp8",
+      "W8A8": "w8a8",
+      "W8A16": "w8a16",
+      "W4A16": "w4a16"
+    },
+    "precision_model_map": {
+      "FP16": {
+        "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+        "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+        "dtype_override": "float16",
+        "_note": "Same checkpoint as BF16 \u2014 dtype_override forces float16 compute. Required for pre-Ampere GPUs (V100, T4) that lack native BF16 support."
+      },
+      "FP8": {
+        "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8",
+        "model_revision": "12fd6884d2585dd4d020373e7f39f74507b31866",
+        "engine_kwargs": {
+          "quantization": "compressed-tensors"
+        },
+        "_note": "Static per-tensor FP8 (weights + activations). Requires Ampere+ (A100, A800, H20). Skipped automatically on FP16-only hardware."
+      },
+      "W8A8": {
+        "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8",
+        "model_revision": "e2bfb7d92784ad7d1b606c2f9644d3cefb2ec708",
+        "engine_kwargs": {
+          "quantization": "compressed-tensors"
+        },
+        "_note": "INT8 weights + INT8 activations via compressed-tensors. Exercises native int8 tensor cores."
+      },
+      "W8A16": {
+        "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16",
+        "model_revision": "38e03ba250017bf8ed3eeecd3a744e21f6b994a9",
+        "engine_kwargs": {
+          "quantization": "compressed-tensors"
+        },
+        "_note": "INT8 weights, FP16 activations. Weight-only quantization \u2014 reduces memory bandwidth, not compute dtype."
+      },
+      "W4A16": {
+        "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+        "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e",
+        "engine_kwargs": {
+          "quantization": "gptq"
+        },
+        "_note": "INT4 weights, FP16 activations via GPTQ Marlin kernels. Weight-only quantization \u2014 larger memory saving than W8A16."
+      }
+    }
+  }
+}

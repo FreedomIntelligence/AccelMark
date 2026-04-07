@@ -52,7 +52,7 @@ class SGLangRunner(BenchmarkRunner):
     # checkpoints. FP8 requires H100 or newer (native FP8 tensor cores).
     # On A100, FP8 weights compute in BF16 — list it here; the leaderboard
     # will show effective_dtype to clarify.
-    SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]
+    SUPPORTED_QUANTIZATION_BACKENDS = ["fp8", "compressed-tensors", "gptq_marlin"]
 
     def __init__(self):
         self.engine        = None   # sglang.Engine (offline/accuracy)
@@ -83,6 +83,7 @@ class SGLangRunner(BenchmarkRunner):
     def load_model(self, model_path: str, parallelism: dict) -> None:
         """Load model — sync Engine for batch inference, AsyncEngine for streaming."""
         tp_size       = parallelism["tensor_parallel_size"]
+        ep_size       = parallelism.get("expert_parallel_size", 1)
         max_tokens    = parallelism["max_tokens"]
         max_model_len = parallelism["max_model_len"]
         use_async     = parallelism["use_async"]
@@ -90,40 +91,27 @@ class SGLangRunner(BenchmarkRunner):
 
         cfg                  = getattr(self, "_runner_config", {})
         mem_fraction_static  = getattr(self, "_mem_fraction_static", 0.88)
-        extra_kwargs         = cfg.get("engine_kwargs") or {}
+        extra_kwargs         = dict(cfg.get("engine_kwargs") or {})
 
         effective_precision = getattr(self, "_effective_precision", "BF16").upper()
+        precision           = getattr(self, "_precision", None) or effective_precision
 
-        dtype         = "bfloat16"
-        quantization  = None
+        _dtype_override  = getattr(self, "_precision_dtype_override", None)
+        _prec_eng_kwargs = dict(getattr(self, "_precision_engine_kwargs", None) or {})
+        quantization     = _prec_eng_kwargs.pop("quantization", None)
 
-        if effective_precision == "BF16":
-            dtype = "bfloat16"
-            self._quantization_method = None
-        elif effective_precision == "FP16":
-            dtype = "float16"
-            self._quantization_method = None
-        elif effective_precision == "FP32":
-            dtype = "float32"
-            self._quantization_method = None
-        elif effective_precision == "FP8":
-            dtype = "auto"
-            self._quantization_method = "fp8"
-        elif effective_precision == "W8A8":
-            dtype = "auto"
-            self._quantization_method = "w8a8"
-        elif effective_precision == "W8A16":
-            dtype = "auto"
-            self._quantization_method = "w8a16"
-        elif effective_precision == "W4A16":
-            dtype = "auto"
-            self._quantization_method = "awq"
-        else:
-            dtype = "auto"
-            self._quantization_method = None
+        _NATIVE_DTYPE_MAP = {"BF16": "bfloat16", "FP16": "float16", "FP32": "float32"}
+        dtype = _NATIVE_DTYPE_MAP.get(precision, "auto")
+        self._quantization_method = quantization
+
+        if _dtype_override:
+            dtype = _dtype_override
+        if _prec_eng_kwargs:
+            _prec_eng_kwargs.update(extra_kwargs)
+            extra_kwargs = _prec_eng_kwargs
 
         print(
-            f"Loading model: precision={effective_precision}, dtype={dtype}"
+            f"Loading model: precision={precision}, dtype={dtype}"
             + (f", quantization_method={self._quantization_method}"
                if self._quantization_method else "")
         )
@@ -146,6 +134,8 @@ class SGLangRunner(BenchmarkRunner):
             mem_fraction_static=mem_fraction_static,
             **extra_kwargs,
         )
+        if ep_size > 1:
+            engine_kwargs["ep_size"] = ep_size
         if quantization:
             engine_kwargs["quantization"] = quantization
         if max_model_len:
@@ -326,6 +316,8 @@ class SGLangRunner(BenchmarkRunner):
         parser = argparse.ArgumentParser(add_help=False)
         parser.add_argument("--tensor-parallel-size", type=int, default=None,
                             dest="tensor_parallel_size")
+        parser.add_argument("--expert-parallel-size", type=int, default=None,
+                            dest="expert_parallel_size")
         parser.add_argument("--disable-cuda-graph", action="store_true", default=False,
                             dest="disable_cuda_graph")
         extra, _ = parser.parse_known_args()
@@ -335,16 +327,21 @@ class SGLangRunner(BenchmarkRunner):
         tp_size, _tp_source = self._resolve_tensor_parallel_size(
             extra.tensor_parallel_size
         )
+        ep_size = (extra.expert_parallel_size
+                   if extra.expert_parallel_size is not None
+                   else cfg.get("expert_parallel_size", 1))
 
         self._enforce_eager       = extra.disable_cuda_graph or cfg.get("disable_cuda_graph", False)
         self._mem_fraction_static = cfg.get("mem_fraction_static", 0.88)
 
         print(f"  tensor_parallel_size = {tp_size}  [{_tp_source}]")
+        if ep_size > 1:
+            print(f"  expert_parallel_size = {ep_size}  [cli/yaml]")
 
         self._parallelism = {
             "tensor_parallel_size":   tp_size,
             "pipeline_parallel_size": 1,
-            "expert_parallel_size":   1,
+            "expert_parallel_size":   ep_size,
             "data_parallel_size":     1,
         }
         self._chip_count = tp_size
@@ -356,6 +353,9 @@ class SGLangRunner(BenchmarkRunner):
             "--tensor-parallel-size",
             str(self._parallelism.get("tensor_parallel_size", 1)),
         ]
+        if self._parallelism.get("expert_parallel_size", 1) > 1:
+            extra += ["--expert-parallel-size",
+                      str(self._parallelism["expert_parallel_size"])]
         if self._enforce_eager:
             extra += ["--disable-cuda-graph"]
         return extra

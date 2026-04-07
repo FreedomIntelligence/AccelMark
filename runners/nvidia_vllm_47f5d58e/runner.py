@@ -42,7 +42,7 @@ class VLLMRunner(BenchmarkRunner):
     # vLLM on NVIDIA supports all precisions — hardware detection in BenchmarkRunner
     # will automatically restrict to FP16 on V100/T4
     SUPPORTED_PRECISIONS = ["bf16", "fp16", "fp32"]
-    SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]
+    SUPPORTED_QUANTIZATION_BACKENDS = ["fp8", "compressed-tensors", "gptq_marlin"]
 
     def __init__(self):
         self.llm: LLM = None
@@ -74,6 +74,7 @@ class VLLMRunner(BenchmarkRunner):
         """Load model — sync LLM for offline/accuracy, async engine for streaming."""
         tp_size = parallelism["tensor_parallel_size"]
         pp_size = parallelism["pipeline_parallel_size"]
+        ep_size = parallelism.get("expert_parallel_size", 1)
         assert pp_size <= 1, "Pipeline parallelism is not supported in VLLMRunner"
 
         max_tokens    = parallelism["max_tokens"]
@@ -105,36 +106,39 @@ class VLLMRunner(BenchmarkRunner):
         # Use precision resolved by BenchmarkRunner._resolve_precision()
         effective_precision = getattr(self, "_effective_precision", "BF16").upper()
         precision           = getattr(self, "_precision", None) or effective_precision
-        quantization        = None
-        dtype               = "bfloat16"
 
-        # Map precision format names to vLLM kwargs.
-        # For pre-quantized checkpoints, use dtype="auto" and let vLLM detect
-        # the quantization method from the checkpoint's config.json.
-        if precision == "BF16":
-            dtype = "bfloat16"
-            self._quantization_method = None
-        elif precision == "FP8":
-            dtype = "auto"
-            self._quantization_method = "fp8"
-        elif precision == "W8A8":
-            dtype = "auto"
-            self._quantization_method = "w8a8"
-        elif precision == "W8A16":
-            dtype = "auto"
-            self._quantization_method = "w8a16"
-        elif precision == "W4A16":
-            dtype = "auto"
-            self._quantization_method = "awq"
-        elif precision == "FP16":
-            dtype = "float16"
-            self._quantization_method = None
-        elif precision == "FP32":
-            dtype = "float32"
-            self._quantization_method = None
-        else:
-            dtype = "auto"
-            self._quantization_method = None
+        # dtype_override and quantization may be injected by benchmark_runner from
+        # precision_model_map entry fields (dtype_override, engine_kwargs.quantization).
+        # These take priority over the runner's own precision→dtype mapping below.
+        _dtype_override  = getattr(self, "_precision_dtype_override", None)
+        _prec_eng_kwargs = dict(getattr(self, "_precision_engine_kwargs", None) or {})
+
+        quantization = _prec_eng_kwargs.pop("quantization", None)
+
+        # Map native precision names to explicit dtypes.
+        # Quantized formats (anything not in this map) use dtype="auto" — vLLM reads
+        # the storage dtype from the checkpoint's config.json, and the quantization
+        # kernel is set explicitly via the `quantization` kwarg already populated above
+        # from precision_model_map engine_kwargs. No fallback guessing needed here.
+        _NATIVE_DTYPE_MAP = {
+            "BF16":  "bfloat16",
+            "FP16":  "float16",
+            "FP32":  "float32",
+        }
+        dtype = _NATIVE_DTYPE_MAP.get(precision, "auto")
+        self._quantization_method = quantization  # None for native, explicit str for quantized
+
+        # dtype_override from precision_model_map wins over the mapping above.
+        # Used for e.g. FP16 baseline on pre-Ampere hardware (V100/T4).
+        if _dtype_override:
+            dtype = _dtype_override
+
+        # Merge remaining precision_engine_kwargs (after popping quantization) into
+        # extra_kwargs so they reach LLM() / AsyncEngineArgs. Runner YAML engine_kwargs
+        # still take final precedence via the **extra_kwargs spread at the end.
+        if _prec_eng_kwargs:
+            _prec_eng_kwargs.update(extra_kwargs)   # runner YAML wins on conflict
+            extra_kwargs = _prec_eng_kwargs
 
         print(f"Loading model: precision={precision}, dtype={dtype}"
               + (f", quantization_method={self._quantization_method}"
@@ -160,6 +164,9 @@ class VLLMRunner(BenchmarkRunner):
                 gpu_memory_utilization=gpu_memory_util,
                 **extra_kwargs,
             )
+            if ep_size > 1:
+                llm_kwargs["enable_expert_parallel"] = True
+                llm_kwargs["tensor_parallel_size"]   = tp_size
             if quantization:
                 llm_kwargs["quantization"] = quantization
             if max_model_len:
@@ -179,6 +186,8 @@ class VLLMRunner(BenchmarkRunner):
                 # This is intentional — engine_kwargs is the power-user escape hatch.
                 **extra_kwargs,
             )
+            if ep_size > 1:
+                engine_kwargs["enable_expert_parallel"] = True
             if max_model_len:
                 engine_kwargs["max_model_len"] = max_model_len
             engine_args = AsyncEngineArgs(**engine_kwargs)
@@ -365,6 +374,8 @@ class VLLMRunner(BenchmarkRunner):
                             dest="tensor_parallel_size")
         parser.add_argument("--pipeline-parallel-size", type=int, default=None,
                             dest="pipeline_parallel_size")
+        parser.add_argument("--expert-parallel-size", type=int, default=None,
+                            dest="expert_parallel_size")
         parser.add_argument("--enforce-eager", action="store_true", default=False,
                             dest="enforce_eager")
         extra, _ = parser.parse_known_args()
@@ -377,23 +388,31 @@ class VLLMRunner(BenchmarkRunner):
 
         pp_size = (extra.pipeline_parallel_size
                    if extra.pipeline_parallel_size is not None
-                   else 1)
+                   else cfg.get("pipeline_parallel_size", 1))
+        ep_size = (extra.expert_parallel_size
+                   if extra.expert_parallel_size is not None
+                   else cfg.get("expert_parallel_size", 1))
         # enforce_eager: CLI flag OR yaml setting (either activates it)
         self._enforce_eager = extra.enforce_eager or cfg.get("enforce_eager", False)
 
         print(f"  tensor_parallel_size = {tp_size}  [{_tp_source}]")
+        if ep_size > 1:
+            print(f"  expert_parallel_size = {ep_size}  [cli/yaml]")
 
         if not self.SUPPORTS_MULTI_CHIP and tp_size * pp_size > 1:
             print(f"Warning: {self.__class__.__name__} does not support multi-chip. "
                   f"Ignoring tensor_parallel_size={tp_size}, using 1.")
             tp_size = 1
             pp_size = 1
+            ep_size = 1
 
         # Report to base class — used by _compute_run_id(), _build_result_json(), etc.
+        # Note: for MoE with expert parallelism, chips are shared between TP and EP
+        # dimensions — ep_size does not add to chip count independently.
         self._parallelism = {
             "tensor_parallel_size":   tp_size,
             "pipeline_parallel_size": pp_size,
-            "expert_parallel_size":   1,
+            "expert_parallel_size":   ep_size,
             "data_parallel_size":     1,
         }
         self._chip_count = tp_size * pp_size
@@ -409,6 +428,9 @@ class VLLMRunner(BenchmarkRunner):
         if self._parallelism.get("pipeline_parallel_size", 1) > 1:
             extra += ["--pipeline-parallel-size",
                       str(self._parallelism["pipeline_parallel_size"])]
+        if self._parallelism.get("expert_parallel_size", 1) > 1:
+            extra += ["--expert-parallel-size",
+                      str(self._parallelism["expert_parallel_size"])]
         if self._enforce_eager:
             extra += ["--enforce-eager"]
         return extra
