@@ -214,5 +214,41 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 4924.15
+  },
+  "tesla_v100s_pcie_32gbx1_suite_A_nvidia_vllm_2b3890cf_70191abc": {
+    "chip_name": "Tesla V100S-PCIE-32GB",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1578.25
+  },
+  "tesla_v100s_pcie_32gbx1_suite_D_nvidia_vllm_2b3890cf_05cea88f": {
+    "chip_name": "Tesla V100S-PCIE-32GB",
+    "suite_id": "suite_D",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1693.37
+  },
+  "tesla_v100s_pcie_32gbx1_suite_F_nvidia_vllm_2b3890cf_8c9e518b": {
+    "chip_name": "Tesla V100S-PCIE-32GB",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 7978.11
+  },
+  "tesla_v100s_pcie_32gbx4_suite_E_nvidia_vllm_2b3890cf_9ff31506": {
+    "chip_name": "Tesla V100S-PCIE-32GB",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1935.77
   }
 }
