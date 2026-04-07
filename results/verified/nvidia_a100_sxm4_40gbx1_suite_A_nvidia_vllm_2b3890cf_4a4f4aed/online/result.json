@@ -11,7 +11,7 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T01:06:58.734254+00:00",
+    "collected_at": "2026-04-05T23:46:42.967709+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -132,37 +132,37 @@
         {
           "target_qps": 5,
           "achieved_qps": 5.0,
-          "ttft_ms_p50": 57.17,
-          "ttft_ms_p90": 89.9,
-          "ttft_ms_p99": 126.12,
-          "tpot_ms_p50": 27.06,
-          "tpot_ms_p90": 34.57,
-          "tpot_ms_p99": 37.89,
-          "elapsed_seconds_median": 112.8,
+          "ttft_ms_p50": 55.56,
+          "ttft_ms_p90": 85.82,
+          "ttft_ms_p99": 120.66,
+          "tpot_ms_p50": 26.36,
+          "tpot_ms_p90": 30.03,
+          "tpot_ms_p99": 33.97,
+          "elapsed_seconds_median": 71.6,
           "sla_met": true
         },
         {
           "target_qps": 25,
           "achieved_qps": 25.0,
-          "ttft_ms_p50": 314.2,
-          "ttft_ms_p90": 24994.27,
-          "ttft_ms_p99": 27828.59,
-          "tpot_ms_p50": 81.19,
-          "tpot_ms_p90": 104.13,
-          "tpot_ms_p99": 191.27,
-          "elapsed_seconds_median": 63.9,
+          "ttft_ms_p50": 149.21,
+          "ttft_ms_p90": 466.23,
+          "ttft_ms_p99": 4485.49,
+          "tpot_ms_p50": 65.19,
+          "tpot_ms_p90": 101.02,
+          "tpot_ms_p99": 183.26,
+          "elapsed_seconds_median": 38.4,
           "sla_met": false
         },
         {
           "target_qps": 100,
           "achieved_qps": 100.0,
-          "ttft_ms_p50": 9514.69,
-          "ttft_ms_p90": 38070.2,
-          "ttft_ms_p99": 42842.45,
-          "tpot_ms_p50": 72.77,
-          "tpot_ms_p90": 80.49,
-          "tpot_ms_p99": 450.39,
-          "elapsed_seconds_median": 64.9,
+          "ttft_ms_p50": 5381.95,
+          "ttft_ms_p90": 6776.74,
+          "ttft_ms_p99": 12039.59,
+          "tpot_ms_p50": 60.18,
+          "tpot_ms_p90": 86.76,
+          "tpot_ms_p99": 1197.96,
+          "elapsed_seconds_median": 38.0,
           "sla_met": false
         }
       ]
@@ -177,8 +177,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "01:27:40",
+    "date": "2026-04-06",
+    "time": "00:01:16",
     "run_id": "4a4f4aed",
     "run_name": "nvidia_a100_sxm4_40gbx1_suite_A_nvidia_vllm_2b3890cf_4a4f4aed",
     "flagged": null,
@@ -187,9 +187,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T01:15:42.820690+00:00",
-    "benchmark_end_time": "2026-04-04T01:27:40.345029+00:00",
-    "benchmark_elapsed_minutes": 12.0,
-    "model_load_seconds": 47.9
+    "benchmark_start_time": "2026-04-05T23:53:53.960899+00:00",
+    "benchmark_end_time": "2026-04-06T00:01:16.734941+00:00",
+    "benchmark_elapsed_minutes": 7.4,
+    "model_load_seconds": 47.4
   }
 }

@@ -11,14 +11,14 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T07:49:48.126225+00:00",
+    "collected_at": "2026-04-05T20:56:59.893694+00:00",
     "accelerators": [
       {
         "index": 0,
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -28,7 +28,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -38,7 +38,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -48,7 +48,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -62,7 +62,7 @@
       "logical_cores": 255,
       "numa_nodes": 2
     },
-    "system_memory_gb": 1007.7,
+    "system_memory_gb": 1007.6,
     "pcie_generation": "PCIe Gen 4",
     "cpu_accelerator_bandwidth_gbs": null,
     "network_interfaces": [
@@ -96,7 +96,7 @@
   "software": {
     "framework": "vLLM",
     "framework_version": "0.6.6.post1",
-    "driver_version": "580.65.06",
+    "driver_version": "565.57.01",
     "runtime_version": "CUDA 12.1",
     "os": "Ubuntu 22.04.4 LTS",
     "python_version": "3.10.18"
@@ -125,19 +125,21 @@
       "data_parallel_size": 1
     },
     "extra_config": {
-      "enforce_eager": false
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
     }
   },
   "metrics": {
     "interactive": {
-      "ttft_ms_p50": 29.36,
-      "ttft_ms_p90": 30.58,
-      "ttft_ms_p99": 32.05,
-      "tpot_ms_p50": 3.92,
-      "tpot_ms_p90": 4.0,
-      "tpot_ms_p99": 4.06,
+      "ttft_ms_p50": 27.93,
+      "ttft_ms_p90": 29.74,
+      "ttft_ms_p99": 31.49,
+      "tpot_ms_p50": 3.64,
+      "tpot_ms_p90": 3.88,
+      "tpot_ms_p99": 4.0,
       "peak_memory_gb": null,
-      "elapsed_seconds_median": 129.8
+      "elapsed_seconds_median": 122.0
     }
   },
   "accuracy": {
@@ -149,8 +151,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "17:17:20",
+    "date": "2026-04-05",
+    "time": "21:10:34",
     "run_id": "553ca500",
     "run_name": "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_vllm_2b3890cf_553ca500",
     "flagged": null,
@@ -159,9 +161,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T17:10:53.274572+00:00",
-    "benchmark_end_time": "2026-04-04T17:17:20.815872+00:00",
-    "benchmark_elapsed_minutes": 6.5,
-    "model_load_seconds": 40.6
+    "benchmark_start_time": "2026-04-05T21:04:37.751715+00:00",
+    "benchmark_end_time": "2026-04-05T21:10:34.502876+00:00",
+    "benchmark_elapsed_minutes": 5.9,
+    "model_load_seconds": 32.3
   }
 }

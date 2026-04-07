@@ -11,14 +11,14 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T01:06:50.913707+00:00",
+    "collected_at": "2026-04-05T13:04:53.606274+00:00",
     "accelerators": [
       {
         "index": 0,
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -28,7 +28,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -38,7 +38,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -48,7 +48,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -62,7 +62,7 @@
       "logical_cores": 255,
       "numa_nodes": 2
     },
-    "system_memory_gb": 1007.7,
+    "system_memory_gb": 1007.6,
     "pcie_generation": "PCIe Gen 4",
     "cpu_accelerator_bandwidth_gbs": null,
     "network_interfaces": [
@@ -96,7 +96,7 @@
   "software": {
     "framework": "vLLM",
     "framework_version": "0.6.6.post1",
-    "driver_version": "580.65.06",
+    "driver_version": "565.57.01",
     "runtime_version": "CUDA 12.1",
     "os": "Ubuntu 22.04.4 LTS",
     "python_version": "3.10.18"
@@ -137,37 +137,37 @@
         {
           "target_qps": 5,
           "achieved_qps": 5.0,
-          "ttft_ms_p50": 54.4,
-          "ttft_ms_p90": 90.37,
-          "ttft_ms_p99": 184.15,
-          "tpot_ms_p50": 24.17,
-          "tpot_ms_p90": 30.28,
-          "tpot_ms_p99": 33.48,
-          "elapsed_seconds_median": 112.0,
+          "ttft_ms_p50": 54.5,
+          "ttft_ms_p90": 89.7,
+          "ttft_ms_p99": 132.47,
+          "tpot_ms_p50": 24.86,
+          "tpot_ms_p90": 29.6,
+          "tpot_ms_p99": 35.32,
+          "elapsed_seconds_median": 71.2,
           "sla_met": true
         },
         {
           "target_qps": 25,
           "achieved_qps": 25.0,
-          "ttft_ms_p50": 284.78,
-          "ttft_ms_p90": 23332.44,
-          "ttft_ms_p99": 26874.34,
-          "tpot_ms_p50": 78.63,
-          "tpot_ms_p90": 92.64,
-          "tpot_ms_p99": 163.35,
-          "elapsed_seconds_median": 62.5,
+          "ttft_ms_p50": 131.33,
+          "ttft_ms_p90": 294.65,
+          "ttft_ms_p99": 4193.82,
+          "tpot_ms_p50": 66.24,
+          "tpot_ms_p90": 101.47,
+          "tpot_ms_p99": 182.13,
+          "elapsed_seconds_median": 38.4,
           "sla_met": false
         },
         {
           "target_qps": 100,
           "achieved_qps": 100.0,
-          "ttft_ms_p50": 5229.91,
-          "ttft_ms_p90": 37728.13,
-          "ttft_ms_p99": 42432.41,
-          "tpot_ms_p50": 77.68,
-          "tpot_ms_p90": 88.18,
-          "tpot_ms_p99": 558.29,
-          "elapsed_seconds_median": 61.6,
+          "ttft_ms_p50": 3743.4,
+          "ttft_ms_p90": 5813.67,
+          "ttft_ms_p99": 11192.67,
+          "tpot_ms_p50": 62.6,
+          "tpot_ms_p90": 89.59,
+          "tpot_ms_p99": 1194.72,
+          "elapsed_seconds_median": 36.3,
           "sla_met": false
         }
       ]
@@ -182,8 +182,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "01:26:59",
+    "date": "2026-04-05",
+    "time": "13:18:36",
     "run_id": "35145afa",
     "run_name": "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_35145afa",
     "flagged": null,
@@ -192,9 +192,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T01:15:20.987255+00:00",
-    "benchmark_end_time": "2026-04-04T01:26:59.902975+00:00",
-    "benchmark_elapsed_minutes": 11.6,
-    "model_load_seconds": 52.9
+    "benchmark_start_time": "2026-04-05T13:11:20.361971+00:00",
+    "benchmark_end_time": "2026-04-05T13:18:36.553300+00:00",
+    "benchmark_elapsed_minutes": 7.3,
+    "model_load_seconds": 42.9
   }
 }

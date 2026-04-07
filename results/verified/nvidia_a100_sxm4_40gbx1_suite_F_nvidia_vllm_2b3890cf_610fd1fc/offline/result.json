@@ -11,7 +11,7 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T11:08:43.805196+00:00",
+    "collected_at": "2026-04-06T06:36:47.680833+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -120,7 +120,9 @@
       "data_parallel_size": 1
     },
     "extra_config": {
-      "enforce_eager": false
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
     }
   },
   "metrics": {
@@ -128,9 +130,9 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 4,
-          "throughput_tokens_per_sec": 8992.58,
-          "throughput_tokens_per_sec_per_chip": 8992.58,
-          "elapsed_seconds_median": 10.1,
+          "throughput_tokens_per_sec": 8634.51,
+          "throughput_tokens_per_sec_per_chip": 8634.51,
+          "elapsed_seconds_median": 7.2,
           "peak_memory_gb": 33.16,
           "power_watts_avg": null,
           "power_watts_peak": null,
@@ -139,9 +141,9 @@
         },
         {
           "client_concurrency": 16,
-          "throughput_tokens_per_sec": 8983.32,
-          "throughput_tokens_per_sec_per_chip": 8983.32,
-          "elapsed_seconds_median": 10.2,
+          "throughput_tokens_per_sec": 8588.06,
+          "throughput_tokens_per_sec_per_chip": 8588.06,
+          "elapsed_seconds_median": 7.3,
           "peak_memory_gb": 33.16,
           "power_watts_avg": null,
           "power_watts_peak": null,
@@ -150,9 +152,9 @@
         },
         {
           "client_concurrency": 64,
-          "throughput_tokens_per_sec": 8959.47,
-          "throughput_tokens_per_sec_per_chip": 8959.47,
-          "elapsed_seconds_median": 10.2,
+          "throughput_tokens_per_sec": 8569.99,
+          "throughput_tokens_per_sec_per_chip": 8569.99,
+          "elapsed_seconds_median": 7.3,
           "peak_memory_gb": 33.16,
           "power_watts_avg": null,
           "power_watts_peak": null,
@@ -171,8 +173,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "11:12:52",
+    "date": "2026-04-06",
+    "time": "06:40:32",
     "run_id": "610fd1fc",
     "run_name": "nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_2b3890cf_610fd1fc",
     "flagged": null,
@@ -181,9 +183,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T11:10:48.948073+00:00",
-    "benchmark_end_time": "2026-04-04T11:12:52.288553+00:00",
-    "benchmark_elapsed_minutes": 2.1,
-    "model_load_seconds": 46.6
+    "benchmark_start_time": "2026-04-06T06:39:04.125626+00:00",
+    "benchmark_end_time": "2026-04-06T06:40:32.346031+00:00",
+    "benchmark_elapsed_minutes": 1.5,
+    "model_load_seconds": 52.5
   }
 }

@@ -1,12 +1,12 @@
 {
-  "collected_at": "2026-04-04T05:03:51.610026+00:00",
+  "collected_at": "2026-04-05T18:47:22.296319+00:00",
   "accelerators": [
     {
       "index": 0,
       "name": "NVIDIA A800-SXM4-80GB",
       "vendor": "NVIDIA",
       "memory_gb": 80.0,
-      "driver_version": "580.65.06",
+      "driver_version": "565.57.01",
       "firmware_version": null,
       "compute_capability": "8.0",
       "supports_bf16": true
@@ -16,7 +16,7 @@
       "name": "NVIDIA A800-SXM4-80GB",
       "vendor": "NVIDIA",
       "memory_gb": 80.0,
-      "driver_version": "580.65.06",
+      "driver_version": "565.57.01",
       "firmware_version": null,
       "compute_capability": "8.0",
       "supports_bf16": true
@@ -26,7 +26,7 @@
       "name": "NVIDIA A800-SXM4-80GB",
       "vendor": "NVIDIA",
       "memory_gb": 80.0,
-      "driver_version": "580.65.06",
+      "driver_version": "565.57.01",
       "firmware_version": null,
       "compute_capability": "8.0",
       "supports_bf16": true
@@ -36,7 +36,7 @@
       "name": "NVIDIA A800-SXM4-80GB",
       "vendor": "NVIDIA",
       "memory_gb": 80.0,
-      "driver_version": "580.65.06",
+      "driver_version": "565.57.01",
       "firmware_version": null,
       "compute_capability": "8.0",
       "supports_bf16": true
@@ -50,7 +50,7 @@
     "logical_cores": 255,
     "numa_nodes": 2
   },
-  "system_memory_gb": 1007.7,
+  "system_memory_gb": 1007.6,
   "pcie_generation": "PCIe Gen 4",
   "cpu_accelerator_bandwidth_gbs": null,
   "network_interfaces": [

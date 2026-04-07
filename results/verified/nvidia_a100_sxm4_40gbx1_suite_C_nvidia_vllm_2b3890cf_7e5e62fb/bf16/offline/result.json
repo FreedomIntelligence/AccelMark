@@ -11,7 +11,7 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T08:23:52.552627+00:00",
+    "collected_at": "2026-04-06T01:17:47.360960+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -120,7 +120,9 @@
       "data_parallel_size": 1
     },
     "extra_config": {
-      "enforce_eager": false
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
     }
   },
   "metrics": {
@@ -128,10 +130,10 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 1,
-          "throughput_tokens_per_sec": 5097.4,
-          "throughput_tokens_per_sec_per_chip": 5097.4,
-          "elapsed_seconds_median": 24.9,
-          "peak_memory_gb": 33.53,
+          "throughput_tokens_per_sec": 3945.83,
+          "throughput_tokens_per_sec_per_chip": 3945.83,
+          "elapsed_seconds_median": 16.1,
+          "peak_memory_gb": 33.52,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
@@ -139,10 +141,10 @@
         },
         {
           "client_concurrency": 4,
-          "throughput_tokens_per_sec": 5063.31,
-          "throughput_tokens_per_sec_per_chip": 5063.31,
-          "elapsed_seconds_median": 25.1,
-          "peak_memory_gb": 33.53,
+          "throughput_tokens_per_sec": 3906.5,
+          "throughput_tokens_per_sec_per_chip": 3906.5,
+          "elapsed_seconds_median": 16.3,
+          "peak_memory_gb": 33.52,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
@@ -150,10 +152,10 @@
         },
         {
           "client_concurrency": 16,
-          "throughput_tokens_per_sec": 5063.46,
-          "throughput_tokens_per_sec_per_chip": 5063.46,
-          "elapsed_seconds_median": 25.1,
-          "peak_memory_gb": 33.53,
+          "throughput_tokens_per_sec": 3928.3,
+          "throughput_tokens_per_sec_per_chip": 3928.3,
+          "elapsed_seconds_median": 16.2,
+          "peak_memory_gb": 33.52,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
@@ -161,10 +163,10 @@
         },
         {
           "client_concurrency": 64,
-          "throughput_tokens_per_sec": 5054.02,
-          "throughput_tokens_per_sec_per_chip": 5054.02,
-          "elapsed_seconds_median": 25.1,
-          "peak_memory_gb": 33.53,
+          "throughput_tokens_per_sec": 3860.9,
+          "throughput_tokens_per_sec_per_chip": 3860.9,
+          "elapsed_seconds_median": 16.5,
+          "peak_memory_gb": 33.52,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
@@ -182,19 +184,19 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "08:33:17",
-    "run_id": "43e8fdb3",
-    "run_name": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_2b3890cf_43e8fdb3",
+    "date": "2026-04-06",
+    "time": "01:25:11",
+    "run_id": "7e5e62fb",
+    "run_name": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_2b3890cf_7e5e62fb",
     "flagged": null,
     "reproduce_script": "runners/nvidia_vllm_2b3890cf/runner.py",
     "env_info_file": "../../env_info.json",
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T08:26:37.897078+00:00",
-    "benchmark_end_time": "2026-04-04T08:33:17.857478+00:00",
-    "benchmark_elapsed_minutes": 6.7,
-    "model_load_seconds": 52.2
+    "benchmark_start_time": "2026-04-06T01:20:51.027100+00:00",
+    "benchmark_end_time": "2026-04-06T01:25:11.992655+00:00",
+    "benchmark_elapsed_minutes": 4.3,
+    "model_load_seconds": 65.8
   }
 }

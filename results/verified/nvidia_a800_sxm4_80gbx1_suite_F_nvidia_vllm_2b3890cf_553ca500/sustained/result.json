@@ -11,14 +11,14 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T07:49:48.126225+00:00",
+    "collected_at": "2026-04-05T20:56:59.893694+00:00",
     "accelerators": [
       {
         "index": 0,
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -28,7 +28,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -38,7 +38,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -48,7 +48,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -62,7 +62,7 @@
       "logical_cores": 255,
       "numa_nodes": 2
     },
-    "system_memory_gb": 1007.7,
+    "system_memory_gb": 1007.6,
     "pcie_generation": "PCIe Gen 4",
     "cpu_accelerator_bandwidth_gbs": null,
     "network_interfaces": [
@@ -96,7 +96,7 @@
   "software": {
     "framework": "vLLM",
     "framework_version": "0.6.6.post1",
-    "driver_version": "580.65.06",
+    "driver_version": "565.57.01",
     "runtime_version": "CUDA 12.1",
     "os": "Ubuntu 22.04.4 LTS",
     "python_version": "3.10.18"
@@ -125,7 +125,9 @@
       "data_parallel_size": 1
     },
     "extra_config": {
-      "enforce_eager": false
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
     }
   },
   "metrics": {
@@ -138,148 +140,148 @@
         {
           "minute": 1.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2350.8,
-          "tokens_out": 141086,
+          "throughput_tokens_per_sec": 2335.2,
+          "tokens_out": 140221,
           "tokens_in": 0,
-          "requests_completed": 412,
-          "ttft_ms_p50": 35.6,
-          "ttft_ms_p99": 663.2
+          "requests_completed": 674,
+          "ttft_ms_p50": 27.8,
+          "ttft_ms_p99": 284.4
         },
         {
           "minute": 2.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2492.6,
-          "tokens_out": 149538,
+          "throughput_tokens_per_sec": 2046.9,
+          "tokens_out": 122785,
           "tokens_in": 0,
-          "requests_completed": 426,
-          "ttft_ms_p50": 34.9,
-          "ttft_ms_p99": 75.5
+          "requests_completed": 588,
+          "ttft_ms_p50": 35.6,
+          "ttft_ms_p99": 82.9
         },
         {
           "minute": 3.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2463.5,
-          "tokens_out": 147826,
+          "throughput_tokens_per_sec": 1989.6,
+          "tokens_out": 119358,
           "tokens_in": 0,
-          "requests_completed": 423,
-          "ttft_ms_p50": 35.1,
-          "ttft_ms_p99": 75.3
+          "requests_completed": 567,
+          "ttft_ms_p50": 35.8,
+          "ttft_ms_p99": 83.1
         },
         {
           "minute": 4.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2385.4,
-          "tokens_out": 143142,
+          "throughput_tokens_per_sec": 2001.9,
+          "tokens_out": 120165,
           "tokens_in": 0,
-          "requests_completed": 404,
-          "ttft_ms_p50": 35.0,
-          "ttft_ms_p99": 74.7
+          "requests_completed": 573,
+          "ttft_ms_p50": 36.0,
+          "ttft_ms_p99": 74.0
         },
         {
           "minute": 5.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2351.6,
-          "tokens_out": 141136,
+          "throughput_tokens_per_sec": 2014.0,
+          "tokens_out": 120835,
           "tokens_in": 0,
-          "requests_completed": 403,
-          "ttft_ms_p50": 36.3,
-          "ttft_ms_p99": 76.7
+          "requests_completed": 576,
+          "ttft_ms_p50": 35.6,
+          "ttft_ms_p99": 75.5
         },
         {
           "minute": 6.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2576.6,
-          "tokens_out": 154558,
+          "throughput_tokens_per_sec": 2056.6,
+          "tokens_out": 123336,
           "tokens_in": 0,
-          "requests_completed": 436,
-          "ttft_ms_p50": 35.0,
-          "ttft_ms_p99": 74.1
+          "requests_completed": 590,
+          "ttft_ms_p50": 35.7,
+          "ttft_ms_p99": 75.7
         },
         {
           "minute": 7.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2440.2,
-          "tokens_out": 146437,
+          "throughput_tokens_per_sec": 2195.3,
+          "tokens_out": 131768,
           "tokens_in": 0,
-          "requests_completed": 416,
-          "ttft_ms_p50": 35.0,
-          "ttft_ms_p99": 74.8
+          "requests_completed": 630,
+          "ttft_ms_p50": 34.1,
+          "ttft_ms_p99": 76.5
         },
         {
           "minute": 8.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2415.9,
-          "tokens_out": 144922,
+          "throughput_tokens_per_sec": 2116.1,
+          "tokens_out": 126912,
           "tokens_in": 0,
-          "requests_completed": 409,
-          "ttft_ms_p50": 35.5,
-          "ttft_ms_p99": 73.8
+          "requests_completed": 609,
+          "ttft_ms_p50": 35.3,
+          "ttft_ms_p99": 88.7
         },
         {
           "minute": 9.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2345.7,
-          "tokens_out": 140689,
+          "throughput_tokens_per_sec": 2078.2,
+          "tokens_out": 124749,
           "tokens_in": 0,
-          "requests_completed": 402,
-          "ttft_ms_p50": 35.6,
-          "ttft_ms_p99": 75.2
+          "requests_completed": 595,
+          "ttft_ms_p50": 35.9,
+          "ttft_ms_p99": 88.5
         },
         {
           "minute": 10.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2213.0,
-          "tokens_out": 132874,
+          "throughput_tokens_per_sec": 2050.4,
+          "tokens_out": 123026,
           "tokens_in": 0,
-          "requests_completed": 382,
-          "ttft_ms_p50": 36.3,
-          "ttft_ms_p99": 75.2
+          "requests_completed": 585,
+          "ttft_ms_p50": 35.6,
+          "ttft_ms_p99": 74.3
         },
         {
           "minute": 11.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2491.7,
-          "tokens_out": 149494,
+          "throughput_tokens_per_sec": 2064.9,
+          "tokens_out": 123803,
           "tokens_in": 0,
-          "requests_completed": 422,
-          "ttft_ms_p50": 35.0,
-          "ttft_ms_p99": 73.3
+          "requests_completed": 594,
+          "ttft_ms_p50": 35.1,
+          "ttft_ms_p99": 76.3
         },
         {
           "minute": 12.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2358.0,
-          "tokens_out": 141458,
+          "throughput_tokens_per_sec": 2016.6,
+          "tokens_out": 121000,
           "tokens_in": 0,
-          "requests_completed": 402,
-          "ttft_ms_p50": 36.0,
-          "ttft_ms_p99": 82.9
+          "requests_completed": 580,
+          "ttft_ms_p50": 36.1,
+          "ttft_ms_p99": 77.0
         },
         {
           "minute": 13.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2402.8,
-          "tokens_out": 144174,
+          "throughput_tokens_per_sec": 2127.5,
+          "tokens_out": 127657,
           "tokens_in": 0,
-          "requests_completed": 417,
-          "ttft_ms_p50": 35.1,
-          "ttft_ms_p99": 75.4
+          "requests_completed": 612,
+          "ttft_ms_p50": 34.8,
+          "ttft_ms_p99": 78.3
         },
         {
           "minute": 14.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 2408.1,
-          "tokens_out": 144405,
+          "throughput_tokens_per_sec": 1999.1,
+          "tokens_out": 120022,
           "tokens_in": 0,
-          "requests_completed": 409,
-          "ttft_ms_p50": 35.1,
-          "ttft_ms_p99": 73.0
+          "requests_completed": 572,
+          "ttft_ms_p50": 35.3,
+          "ttft_ms_p99": 74.9
         }
       ],
-      "sustained_throughput_tokens_per_sec": 2406.8,
-      "throttle_ratio": 0.859,
-      "throttle_onset_minute": 10.0,
-      "ttft_p99_drift_ms": -590.2
+      "sustained_throughput_tokens_per_sec": 2078.0,
+      "throttle_ratio": 0.852,
+      "throttle_onset_minute": 2.0,
+      "ttft_p99_drift_ms": -209.5
     }
   },
   "accuracy": {
@@ -291,8 +293,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "08:37:12",
+    "date": "2026-04-05",
+    "time": "21:26:34",
     "run_id": "553ca500",
     "run_name": "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_vllm_2b3890cf_553ca500",
     "flagged": null,
@@ -301,9 +303,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T08:22:04.834972+00:00",
-    "benchmark_end_time": "2026-04-04T08:37:12.638463+00:00",
+    "benchmark_start_time": "2026-04-05T21:11:29.469975+00:00",
+    "benchmark_end_time": "2026-04-05T21:26:34.315894+00:00",
     "benchmark_elapsed_minutes": 15.1,
-    "model_load_seconds": 39.3
+    "model_load_seconds": 32.2
   }
 }

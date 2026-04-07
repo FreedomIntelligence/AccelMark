@@ -11,7 +11,7 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T11:08:43.805196+00:00",
+    "collected_at": "2026-04-06T06:36:47.680833+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -120,17 +120,19 @@
       "data_parallel_size": 1
     },
     "extra_config": {
-      "enforce_eager": false
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
     }
   },
   "metrics": {
     "interactive": {
-      "ttft_ms_p50": 17.4,
-      "ttft_ms_p90": 18.69,
-      "ttft_ms_p99": 20.62,
+      "ttft_ms_p50": 16.71,
+      "ttft_ms_p90": 17.88,
+      "ttft_ms_p99": 19.87,
       "tpot_ms_p50": 3.17,
-      "tpot_ms_p90": 3.2,
-      "tpot_ms_p99": 3.26,
+      "tpot_ms_p90": 3.21,
+      "tpot_ms_p99": 3.31,
       "peak_memory_gb": null,
       "elapsed_seconds_median": 103.4
     }
@@ -144,8 +146,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "17:55:45",
+    "date": "2026-04-06",
+    "time": "06:50:03",
     "run_id": "610fd1fc",
     "run_name": "nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_2b3890cf_610fd1fc",
     "flagged": null,
@@ -154,9 +156,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T17:50:35.577223+00:00",
-    "benchmark_end_time": "2026-04-04T17:55:45.774910+00:00",
+    "benchmark_start_time": "2026-04-06T06:44:53.041210+00:00",
+    "benchmark_end_time": "2026-04-06T06:50:03.022322+00:00",
     "benchmark_elapsed_minutes": 5.2,
-    "model_load_seconds": 38.8
+    "model_load_seconds": 33.4
   }
 }

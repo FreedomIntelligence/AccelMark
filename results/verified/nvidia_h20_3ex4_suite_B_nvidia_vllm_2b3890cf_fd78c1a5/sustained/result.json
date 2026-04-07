@@ -1,0 +1,481 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_B",
+  "implementation_id": "nvidia_vllm_2b3890cf",
+  "chip": {
+    "name": "NVIDIA H20-3e",
+    "vendor": "NVIDIA",
+    "count": 4,
+    "memory_gb": 140.4,
+    "interconnect_intra_node": "NVLink",
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-05T12:12:29.998696+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "580.65.06",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "580.65.06",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "580.65.06",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "580.65.06",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tNIC0\tNIC1\tNIC2\tNIC3\tNIC4\tNIC5\tNIC6\tNIC7\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV18\tNV18\tNV18\tPIX\tPIX\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t0-47,96-143\t0\t\tN/A\nGPU1\tNV18\t X \tNV18\tNV18\tNODE\tNODE\tPIX\tNODE\tSYS\tSYS\tSYS\tSYS\t0-47,96-143\t0\t\tN/A\nGPU2\tNV18\tNV18\t X \tNV18\tNODE\tNODE\tNODE\tPIX\tSYS\tSYS\tSYS\tSYS\t0-47,96-143\t0\t\tN/A\nGPU3\tNV18\tNV18\tNV18\t X \tNODE\tNODE\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t0-47,96-143\t0\t\tN/A\nNIC0\tPIX\tNODE\tNODE\tNODE\t X \tPIX\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC1\tPIX\tNODE\tNODE\tNODE\tPIX\t X \tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC2\tNODE\tPIX\tNODE\tNODE\tNODE\tNODE\t X \tNODE\tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC3\tNODE\tNODE\tPIX\tNODE\tNODE\tNODE\tNODE\t X \tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC4\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t X \tPIX\tNODE\tNODE\t\t\t\t\nNIC5\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tPIX\t X \tNODE\tNODE\t\t\t\t\nNIC6\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tNODE\tNODE\t X \tPIX\t\t\t\t\nNIC7\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tNODE\tNODE\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n  NIC3: mlx5_3\n  NIC4: mlx5_4\n  NIC5: mlx5_5\n  NIC6: mlx5_6\n  NIC7: mlx5_7\n\n",
+    "intra_node_interconnect": "NVLink",
+    "cpu": {
+      "model": "INTEL(R) XEON(R) PLATINUM 8558",
+      "physical_cores": 96,
+      "logical_cores": 192,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1511.5,
+    "pcie_generation": "PCIe Gen 5",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_3",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_4",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_5",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_6",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_7",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.1",
+    "pytorch_version": "2.5.1+cu121"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "580.65.06",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 70.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "sustained",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 4,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    }
+  },
+  "metrics": {
+    "sustained": {
+      "sustained_concurrency": 4,
+      "duration_minutes": 30,
+      "warmup_minutes": 2,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": true,
+          "throughput_tokens_per_sec": 197.8,
+          "tokens_out": 11872,
+          "tokens_in": 0,
+          "requests_completed": 37,
+          "ttft_ms_p50": 93.9,
+          "ttft_ms_p99": 549.5
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 232.1,
+          "tokens_out": 13933,
+          "tokens_in": 0,
+          "requests_completed": 40,
+          "ttft_ms_p50": 100.5,
+          "ttft_ms_p99": 205.3
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 224.5,
+          "tokens_out": 13466,
+          "tokens_in": 0,
+          "requests_completed": 37,
+          "ttft_ms_p50": 102.1,
+          "ttft_ms_p99": 194.6
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 227.4,
+          "tokens_out": 13649,
+          "tokens_in": 0,
+          "requests_completed": 41,
+          "ttft_ms_p50": 95.1,
+          "ttft_ms_p99": 180.9
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 223.0,
+          "tokens_out": 13378,
+          "tokens_in": 0,
+          "requests_completed": 39,
+          "ttft_ms_p50": 99.4,
+          "ttft_ms_p99": 202.8
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 230.8,
+          "tokens_out": 13839,
+          "tokens_in": 0,
+          "requests_completed": 40,
+          "ttft_ms_p50": 95.0,
+          "ttft_ms_p99": 191.2
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 229.2,
+          "tokens_out": 13752,
+          "tokens_in": 0,
+          "requests_completed": 39,
+          "ttft_ms_p50": 101.3,
+          "ttft_ms_p99": 202.3
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 206.5,
+          "tokens_out": 12392,
+          "tokens_in": 0,
+          "requests_completed": 37,
+          "ttft_ms_p50": 101.4,
+          "ttft_ms_p99": 196.7
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 185.8,
+          "tokens_out": 11152,
+          "tokens_in": 0,
+          "requests_completed": 33,
+          "ttft_ms_p50": 102.9,
+          "ttft_ms_p99": 209.4
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 195.2,
+          "tokens_out": 11705,
+          "tokens_in": 0,
+          "requests_completed": 34,
+          "ttft_ms_p50": 108.9,
+          "ttft_ms_p99": 204.7
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 200.9,
+          "tokens_out": 12058,
+          "tokens_in": 0,
+          "requests_completed": 34,
+          "ttft_ms_p50": 104.7,
+          "ttft_ms_p99": 206.0
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 194.3,
+          "tokens_out": 11664,
+          "tokens_in": 0,
+          "requests_completed": 34,
+          "ttft_ms_p50": 103.0,
+          "ttft_ms_p99": 202.5
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 207.1,
+          "tokens_out": 12424,
+          "tokens_in": 0,
+          "requests_completed": 37,
+          "ttft_ms_p50": 119.4,
+          "ttft_ms_p99": 202.1
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 195.5,
+          "tokens_out": 11723,
+          "tokens_in": 0,
+          "requests_completed": 32,
+          "ttft_ms_p50": 104.9,
+          "ttft_ms_p99": 218.7
+        },
+        {
+          "minute": 15.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 193.3,
+          "tokens_out": 11592,
+          "tokens_in": 0,
+          "requests_completed": 34,
+          "ttft_ms_p50": 103.6,
+          "ttft_ms_p99": 187.2
+        },
+        {
+          "minute": 16.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 188.7,
+          "tokens_out": 11324,
+          "tokens_in": 0,
+          "requests_completed": 35,
+          "ttft_ms_p50": 117.1,
+          "ttft_ms_p99": 205.4
+        },
+        {
+          "minute": 17.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 193.5,
+          "tokens_out": 11610,
+          "tokens_in": 0,
+          "requests_completed": 31,
+          "ttft_ms_p50": 103.6,
+          "ttft_ms_p99": 199.0
+        },
+        {
+          "minute": 18.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 204.8,
+          "tokens_out": 12291,
+          "tokens_in": 0,
+          "requests_completed": 36,
+          "ttft_ms_p50": 102.2,
+          "ttft_ms_p99": 248.4
+        },
+        {
+          "minute": 19.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 194.8,
+          "tokens_out": 11692,
+          "tokens_in": 0,
+          "requests_completed": 36,
+          "ttft_ms_p50": 106.4,
+          "ttft_ms_p99": 202.2
+        },
+        {
+          "minute": 20.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 200.2,
+          "tokens_out": 12003,
+          "tokens_in": 0,
+          "requests_completed": 33,
+          "ttft_ms_p50": 103.6,
+          "ttft_ms_p99": 198.2
+        },
+        {
+          "minute": 21.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 197.3,
+          "tokens_out": 11839,
+          "tokens_in": 0,
+          "requests_completed": 35,
+          "ttft_ms_p50": 104.2,
+          "ttft_ms_p99": 186.7
+        },
+        {
+          "minute": 22.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 190.5,
+          "tokens_out": 11433,
+          "tokens_in": 0,
+          "requests_completed": 36,
+          "ttft_ms_p50": 111.2,
+          "ttft_ms_p99": 205.7
+        },
+        {
+          "minute": 23.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 188.6,
+          "tokens_out": 11319,
+          "tokens_in": 0,
+          "requests_completed": 30,
+          "ttft_ms_p50": 128.0,
+          "ttft_ms_p99": 198.3
+        },
+        {
+          "minute": 24.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 202.6,
+          "tokens_out": 12154,
+          "tokens_in": 0,
+          "requests_completed": 36,
+          "ttft_ms_p50": 103.3,
+          "ttft_ms_p99": 213.0
+        },
+        {
+          "minute": 25.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 190.7,
+          "tokens_out": 11442,
+          "tokens_in": 0,
+          "requests_completed": 35,
+          "ttft_ms_p50": 102.9,
+          "ttft_ms_p99": 206.1
+        },
+        {
+          "minute": 26.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 198.3,
+          "tokens_out": 11902,
+          "tokens_in": 0,
+          "requests_completed": 31,
+          "ttft_ms_p50": 130.8,
+          "ttft_ms_p99": 199.9
+        },
+        {
+          "minute": 27.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 196.6,
+          "tokens_out": 11787,
+          "tokens_in": 0,
+          "requests_completed": 36,
+          "ttft_ms_p50": 105.6,
+          "ttft_ms_p99": 192.5
+        },
+        {
+          "minute": 28.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 189.1,
+          "tokens_out": 11350,
+          "tokens_in": 0,
+          "requests_completed": 34,
+          "ttft_ms_p50": 102.2,
+          "ttft_ms_p99": 201.0
+        },
+        {
+          "minute": 29.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 204.9,
+          "tokens_out": 12295,
+          "tokens_in": 0,
+          "requests_completed": 33,
+          "ttft_ms_p50": 125.9,
+          "ttft_ms_p99": 207.1
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 203.1,
+      "throttle_ratio": 0.801,
+      "throttle_onset_minute": 8.0,
+      "ttft_p99_drift_ms": 1.8
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-05",
+    "time": "13:10:30",
+    "run_id": "fd78c1a5",
+    "run_name": "nvidia_h20_3ex4_suite_B_nvidia_vllm_2b3890cf_fd78c1a5",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_2b3890cf/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-05T12:40:14.752476+00:00",
+    "benchmark_end_time": "2026-04-05T13:10:30.232003+00:00",
+    "benchmark_elapsed_minutes": 30.3,
+    "model_load_seconds": 67.5
+  }
+}

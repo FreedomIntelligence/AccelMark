@@ -1,6 +1,6 @@
 {
-  "subset_score": 0.56,
-  "baseline_delta": -0.01,
+  "subset_score": 0.55,
+  "baseline_delta": -0.02,
   "valid": true,
   "framework": "vLLM",
   "precision": "BF16",

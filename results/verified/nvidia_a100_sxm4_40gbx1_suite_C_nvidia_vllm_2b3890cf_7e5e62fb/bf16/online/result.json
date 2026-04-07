@@ -11,7 +11,7 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T08:23:52.552627+00:00",
+    "collected_at": "2026-04-06T01:17:47.360960+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -120,7 +120,9 @@
       "data_parallel_size": 1
     },
     "extra_config": {
-      "enforce_eager": false
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
     }
   },
   "metrics": {
@@ -130,49 +132,49 @@
         {
           "target_qps": 5,
           "achieved_qps": 5.0,
-          "ttft_ms_p50": 58.22,
-          "ttft_ms_p90": 92.77,
-          "ttft_ms_p99": 131.76,
-          "tpot_ms_p50": 28.44,
-          "tpot_ms_p90": 33.13,
-          "tpot_ms_p99": 39.3,
-          "elapsed_seconds_median": 71.8,
+          "ttft_ms_p50": 59.14,
+          "ttft_ms_p90": 95.24,
+          "ttft_ms_p99": 147.17,
+          "tpot_ms_p50": 28.33,
+          "tpot_ms_p90": 32.4,
+          "tpot_ms_p99": 42.62,
+          "elapsed_seconds_median": 71.9,
           "sla_met": true
         },
         {
           "target_qps": 10,
           "achieved_qps": 10.0,
-          "ttft_ms_p50": 85.74,
-          "ttft_ms_p90": 143.6,
-          "ttft_ms_p99": 322.62,
-          "tpot_ms_p50": 56.15,
-          "tpot_ms_p90": 69.12,
-          "tpot_ms_p99": 90.87,
-          "elapsed_seconds_median": 48.4,
+          "ttft_ms_p50": 84.81,
+          "ttft_ms_p90": 141.77,
+          "ttft_ms_p99": 246.34,
+          "tpot_ms_p50": 54.72,
+          "tpot_ms_p90": 66.5,
+          "tpot_ms_p99": 93.9,
+          "elapsed_seconds_median": 48.0,
           "sla_met": true
         },
         {
           "target_qps": 25,
           "achieved_qps": 25.0,
-          "ttft_ms_p50": 174.55,
-          "ttft_ms_p90": 569.37,
-          "ttft_ms_p99": 4735.47,
-          "tpot_ms_p50": 67.71,
-          "tpot_ms_p90": 102.67,
-          "tpot_ms_p99": 221.76,
-          "elapsed_seconds_median": 40.3,
+          "ttft_ms_p50": 173.73,
+          "ttft_ms_p90": 552.23,
+          "ttft_ms_p99": 4733.2,
+          "tpot_ms_p50": 66.44,
+          "tpot_ms_p90": 102.96,
+          "tpot_ms_p99": 201.1,
+          "elapsed_seconds_median": 39.4,
           "sla_met": false
         },
         {
           "target_qps": 50,
           "achieved_qps": 50.0,
-          "ttft_ms_p50": 2015.36,
-          "ttft_ms_p90": 3657.19,
-          "ttft_ms_p99": 8867.39,
-          "tpot_ms_p50": 64.97,
-          "tpot_ms_p90": 99.64,
-          "tpot_ms_p99": 2602.06,
-          "elapsed_seconds_median": 38.2,
+          "ttft_ms_p50": 2554.33,
+          "ttft_ms_p90": 3670.15,
+          "ttft_ms_p99": 9091.65,
+          "tpot_ms_p50": 64.14,
+          "tpot_ms_p90": 98.77,
+          "tpot_ms_p99": 2599.12,
+          "elapsed_seconds_median": 38.1,
           "sla_met": false
         }
       ]
@@ -187,19 +189,19 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "13:10:15",
-    "run_id": "43e8fdb3",
-    "run_name": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_2b3890cf_43e8fdb3",
+    "date": "2026-04-06",
+    "time": "01:36:12",
+    "run_id": "7e5e62fb",
+    "run_name": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_2b3890cf_7e5e62fb",
     "flagged": null,
     "reproduce_script": "runners/nvidia_vllm_2b3890cf/runner.py",
     "env_info_file": "../../env_info.json",
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T13:00:21.407296+00:00",
-    "benchmark_end_time": "2026-04-04T13:10:15.214496+00:00",
-    "benchmark_elapsed_minutes": 9.9,
-    "model_load_seconds": 36.0
+    "benchmark_start_time": "2026-04-06T01:26:23.426754+00:00",
+    "benchmark_end_time": "2026-04-06T01:36:12.274217+00:00",
+    "benchmark_elapsed_minutes": 9.8,
+    "model_load_seconds": 48.6
   }
 }

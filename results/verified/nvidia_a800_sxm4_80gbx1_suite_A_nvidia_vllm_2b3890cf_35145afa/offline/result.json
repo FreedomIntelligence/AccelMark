@@ -11,14 +11,14 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-04T01:06:50.913707+00:00",
+    "collected_at": "2026-04-05T13:04:53.606274+00:00",
     "accelerators": [
       {
         "index": 0,
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -28,7 +28,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -38,7 +38,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -48,7 +48,7 @@
         "name": "NVIDIA A800-SXM4-80GB",
         "vendor": "NVIDIA",
         "memory_gb": 80.0,
-        "driver_version": "580.65.06",
+        "driver_version": "565.57.01",
         "firmware_version": null,
         "compute_capability": "8.0",
         "supports_bf16": true
@@ -62,7 +62,7 @@
       "logical_cores": 255,
       "numa_nodes": 2
     },
-    "system_memory_gb": 1007.7,
+    "system_memory_gb": 1007.6,
     "pcie_generation": "PCIe Gen 4",
     "cpu_accelerator_bandwidth_gbs": null,
     "network_interfaces": [
@@ -96,7 +96,7 @@
   "software": {
     "framework": "vLLM",
     "framework_version": "0.6.6.post1",
-    "driver_version": "580.65.06",
+    "driver_version": "565.57.01",
     "runtime_version": "CUDA 12.1",
     "os": "Ubuntu 22.04.4 LTS",
     "python_version": "3.10.18"
@@ -135,10 +135,10 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 8,
-          "throughput_tokens_per_sec": 5732.08,
-          "throughput_tokens_per_sec_per_chip": 5732.08,
-          "elapsed_seconds_median": 20.7,
-          "peak_memory_gb": 69.69,
+          "throughput_tokens_per_sec": 4454.18,
+          "throughput_tokens_per_sec_per_chip": 4454.18,
+          "elapsed_seconds_median": 13.5,
+          "peak_memory_gb": 69.29,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
@@ -146,10 +146,10 @@
         },
         {
           "client_concurrency": 32,
-          "throughput_tokens_per_sec": 5710.83,
-          "throughput_tokens_per_sec_per_chip": 5710.83,
-          "elapsed_seconds_median": 20.7,
-          "peak_memory_gb": 69.69,
+          "throughput_tokens_per_sec": 4467.4,
+          "throughput_tokens_per_sec_per_chip": 4467.4,
+          "elapsed_seconds_median": 13.4,
+          "peak_memory_gb": 69.29,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
@@ -157,10 +157,10 @@
         },
         {
           "client_concurrency": 128,
-          "throughput_tokens_per_sec": 5710.57,
-          "throughput_tokens_per_sec_per_chip": 5710.57,
-          "elapsed_seconds_median": 20.7,
-          "peak_memory_gb": 69.69,
+          "throughput_tokens_per_sec": 4473.15,
+          "throughput_tokens_per_sec_per_chip": 4473.15,
+          "elapsed_seconds_median": 13.4,
+          "peak_memory_gb": 69.29,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
@@ -178,8 +178,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "01:14:06",
+    "date": "2026-04-05",
+    "time": "13:10:17",
     "run_id": "35145afa",
     "run_name": "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_35145afa",
     "flagged": null,
@@ -188,9 +188,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T01:09:58.872611+00:00",
-    "benchmark_end_time": "2026-04-04T01:14:06.043025+00:00",
-    "benchmark_elapsed_minutes": 4.1,
-    "model_load_seconds": 74.3
+    "benchmark_start_time": "2026-04-05T13:07:34.500653+00:00",
+    "benchmark_end_time": "2026-04-05T13:10:17.115848+00:00",
+    "benchmark_elapsed_minutes": 2.7,
+    "model_load_seconds": 62.3
   }
 }
