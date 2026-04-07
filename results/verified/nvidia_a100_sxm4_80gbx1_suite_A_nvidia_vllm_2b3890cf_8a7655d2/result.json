@@ -129,7 +129,9 @@
     },
     "num_runs": 3,
     "extra_config": {
-      "enforce_eager": false
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
     }
   },
   "metrics": {
@@ -138,9 +140,9 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 8,
-          "throughput_tokens_per_sec": 4218.13,
-          "throughput_tokens_per_sec_per_chip": 4218.13,
-          "elapsed_seconds_median": 14.2,
+          "throughput_tokens_per_sec": 4265.11,
+          "throughput_tokens_per_sec_per_chip": 4265.11,
+          "elapsed_seconds_median": 14.1,
           "peak_memory_gb": 69.29,
           "power_watts_avg": null,
           "power_watts_peak": null,
@@ -149,9 +151,9 @@
         },
         {
           "client_concurrency": 32,
-          "throughput_tokens_per_sec": 4170.68,
-          "throughput_tokens_per_sec_per_chip": 4170.68,
-          "elapsed_seconds_median": 14.4,
+          "throughput_tokens_per_sec": 4259.06,
+          "throughput_tokens_per_sec_per_chip": 4259.06,
+          "elapsed_seconds_median": 14.1,
           "peak_memory_gb": 69.29,
           "power_watts_avg": null,
           "power_watts_peak": null,
@@ -160,9 +162,9 @@
         },
         {
           "client_concurrency": 128,
-          "throughput_tokens_per_sec": 4109.42,
-          "throughput_tokens_per_sec_per_chip": 4109.42,
-          "elapsed_seconds_median": 14.6,
+          "throughput_tokens_per_sec": 4250.83,
+          "throughput_tokens_per_sec_per_chip": 4250.83,
+          "elapsed_seconds_median": 14.1,
           "peak_memory_gb": 69.29,
           "power_watts_avg": null,
           "power_watts_peak": null,
@@ -536,8 +538,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-04",
-    "time": "17:31:37",
+    "date": "2026-04-07",
+    "time": "04:12:40",
     "run_id": "8a7655d2",
     "run_name": "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_8a7655d2",
     "flagged": null,
@@ -546,10 +548,10 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-04T17:28:43.196537+00:00",
-    "benchmark_end_time": "2026-04-04T17:31:37.179987+00:00",
-    "benchmark_elapsed_minutes": 75.7,
-    "model_load_seconds": 95.6,
+    "benchmark_start_time": "2026-04-07T04:09:50.183321+00:00",
+    "benchmark_end_time": "2026-04-07T04:12:40.650470+00:00",
+    "benchmark_elapsed_minutes": 75.6,
+    "model_load_seconds": 67.3,
     "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'interactive', 'sustained'] scenarios.",
     "scenario_dirs": {
       "offline": "results/verified/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_2b3890cf_8a7655d2/offline",

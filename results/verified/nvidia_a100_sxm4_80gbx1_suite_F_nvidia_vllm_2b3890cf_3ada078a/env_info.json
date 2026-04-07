@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-04-05T02:08:40.286724+00:00",
+  "collected_at": "2026-04-07T03:31:34.829185+00:00",
   "accelerators": [
     {
       "index": 0,
@@ -42,13 +42,13 @@
       "supports_bf16": true
     }
   ],
-  "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tNIC0\tNIC1\tNIC2\tNIC3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV12\tNV12\tNV12\tPXB\tSYS\tSYS\tSYS\t48-63,176-191\t3\t\tN/A\nGPU1\tNV12\t X \tNV12\tNV12\tPXB\tSYS\tSYS\tSYS\t48-63,176-191\t3\t\tN/A\nGPU2\tNV12\tNV12\t X \tNV12\tSYS\tPXB\tPXB\tSYS\t16-31,144-159\t1\t\tN/A\nGPU3\tNV12\tNV12\tNV12\t X \tSYS\tPXB\tPXB\tSYS\t16-31,144-159\t1\t\tN/A\nNIC0\tPXB\tPXB\tSYS\tSYS\t X \tSYS\tSYS\tSYS\t\t\t\t\nNIC1\tSYS\tSYS\tPXB\tPXB\tSYS\t X \tPIX\tSYS\t\t\t\t\nNIC2\tSYS\tSYS\tPXB\tPXB\tSYS\tPIX\t X \tSYS\t\t\t\t\nNIC3\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n  NIC3: mlx5_3\n\n",
+  "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tNIC0\tNIC1\tNIC2\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV12\tNV12\tNV12\tPXB\tSYS\tSYS\t0-63,128-191\t0\t\tN/A\nGPU1\tNV12\t X \tNV12\tNV12\tPXB\tSYS\tSYS\t0-63,128-191\t0\t\tN/A\nGPU2\tNV12\tNV12\t X \tNV12\tNODE\tSYS\tSYS\t0-63,128-191\t0\t\tN/A\nGPU3\tNV12\tNV12\tNV12\t X \tNODE\tSYS\tSYS\t0-63,128-191\t0\t\tN/A\nNIC0\tPXB\tPXB\tNODE\tNODE\t X \tSYS\tSYS\t\t\t\t\nNIC1\tSYS\tSYS\tSYS\tSYS\tSYS\t X \tPIX\t\t\t\t\nNIC2\tSYS\tSYS\tSYS\tSYS\tSYS\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n\n",
   "intra_node_interconnect": "NVLink",
   "cpu": {
     "model": "AMD EPYC 7742 64-Core Processor",
     "physical_cores": 128,
     "logical_cores": 255,
-    "numa_nodes": 8
+    "numa_nodes": 2
   },
   "system_memory_gb": 1007.7,
   "pcie_generation": "PCIe Gen 4",
@@ -68,15 +68,10 @@
       "name": "mlx5_2",
       "type": "InfiniBand/RoCE",
       "bandwidth_gbps": null
-    },
-    {
-      "name": "mlx5_3",
-      "type": "InfiniBand/RoCE",
-      "bandwidth_gbps": null
     }
   ],
   "os": "Ubuntu 22.04.4 LTS",
-  "python_version": "3.10.18",
+  "python_version": "3.10.12",
   "kernel_version": "5.15.0-60-generic",
   "runtime_version": "CUDA 12.1",
   "pytorch_version": "2.5.1+cu121"
