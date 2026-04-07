@@ -33,7 +33,7 @@
   },
   "suite_C": {
     "suite_id": "suite_C",
-    "description": "Quantization efficiency benchmark. Measures throughput and accuracy across BF16, FP8, W8A8, W8A16, and W4A16 precision formats using fixed pre-quantized checkpoints.",
+    "description": "Quantization efficiency benchmark. Measures throughput and accuracy across BF16, FP16, FP8, W8A8, W8A16, and W4A16 precision formats using fixed pre-quantized checkpoints. FP16 is included as a hardware-compatibility baseline for pre-Ampere GPUs.",
     "model_id": "meta-llama/Llama-3.1-8B-Instruct",
     "precision": "BF16",
     "default_scenarios": [

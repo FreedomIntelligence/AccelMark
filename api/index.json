@@ -9,10 +9,6 @@
         "best_sustained_throughput_tokens_per_sec": 488.0,
         "throttle_ratio": 0.897
       },
-      "suite_C": {
-        "best_quality_efficiency": 3013.3,
-        "best_quality_efficiency_format": "W8A8"
-      },
       "suite_D": {
         "best_throughput_tokens_per_sec": 6400.5,
         "best_online_max_qps": 0.0,
@@ -52,7 +48,7 @@
         "throttle_ratio": 0.871
       },
       "suite_C": {
-        "best_quality_efficiency": 3228.8,
+        "best_quality_efficiency": 3294.0,
         "best_quality_efficiency_format": "W8A8"
       },
       "suite_D": {
@@ -93,10 +89,6 @@
         "best_sustained_throughput_tokens_per_sec": 528.4,
         "throttle_ratio": 0.878
       },
-      "suite_C": {
-        "best_quality_efficiency": 3477.5,
-        "best_quality_efficiency_format": "W8A8"
-      },
       "suite_D": {
         "best_throughput_tokens_per_sec": 7975.2,
         "best_online_max_qps": 0.0,
@@ -135,10 +127,6 @@
         "best_sustained_throughput_tokens_per_sec": 689.7,
         "throttle_ratio": 0.942
       },
-      "suite_C": {
-        "best_quality_efficiency": 3241.6,
-        "best_quality_efficiency_format": "W8A8"
-      },
       "suite_D": {
         "best_throughput_tokens_per_sec": 4424.9,
         "best_online_max_qps": 0.0,
@@ -176,6 +164,10 @@
         "best_interactive_ttft_p99_ms": 150.8,
         "best_sustained_throughput_tokens_per_sec": 274.3,
         "throttle_ratio": 0.906
+      },
+      "suite_C": {
+        "best_quality_efficiency": 900.1,
+        "best_quality_efficiency_format": "FP16"
       },
       "suite_D": {
         "best_throughput_tokens_per_sec": 1693.4,
