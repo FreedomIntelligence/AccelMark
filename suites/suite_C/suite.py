@@ -168,15 +168,13 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
 
         print(f"  Command: {' '.join(cmd)}\n")
 
-        try:
-            subprocess.run(cmd, check=True, cwd=str(_REPO_ROOT))
+        ok = br._run_subprocess(cmd, precision)
+        if ok:
             results_summary.append((precision, "SUCCESS", str(precision_dir)))
-            print(f"\n  ✓ {precision} completed")
-        except subprocess.CalledProcessError as e:
-            results_summary.append(
-                (precision, f"FAILED: returncode={e.returncode}", str(precision_dir))
-            )
-            print(f"\n  ✗ {precision} failed (return code {e.returncode})")
+            print(f"\n  {precision} completed")
+        else:
+            results_summary.append((precision, "FAILED: subprocess error", str(precision_dir)))
+
 
         print("  Waiting 10s before next precision level...")
         time.sleep(10)
