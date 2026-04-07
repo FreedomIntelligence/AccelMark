@@ -455,7 +455,43 @@ class BenchmarkRunner(ABC):
         """
         return []
 
-    # ── Implementation identity ───────────────────────────────────────────────
+    def _run_subprocess(self, cmd: list, label: str) -> bool:
+        """
+        Run a scenario subprocess and report failures clearly.
+
+        Uses inherited fds so tqdm progress bars render correctly on the
+        terminal. On non-zero exit, prints the signal name (if the process
+        was killed by a signal) so the cause is always visible.
+
+        Args:
+            cmd:   Full command list to pass to subprocess.run().
+            label: Human-readable name for error messages (e.g. "offline",
+                   "bf16", "2x").
+
+        Returns:
+            True on success (returncode == 0), False otherwise.
+        """
+        import signal as _sig
+        import subprocess as _sp
+
+        proc = _sp.run(cmd, cwd=str(_REPO_ROOT))
+
+        if proc.returncode == 0:
+            return True
+
+        rc = proc.returncode
+        if rc < 0:
+            try:
+                sig_name = _sig.Signals(-rc).name
+            except ValueError:
+                sig_name = f"signal {-rc}"
+            rc_desc = f"killed by {sig_name} (return code {rc})"
+        else:
+            rc_desc = f"exited with code {rc}"
+
+        print(f"\n  {label} FAILED -- subprocess {rc_desc}")
+        return False
+
 
     def _compute_implementation_id(self) -> str | None:
         """
@@ -1175,6 +1211,8 @@ class BenchmarkRunner(ABC):
                 except Exception as e:
                     print(f"  Warning: could not load existing accuracy.json ({e}) — re-running.")
 
+        platform_script = sys.argv[0]
+
         if run_accuracy:
             print(f"\n{'='*60}")
             if skip_gate:
@@ -1184,61 +1222,53 @@ class BenchmarkRunner(ABC):
                 print(f"  Must pass before benchmark runs.")
             print(f"{'='*60}\n")
 
-            # Accuracy outputs go to base_dir/accuracy/ (consistent with other scenario subdirs)
             acc_subdir = base_dir / "accuracy"
             acc_subdir.mkdir(parents=True, exist_ok=True)
 
-            # Load model for accuracy check
-            # Model stays loaded for first benchmark scenario
-            model_id = suite.get("model_id", "unknown")
-            effective_model_path = self._resolve_model_path(
-                model_id, getattr(args, "model_path", None)
-            )
-            if getattr(args, "model_note", None):
-                self._model_note_override = args.model_note
-            if getattr(args, "model_name", None):
-                self._model_name_override = args.model_name
-            _par    = getattr(self, "_parallelism", {})
-            tp_size = _par.get("tensor_parallel_size", 1)
-            pp_size = _par.get("pipeline_parallel_size", 1)
-            ep_size = _par.get("expert_parallel_size", 1)
-            dp_size = _par.get("data_parallel_size", 1)
-
-            # Load env_info for precision resolution — search up to parent dir
-            _all_env_info: dict = {}
-            for _c in [base_dir, base_dir.parent]:
-                _p = _c / "env_info.json"
-                if _p.exists():
-                    with open(_p) as _f:
-                        _all_env_info = json.load(_f)
-                    break
-
-            # Respect explicit --precision if set (e.g. by a suite subprocess);
-            # otherwise resolve from suite requirements and hardware capability.
+            # Run accuracy as a subprocess — identical to how benchmark scenarios
+            # are run.  This is critical: a SIGKILL from the OOM killer (e.g. during
+            # cudagraph capture on a large-memory GPU) terminates the child process
+            # but leaves the parent alive to detect the non-zero exit code, write a
+            # clear error message, and preserve accuracy/run.log.  Running in-process
+            # means SIGKILL kills the whole program with no output at all.
+            #
+            # Output is streamed line-by-line through the parent so it appears on
+            # the terminal in real time AND is captured to accuracy/run.log via the
+            # parent's TeeWriter (set up by _setup_logging above).  Using
+            # subprocess.run() with inherited fds would bypass the TeeWriter entirely
+            # since the child writes directly to the OS fd, not through sys.stdout.
+            acc_cmd = [
+                sys.executable, platform_script,
+                "--suite",      args.suite,
+                "--scenario",   "accuracy",
+                "--output-dir", str(base_dir),
+                "--tier",       getattr(args, "tier", "community"),
+                "--skip-accuracy-gate",
+            ]
+            if getattr(args, "model_path", None):
+                acc_cmd += ["--model-path", args.model_path]
             if getattr(args, "precision", None):
-                effective_precision = args.precision.upper()
+                acc_cmd += ["--precision", args.precision]
+            acc_cmd += self.get_extra_subprocess_args(args)
+
+            print(f"  Command: {' '.join(acc_cmd)}\n")
+
+            acc_ok = self._run_subprocess(acc_cmd, "accuracy")
+            acc_json_path = acc_subdir / "accuracy.json"
+
+            if not acc_ok or not acc_json_path.exists():
+                results_summary.append(("accuracy", "FAILED: subprocess error", str(acc_subdir)))
+                if not skip_gate:
+                    print("  Aborting benchmark. Use --skip-accuracy-gate to override.")
+                    return
+                else:
+                    print("  --skip-accuracy-gate set -- continuing anyway.\n")
+                    acc_result = None
+                    acc_result = None
             else:
-                effective_precision = self._resolve_precision(suite, _all_env_info)
-            self._effective_precision = effective_precision
-
-            if getattr(self, "llm", None) is None and getattr(self, "engine", None) is None:
-                print(f"Loading model for accuracy check...")
-                t_load = time.perf_counter()
-                self._current_scenario = "accuracy"
-                self._advance_dist_port()
-                self.load_model(effective_model_path, {
-                    "tensor_parallel_size":   tp_size,
-                    "pipeline_parallel_size": pp_size,
-                    "expert_parallel_size":   ep_size,
-                    "data_parallel_size":     dp_size,
-                    "max_tokens":             suite.get("output_tokens_max", 512),
-                    "max_model_len":          suite.get("max_model_len"),
-                    "use_async":              False,
-                })
-                print(f"Model loaded in {round(time.perf_counter() - t_load, 1)}s\n")
-
-            try:
-                acc_result = self._run_accuracy_scenario(suite, acc_subdir)
+                # Subprocess succeeded — read accuracy.json written by the child
+                with open(acc_json_path) as f:
+                    acc_result = json.load(f)
 
                 if not acc_result.get("valid"):
                     results_summary.append(("accuracy", "FAILED: score below threshold", str(base_dir)))
@@ -1255,8 +1285,6 @@ class BenchmarkRunner(ABC):
                         f"{'='*60}\n"
                     )
                     if not skip_gate:
-                        self._release_gpu_memory()
-                        time.sleep(10)
                         return
                     else:
                         print("  --skip-accuracy-gate set — continuing anyway.\n")
@@ -1269,27 +1297,12 @@ class BenchmarkRunner(ABC):
                         f"valid=True)\n"
                     )
 
-            except Exception as e:
-                results_summary.append(("accuracy", f"FAILED: {str(e)[:80]}", ""))
-                print(f"\n  ✗ Accuracy check raised an error: {e}")
-                if not skip_gate:
-                    print("  Aborting benchmark. Use --skip-accuracy-gate to override.")
-                    self._release_gpu_memory()
-                    time.sleep(10)
-                    return
-                else:
-                    print("  --skip-accuracy-gate set — continuing anyway.\n")
-
 # ── Step 2: Benchmark scenarios — each as a subprocess ───────────────
         # Each scenario runs in a fresh process to guarantee a clean CUDA
         # context. This avoids vLLM distributed re-initialization hangs when
         # TP > 1 (e.g. Suite B) where spawned workers inherit stale IPC state
         # from the previous scenario's process group.
-        if run_accuracy:
-            self._release_gpu_memory()
-            time.sleep(10)
 
-        platform_script = sys.argv[0]
         for i, scenario in enumerate(benchmark_scenarios):
             scenario_dir = base_dir / scenario
             scenario_dir.mkdir(parents=True, exist_ok=True)
@@ -1325,15 +1338,12 @@ class BenchmarkRunner(ABC):
 
             print(f"  Command: {' '.join(cmd)}\n")
 
-            try:
-                subprocess.run(cmd, check=True, cwd=str(_REPO_ROOT))
+            ok = self._run_subprocess(cmd, scenario)
+            if ok:
                 results_summary.append((scenario, "SUCCESS", str(scenario_dir)))
-                print(f"\n✓ {scenario} completed")
-            except subprocess.CalledProcessError as e:
-                results_summary.append(
-                    (scenario, f"FAILED: returncode={e.returncode}", str(scenario_dir))
-                )
-                print(f"\n✗ {scenario} failed (return code {e.returncode})")
+                print(f"\n  {scenario} completed")
+            else:
+                results_summary.append((scenario, "FAILED: subprocess error", str(scenario_dir)))
 
             print("  Waiting 10s before next scenario...")
             time.sleep(10)

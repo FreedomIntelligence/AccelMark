@@ -18,11 +18,32 @@ AccelMark runner for NVIDIA GPUs using [vLLM](https://github.com/vllm-project/vl
 | GPU generation | Architecture | sm | BF16 | CUDA graphs | Suite F | Notes |
 |---|---|---|---|---|---|---|
 | H100, H800 | Hopper | sm_90 | ✅ | ✅ | ✅ | FP8 native; full support |
+| H20 | Hopper | sm_90 | ✅ | ✅ | ✅ | See large-memory notes below |
 | A100, A800, A10, L4, L40 | Ampere | sm_80/86 | ✅ | ✅ | ✅ | Full support |
 | RTX 3090, RTX 3080, A5000 | Ampere | sm_86 | ✅ | ✅ | ✅ | Full support |
 | RTX 4090, RTX 4080, RTX 4070 | Ada Lovelace | sm_89 | ✅ | ✅ | ✅ | Full support |
 | RTX 2080, T4 | Turing | sm_75 | ❌ | ⚠️ | ✅ | See pre-Ampere notes below |
 | V100, V100S | Volta | sm_70 | ❌ | ⚠️ | ✅ | See pre-Ampere notes below |
+
+## Large-memory GPUs (H20, A100 80 GB, etc.)
+
+On GPUs with very large VRAM (≥ 80 GB per chip), vLLM allocates a proportionally large
+KV cache. Combined with an outdated `nvidia-cublas-cu12`, this can trigger a **SIGFPE**
+(floating point exception) during inference — the process exits silently with no Python
+traceback.
+
+**Symptom:** accuracy gate subprocess exits with `SIGFPE (return code -8)`, either
+immediately after model load or at the first inference batch.
+
+**Fix: upgrade cuBLAS:**
+
+```bash
+pip install --upgrade nvidia-cublas-cu12
+```
+
+This is a bug in older cuBLAS builds that manifests specifically on large-memory GPUs
+where the KV cache allocation is large enough to trigger a code path with an uninitialized
+state. Upgrading cuBLAS resolves it without any configuration changes.
 
 ## Pre-Ampere GPUs (V100, T4, RTX 20xx)
 
