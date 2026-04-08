@@ -608,6 +608,624 @@ const LEADERBOARD_DATA = [
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
   {
+    "submission": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_47f5d58e_ac91844d",
+    "tier": "verified",
+    "is_suite_level": true,
+    "chip": "NVIDIA A100-SXM4-40GB",
+    "vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 40.0,
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "model": "Llama-3.1-8B-Instruct",
+    "precision": "BF16",
+    "precision_fallback": false,
+    "precision_emulated": false,
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_source": "local",
+    "model_name": null,
+    "model_format": "HuggingFace original",
+    "architecture": "dense",
+    "suite": "suite_C",
+    "scenario": "all",
+    "primary_metric": 5116.24,
+    "primary_metric_label": "tokens/sec (W8A8)",
+    "tokens_per_sec_per_chip": null,
+    "offline_throughput": null,
+    "online_max_qps": null,
+    "interactive_ttft_p99": null,
+    "peak_memory_gb": null,
+    "memory_utilization_pct": null,
+    "memory_efficiency_toks_per_gb": null,
+    "min_price_usd_per_hr": null,
+    "cost_efficiency_toks_per_dollar_hr": null,
+    "tokens_per_watt": null,
+    "accuracy_valid": null,
+    "accuracy_score": null,
+    "date": "2026-04-08",
+    "submitted_by": "JuhaoLiang1997",
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "notes": null,
+    "run_id": "ac91844d",
+    "run_name": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_47f5d58e_ac91844d",
+    "flagged": null,
+    "scaling_efficiency_2x": null,
+    "scaling_efficiency_4x": null,
+    "scaling_base_throughput": null,
+    "quant_bf16_throughput": 3961.35,
+    "quant_best_throughput": 5116.24,
+    "quant_best_precision": "W8A8",
+    "quant_int8_speedup": 0.992,
+    "quant_int4_speedup": 0.673,
+    "quant_quality_eff": 3018.6,
+    "sustained_throughput": null,
+    "throttle_ratio": null,
+    "throttle_onset_minute": null,
+    "ttft_p99_drift_ms": null,
+    "sustained_concurrency": null,
+    "detail": {
+      "hw_chip": "NVIDIA A100-SXM4-40GB",
+      "hw_vendor": "NVIDIA",
+      "hw_count": 1,
+      "hw_memory_gb": 40.0,
+      "hw_interconnect_intra": null,
+      "hw_interconnect_inter": null,
+      "hw_cpu": "AMD EPYC 7532 32-Core Processor, 64 cores",
+      "hw_system_memory_gb": 1007.7,
+      "hw_pcie": "PCIe Gen 4",
+      "hw_network": "4x InfiniBand/RoCE (mlx5_0, mlx5_1, mlx5_2, mlx5_3)",
+      "sw_framework": "vLLM",
+      "sw_framework_version": "0.6.6.post1",
+      "sw_driver": "565.57.01",
+      "sw_runtime": "CUDA 12.1",
+      "sw_os": "Ubuntu 22.04.4 LTS",
+      "sw_python": "3.10.18",
+      "sw_pytorch": "2.5.1+cu121",
+      "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+      "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "model_name": null,
+      "model_note": null,
+      "model_source": "local",
+      "model_arch": "dense",
+      "model_params_b": 8.0,
+      "model_precision": "BF16",
+      "model_effective_dtype": "bfloat16",
+      "model_quant_method": null,
+      "model_format": "HuggingFace original",
+      "run_scenarios": [
+        "accuracy",
+        "offline",
+        "online",
+        "sustained"
+      ],
+      "run_chip_counts": null,
+      "run_num_runs": 3,
+      "run_tp": 1,
+      "run_pp": 1,
+      "run_dp": 1,
+      "acc_score": null,
+      "acc_baseline_delta": null,
+      "acc_valid": null,
+      "acc_notes": null,
+      "meta_submitted_by": "JuhaoLiang1997",
+      "meta_submission_type": "individual",
+      "meta_date": "2026-04-08",
+      "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+      "meta_elapsed_min": 146.6,
+      "meta_model_load_sec": 65.5,
+      "meta_start_time": "2026-04-08T00:34:53.853990+00:00",
+      "meta_notes": null
+    },
+    "viz": {
+      "type": "suite_C",
+      "precisions": [
+        "BF16",
+        "FP8",
+        "W8A8",
+        "W8A16",
+        "W4A16"
+      ],
+      "throughput": [
+        3961.35,
+        4213.79,
+        5116.24,
+        3929.1,
+        2666.44
+      ],
+      "speedup": [
+        1.0,
+        1.064,
+        1.292,
+        0.992,
+        0.673
+      ],
+      "quality_efficiency": [
+        2218.4,
+        2444.0,
+        3018.6,
+        2318.2,
+        1519.9
+      ],
+      "accuracies": [
+        0.56,
+        0.58,
+        0.59,
+        0.59,
+        0.57
+      ],
+      "acc_valid": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "acc_deltas": [
+        -0.01,
+        0.01,
+        0.0,
+        0.02,
+        0.0
+      ],
+      "effective_dtypes": [
+        "bfloat16",
+        "bfloat16",
+        "bfloat16",
+        "bfloat16",
+        "float16"
+      ],
+      "quantization_methods": [
+        null,
+        "compressed-tensors",
+        "compressed-tensors",
+        "compressed-tensors",
+        "gptq"
+      ],
+      "best_quality_eff": 3018.6,
+      "bf16_throughput": 3961.35,
+      "online_by_precision": [
+        {
+          "precision": "BF16",
+          "max_valid_qps": 10,
+          "qps_labels": [
+            "5",
+            "10",
+            "25",
+            "50"
+          ],
+          "ttft_p50": [
+            58.48,
+            83.57,
+            162.56,
+            1884.17
+          ],
+          "ttft_p99": [
+            139.65,
+            268.2,
+            4710.99,
+            9041.19
+          ],
+          "sla_met": [
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "FP8",
+          "max_valid_qps": 10,
+          "qps_labels": [
+            "5",
+            "10",
+            "25",
+            "50"
+          ],
+          "ttft_p50": [
+            58.13,
+            91.66,
+            240.35,
+            3135.1
+          ],
+          "ttft_p99": [
+            169.06,
+            455.0,
+            5642.6,
+            10826.62
+          ],
+          "sla_met": [
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "W8A8",
+          "max_valid_qps": 10,
+          "qps_labels": [
+            "5",
+            "10",
+            "25",
+            "50"
+          ],
+          "ttft_p50": [
+            44.0,
+            68.46,
+            138.12,
+            1284.19
+          ],
+          "ttft_p99": [
+            104.93,
+            225.11,
+            3241.71,
+            7079.24
+          ],
+          "sla_met": [
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "W8A16",
+          "max_valid_qps": 10,
+          "qps_labels": [
+            "5",
+            "10",
+            "25",
+            "50"
+          ],
+          "ttft_p50": [
+            65.63,
+            101.51,
+            335.99,
+            4347.44
+          ],
+          "ttft_p99": [
+            183.98,
+            334.29,
+            6044.96,
+            13396.07
+          ],
+          "sla_met": [
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "W4A16",
+          "max_valid_qps": 10,
+          "qps_labels": [
+            "5",
+            "10",
+            "25",
+            "50"
+          ],
+          "ttft_p50": [
+            55.13,
+            93.52,
+            257.1,
+            3933.52
+          ],
+          "ttft_p99": [
+            159.59,
+            357.87,
+            4775.14,
+            10508.24
+          ],
+          "sla_met": [
+            true,
+            true,
+            false,
+            false
+          ]
+        }
+      ],
+      "sustained_by_precision": [
+        {
+          "precision": "BF16",
+          "sustained_throughput_tokens_per_sec": 486.1,
+          "throttle_ratio": 0.888,
+          "throttle_onset_minute": 1.0,
+          "ttft_p99_drift_ms": -212.2,
+          "duration_minutes": 15,
+          "minutes": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0
+          ],
+          "throughput": [
+            451.1,
+            500.8,
+            497.3,
+            471.6,
+            503.8,
+            469.6,
+            507.8,
+            482.9,
+            484.9,
+            487.9,
+            492.7,
+            465.2,
+            484.5,
+            505.1
+          ],
+          "is_warmup": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "FP8",
+          "sustained_throughput_tokens_per_sec": 692.6,
+          "throttle_ratio": 0.93,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -264.6,
+          "duration_minutes": 15,
+          "minutes": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0
+          ],
+          "throughput": [
+            665.8,
+            712.1,
+            681.8,
+            716.2,
+            687.1,
+            705.9,
+            684.8,
+            678.3,
+            707.7,
+            677.9,
+            699.1,
+            685.0,
+            686.8,
+            707.2
+          ],
+          "is_warmup": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "W8A8",
+          "sustained_throughput_tokens_per_sec": 635.9,
+          "throttle_ratio": 0.927,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -234.7,
+          "duration_minutes": 15,
+          "minutes": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0
+          ],
+          "throughput": [
+            615.2,
+            646.7,
+            653.4,
+            630.7,
+            616.1,
+            621.7,
+            606.0,
+            644.5,
+            647.6,
+            643.7,
+            645.3,
+            643.4,
+            645.9,
+            641.7
+          ],
+          "is_warmup": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "W8A16",
+          "sustained_throughput_tokens_per_sec": 666.2,
+          "throttle_ratio": 0.935,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -246.2,
+          "duration_minutes": 15,
+          "minutes": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0
+          ],
+          "throughput": [
+            638.9,
+            658.1,
+            663.2,
+            662.0,
+            668.0,
+            683.2,
+            663.2,
+            662.1,
+            667.5,
+            671.2,
+            670.8,
+            681.7,
+            654.9,
+            682.2
+          ],
+          "is_warmup": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "W4A16",
+          "sustained_throughput_tokens_per_sec": 773.9,
+          "throttle_ratio": 0.919,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -275.4,
+          "duration_minutes": 15,
+          "minutes": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0
+          ],
+          "throughput": [
+            736.7,
+            773.6,
+            801.2,
+            760.2,
+            784.5,
+            781.9,
+            775.0,
+            769.3,
+            781.6,
+            767.1,
+            764.5,
+            785.9,
+            760.5,
+            792.8
+          ],
+          "is_warmup": [
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    "impl": {
+      "id": "nvidia_vllm_47f5d58e",
+      "platform": "nvidia",
+      "name": "vLLM on NVIDIA (reference implementation)",
+      "framework": "vLLM",
+      "submitted_by": "JuhaoLiang1997",
+      "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A\u2013F). Standard vLLM configuration, no custom patches.",
+      "notes": "Decouple runners from suite and scenario knowledge \u2014 load_model() uses use_async from parallelism dict instead of checking scenario name.",
+      "created": "2026-04-03",
+      "supersedes_chain": [],
+      "deprecated_by": null,
+      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+    },
+    "implementation_id": "nvidia_vllm_47f5d58e"
+  },
+  {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_D_nvidia_vllm_47f5d58e_17fd9396",
     "tier": "verified",
     "is_suite_level": true,

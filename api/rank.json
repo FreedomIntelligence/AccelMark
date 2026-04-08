@@ -8,6 +8,15 @@
     "percentile": 100.0,
     "primary_metric": 3852.33
   },
+  "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_47f5d58e_ac91844d": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_C",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3018.6
+  },
   "nvidia_a100_sxm4_40gbx1_suite_D_nvidia_vllm_47f5d58e_17fd9396": {
     "chip_name": "NVIDIA A100-SXM4-40GB",
     "suite_id": "suite_D",

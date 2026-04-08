@@ -9,6 +9,10 @@
         "best_sustained_throughput_tokens_per_sec": 488.0,
         "throttle_ratio": 0.897
       },
+      "suite_C": {
+        "best_quality_efficiency": 3018.6,
+        "best_quality_efficiency_format": "W8A8"
+      },
       "suite_D": {
         "best_throughput_tokens_per_sec": 6400.5,
         "best_online_max_qps": 0.0,

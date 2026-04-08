@@ -19,9 +19,9 @@
   },
   {
     "name": "NVIDIA A100-SXM4-40GB",
-    "submission_count": 5,
+    "submission_count": 6,
     "best_throughput_tokens_per_sec": 8634.51,
-    "median_throughput_tokens_per_sec": 4498.9
+    "median_throughput_tokens_per_sec": 4175.6
   },
   {
     "name": "Tesla V100S-PCIE-32GB",
