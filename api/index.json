@@ -121,26 +121,31 @@
       }
     }
   },
-  "NVIDIA GeForce RTX 4090 D": {
-    "best_throughput_tokens_per_sec": 14656.96,
+  "NVIDIA GeForce RTX 3090": {
+    "best_throughput_tokens_per_sec": 8654.58,
     "suites": {
       "suite_A": {
-        "best_throughput_tokens_per_sec": 2454.6,
-        "best_online_max_qps": 5,
-        "best_interactive_ttft_p99_ms": 90.7,
-        "best_sustained_throughput_tokens_per_sec": 406.1,
-        "throttle_ratio": 0.905
+        "best_throughput_tokens_per_sec": 1670.8,
+        "best_online_max_qps": 0.0,
+        "best_interactive_ttft_p99_ms": 163.5,
+        "best_sustained_throughput_tokens_per_sec": 305.9,
+        "throttle_ratio": 0.907
       },
       "suite_C": {
-        "best_quality_efficiency": 3002.1,
-        "best_quality_efficiency_format": "FP8"
+        "best_quality_efficiency": 2040.7,
+        "best_quality_efficiency_format": "W8A8"
       },
       "suite_F": {
-        "best_throughput_tokens_per_sec": 14657.0,
-        "best_online_max_qps": 40,
-        "best_interactive_ttft_p99_ms": 11.9,
-        "best_sustained_throughput_tokens_per_sec": 4643.1,
-        "throttle_ratio": 0.919
+        "best_throughput_tokens_per_sec": 8654.6,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 28.5,
+        "best_sustained_throughput_tokens_per_sec": 2087.9,
+        "throttle_ratio": 0.829
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 1762.3,
+        "best_scaling_efficiency_2x": 0.714,
+        "best_scaling_efficiency_4x": 0.397
       }
     }
   },
