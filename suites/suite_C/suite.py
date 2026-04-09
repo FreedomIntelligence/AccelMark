@@ -23,16 +23,22 @@ def run(br, args, suite: dict, env_info: dict) -> None:
     Suite C entry point called by BenchmarkRunner.main().
 
     Dispatches based on scenario:
-    - "default" / "all" with no --precision → run full multi-format benchmark
-    - anything else → single scenario/precision subprocess, use generic path
+    - "default" / "all" with no --precision — run full multi-format benchmark
+      (precision loop: BF16/FP8/W8A8/W8A16/W4A16, each as a subprocess)
+    - explicit scenario (e.g. "offline", "online") with no --precision —
+      run that single scenario across all precision formats, producing the
+      same folder structure: bf16/offline/, fp8/offline/, etc.
+    - any scenario with --precision set — per-precision subprocess called by
+      the precision loop above; use generic multi-scenario or single-scenario path
     """
-    if args.scenario in ("default", "all") and getattr(args, "precision", None) is None:
+    if getattr(args, "precision", None) is None:
+        # Top-level invocation — run precision loop for all formats
         _run_suite_c(br, args, suite, env_info)
     elif args.scenario in ("default", "all"):
-        # Per-precision subprocess — run actual scenarios via the generic multi-scenario path
+        # Per-precision subprocess dispatched by the precision loop (default/all)
         br._run_all_scenarios(args, suite)
     else:
-        # Single explicit scenario (e.g. --scenario offline) — generic path
+        # Per-precision subprocess dispatched by the precision loop (single scenario)
         br._setup_logging(args.output_dir)
         br._run_single_scenario(args, suite)
 
@@ -128,20 +134,25 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
         precision_dir = base_dir / precision.lower()
         precision_dir.mkdir(parents=True, exist_ok=True)
 
-        # Skip if this precision already has a completed result.json
-        precision_result_path = precision_dir / "result.json"
-        if precision_result_path.exists():
+        # Skip if this precision already has a completed result for the requested scenario.
+        # - default/all: check precision_dir/result.json (the merged per-precision result)
+        # - explicit scenario (e.g. offline): check precision_dir/offline/result.json
+        if args.scenario in ("default", "all"):
+            skip_check_path = precision_dir / "result.json"
+        else:
+            skip_check_path = precision_dir / args.scenario / "result.json"
+        if skip_check_path.exists():
             try:
-                with open(precision_result_path) as f:
+                with open(skip_check_path) as f:
                     json.load(f)  # validate parseable
                 print(
-                    f"\n  {precision} already done — skipping "
-                    f"(found {precision_result_path})"
+                    f"\n  {precision}/{args.scenario} already done — skipping "
+                    f"(found {skip_check_path})"
                 )
                 results_summary.append((precision, "SUCCESS", str(precision_dir)))
                 continue
             except Exception as e:
-                print(f"  Warning: existing {precision_result_path} unreadable ({e}) — re-running.")
+                print(f"  Warning: existing {skip_check_path} unreadable ({e}) — re-running.")
 
         print(f"\n{'='*60}")
         print(f"  Precision: {precision}")
@@ -160,10 +171,12 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
         br.__dict__.pop("_model_note_override", None)
         br.__dict__.pop("_model_name_override", None)
 
-        # Forward the user's --scenario so "all" actually runs extra scenarios.
-        # Subprocesses with --precision set go through br._run_all_scenarios(),
-        # which respects both default and extra scenario lists from suite.json.
-        subprocess_scenario = args.scenario if args.scenario == "all" else "default"
+        # Forward the user's --scenario to the per-precision subprocess.
+        # - "all"     → "all":     extra scenarios (online, sustained) are included
+        # - "default" → "default": only default scenarios (accuracy, offline)
+        # - explicit  → forwarded as-is (e.g. "offline", "online", "sustained")
+        #   The subprocess hits the else branch in run() and calls _run_single_scenario().
+        subprocess_scenario = args.scenario
         cmd = [
             sys.executable, platform_script,
             "--suite",      args.suite,

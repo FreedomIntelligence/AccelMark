@@ -7,14 +7,16 @@
 #      Install instructions: https://gitee.com/ascend/pytorch
 #
 # Then install this runner's Python dependencies:
-#   pip install -r runners/ascend_vllm_ascend_43650c71/requirements.txt
+#   pip install -r runners/ascend_vllm_ascend_6ebe6ef9/requirements.txt
 
 # LLM inference — vllm-ascend community fork
 # Install from PyPI:
 #   pip install vllm-ascend
 # Or from source for the latest CANN-compatible build:
 #   pip install git+https://github.com/vllm-project/vllm-ascend.git
-vllm-ascend>=0.6.0
+# Tested with vllm-ascend 0.7.3 (tracks vLLM 0.7.x + CANN patches).
+# Compatible range: >=0.7.0,<0.8.0
+vllm-ascend>=0.7.0,<0.8.0
 
 # Transformers (for tokenizer)
 transformers==4.46.3

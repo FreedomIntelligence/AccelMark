@@ -1,6 +1,6 @@
-# AccelMark runner config — ascend_vllm_ascend_68a18363 (vllm-ascend on Ascend NPU)
+# AccelMark runner config — ascend_vllm_ascend_605db33a (vllm-ascend on Ascend NPU)
 #
-# Copy this file to runner_ascend_vllm_ascend_68a18363.yaml (remove .example suffix)
+# Copy this file to runner_ascend_vllm_ascend_605db33a.yaml (remove .example suffix)
 # and edit as needed for your hardware.
 #
 # Merge priority: CLI flags > suite-specific > global defaults > runner defaults
@@ -11,10 +11,17 @@
 tensor_parallel_size: 1
 
 # Disable graph compilation (default: false).
+# Set to true if you encounter CANN graph compilation errors on your NPU model.
 enforce_eager: false
 
 # Maximum number of sequences in a batch (default: 512).
+# Reduce on lower-memory NPUs: 128 for 32 GB, 64 for 16 GB or less.
 max_num_seqs: 512
+
+# Fraction of NPU memory reserved for the KV cache (default: 0.90).
+# Reduce if you get NPU OOM errors: try 0.85 for tighter memory budgets.
+# vllm-ascend exposes this as gpu_memory_utilization (same parameter name as vLLM).
+gpu_memory_utilization: 0.90
 
 # Pass-through kwargs forwarded directly to vllm-ascend LLM() / AsyncEngineArgs().
 # engine_kwargs:
@@ -24,4 +31,6 @@ max_num_seqs: 512
 
 suites:
   suite_D:
+    # Long-context suite — reduce batch size and reserve more NPU memory.
     max_num_seqs: 64
+    gpu_memory_utilization: 0.85

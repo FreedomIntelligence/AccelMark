@@ -15,7 +15,7 @@ Runtime:      CANN (Compute Architecture for Neural Networks)
 Framework:    vllm-ascend — https://github.com/vllm-project/vllm-ascend
 Precision:    BF16 (preferred), FP16 (fallback). FP8 not supported on
               current Ascend 910B/910C hardware.
-Quantization: W8A8, W8A16, W4A16 via vllm-ascend quantization layer.
+Quantization: W8A8, W8A16 via compressed-tensors; W4A16 via gptq (CANN kernel, not Marlin).
 Multi-chip:   Tensor parallelism via HCCL.
 Streaming:    Fully supported — AsyncLLMEngine API is identical to vLLM.
 
@@ -73,9 +73,11 @@ class AscendVLLMRunner(BenchmarkRunner):
     # FP8 is not supported on current Ascend hardware — excluded entirely.
     SUPPORTED_PRECISIONS = ["bf16", "fp16", "fp32"]
 
-    # compressed-tensors (W8A8/W8A16) and gptq_marlin (W4A16) supported via vllm-ascend.
+    # compressed-tensors (W8A8/W8A16) and gptq (W4A16) supported via vllm-ascend.
+    # Note: vllm-ascend uses "gptq" (CANN-based kernel), not "gptq_marlin"
+    # (CUDA Marlin sparse kernels — NVIDIA-only, not available on CANN).
     # FP8 excluded — no native FP8 hardware support on Ascend 910B/910C.
-    SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq_marlin"]
+    SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq"]
 
     def __init__(self):
         self.llm             = None  # vllm.LLM (offline / accuracy)
@@ -143,9 +145,26 @@ class AscendVLLMRunner(BenchmarkRunner):
         use_async     = parallelism["use_async"]
         enforce_eager = getattr(self, "_enforce_eager", False)
 
-        cfg          = getattr(self, "_runner_config", {})
-        max_num_seqs = cfg.get("max_num_seqs", 512)
-        extra_kwargs = dict(cfg.get("engine_kwargs") or {})
+        cfg             = getattr(self, "_runner_config", {})
+        max_num_seqs    = cfg.get("max_num_seqs", 512)
+        npu_memory_util = cfg.get("gpu_memory_utilization", 0.90)
+        extra_kwargs    = dict(cfg.get("engine_kwargs") or {})
+
+        # Filter engine_kwargs to only fields this vllm-ascend version accepts.
+        # Prevents TypeError on startup when config YAML references a key that
+        # doesn't exist in the installed vllm-ascend version (EngineArgs is a
+        # strict dataclass — unknown keyword arguments raise TypeError immediately).
+        try:
+            import dataclasses
+            from vllm.engine.arg_utils import EngineArgs as _EngineArgs
+            _valid = {f.name for f in dataclasses.fields(_EngineArgs)}
+            _dropped = {k: v for k, v in extra_kwargs.items() if k not in _valid}
+            if _dropped:
+                print(f"  Warning: engine_kwargs keys not supported by this "
+                      f"vllm-ascend version and will be ignored: {list(_dropped)}")
+            extra_kwargs = {k: v for k, v in extra_kwargs.items() if k in _valid}
+        except Exception:
+            pass  # If introspection fails, pass kwargs as-is and let vllm-ascend report the error
 
         effective_precision = getattr(self, "_effective_precision", "BF16").upper()
         precision           = getattr(self, "_precision", None) or effective_precision
@@ -196,13 +215,22 @@ class AscendVLLMRunner(BenchmarkRunner):
         if not use_async:
             # engine_kwargs values override named fields above if the same key appears in both.
             # This is intentional — engine_kwargs is the power-user escape hatch.
-            self.llm = LLM(**{**base_kwargs, "max_num_seqs": max_num_seqs, **extra_kwargs})
+            self.llm = LLM(**{
+                **base_kwargs,
+                "max_num_seqs":           max_num_seqs,
+                "gpu_memory_utilization": npu_memory_util,
+                **extra_kwargs,
+            })
         else:
             self._loop = asyncio.new_event_loop()
             asyncio.set_event_loop(self._loop)
             # engine_kwargs values override named fields above if the same key appears in both.
             # This is intentional — engine_kwargs is the power-user escape hatch.
-            engine_args = AsyncEngineArgs(**{**base_kwargs, **extra_kwargs})
+            engine_args = AsyncEngineArgs(**{
+                **base_kwargs,
+                "gpu_memory_utilization": npu_memory_util,
+                **extra_kwargs,
+            })
             self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
     def get_effective_dtype(self) -> Optional[str]:
@@ -227,6 +255,9 @@ class AscendVLLMRunner(BenchmarkRunner):
         t_start   = time.perf_counter()
         outputs   = self.llm.generate(formatted, self.sampling_params)
         elapsed   = time.perf_counter() - t_start
+
+        # Store output text for _run_accuracy_integrated() in the base class.
+        self._last_accuracy_outputs = [o.outputs[0].text for o in outputs]
 
         results = []
         for output in outputs:
