@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.6,
+  "baseline_delta": 0.03,
+  "valid": true,
+  "framework": "vLLM",
+  "precision": "FP8",
+  "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+}
