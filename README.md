@@ -14,7 +14,7 @@
 
 | | The problem | AccelMark's answer |
 |---|---|---|
-| **MLPerf** | Rigorous but slow — only large vendors participate | Community runs often finish quickly (e.g. Suite A default ~13 min; Suite D default ~26 min; full all-scenarios run ~7 h) |
+| **MLPerf** | Rigorous but slow — only large vendors participate | Community runs often finish quickly (e.g. Suite A default ~11 min; Suite D default ~22 min; full all-scenarios run ~7 h) |
 | **Vendor whitepapers** | Different setups make cross-vendor comparison impossible | Fixed schema + shared LoadGen = apples-to-apples |
 | **Most benchmarks** | Cover only NVIDIA and only throughput | NVIDIA, AMD, Huawei Ascend, Apple Silicon — throughput, latency, scaling, quantization |
 
@@ -33,7 +33,7 @@ pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt # installs runner d
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name
 
-# 3. Run the benchmark (~17 min on A100)
+# 3. Run the benchmark (~11 min on A100)
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
 # 4. Submit — open a GitHub Issue and paste your result.json
@@ -68,7 +68,7 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). Check
 | NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | NVIDIA GPU | `nvidia_sglang_6da83845` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | AMD GPU | `amd_vllm_rocm_5355c2c6` | vLLM (ROCm) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Huawei Ascend NPU | `ascend_vllm_ascend_6ebe6ef9` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| Huawei Ascend NPU | `ascend_vllm_ascend_605db33a` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — |
 
 Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 

@@ -20,7 +20,7 @@ pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 cp configs/submitter.yaml.example configs/submitter.yaml
 # Edit configs/submitter.yaml — add your name or GitHub username
 
-# 3. Run the benchmark (~50 min on A100)
+# 3. Run the benchmark (~11 min on A100 for default scenarios)
 #    Accuracy gate runs automatically before the benchmark starts.
 #    Output directory is auto-named using run_name, e.g.:
 #    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_52162d64
@@ -97,11 +97,11 @@ need `--model-path` on the command line.
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 ```
 
-This runs the suite's default scenarios (accuracy gate → offline → online → interactive)
+This runs the suite's default scenarios (accuracy gate → offline → online)
 in sequence and produces a single merged `result.json`. If the accuracy gate fails,
 the benchmark is aborted (use `--skip-accuracy-gate` to override).
 
-Use `--scenario all` to also include extra scenarios defined in the suite (e.g. `sustained`),
+Use `--scenario all` to also include extra scenarios defined in the suite (e.g. `interactive`, `sustained`),
 or `--scenario offline` (or any other scenario name) to run a single scenario.
 
 ```bash
@@ -218,13 +218,15 @@ See [suites/README.md](suites/README.md) for full details on all suites and metr
 
 | Suite | Default run | Notes |
 |-------|-------------|-------|
-| A | ~50 min | offline + online + interactive |
-| B | ~69 min | 4× chips |
-| C | ~45 min | All 5 precision formats |
-| D | ~60 min | Long-context |
-| E | ~24 min | Up to 4× scaling |
+| A | ~11 min | offline + online |
+| B | ~20 min | 4× chips (A100-80GB); ~37 min on A100-40GB |
+| C | ~22 min | offline only, all 5 precision formats |
+| D | ~22 min | Long-context (offline only) |
+| E | ~9 min | Up to 4× scaling |
+| F | ~10 min | offline + online + interactive |
 
-Sustained adds about **30 minutes** on most suites; **Suite F** uses a **15-minute** sustained profile (`suite_F/suite.json`).
+Sustained adds about **30 minutes** on datacenter suites (A–E); **Suite F** uses a **15-minute** sustained profile.
+Add interactive (~35 min on Suite A) by running with `--scenario interactive` or `--scenario all`.
 
 ---
 

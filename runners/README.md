@@ -88,13 +88,14 @@ class MyFrameworkRunner(BenchmarkRunner):
     # SUPPORTED_QUANTIZATIONS = ["w8a8", "w4a16"]                 # ROCm example
     # SUPPORTED_QUANTIZATIONS = []                                 # Apple MLX
 
-    def load_model(self, model_path: str, suite: dict, tp_size: int) -> None:
+    def load_model(self, model_path: str, parallelism: dict) -> None:
         from myframework import Engine
+        tp_size = parallelism["tensor_parallel_size"]
         self.engine = Engine(model_path, tp_size=tp_size)
 
-    def inference_fn_offline(self, prompts: list[str]) -> list[InferenceResult]:
+    def inference_fn_offline(self, requests: list[InferenceRequest]) -> list[InferenceResult]:
         t_start = time.perf_counter()
-        outputs = self.engine.generate(prompts)
+        outputs = self.engine.generate([r.prompt for r in requests])
         elapsed_ms = (time.perf_counter() - t_start) * 1000
         return [
             InferenceResult(
@@ -103,18 +104,18 @@ class MyFrameworkRunner(BenchmarkRunner):
                 output_tokens=o.num_tokens,
                 input_tokens=o.num_input_tokens,
                 success=True,
-                text=o.text,
+                output_text=o.text,
             )
             for o in outputs
         ]
 
-    async def inference_fn_streaming(self, prompt: str) -> InferenceResult:
+    async def inference_fn_streaming(self, request: InferenceRequest) -> InferenceResult:
         import time
         t_start = time.perf_counter()
         first_token_time_ms = None
         output_text = ""
         output_tokens = 0
-        async for token in self.engine.stream(prompt):
+        async for token in self.engine.stream(request.prompt):
             if first_token_time_ms is None:
                 first_token_time_ms = (time.perf_counter() - t_start) * 1000
             output_text   += token
@@ -125,7 +126,7 @@ class MyFrameworkRunner(BenchmarkRunner):
             output_tokens=output_tokens,
             input_tokens=0,
             success=True,
-            text=output_text,
+            output_text=output_text,
         )
 
     def release_resources(self) -> None:

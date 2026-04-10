@@ -42,24 +42,24 @@ Default scenarios only:
 | B | *(interactive — extra)* | 50 | 780s/run × 3 runs | *(~39 min)* |
 | B | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
 | | | | **Suite B default total** | **~26 min** |
-| C | offline (×5 formats) | 100 | 17s/run × 4 × 4 conc × 5 fmt | ~27 min |
-| C | *(online — extra)* | 300 | Σ(elapsed × 3) / 4 QPS | *(~11 min)* |
-| C | *(sustained — extra)* | — | 31 min fixed | *(~31 min)* |
-| | | | **Suite C default total** | **~31 min** |
+| C | offline (×5 formats) | 100 | 4s/run × 4 × 3 conc × 5 fmt | ~22 min |
+| C | *(online — extra)* | 300 | Σ(elapsed × 3) / 4 QPS × 5 fmt | *(~48 min)* |
+| C | *(sustained — extra)* | — | 15 min fixed × 5 fmt | *(~76 min)* |
+| | | | **Suite C default total** | **~22 min** |
 | D | offline | 50 | 220s/run × 3 × 2 conc | ~22 min |
 | D | *(interactive — extra)* | 100 | 1124s/run × 2 runs | *(~37 min)* |
-| D | *(online — extra)* | 200 | Σ(elapsed × 2) / 3 QPS | *(~24 min)* |
+| D | *(online — extra)* | 200 | Σ(elapsed × 2) / 3 QPS | *(~38 min)* |
 | D | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
-| | | | **Suite D default total** | **~26 min** |
-| E | offline (1×/2×/4×) | 150 | per-chip runs × 4 × 3 conc | ~13 min |
-| | | | **Suite E default total** | **~17 min** |
+| | | | **Suite D default total** | **~22 min** |
+| E | offline (1×/2×/4×) | 150 | per-chip runs × 4 × 3 conc | ~9 min |
+| | | | **Suite E default total** | **~9 min** |
 | F | offline | 200 | 8s/run × 4 × 3 conc | ~2 min |
-| F | online | 300 | Σ(elapsed × 3) / 2 QPS | ~7 min |
+| F | online | 300 | Σ(elapsed × 3) / 2 QPS | ~3 min |
 | F | interactive | 150 | 94s/run × 3 runs | ~5 min |
-| F | *(sustained — extra)* | — | 17 min fixed | *(~17 min)* |
-| | | | **Suite F default total** | **~14 min** |
+| F | *(sustained — extra)* | — | 15 min fixed | *(~15 min)* |
+| | | | **Suite F default total** | **~10 min** |
 
-**Total default (all suites):** ~110 min · **Total all-scenarios:** ~430 min
+**Total default (all suites):** ~85 min · **Total all-scenarios:** ~420 min
 
 `rc` = request count per run. `elapsed` = `elapsed_seconds_median` from result.json (one run).
 Formula for offline: `elapsed × (num_runs + 1 warmup) × num_concurrency_levels`.

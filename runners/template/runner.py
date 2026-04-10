@@ -9,7 +9,7 @@ and implement the TODO sections. Then compute the hash:
 Rename your folder to the printed ID before submitting a PR.
 
 See runners/README.md for the full submission guide.
-See docs/DEVELOPMENT.md for a complete worked example (LMDeploy).
+See DEVELOPMENT.md for a complete worked example (LMDeploy).
 """
 
 import sys
@@ -81,25 +81,26 @@ class TemplateRunner(BenchmarkRunner):
 
     # ── Required: load model ──────────────────────────────────────────────────
 
-    def load_model(self, model_path: str, suite: dict, parallelism: dict) -> None:
+    def load_model(self, model_path: str, parallelism: dict) -> None:
         """
         Load model weights into accelerator memory.
 
         Args:
             model_path:  Resolved local path or HuggingFace model ID.
-            suite:       Parsed suite.json dict. Useful fields:
-                             suite["output_tokens_max"]  → max generation length
-                             suite["max_model_len"]      → context window limit
-            parallelism: Dict of parallel sizes. Always contains:
-                             "tensor_parallel_size":   int  (default 1)
-                             "pipeline_parallel_size": int  (default 1)
-                             "expert_parallel_size":   int  (default 1)
-                             "data_parallel_size":     int  (default 1)
+            parallelism: Engine configuration dict. Always contains:
+                             "tensor_parallel_size":   int   (default 1)
+                             "pipeline_parallel_size": int   (default 1)
+                             "expert_parallel_size":   int   (default 1)
+                             "data_parallel_size":     int   (default 1)
+                             "max_tokens":             int   — max generation tokens
+                             "max_model_len":          int|None — context window limit
+                             "use_async":              bool  — True for online/interactive/sustained
                          Read only the keys you need. Ignore unknown keys.
         """
         # TODO: load your model
         # Example:
         #   tp_size = parallelism["tensor_parallel_size"]
+        #   max_tokens = parallelism["max_tokens"]
         #   self.model = MyFramework.load(model_path, tp=tp_size)
         raise NotImplementedError
 
