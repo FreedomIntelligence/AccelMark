@@ -1,0 +1,260 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "NVIDIA GeForce RTX 4090 D",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 24.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-09T16:22:31.929838+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 4090 D",
+        "vendor": "NVIDIA",
+        "memory_gb": 24.0,
+        "driver_version": "570.153.02",
+        "firmware_version": null,
+        "compute_capability": "8.9",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t\t1\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "AMD EPYC 9554 64-Core Processor",
+      "physical_cores": 128,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 755.1,
+    "pcie_generation": "PCIe Gen 2",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": null,
+    "os": "Rocky Linux 8.10 (Green Obsidian)",
+    "python_version": "3.10.18",
+    "kernel_version": "4.18.0-553.el8_10.x86_64",
+    "runtime_version": "CUDA 12.4",
+    "pytorch_version": "2.5.1+cu124"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.6.6.post1",
+    "driver_version": "570.153.02",
+    "runtime_version": "CUDA 12.4",
+    "os": "Rocky Linux 8.10 (Green Obsidian)",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8",
+    "model_revision": "e2bfb7d92784ad7d1b606c2f9644d3cefb2ec708",
+    "model_name": null,
+    "model_note": "INT8 quantized by RedHatAI using llm-compressor (compressed-tensors). Both weights and activations quantized to INT8.",
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "W8A8",
+    "effective_dtype": "bfloat16",
+    "quantization_method": "compressed-tensors",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "sustained",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    }
+  },
+  "metrics": {
+    "sustained": {
+      "sustained_concurrency": 8,
+      "duration_minutes": 15,
+      "warmup_minutes": 1,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 540.7,
+          "tokens_out": 32457,
+          "tokens_in": 0,
+          "requests_completed": 92,
+          "ttft_ms_p50": 45.9,
+          "ttft_ms_p99": 228.1
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 569.9,
+          "tokens_out": 34210,
+          "tokens_in": 0,
+          "requests_completed": 96,
+          "ttft_ms_p50": 42.0,
+          "ttft_ms_p99": 67.3
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 563.6,
+          "tokens_out": 33798,
+          "tokens_in": 0,
+          "requests_completed": 93,
+          "ttft_ms_p50": 45.8,
+          "ttft_ms_p99": 86.7
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 576.9,
+          "tokens_out": 34606,
+          "tokens_in": 0,
+          "requests_completed": 95,
+          "ttft_ms_p50": 38.0,
+          "ttft_ms_p99": 67.6
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 573.9,
+          "tokens_out": 34438,
+          "tokens_in": 0,
+          "requests_completed": 94,
+          "ttft_ms_p50": 41.7,
+          "ttft_ms_p99": 66.7
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 554.5,
+          "tokens_out": 33269,
+          "tokens_in": 0,
+          "requests_completed": 93,
+          "ttft_ms_p50": 37.8,
+          "ttft_ms_p99": 98.1
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 577.3,
+          "tokens_out": 34651,
+          "tokens_in": 0,
+          "requests_completed": 97,
+          "ttft_ms_p50": 45.4,
+          "ttft_ms_p99": 86.0
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 571.5,
+          "tokens_out": 34281,
+          "tokens_in": 0,
+          "requests_completed": 95,
+          "ttft_ms_p50": 38.2,
+          "ttft_ms_p99": 66.8
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 567.3,
+          "tokens_out": 34058,
+          "tokens_in": 0,
+          "requests_completed": 95,
+          "ttft_ms_p50": 37.8,
+          "ttft_ms_p99": 69.2
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 571.4,
+          "tokens_out": 34271,
+          "tokens_in": 0,
+          "requests_completed": 95,
+          "ttft_ms_p50": 38.4,
+          "ttft_ms_p99": 67.5
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 557.4,
+          "tokens_out": 33442,
+          "tokens_in": 0,
+          "requests_completed": 95,
+          "ttft_ms_p50": 46.4,
+          "ttft_ms_p99": 67.6
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 577.0,
+          "tokens_out": 34616,
+          "tokens_in": 0,
+          "requests_completed": 96,
+          "ttft_ms_p50": 45.8,
+          "ttft_ms_p99": 78.4
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 564.1,
+          "tokens_out": 33849,
+          "tokens_in": 0,
+          "requests_completed": 92,
+          "ttft_ms_p50": 45.5,
+          "ttft_ms_p99": 68.2
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 578.9,
+          "tokens_out": 34742,
+          "tokens_in": 0,
+          "requests_completed": 95,
+          "ttft_ms_p50": 38.3,
+          "ttft_ms_p99": 68.0
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 567.5,
+      "throttle_ratio": 0.934,
+      "throttle_onset_minute": null,
+      "ttft_p99_drift_ms": -160.1
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-10",
+    "time": "02:59:13",
+    "run_id": "a30e221a",
+    "run_name": "nvidia_geforce_rtx_4090_dx1_suite_C_nvidia_vllm_47f5d58e_a30e221a",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-09T18:44:04.883813+00:00",
+    "benchmark_end_time": "2026-04-09T18:59:13.018311+00:00",
+    "benchmark_elapsed_minutes": 15.1,
+    "model_load_seconds": 24.0
+  }
+}
