@@ -22,15 +22,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 3852.33,
+    "primary_metric": 2337.39,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 3852.3,
-    "offline_throughput": 3852.33,
+    "tokens_per_sec_per_chip": 2337.4,
+    "offline_throughput": 2337.39,
     "online_max_qps": 5,
     "interactive_ttft_p99": 65.52,
     "peak_memory_gb": 33.52,
     "memory_utilization_pct": 83.8,
-    "memory_efficiency_toks_per_gb": 114.9,
+    "memory_efficiency_toks_per_gb": 69.7,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -119,9 +119,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          3852.33,
-          3839.34,
-          3851.82
+          2337.39,
+          2324.4,
+          2336.88
         ],
         "memory_gb": [
           33.52,
@@ -629,7 +629,7 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 5116.24,
+    "primary_metric": 3225.6,
     "primary_metric_label": "tokens/sec (W8A8)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
@@ -653,12 +653,12 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_2x": null,
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
-    "quant_bf16_throughput": 3961.35,
-    "quant_best_throughput": 5116.24,
+    "quant_bf16_throughput": 2493.46,
+    "quant_best_throughput": 3225.6,
     "quant_best_precision": "W8A8",
-    "quant_int8_speedup": 0.992,
-    "quant_int4_speedup": 0.673,
-    "quant_quality_eff": 3018.6,
+    "quant_int8_speedup": 0.987,
+    "quant_int4_speedup": 0.666,
+    "quant_quality_eff": 1903.1,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -727,25 +727,25 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        3961.35,
-        4213.79,
-        5116.24,
-        3929.1,
-        2666.44
+        2493.46,
+        2658.99,
+        3225.6,
+        2461.21,
+        1660.78
       ],
       "speedup": [
         1.0,
-        1.064,
-        1.292,
-        0.992,
-        0.673
+        1.066,
+        1.294,
+        0.987,
+        0.666
       ],
       "quality_efficiency": [
-        2218.4,
-        2444.0,
-        3018.6,
-        2318.2,
-        1519.9
+        1396.3,
+        1542.2,
+        1903.1,
+        1452.1,
+        946.6
       ],
       "accuracies": [
         0.56,
@@ -782,8 +782,8 @@ const LEADERBOARD_DATA = [
         "compressed-tensors",
         "gptq"
       ],
-      "best_quality_eff": 3018.6,
-      "bf16_throughput": 3961.35,
+      "best_quality_eff": 1903.1,
+      "bf16_throughput": 2493.46,
       "online_by_precision": [
         {
           "precision": "BF16",
@@ -1247,15 +1247,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_D",
     "scenario": "all",
-    "primary_metric": 6400.47,
+    "primary_metric": 71.6,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 6400.5,
-    "offline_throughput": 6400.47,
+    "tokens_per_sec_per_chip": 71.6,
+    "offline_throughput": 71.6,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 2971.44,
     "peak_memory_gb": 35.42,
     "memory_utilization_pct": 88.6,
-    "memory_efficiency_toks_per_gb": 180.7,
+    "memory_efficiency_toks_per_gb": 2.0,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -1343,8 +1343,8 @@ const LEADERBOARD_DATA = [
           "4"
         ],
         "throughput": [
-          6400.47,
-          6387.49
+          70.59,
+          71.6
         ],
         "memory_gb": [
           35.42,
@@ -1823,15 +1823,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 8634.51,
+    "primary_metric": 6637.68,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 8634.5,
-    "offline_throughput": 8634.51,
+    "tokens_per_sec_per_chip": 6637.7,
+    "offline_throughput": 6637.68,
     "online_max_qps": 10,
     "interactive_ttft_p99": 19.87,
     "peak_memory_gb": 33.16,
     "memory_utilization_pct": 82.9,
-    "memory_efficiency_toks_per_gb": 260.4,
+    "memory_efficiency_toks_per_gb": 200.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -1920,9 +1920,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          8634.51,
-          8588.06,
-          8569.99
+          6637.68,
+          6618.58,
+          6600.51
         ],
         "memory_gb": [
           33.16,
@@ -2215,15 +2215,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_B",
     "scenario": "all",
-    "primary_metric": 947.1,
+    "primary_metric": 574.65,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 236.8,
-    "offline_throughput": 947.1,
+    "tokens_per_sec_per_chip": 143.7,
+    "offline_throughput": 574.65,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 172.63,
     "peak_memory_gb": 34.5,
     "memory_utilization_pct": 86.2,
-    "memory_efficiency_toks_per_gb": 27.5,
+    "memory_efficiency_toks_per_gb": 16.7,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -2312,14 +2312,14 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          946.95,
-          947.1,
-          946.82
+          574.19,
+          574.34,
+          574.65
         ],
         "throughput_per_chip": [
-          236.74,
-          236.78,
-          236.71
+          143.55,
+          143.58,
+          143.66
         ],
         "memory_gb": [
           34.5,
@@ -2824,10 +2824,10 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 4498.88,
+    "primary_metric": 2726.41,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 4498.88,
+    "offline_throughput": 2726.41,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
@@ -2846,8 +2846,8 @@ const LEADERBOARD_DATA = [
     "run_name": "nvidia_a100_sxm4_40gbx4_suite_E_nvidia_vllm_47f5d58e_002e4fff",
     "flagged": null,
     "scaling_efficiency_2x": 0.685,
-    "scaling_efficiency_4x": 0.426,
-    "scaling_base_throughput": 4498.88,
+    "scaling_efficiency_4x": 0.424,
+    "scaling_base_throughput": 2726.41,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -2921,19 +2921,19 @@ const LEADERBOARD_DATA = [
         4
       ],
       "throughput": [
-        4498.88,
-        6162.15,
-        7658.41
+        2726.41,
+        3734.1,
+        4628.54
       ],
       "efficiency_pct": [
         100.0,
         68.5,
-        42.6
+        42.4
       ],
       "throughput_per_chip": [
-        4498.88,
-        3081.07,
-        1914.6
+        2726.41,
+        1867.05,
+        1157.13
       ]
     },
     "impl": {
@@ -2974,15 +2974,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 4265.11,
+    "primary_metric": 2589.01,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 4265.1,
-    "offline_throughput": 4265.11,
+    "tokens_per_sec_per_chip": 2589.0,
+    "offline_throughput": 2589.01,
     "online_max_qps": 5,
     "interactive_ttft_p99": 66.9,
     "peak_memory_gb": 69.29,
     "memory_utilization_pct": 86.6,
-    "memory_efficiency_toks_per_gb": 61.6,
+    "memory_efficiency_toks_per_gb": 37.4,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -3071,9 +3071,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          4265.11,
-          4259.06,
-          4250.83
+          2589.01,
+          2582.96,
+          2574.73
         ],
         "memory_gb": [
           69.29,
@@ -3581,7 +3581,7 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 5583.08,
+    "primary_metric": 3521.25,
     "primary_metric_label": "tokens/sec (W8A8)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
@@ -3605,12 +3605,12 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_2x": null,
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
-    "quant_bf16_throughput": 4381.09,
-    "quant_best_throughput": 5583.08,
+    "quant_bf16_throughput": 2751.23,
+    "quant_best_throughput": 3521.25,
     "quant_best_precision": "W8A8",
-    "quant_int8_speedup": 0.998,
-    "quant_int4_speedup": 0.686,
-    "quant_quality_eff": 3294.0,
+    "quant_int8_speedup": 0.997,
+    "quant_int4_speedup": 0.68,
+    "quant_quality_eff": 2077.5,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -3677,25 +3677,25 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        4381.09,
-        4577.74,
-        5583.08,
-        4374.03,
-        3006.17
+        2751.23,
+        2889.67,
+        3521.25,
+        2744.17,
+        1869.97
       ],
       "speedup": [
         1.0,
-        1.045,
-        1.274,
-        0.998,
-        0.686
+        1.05,
+        1.28,
+        0.997,
+        0.68
       ],
       "quality_efficiency": [
-        2453.4,
-        2655.1,
-        3294.0,
-        2580.7,
-        1713.5
+        1540.7,
+        1676.0,
+        2077.5,
+        1619.1,
+        1065.9
       ],
       "accuracies": [
         0.56,
@@ -3732,8 +3732,8 @@ const LEADERBOARD_DATA = [
         "compressed-tensors",
         "gptq"
       ],
-      "best_quality_eff": 3294.0,
-      "bf16_throughput": 4381.09,
+      "best_quality_eff": 2077.5,
+      "bf16_throughput": 2751.23,
       "online_by_precision": null,
       "sustained_by_precision": null
     },
@@ -3775,15 +3775,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_D",
     "scenario": "all",
-    "primary_metric": 7812.08,
+    "primary_metric": 87.87,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 7812.1,
-    "offline_throughput": 7812.08,
+    "tokens_per_sec_per_chip": 87.9,
+    "offline_throughput": 87.87,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 3030.94,
     "peak_memory_gb": 71.21,
     "memory_utilization_pct": 89.0,
-    "memory_efficiency_toks_per_gb": 109.7,
+    "memory_efficiency_toks_per_gb": 1.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -3871,8 +3871,8 @@ const LEADERBOARD_DATA = [
           "4"
         ],
         "throughput": [
-          7812.08,
-          7801.98
+          85.45,
+          87.87
         ],
         "memory_gb": [
           71.21,
@@ -4351,15 +4351,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 9207.93,
+    "primary_metric": 7093.64,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 9207.9,
-    "offline_throughput": 9207.93,
+    "tokens_per_sec_per_chip": 7093.6,
+    "offline_throughput": 7093.64,
     "online_max_qps": 10,
     "interactive_ttft_p99": 32.39,
     "peak_memory_gb": 68.95,
     "memory_utilization_pct": 86.2,
-    "memory_efficiency_toks_per_gb": 133.5,
+    "memory_efficiency_toks_per_gb": 102.9,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -4448,9 +4448,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          9207.93,
-          9167.28,
-          9029.35
+          7093.64,
+          7052.99,
+          6945.7
         ],
         "memory_gb": [
           68.95,
@@ -4743,15 +4743,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_B",
     "scenario": "all",
-    "primary_metric": 2145.7,
+    "primary_metric": 1298.64,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 536.4,
-    "offline_throughput": 2145.7,
+    "tokens_per_sec_per_chip": 324.7,
+    "offline_throughput": 1298.64,
     "online_max_qps": 10,
     "interactive_ttft_p99": 177.56,
     "peak_memory_gb": 70.65,
     "memory_utilization_pct": 88.3,
-    "memory_efficiency_toks_per_gb": 30.4,
+    "memory_efficiency_toks_per_gb": 18.4,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -4840,14 +4840,14 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          2145.7,
-          2144.77,
-          2085.5
+          1298.64,
+          1297.71,
+          1262.05
         ],
         "throughput_per_chip": [
-          536.43,
-          536.19,
-          521.38
+          324.66,
+          324.43,
+          315.51
         ],
         "memory_gb": [
           70.65,
@@ -5352,10 +5352,10 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 4881.5,
+    "primary_metric": 2956.48,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 4881.5,
+    "offline_throughput": 2956.48,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
@@ -5373,9 +5373,9 @@ const LEADERBOARD_DATA = [
     "run_id": "7544a582",
     "run_name": "nvidia_a100_sxm4_80gbx4_suite_E_nvidia_vllm_47f5d58e_7544a582",
     "flagged": null,
-    "scaling_efficiency_2x": 0.658,
+    "scaling_efficiency_2x": 0.659,
     "scaling_efficiency_4x": 0.401,
-    "scaling_base_throughput": 4881.5,
+    "scaling_base_throughput": 2956.48,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -5449,19 +5449,19 @@ const LEADERBOARD_DATA = [
         4
       ],
       "throughput": [
-        4881.5,
-        6428.19,
-        7825.89
+        2956.48,
+        3896.08,
+        4743.32
       ],
       "efficiency_pct": [
         100.0,
-        65.8,
+        65.9,
         40.1
       ],
       "throughput_per_chip": [
-        4881.5,
-        3214.09,
-        1956.47
+        2956.48,
+        1948.04,
+        1185.83
       ]
     },
     "impl": {
@@ -5502,17 +5502,17 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 4473.15,
+    "primary_metric": 2709.49,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 4473.1,
-    "offline_throughput": 4473.15,
+    "tokens_per_sec_per_chip": 2709.5,
+    "offline_throughput": 2709.49,
     "online_max_qps": 5,
     "interactive_ttft_p99": 64.7,
     "peak_memory_gb": 69.29,
     "memory_utilization_pct": 86.6,
-    "memory_efficiency_toks_per_gb": 64.6,
+    "memory_efficiency_toks_per_gb": 39.1,
     "min_price_usd_per_hr": 2.5,
-    "cost_efficiency_toks_per_dollar_hr": 1789.0,
+    "cost_efficiency_toks_per_dollar_hr": 1084.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.6,
@@ -5599,9 +5599,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          4454.18,
-          4467.4,
-          4473.15
+          2703.59,
+          2703.74,
+          2709.49
         ],
         "memory_gb": [
           69.29,
@@ -6109,17 +6109,17 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_D",
     "scenario": "all",
-    "primary_metric": 7975.19,
+    "primary_metric": 90.79,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 7975.2,
-    "offline_throughput": 7975.19,
+    "tokens_per_sec_per_chip": 90.8,
+    "offline_throughput": 90.79,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 2927.16,
     "peak_memory_gb": 71.21,
     "memory_utilization_pct": 89.0,
-    "memory_efficiency_toks_per_gb": 112.0,
+    "memory_efficiency_toks_per_gb": 1.3,
     "min_price_usd_per_hr": 2.5,
-    "cost_efficiency_toks_per_dollar_hr": 3190.0,
+    "cost_efficiency_toks_per_dollar_hr": 36.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.55,
@@ -6205,8 +6205,8 @@ const LEADERBOARD_DATA = [
           "4"
         ],
         "throughput": [
-          7975.19,
-          7972.92
+          90.79,
+          88.52
         ],
         "memory_gb": [
           71.21,
@@ -6685,17 +6685,17 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 11627.84,
+    "primary_metric": 8965.4,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 11627.8,
-    "offline_throughput": 11627.84,
+    "tokens_per_sec_per_chip": 8965.4,
+    "offline_throughput": 8965.4,
     "online_max_qps": 10,
     "interactive_ttft_p99": 31.49,
     "peak_memory_gb": 68.95,
     "memory_utilization_pct": 86.2,
-    "memory_efficiency_toks_per_gb": 168.6,
+    "memory_efficiency_toks_per_gb": 130.0,
     "min_price_usd_per_hr": 2.5,
-    "cost_efficiency_toks_per_dollar_hr": 4651.0,
+    "cost_efficiency_toks_per_dollar_hr": 3586.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.38,
@@ -6782,9 +6782,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          11300.33,
-          11627.84,
-          11609.51
+          8686.29,
+          8965.4,
+          8947.07
         ],
         "memory_gb": [
           68.95,
@@ -7077,17 +7077,17 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_B",
     "scenario": "all",
-    "primary_metric": 2200.46,
+    "primary_metric": 1334.78,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 550.1,
-    "offline_throughput": 2200.46,
+    "tokens_per_sec_per_chip": 333.7,
+    "offline_throughput": 1334.78,
     "online_max_qps": 10,
     "interactive_ttft_p99": 224.62,
     "peak_memory_gb": 67.94,
     "memory_utilization_pct": 84.9,
-    "memory_efficiency_toks_per_gb": 32.4,
+    "memory_efficiency_toks_per_gb": 19.6,
     "min_price_usd_per_hr": 2.5,
-    "cost_efficiency_toks_per_dollar_hr": 880.0,
+    "cost_efficiency_toks_per_dollar_hr": 534.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.78,
@@ -7174,14 +7174,14 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          2200.46,
-          2182.59,
-          2190.2
+          1334.78,
+          1323.21,
+          1327.68
         ],
         "throughput_per_chip": [
-          550.11,
-          545.65,
-          547.55
+          333.7,
+          330.8,
+          331.92
         ],
         "memory_gb": [
           67.94,
@@ -7686,17 +7686,17 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 5288.43,
+    "primary_metric": 3203.17,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 5288.43,
+    "offline_throughput": 3203.17,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
     "memory_utilization_pct": null,
     "memory_efficiency_toks_per_gb": null,
     "min_price_usd_per_hr": 2.5,
-    "cost_efficiency_toks_per_dollar_hr": 2115.0,
+    "cost_efficiency_toks_per_dollar_hr": 1281.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.6,
@@ -7708,8 +7708,8 @@ const LEADERBOARD_DATA = [
     "run_name": "nvidia_a800_sxm4_80gbx4_suite_E_nvidia_vllm_47f5d58e_c0a3ee4a",
     "flagged": null,
     "scaling_efficiency_2x": 0.673,
-    "scaling_efficiency_4x": 0.422,
-    "scaling_base_throughput": 5288.43,
+    "scaling_efficiency_4x": 0.423,
+    "scaling_base_throughput": 3203.17,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -7783,19 +7783,19 @@ const LEADERBOARD_DATA = [
         4
       ],
       "throughput": [
-        5288.43,
-        7122.42,
-        8925.03
+        3203.17,
+        4308.97,
+        5415.18
       ],
       "efficiency_pct": [
         100.0,
         67.3,
-        42.2
+        42.3
       ],
       "throughput_per_chip": [
-        5288.43,
-        3561.21,
-        2231.26
+        3203.17,
+        2154.49,
+        1353.8
       ]
     },
     "impl": {
@@ -7836,15 +7836,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 1670.8,
+    "primary_metric": 1016.15,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 1670.8,
-    "offline_throughput": 1670.8,
+    "tokens_per_sec_per_chip": 1016.1,
+    "offline_throughput": 1016.15,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 163.47,
     "peak_memory_gb": 19.33,
     "memory_utilization_pct": 80.5,
-    "memory_efficiency_toks_per_gb": 86.4,
+    "memory_efficiency_toks_per_gb": 52.6,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -7933,9 +7933,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          1651.46,
-          1670.8,
-          1668.74
+          1003.98,
+          1016.15,
+          1014.09
         ],
         "memory_gb": [
           19.33,
@@ -8443,7 +8443,7 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 3458.86,
+    "primary_metric": 2181.4,
     "primary_metric_label": "tokens/sec (W8A8)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
@@ -8467,12 +8467,12 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_2x": null,
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
-    "quant_bf16_throughput": 1557.6,
-    "quant_best_throughput": 3458.86,
+    "quant_bf16_throughput": 982.59,
+    "quant_best_throughput": 2181.4,
     "quant_best_precision": "W8A8",
-    "quant_int8_speedup": 1.491,
-    "quant_int4_speedup": 1.196,
-    "quant_quality_eff": 2040.7,
+    "quant_int8_speedup": 1.495,
+    "quant_int4_speedup": 1.179,
+    "quant_quality_eff": 1287.0,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -8541,25 +8541,25 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        1557.6,
-        2380.11,
-        3458.86,
-        2322.34,
-        1863.66
+        982.59,
+        1503.65,
+        2181.4,
+        1469.16,
+        1158.2
       ],
       "speedup": [
         1.0,
-        1.528,
-        2.221,
-        1.491,
-        1.196
+        1.53,
+        2.22,
+        1.495,
+        1.179
       ],
       "quality_efficiency": [
-        856.7,
-        1428.1,
-        2040.7,
-        1370.2,
-        1043.6
+        540.4,
+        902.2,
+        1287.0,
+        866.8,
+        648.6
       ],
       "accuracies": [
         0.55,
@@ -8596,8 +8596,8 @@ const LEADERBOARD_DATA = [
         "compressed-tensors",
         "gptq"
       ],
-      "best_quality_eff": 2040.7,
-      "bf16_throughput": 1557.6,
+      "best_quality_eff": 1287.0,
+      "bf16_throughput": 982.59,
       "online_by_precision": [
         {
           "precision": "BF16",
@@ -9061,15 +9061,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 8654.58,
+    "primary_metric": 6683.66,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 8654.6,
-    "offline_throughput": 8654.58,
+    "tokens_per_sec_per_chip": 6683.7,
+    "offline_throughput": 6683.66,
     "online_max_qps": 10,
     "interactive_ttft_p99": 28.49,
     "peak_memory_gb": 18.99,
     "memory_utilization_pct": 79.1,
-    "memory_efficiency_toks_per_gb": 455.7,
+    "memory_efficiency_toks_per_gb": 352.0,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -9158,9 +9158,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          8654.58,
-          8615.64,
-          8653.14
+          6657.75,
+          6646.16,
+          6683.66
         ],
         "memory_gb": [
           18.99,
@@ -9453,10 +9453,10 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 1762.28,
+    "primary_metric": 1064.46,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 1762.28,
+    "offline_throughput": 1064.46,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
@@ -9474,9 +9474,9 @@ const LEADERBOARD_DATA = [
     "run_id": "76c20e61",
     "run_name": "nvidia_geforce_rtx_3090x4_suite_E_nvidia_vllm_47f5d58e_76c20e61",
     "flagged": null,
-    "scaling_efficiency_2x": 0.714,
-    "scaling_efficiency_4x": 0.397,
-    "scaling_base_throughput": 1762.28,
+    "scaling_efficiency_2x": 0.716,
+    "scaling_efficiency_4x": 0.399,
+    "scaling_base_throughput": 1064.46,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -9550,19 +9550,19 @@ const LEADERBOARD_DATA = [
         4
       ],
       "throughput": [
-        1762.28,
-        2515.18,
-        2797.26
+        1064.46,
+        1524.97,
+        1698.29
       ],
       "efficiency_pct": [
         100.0,
-        71.4,
-        39.7
+        71.6,
+        39.9
       ],
       "throughput_per_chip": [
-        1762.28,
-        1257.59,
-        699.32
+        1064.46,
+        762.49,
+        424.57
       ]
     },
     "impl": {
@@ -9603,15 +9603,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 2458.88,
+    "primary_metric": 1498.19,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 2458.9,
-    "offline_throughput": 2458.88,
+    "tokens_per_sec_per_chip": 1498.2,
+    "offline_throughput": 1498.19,
     "online_max_qps": 5,
     "interactive_ttft_p99": 90.28,
     "peak_memory_gb": 19.16,
     "memory_utilization_pct": 79.8,
-    "memory_efficiency_toks_per_gb": 128.3,
+    "memory_efficiency_toks_per_gb": 78.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -9700,9 +9700,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          2441.3,
-          2447.82,
-          2458.88
+          1488.36,
+          1491.02,
+          1498.19
         ],
         "memory_gb": [
           19.16,
@@ -10210,7 +10210,7 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 5181.61,
+    "primary_metric": 3228.47,
     "primary_metric_label": "tokens/sec (FP8)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
@@ -10234,12 +10234,12 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_2x": null,
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
-    "quant_bf16_throughput": 2274.98,
-    "quant_best_throughput": 5181.61,
+    "quant_bf16_throughput": 1439.89,
+    "quant_best_throughput": 3228.47,
     "quant_best_precision": "FP8",
-    "quant_int8_speedup": 1.731,
-    "quant_int4_speedup": 1.069,
-    "quant_quality_eff": 3005.3,
+    "quant_int8_speedup": 1.716,
+    "quant_int4_speedup": 1.053,
+    "quant_quality_eff": 1872.5,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -10308,25 +10308,25 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        2274.98,
-        5181.61,
-        4679.53,
-        3938.94,
-        2432.25
+        1439.89,
+        3228.47,
+        2952.95,
+        2471.05,
+        1516.24
       ],
       "speedup": [
         1.0,
-        2.278,
-        2.057,
-        1.731,
-        1.069
+        2.242,
+        2.051,
+        1.716,
+        1.053
       ],
       "quality_efficiency": [
-        1228.5,
-        3005.3,
-        2760.9,
-        2324.0,
-        1386.4
+        777.5,
+        1872.5,
+        1742.2,
+        1457.9,
+        864.3
       ],
       "accuracies": [
         0.54,
@@ -10363,8 +10363,8 @@ const LEADERBOARD_DATA = [
         "compressed-tensors",
         "gptq"
       ],
-      "best_quality_eff": 3005.3,
-      "bf16_throughput": 2274.98,
+      "best_quality_eff": 1872.5,
+      "bf16_throughput": 1439.89,
       "online_by_precision": [
         {
           "precision": "BF16",
@@ -10828,15 +10828,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 14392.51,
+    "primary_metric": 11124.96,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 14392.5,
-    "offline_throughput": 14392.51,
+    "tokens_per_sec_per_chip": 11125.0,
+    "offline_throughput": 11124.96,
     "online_max_qps": 40,
     "interactive_ttft_p99": 12.24,
     "peak_memory_gb": 18.8,
     "memory_utilization_pct": 78.3,
-    "memory_efficiency_toks_per_gb": 765.6,
+    "memory_efficiency_toks_per_gb": 591.8,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -10925,9 +10925,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          14392.51,
-          14345.27,
-          14382.09
+          11124.96,
+          11077.72,
+          11114.54
         ],
         "memory_gb": [
           18.8,
@@ -11220,15 +11220,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 9316.66,
+    "primary_metric": 5680.81,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 9316.7,
-    "offline_throughput": 9316.66,
+    "tokens_per_sec_per_chip": 5680.8,
+    "offline_throughput": 5680.81,
     "online_max_qps": 5,
     "interactive_ttft_p99": 61.17,
     "peak_memory_gb": 123.75,
     "memory_utilization_pct": 88.1,
-    "memory_efficiency_toks_per_gb": 75.3,
+    "memory_efficiency_toks_per_gb": 45.9,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -11317,9 +11317,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          7851.98,
-          9316.66,
-          9308.22
+          4782.76,
+          5680.81,
+          5672.37
         ],
         "memory_gb": [
           123.75,
@@ -11827,7 +11827,7 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 10997.6,
+    "primary_metric": 6922.94,
     "primary_metric_label": "tokens/sec (W8A8)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
@@ -11851,12 +11851,12 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_2x": null,
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
-    "quant_bf16_throughput": 9538.23,
-    "quant_best_throughput": 10997.6,
+    "quant_bf16_throughput": 6010.92,
+    "quant_best_throughput": 6922.94,
     "quant_best_precision": "W8A8",
-    "quant_int8_speedup": 0.936,
-    "quant_int4_speedup": 0.622,
-    "quant_quality_eff": 6488.6,
+    "quant_int8_speedup": 0.931,
+    "quant_int4_speedup": 0.612,
+    "quant_quality_eff": 4084.5,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -11925,25 +11925,25 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        9538.23,
+        6010.92,
         null,
-        10997.6,
-        8926.24,
-        5931.71
+        6922.94,
+        5597.65,
+        3680.95
       ],
       "speedup": [
         1.0,
         null,
-        1.153,
-        0.936,
-        0.622
+        1.152,
+        0.931,
+        0.612
       ],
       "quality_efficiency": [
-        5436.8,
+        3426.2,
         null,
-        6488.6,
-        5177.2,
-        3262.4
+        4084.5,
+        3246.6,
+        2024.5
       ],
       "accuracies": [
         0.57,
@@ -11980,8 +11980,8 @@ const LEADERBOARD_DATA = [
         "compressed-tensors",
         "gptq"
       ],
-      "best_quality_eff": 6488.6,
-      "bf16_throughput": 9538.23,
+      "best_quality_eff": 4084.5,
+      "bf16_throughput": 6010.92,
       "online_by_precision": [
         {
           "precision": "BF16",
@@ -12417,15 +12417,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_D",
     "scenario": "all",
-    "primary_metric": 17205.57,
+    "primary_metric": 202.21,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 17205.6,
-    "offline_throughput": 17205.57,
+    "tokens_per_sec_per_chip": 202.2,
+    "offline_throughput": 202.21,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 1550.93,
     "peak_memory_gb": 125.65,
     "memory_utilization_pct": 89.5,
-    "memory_efficiency_toks_per_gb": 136.9,
+    "memory_efficiency_toks_per_gb": 1.6,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -12513,8 +12513,8 @@ const LEADERBOARD_DATA = [
           "4"
         ],
         "throughput": [
-          17089.37,
-          17205.57
+          202.21,
+          197.78
         ],
         "memory_gb": [
           125.65,
@@ -12993,15 +12993,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 16747.85,
+    "primary_metric": 12862.12,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 16747.8,
-    "offline_throughput": 16747.85,
+    "tokens_per_sec_per_chip": 12862.1,
+    "offline_throughput": 12862.12,
     "online_max_qps": 10,
     "interactive_ttft_p99": 44.76,
     "peak_memory_gb": 123.42,
     "memory_utilization_pct": 87.9,
-    "memory_efficiency_toks_per_gb": 135.7,
+    "memory_efficiency_toks_per_gb": 104.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -13090,9 +13090,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          9735.7,
-          16747.85,
-          16740.88
+          7489.26,
+          12862.12,
+          12855.15
         ],
         "memory_gb": [
           123.42,
@@ -13385,15 +13385,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_B",
     "scenario": "all",
-    "primary_metric": 5847.93,
+    "primary_metric": 3553.46,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 731.0,
-    "offline_throughput": 5847.93,
+    "tokens_per_sec_per_chip": 444.2,
+    "offline_throughput": 3553.46,
     "online_max_qps": 10,
     "interactive_ttft_p99": 193.03,
     "peak_memory_gb": 116.69,
     "memory_utilization_pct": 83.1,
-    "memory_efficiency_toks_per_gb": 50.1,
+    "memory_efficiency_toks_per_gb": 30.5,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -13482,14 +13482,14 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          5288.9,
-          5615.29,
-          5847.93
+          3215.83,
+          3406.6,
+          3553.46
         ],
         "throughput_per_chip": [
-          661.11,
-          701.91,
-          730.99
+          401.98,
+          425.82,
+          444.18
         ],
         "memory_gb": [
           116.69,
@@ -13994,10 +13994,10 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 10831.57,
+    "primary_metric": 6560.55,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 10831.57,
+    "offline_throughput": 6560.55,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
@@ -14015,9 +14015,9 @@ const LEADERBOARD_DATA = [
     "run_id": "c7cc2db9",
     "run_name": "nvidia_h200x8_suite_E_nvidia_vllm_47f5d58e_c7cc2db9",
     "flagged": null,
-    "scaling_efficiency_2x": 0.599,
+    "scaling_efficiency_2x": 0.602,
     "scaling_efficiency_4x": 0.329,
-    "scaling_base_throughput": 10831.57,
+    "scaling_base_throughput": 6560.55,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -14093,22 +14093,22 @@ const LEADERBOARD_DATA = [
         8
       ],
       "throughput": [
-        10831.57,
-        12977.27,
-        14261.03,
-        15017.03
+        6560.55,
+        7894.6,
+        8634.13,
+        9108.78
       ],
       "efficiency_pct": [
         100.0,
-        59.9,
+        60.2,
         32.9,
-        17.3
+        17.4
       ],
       "throughput_per_chip": [
-        10831.57,
-        6488.64,
-        3565.26,
-        1877.13
+        6560.55,
+        3947.3,
+        2158.53,
+        1138.6
       ]
     },
     "impl": {
@@ -14149,15 +14149,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 4715.57,
+    "primary_metric": 2869.24,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 4715.6,
-    "offline_throughput": 4715.57,
+    "tokens_per_sec_per_chip": 2869.2,
+    "offline_throughput": 2869.24,
     "online_max_qps": 5,
     "interactive_ttft_p99": 91.87,
     "peak_memory_gb": 123.77,
     "memory_utilization_pct": 88.2,
-    "memory_efficiency_toks_per_gb": 38.1,
+    "memory_efficiency_toks_per_gb": 23.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -14246,9 +14246,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          4715.57,
-          4705.3,
-          4691.5
+          2869.24,
+          2858.97,
+          2845.17
         ],
         "memory_gb": [
           123.77,
@@ -14756,15 +14756,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_D",
     "scenario": "all",
-    "primary_metric": 4424.91,
+    "primary_metric": 49.72,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 4424.9,
-    "offline_throughput": 4424.91,
+    "tokens_per_sec_per_chip": 49.7,
+    "offline_throughput": 49.72,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 5875.7,
     "peak_memory_gb": 125.69,
     "memory_utilization_pct": 89.5,
-    "memory_efficiency_toks_per_gb": 35.2,
+    "memory_efficiency_toks_per_gb": 0.4,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -14852,8 +14852,8 @@ const LEADERBOARD_DATA = [
           "4"
         ],
         "throughput": [
-          4424.91,
-          4388.18
+          49.25,
+          49.72
         ],
         "memory_gb": [
           125.69,
@@ -15332,15 +15332,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 12029.45,
+    "primary_metric": 9286.7,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 12029.5,
-    "offline_throughput": 12029.45,
+    "tokens_per_sec_per_chip": 9286.7,
+    "offline_throughput": 9286.7,
     "online_max_qps": 10,
     "interactive_ttft_p99": 44.45,
     "peak_memory_gb": 123.43,
     "memory_utilization_pct": 87.9,
-    "memory_efficiency_toks_per_gb": 97.5,
+    "memory_efficiency_toks_per_gb": 75.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -15429,9 +15429,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          11975.54,
-          12029.45,
-          11999.38
+          9262.86,
+          9264.6,
+          9286.7
         ],
         "memory_gb": [
           123.43,
@@ -15724,15 +15724,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_B",
     "scenario": "all",
-    "primary_metric": 2392.05,
+    "primary_metric": 1454.81,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 598.0,
-    "offline_throughput": 2392.05,
+    "tokens_per_sec_per_chip": 363.7,
+    "offline_throughput": 1454.81,
     "online_max_qps": 5,
     "interactive_ttft_p99": 203.42,
     "peak_memory_gb": 118.98,
     "memory_utilization_pct": 84.7,
-    "memory_efficiency_toks_per_gb": 20.1,
+    "memory_efficiency_toks_per_gb": 12.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -15821,14 +15821,14 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          2388.92,
-          2390.66,
-          2392.05
+          1454.81,
+          1452.84,
+          1454.23
         ],
         "throughput_per_chip": [
-          597.23,
-          597.67,
-          598.01
+          363.7,
+          363.21,
+          363.56
         ],
         "memory_gb": [
           118.98,
@@ -16333,10 +16333,10 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 4924.15,
+    "primary_metric": 2976.38,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 4924.15,
+    "offline_throughput": 2976.38,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
@@ -16354,9 +16354,9 @@ const LEADERBOARD_DATA = [
     "run_id": "bb66ef51",
     "run_name": "nvidia_h20_3ex4_suite_E_nvidia_vllm_47f5d58e_bb66ef51",
     "flagged": null,
-    "scaling_efficiency_2x": 0.728,
+    "scaling_efficiency_2x": 0.732,
     "scaling_efficiency_4x": 0.48,
-    "scaling_base_throughput": 4924.15,
+    "scaling_base_throughput": 2976.38,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -16430,19 +16430,19 @@ const LEADERBOARD_DATA = [
         4
       ],
       "throughput": [
-        4924.15,
-        7168.87,
-        9445.39
+        2976.38,
+        4355.42,
+        5713.86
       ],
       "efficiency_pct": [
         100.0,
-        72.8,
+        73.2,
         48.0
       ],
       "throughput_per_chip": [
-        4924.15,
-        3584.43,
-        2361.35
+        2976.38,
+        2177.71,
+        1428.46
       ]
     },
     "impl": {
@@ -16483,15 +16483,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 1578.25,
+    "primary_metric": 959.59,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 1578.2,
-    "offline_throughput": 1578.25,
+    "tokens_per_sec_per_chip": 959.6,
+    "offline_throughput": 959.59,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 150.8,
     "peak_memory_gb": 26.53,
     "memory_utilization_pct": 82.9,
-    "memory_efficiency_toks_per_gb": 59.5,
+    "memory_efficiency_toks_per_gb": 36.2,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -16580,9 +16580,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          1576.53,
-          1578.25,
-          1573.17
+          957.87,
+          959.59,
+          956.12
         ],
         "memory_gb": [
           26.53,
@@ -17090,7 +17090,7 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 1636.52,
+    "primary_metric": 1030.55,
     "primary_metric_label": "tokens/sec (FP16)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
@@ -17115,11 +17115,11 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
     "quant_bf16_throughput": null,
-    "quant_best_throughput": 1636.52,
+    "quant_best_throughput": 1030.55,
     "quant_best_precision": "FP16",
     "quant_int8_speedup": null,
-    "quant_int4_speedup": 0.841,
-    "quant_quality_eff": 900.1,
+    "quant_int4_speedup": 0.836,
+    "quant_quality_eff": 566.8,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -17183,16 +17183,16 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        1636.52,
-        1376.91
+        1030.55,
+        862.03
       ],
       "speedup": [
         1.0,
-        0.841
+        0.836
       ],
       "quality_efficiency": [
-        900.1,
-        771.1
+        566.8,
+        482.7
       ],
       "accuracies": [
         0.55,
@@ -17214,7 +17214,7 @@ const LEADERBOARD_DATA = [
         null,
         "gptq"
       ],
-      "best_quality_eff": 900.1,
+      "best_quality_eff": 566.8,
       "bf16_throughput": null,
       "online_by_precision": null,
       "sustained_by_precision": null
@@ -17257,15 +17257,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_D",
     "scenario": "all",
-    "primary_metric": 1693.37,
+    "primary_metric": 18.9,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 1693.4,
-    "offline_throughput": 1693.37,
+    "tokens_per_sec_per_chip": 18.9,
+    "offline_throughput": 18.9,
     "online_max_qps": 0.0,
     "interactive_ttft_p99": 13500.2,
     "peak_memory_gb": 28.46,
     "memory_utilization_pct": 88.9,
-    "memory_efficiency_toks_per_gb": 59.5,
+    "memory_efficiency_toks_per_gb": 0.7,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -17353,8 +17353,8 @@ const LEADERBOARD_DATA = [
           "4"
         ],
         "throughput": [
-          1692.33,
-          1693.37
+          18.85,
+          18.9
         ],
         "memory_gb": [
           28.46,
@@ -17833,15 +17833,15 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 7978.11,
+    "primary_metric": 6158.21,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 7978.1,
-    "offline_throughput": 7978.11,
+    "tokens_per_sec_per_chip": 6158.2,
+    "offline_throughput": 6158.21,
     "online_max_qps": 10,
     "interactive_ttft_p99": 51.16,
     "peak_memory_gb": 26.17,
     "memory_utilization_pct": 81.8,
-    "memory_efficiency_toks_per_gb": 304.9,
+    "memory_efficiency_toks_per_gb": 235.3,
     "min_price_usd_per_hr": null,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
@@ -17930,9 +17930,9 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          7920.99,
-          7816.56,
-          7978.11
+          6101.09,
+          6019.41,
+          6158.21
         ],
         "memory_gb": [
           26.17,
@@ -18225,10 +18225,10 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 1935.77,
+    "primary_metric": 1171.77,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 1935.77,
+    "offline_throughput": 1171.77,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
@@ -18248,7 +18248,7 @@ const LEADERBOARD_DATA = [
     "flagged": null,
     "scaling_efficiency_2x": 0.722,
     "scaling_efficiency_4x": 0.441,
-    "scaling_base_throughput": 1935.77,
+    "scaling_base_throughput": 1171.77,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -18322,9 +18322,9 @@ const LEADERBOARD_DATA = [
         4
       ],
       "throughput": [
-        1935.77,
-        2796.2,
-        3412.69
+        1171.77,
+        1691.85,
+        2064.8
       ],
       "efficiency_pct": [
         100.0,
@@ -18332,9 +18332,9 @@ const LEADERBOARD_DATA = [
         44.1
       ],
       "throughput_per_chip": [
-        1935.77,
-        1398.1,
-        853.17
+        1171.77,
+        845.92,
+        516.2
       ]
     },
     "impl": {
