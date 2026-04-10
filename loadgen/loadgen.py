@@ -232,7 +232,7 @@ class AccelMarkLoadGen:
                 interval_elapsed = now - interval_start
                 total_tokens     = interval_tokens_out + interval_tokens_in
                 throughput       = (
-                    total_tokens / interval_elapsed if interval_elapsed > 0 else 0
+                    interval_tokens_out / interval_elapsed if interval_elapsed > 0 else 0
                 )
 
                 ttft_p50 = _percentile(interval_ttfts, 50) if interval_ttfts else None
@@ -341,8 +341,10 @@ class AccelMarkLoadGen:
         Higher client concurrency allows the engine to form larger internal batches,
         which may improve throughput up to the engine's scheduling limits.
 
-        Throughput = (total_input_tokens + total_output_tokens) / elapsed,
-        which matches vLLM's own internal throughput metric.
+        Throughput = total_output_tokens / elapsed (output tokens only).
+        This is consistent with the sustained scenario and standard LLM throughput
+        reporting practice. Input tokens are tracked internally but not recorded
+        as the primary metric.
 
         NOTE — total_ms in samples.jsonl for offline:
         Each InferenceResult.total_time_ms is set by the runner to the wall-clock
@@ -422,39 +424,40 @@ class AccelMarkLoadGen:
                             pass
                         break  # skip remaining runs for this client_concurrency
 
-                    # Count both input and output tokens (matches vLLM's throughput metric)
+                    # Count output tokens only for throughput (consistent with sustained/online).
+                    # Input tokens are also tracked for reference but not used as the primary metric.
                     total_input_tokens = sum(r.input_tokens for r in all_results if r.success)
                     total_output_tokens = sum(r.output_tokens for r in all_results if r.success)
                     total_tokens = total_input_tokens + total_output_tokens
-                    throughput = total_tokens / elapsed if elapsed > 0 else 0
                     throughput_output_only = total_output_tokens / elapsed if elapsed > 0 else 0
+                    throughput_total = total_tokens / elapsed if elapsed > 0 else 0
 
                     if is_warmup:
                         tqdm.write(
                             f"  [warmup] client_concurrency={client_concurrency} — "
-                            f"{throughput:.0f} tok/s total, "
-                            f"{throughput_output_only:.0f} tok/s output (not recorded)"
+                            f"{throughput_output_only:.0f} tok/s output, "
+                            f"{throughput_total:.0f} tok/s total (input+output, not recorded)"
                         )
                         continue
 
-                    run_throughputs.append(throughput)
+                    run_throughputs.append(throughput_output_only)
                     run_elapsed_times.append(elapsed)
 
                     per_chip_str = ""
                     if self.chip_count > 1:
-                        per_chip_str = f"  ({throughput/self.chip_count:.0f} tok/s per chip)"
+                        per_chip_str = f"  ({throughput_output_only/self.chip_count:.0f} tok/s per chip)"
 
                     tqdm.write(
                         f"  [offline] client_concurrency={client_concurrency} {run_label} — "
-                        f"{throughput:.0f} tok/s total "
-                        f"({throughput_output_only:.0f} output only)"
+                        f"{throughput_output_only:.0f} tok/s output "
+                        f"({throughput_total:.0f} tok/s total input+output)"
                         f"{per_chip_str}  ({elapsed:.1f}s)"
                     )
 
                     overall_pbar.update(1)
                     overall_pbar.set_postfix({
                         "client_concurrency": client_concurrency,
-                        "tok/s": f"{throughput:.0f}",
+                        "tok/s": f"{throughput_output_only:.0f}",
                     })
 
                     sampled = self._sample_results(all_results, client_concurrency, "offline")
@@ -483,6 +486,7 @@ class AccelMarkLoadGen:
                     "power_watts_avg": None,
                     "power_watts_peak": None,
                     "oom": False,
+                    "_throughput_note": "output_only",
                     "_concurrency_note": (
                         "client_concurrency is the number of requests sent simultaneously. "
                         "The inference engine batches internally; this does not directly "
@@ -609,7 +613,11 @@ class AccelMarkLoadGen:
             })
 
         self._write_samples(all_samples)
-        return {"online": {"max_valid_qps": max_valid_qps, "results_by_qps": results_by_qps}}
+        return {"online": {
+            "sla_ttft_ms": sla_ms,
+            "max_valid_qps": max_valid_qps,
+            "results_by_qps": results_by_qps,
+        }}
 
     # ------------------------------------------------------------------
     # Interactive scenario

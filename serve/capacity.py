@@ -101,7 +101,7 @@ def load_capacity_estimate(implementation_id: str) -> Optional[CapacityEstimate]
         date=data.get("meta", {}).get("date", "unknown"),
         offline_throughput_tokens_per_sec=offline_throughput,
         online_max_qps=online.get("max_valid_qps") if online else None,
-        online_sla_ttft_ms=None,  # not stored in result.json directly
+        online_sla_ttft_ms=online.get("sla_ttft_ms") if online else None,
         interactive_ttft_p99_ms=(
             interactive.get("ttft_ms_p99") if interactive else None
         ),
@@ -120,9 +120,10 @@ def format_capacity_log(est: CapacityEstimate) -> list[str]:
             f"{est.offline_throughput_tokens_per_sec:,.0f} tokens/sec"
         )
     if est.online_max_qps is not None:
+        sla_str = (f"within {est.online_sla_ttft_ms:.0f}ms TTFT SLA"
+                   if est.online_sla_ttft_ms else "within SLA")
         lines.append(
-            f"  Online max QPS     : {est.online_max_qps} "
-            f"(within 500ms TTFT SLA)"
+            f"  Online max QPS     : {est.online_max_qps} ({sla_str})"
         )
     if est.interactive_ttft_p99_ms is not None:
         lines.append(

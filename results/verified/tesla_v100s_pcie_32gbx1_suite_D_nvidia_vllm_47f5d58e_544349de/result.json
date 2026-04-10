@@ -140,25 +140,27 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 1,
-          "throughput_tokens_per_sec": 1692.33,
-          "throughput_tokens_per_sec_per_chip": 1692.33,
+          "throughput_tokens_per_sec": 18.85,
+          "throughput_tokens_per_sec_per_chip": 18.85,
           "elapsed_seconds_median": 853.7,
           "peak_memory_gb": 28.46,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
+          "_throughput_note": "output_only"
         },
         {
           "client_concurrency": 4,
-          "throughput_tokens_per_sec": 1693.37,
-          "throughput_tokens_per_sec_per_chip": 1693.37,
+          "throughput_tokens_per_sec": 18.9,
+          "throughput_tokens_per_sec_per_chip": 18.9,
           "elapsed_seconds_median": 853.2,
           "peak_memory_gb": 28.46,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
+          "_throughput_note": "output_only"
         }
       ]
     },
@@ -522,7 +524,7 @@
     "valid": true,
     "framework": "vLLM",
     "precision": "FP16",
-    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
+    "notes": "Integrated accuracy check — used same vLLM instance as benchmark."
   },
   "meta": {
     "submitted_by": "JuhaoLiang1997",

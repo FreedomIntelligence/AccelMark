@@ -26,7 +26,8 @@
 # 1. Clone and install
 git clone https://github.com/JuhaoLiang1997/AccelMark.git
 cd AccelMark
-pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
+pip install -e .                                              # installs framework dependencies (Python >=3.10 required)
+pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt # installs runner dependencies
 
 # 2. One-time setup
 cp configs/submitter.yaml.example configs/submitter.yaml

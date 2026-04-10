@@ -201,25 +201,27 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 1,
-          "throughput_tokens_per_sec": 17089.37,
-          "throughput_tokens_per_sec_per_chip": 17089.37,
+          "throughput_tokens_per_sec": 202.21,
+          "throughput_tokens_per_sec_per_chip": 202.21,
           "elapsed_seconds_median": 84.6,
           "peak_memory_gb": 125.65,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
+          "_throughput_note": "output_only"
         },
         {
           "client_concurrency": 4,
-          "throughput_tokens_per_sec": 17205.57,
-          "throughput_tokens_per_sec_per_chip": 17205.57,
+          "throughput_tokens_per_sec": 197.78,
+          "throughput_tokens_per_sec_per_chip": 197.78,
           "elapsed_seconds_median": 84.0,
           "peak_memory_gb": 125.65,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
+          "_throughput_note": "output_only"
         }
       ]
     }
