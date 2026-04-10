@@ -120,8 +120,11 @@ def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
             print(f"  Step 1: Accuracy Gate (1× chip)")
             print(f"{'='*60}\n")
 
-            cmd = [
-                sys.executable, platform_script,
+            runner_id = br._compute_implementation_id()
+            cmd = [sys.executable, platform_script]
+            if Path(platform_script).name == "run.py" and runner_id:
+                cmd += ["--runner", runner_id]
+            cmd += [
                 "--suite",    args.suite,
                 "--scenario", "accuracy",
                 "--output-dir", str(base_dir),
@@ -182,8 +185,11 @@ def _run_suite_e(br, args, suite: dict, env_info: dict) -> None:
         print(f"  Running {count}× chips")
         print(f"{'='*60}\n")
 
-        cmd = [
-            sys.executable, platform_script,
+        runner_id = br._compute_implementation_id()
+        cmd = [sys.executable, platform_script]
+        if Path(platform_script).name == "run.py" and runner_id:
+            cmd += ["--runner", runner_id]
+        cmd += [
             "--suite",    args.suite,
             "--scenario", "offline",
             "--output-dir", str(count_dir),

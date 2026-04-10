@@ -177,8 +177,15 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
         # - explicit  → forwarded as-is (e.g. "offline", "online", "sustained")
         #   The subprocess hits the else branch in run() and calls _run_single_scenario().
         subprocess_scenario = args.scenario
-        cmd = [
-            sys.executable, platform_script,
+
+        # When invoked via `python run.py --runner X`, sys.argv[0] is run.py.
+        # run.py requires --runner to dispatch to the correct runner.py.
+        # Inject --runner if platform_script looks like run.py.
+        runner_id = br._compute_implementation_id()
+        cmd = [sys.executable, platform_script]
+        if Path(platform_script).name == "run.py" and runner_id:
+            cmd += ["--runner", runner_id]
+        cmd += [
             "--suite",      args.suite,
             "--scenario",   subprocess_scenario,
             "--output-dir", str(precision_dir),

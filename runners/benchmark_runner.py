@@ -1252,6 +1252,14 @@ class BenchmarkRunner(ABC):
 
         platform_script = sys.argv[0]
 
+        # When invoked via `python run.py --runner X`, sys.argv[0] is run.py.
+        # Subprocesses need --runner to dispatch correctly through run.py.
+        # Detect this case and store the runner_id for injection into cmds below.
+        _runner_id_for_subprocess = None
+        if Path(platform_script).name == "run.py":
+            _runner_id_for_subprocess = self._compute_implementation_id()
+
+
         if run_accuracy:
             print(f"\n{'='*60}")
             if skip_gate:
@@ -1276,8 +1284,10 @@ class BenchmarkRunner(ABC):
             # parent's TeeWriter (set up by _setup_logging above).  Using
             # subprocess.run() with inherited fds would bypass the TeeWriter entirely
             # since the child writes directly to the OS fd, not through sys.stdout.
-            acc_cmd = [
-                sys.executable, platform_script,
+            acc_cmd = [sys.executable, platform_script]
+            if _runner_id_for_subprocess:
+                acc_cmd += ["--runner", _runner_id_for_subprocess]
+            acc_cmd += [
                 "--suite",      args.suite,
                 "--scenario",   "accuracy",
                 "--output-dir", str(base_dir),
@@ -1357,8 +1367,10 @@ class BenchmarkRunner(ABC):
             print(f"  Step {i + 2 if run_accuracy else i + 1}: {scenario}")
             print(f"{'='*60}\n")
 
-            cmd = [
-                sys.executable, platform_script,
+            cmd = [sys.executable, platform_script]
+            if _runner_id_for_subprocess:
+                cmd += ["--runner", _runner_id_for_subprocess]
+            cmd += [
                 "--suite",      args.suite,
                 "--scenario",   scenario,
                 "--output-dir", str(base_dir),
