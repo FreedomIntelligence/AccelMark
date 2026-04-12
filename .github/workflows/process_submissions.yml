@@ -115,9 +115,9 @@ jobs:
           EXISTING_DIR=$(dirname "$EXISTING")
 
           # New scenarios from step output (file not written yet)
-          NEW_SCENARIOS=$(python3 -c "import json,sys; r=json.loads(sys.argv[1]); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" '${{ steps.extract.outputs.result_json }}' 2>/dev/null || echo "unknown")
+          NEW_SCENARIOS=$(python3 -c "import json,sys; r=json.loads(sys.argv[1]); s=sorted(r.get('task',{}).get('scenarios_run',[])); print(','.join(s) if s else 'none')" '${{ steps.extract.outputs.result_json }}' 2>/dev/null || echo "unknown")
 
-          OLD_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open(sys.argv[1])); s=sorted(r.get('scenarios_run',[])); print(','.join(s) if s else 'none')" "$EXISTING" 2>/dev/null || echo "unknown")
+          OLD_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open(sys.argv[1])); s=sorted(r.get('task',{}).get('scenarios_run',[])); print(','.join(s) if s else 'none')" "$EXISTING" 2>/dev/null || echo "unknown")
 
           echo "Existing scenarios: $OLD_SCENARIOS"
           echo "New scenarios:      $NEW_SCENARIOS"
