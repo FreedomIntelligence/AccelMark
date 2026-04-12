@@ -1201,14 +1201,20 @@ class BenchmarkRunner(ABC):
 
         # ── Resolve which scenarios to run ────────────────────────────────────
         default_scenarios, extra_scenarios = self._parse_scenarios_config(suite)
+        all_suite_scenarios = default_scenarios + [
+            s for s in extra_scenarios if s not in default_scenarios
+        ]
 
         if args.scenario == "all":
-            all_requested = default_scenarios + [
-                s for s in extra_scenarios if s not in default_scenarios
-            ]
-        else:
-            # "default"
+            all_requested = all_suite_scenarios
+        elif args.scenario in ("default", None):
             all_requested = default_scenarios
+        else:
+            # Explicit scenario name (e.g. "sustained", "online") — run just
+            # that scenario. Always include accuracy so the gate still fires,
+            # unless the caller has set --skip-accuracy-gate.
+            explicit = args.scenario
+            all_requested = (["accuracy"] if "accuracy" in default_scenarios else []) + [explicit]
 
         run_accuracy = "accuracy" in all_requested
         skip_gate    = getattr(args, "skip_accuracy_gate", False)
@@ -1219,6 +1225,7 @@ class BenchmarkRunner(ABC):
             if s not in ("accuracy", "training")
             and (s != "online"      or self.SUPPORTS_ONLINE)
             and (s != "interactive" or self.SUPPORTS_STREAMING)
+            and (s != "sustained"   or self.SUPPORTS_STREAMING)
         ]
 
         results_summary = []
