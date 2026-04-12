@@ -160,105 +160,201 @@ def _ascend_supports_bf16(chip_name: str) -> bool:
     return True   # unknown Ascend chip — assume capable
 
 
-def collect_ascend() -> list[dict]:
+def _ascend_enrich_via_torch_npu(accelerators: list[dict]) -> None:
+    """Backfill memory_gb and name via torch_npu runtime API.
+
+    torch_npu.npu.get_device_properties(i) mirrors torch.cuda:
+      - .total_memory  — total HBM bytes
+      - .name          — chip name string (e.g. "910B2")
+
+    Logical indices 0..N-1 map positionally to npu-smi enumeration order
+    when all devices are visible (respects ASCEND_VISIBLE_DEVICES masking).
+    Only fills fields still None so parsed values are never overwritten.
+    """
     try:
-        # npu-smi info -l lists all NPUs with detailed info
+        import torch_npu
+        logical_count = torch_npu.npu.device_count()
+    except Exception:
+        return
+    for logical_idx in range(min(logical_count, len(accelerators))):
+        rec = accelerators[logical_idx]
+        try:
+            props = torch_npu.npu.get_device_properties(logical_idx)
+            if rec.get("memory_gb") is None and props.total_memory:
+                rec["memory_gb"] = round(props.total_memory / (1024 ** 3), 1)
+            if rec.get("name") in (None, "Huawei Ascend NPU") and props.name:
+                rec["name"] = f"Huawei Ascend {props.name.strip()}"
+        except Exception:
+            continue
+
+
+def _parse_npu_smi_table(out: str, cann_version: str) -> list[dict]:
+    """Parse the tabular output of plain `npu-smi info`.
+
+    The table format has two data rows per device:
+      Row 1: | <NPU_ID>  <ChipName>  | <Health> | <Power> <Temp> <Hugepages> |
+      Row 2: | <ChipID>              | <Bus-Id> | <AICore> <Mem-Usage>  <HBM-Usage(used/total MB)> |
+
+    Example:
+      | 7     910B2               | OK            | 96.5        49                0    / 0             |
+      | 0                         | 0000:42:00.0  | 0           0    / 0          3389 / 65536         |
+    """
+    import re
+    accelerators = []
+    lines = out.splitlines()
+
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        # Row 1: starts with "| <int>  <ChipName>" — NPU ID and chip name
+        row1 = re.match(r'\|\s*(\d+)\s+(\S+)\s*\|', line)
+        if row1:
+            npu_id = int(row1.group(1))
+            chip_name = row1.group(2).strip()
+            # Row 2 is the very next table row — HBM total is second number in
+            # the last "used / total" pair on that line
+            hbm_total_mb = None
+            if i + 1 < len(lines):
+                row2 = lines[i + 1]
+                # Match "used / total" at end of line, e.g. "3389 / 65536"
+                hbm_match = re.search(r'(\d+)\s*/\s*(\d+)\s*\|?\s*$', row2)
+                if hbm_match:
+                    hbm_total_mb = int(hbm_match.group(2))
+                i += 1  # consume row 2
+
+            memory_gb = round(hbm_total_mb / 1024, 1) if hbm_total_mb else None
+            name = f"Huawei Ascend {chip_name}" if chip_name else "Huawei Ascend NPU"
+            accelerators.append({
+                "index": npu_id,
+                "name": name,
+                "vendor": "Huawei",
+                "memory_gb": memory_gb,
+                "driver_version": cann_version,
+                "firmware_version": None,
+                "supports_bf16": _ascend_supports_bf16(name),
+            })
+        i += 1
+
+    return accelerators
+
+
+def collect_ascend() -> list[dict]:
+    import re
+
+    try:
+        # Primary: plain `npu-smi info` — tabular format with chip name + HBM.
+        # `npu-smi info -l` only returns NPU ID and Chip Count on some firmware
+        # versions (e.g. 24.1.x on openEuler/aarch64) so it is not reliable.
         out = subprocess.check_output(
-            ["npu-smi", "info", "-l"],
-            text=True, stderr=subprocess.DEVNULL
-        )
-        import re
-        accelerators = []
-        current_npu: dict | None = None
-
-        for line in out.splitlines():
-            # New NPU entry — line like "NPU ID         : 0"
-            npu_match = re.search(r'NPU\s+ID\s*:\s*(\d+)', line, re.IGNORECASE)
-            if npu_match:
-                if current_npu:
-                    current_npu["supports_bf16"] = _ascend_supports_bf16(current_npu.get("name", ""))
-                    accelerators.append(current_npu)
-                current_npu = {
-                    "index": int(npu_match.group(1)),
-                    "name": "Huawei Ascend NPU",
-                    "vendor": "Huawei",
-                    "memory_gb": None,
-                    "driver_version": _get_cann_version(),
-                    "firmware_version": None,
-                }
-
-            if current_npu is None:
-                continue
-
-            # Chip name — line like "Chip Name      : 910B"
-            chip_match = re.search(r'Chip\s+Name\s*:\s*(.+)', line, re.IGNORECASE)
-            if chip_match:
-                current_npu["name"] = f"Huawei Ascend {chip_match.group(1).strip()}"
-
-            # Memory — line like "HBM Capacity(MB): 65536"
-            mem_match = re.search(r'HBM\s+Capacity.*?:\s*(\d+)', line, re.IGNORECASE)
-            if mem_match:
-                current_npu["memory_gb"] = round(int(mem_match.group(1)) / 1024, 1)
-
-            # Also try "Memory Capacity" format
-            mem_match2 = re.search(r'Memory\s+Capacity.*?:\s*(\d+)\s*MB', line, re.IGNORECASE)
-            if mem_match2 and current_npu["memory_gb"] is None:
-                current_npu["memory_gb"] = round(int(mem_match2.group(1)) / 1024, 1)
-
-        if current_npu:
-            current_npu["supports_bf16"] = _ascend_supports_bf16(current_npu.get("name", ""))
-            accelerators.append(current_npu)
-
-        if accelerators:
-            return accelerators
-
-        # Fallback: try basic npu-smi info without -l
-        out2 = subprocess.check_output(
             ["npu-smi", "info"], text=True, stderr=subprocess.DEVNULL
         )
-        return [{
-            "index": 0,
-            "name": "Huawei Ascend NPU",
-            "vendor": "Huawei",
-            "memory_gb": None,
-            "driver_version": _get_cann_version(),
-            "firmware_version": None,
-            "supports_bf16": True,   # unknown fallback — assume capable
-        }]
+        # Parse with a placeholder driver/firmware — filled in per-device below
+        accelerators = _parse_npu_smi_table(out, "unknown")
 
-    except Exception:
-        return []
+        if not accelerators:
+            # Secondary: try -l in case this firmware uses key-value format
+            out_l = subprocess.check_output(
+                ["npu-smi", "info", "-l"], text=True, stderr=subprocess.DEVNULL
+            )
+            current_npu: dict | None = None
+            for line in out_l.splitlines():
+                npu_match = re.search(r'NPU\s+ID\s*:\s*(\d+)', line, re.IGNORECASE)
+                if npu_match:
+                    if current_npu:
+                        current_npu["supports_bf16"] = _ascend_supports_bf16(current_npu.get("name", ""))
+                        accelerators.append(current_npu)
+                    current_npu = {
+                        "index": int(npu_match.group(1)),
+                        "name": "Huawei Ascend NPU",
+                        "vendor": "Huawei",
+                        "memory_gb": None,
+                        "driver_version": "unknown",
+                        "firmware_version": None,
+                    }
+                if current_npu is None:
+                    continue
+                chip_match = re.search(r'Chip\s+Name\s*:\s*(.+)', line, re.IGNORECASE)
+                if chip_match:
+                    current_npu["name"] = f"Huawei Ascend {chip_match.group(1).strip()}"
+                mem_match = re.search(r'HBM\s+Capacity.*?:\s*(\d+)', line, re.IGNORECASE)
+                if mem_match:
+                    current_npu["memory_gb"] = round(int(mem_match.group(1)) / 1024, 1)
+                if current_npu["memory_gb"] is None:
+                    mem_match2 = re.search(r'Memory\s+Capacity.*?:\s*(\d+)\s*MB', line, re.IGNORECASE)
+                    if mem_match2:
+                        current_npu["memory_gb"] = round(int(mem_match2.group(1)) / 1024, 1)
+                if current_npu["firmware_version"] is None:
+                    fw_match = re.search(r'Firmware\s+Version\s*:\s*(.+)', line, re.IGNORECASE)
+                    if fw_match:
+                        current_npu["firmware_version"] = fw_match.group(1).strip()
+            if current_npu:
+                current_npu["supports_bf16"] = _ascend_supports_bf16(current_npu.get("name", ""))
+                accelerators.append(current_npu)
 
+        if accelerators:
+            # Enrich driver_version and firmware_version per device via -t board
+            for rec in accelerators:
+                board_info = _get_npu_board_info(str(rec["index"]))
+                rec["driver_version"] = board_info["driver_version"]
+                rec["firmware_version"] = board_info["firmware_version"]
+            # Enrich any still-missing memory/name via torch_npu runtime API
+            _ascend_enrich_via_torch_npu(accelerators)
+            return accelerators
 
-def _get_cann_version() -> str:
-    """Get CANN (Compute Architecture for Neural Networks) version."""
-    # Try npu-smi for driver/CANN version
-    try:
-        out = subprocess.check_output(
-            ["npu-smi", "info", "-t", "common", "-i", "0"],
-            text=True, stderr=subprocess.DEVNULL
-        )
-        import re
-        for line in out.splitlines():
-            match = re.search(r'(CANN|Driver)\s+Version\s*:\s*(.+)', line, re.IGNORECASE)
-            if match:
-                return match.group(2).strip()
     except Exception:
         pass
-    # Try reading from CANN install path
-    for cann_path in ["/usr/local/Ascend/ascend-toolkit/latest", "/usr/local/Ascend/nnae/latest"]:
-        version_file = Path(cann_path) / "version.cfg"
-        if version_file.exists():
-            try:
-                content = version_file.read_text()
-                import re
-                match = re.search(r'Version=(.+)', content)
-                if match:
-                    return f"CANN {match.group(1).strip()}"
-            except Exception:
-                pass
-    return "unknown"
 
+    return []
+
+
+def _get_npu_board_info(npu_id: str) -> dict:
+    """Query driver version and firmware version for a single NPU via -t board.
+
+    `npu-smi info -t board -i <NPU_ID>` returns key-value fields including:
+      Software Version  : 24.1.0.3   (driver / npu-smi package version)
+      Firmware Version  : NA          (NA means not available on this board)
+
+    Returns dict with keys "driver_version" and "firmware_version".
+    Falls back to CANN install-path files for driver_version if the command
+    fails or produces no match.
+    """
+    import re
+
+    result = {"driver_version": "unknown", "firmware_version": None}
+
+    try:
+        out = subprocess.check_output(
+            ["npu-smi", "info", "-t", "board", "-i", npu_id],
+            text=True, stderr=subprocess.DEVNULL
+        )
+        for line in out.splitlines():
+            # Software Version is the driver/npu-smi package version
+            sw_match = re.search(r'Software\s+Version\s*:\s*(.+)', line, re.IGNORECASE)
+            if sw_match:
+                result["driver_version"] = sw_match.group(1).strip()
+            # Firmware Version — treat "NA" as not available
+            fw_match = re.search(r'Firmware\s+Version\s*:\s*(.+)', line, re.IGNORECASE)
+            if fw_match:
+                fw = fw_match.group(1).strip()
+                result["firmware_version"] = None if fw.upper() == "NA" else fw
+    except Exception:
+        pass
+
+    # Fallback for driver_version: CANN toolkit install path
+    if result["driver_version"] == "unknown":
+        for cann_path in ["/usr/local/Ascend/ascend-toolkit/latest", "/usr/local/Ascend/nnae/latest"]:
+            version_file = Path(cann_path) / "version.cfg"
+            if version_file.exists():
+                try:
+                    text = version_file.read_text()
+                    m = re.search(r'Version=(.+)', text)
+                    if m:
+                        result["driver_version"] = f"CANN {m.group(1).strip()}"
+                        break
+                except Exception:
+                    pass
+
+    return result
 
 def _apple_supports_bf16(chip_name: str) -> bool:
     """M1 has limited/slow BF16. M2+ has full hardware BF16."""
@@ -344,6 +440,19 @@ def _get_cpu_model() -> str:
             for line in f:
                 if line.startswith("model name"):
                     return line.split(":", 1)[1].strip()
+        # aarch64: /proc/cpuinfo has no "model name" — try "Hardware" field
+        with open("/proc/cpuinfo") as f:
+            for line in f:
+                if line.startswith("Hardware"):
+                    return line.split(":", 1)[1].strip()
+    except Exception:
+        pass
+    # Try lscpu for model name (works on aarch64)
+    try:
+        out = subprocess.check_output(["lscpu"], text=True, stderr=subprocess.DEVNULL)
+        for line in out.splitlines():
+            if line.startswith("Model name"):
+                return line.split(":", 1)[1].strip()
     except Exception:
         pass
     # macOS fallback
@@ -450,6 +559,20 @@ def detect_runtime_version() -> str:
             text=True, stderr=subprocess.STDOUT
         )
         return f"ROCm {out.strip().splitlines()[-1]}"
+    except Exception:
+        pass
+
+    # Try Ascend/CANN — reuse board info from npu-smi
+    try:
+        import re as _re
+        info_out = subprocess.check_output(
+            ["npu-smi", "info"], text=True, stderr=subprocess.DEVNULL
+        )
+        m = _re.search(r'\|\s*(\d+)\s+\S+\s*\|', info_out)
+        if m:
+            board = _get_npu_board_info(m.group(1))
+            if board["driver_version"] != "unknown":
+                return f"CANN {board['driver_version']}"
     except Exception:
         pass
 

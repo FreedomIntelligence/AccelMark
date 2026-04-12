@@ -106,6 +106,14 @@ class AscendVLLMRunner(BenchmarkRunner):
         return "vllm-ascend"
 
     def _get_framework_version(self) -> str:
+        # Report vllm-ascend version — this is the Ascend-patched fork and the
+        # meaningful version for reproducibility. Fall back to vllm core version
+        # if vllm_ascend package metadata is unavailable.
+        try:
+            from importlib.metadata import version
+            return version("vllm-ascend")
+        except Exception:
+            pass
         try:
             import vllm
             return vllm.__version__

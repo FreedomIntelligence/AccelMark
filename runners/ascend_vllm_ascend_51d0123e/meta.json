@@ -1,5 +1,5 @@
 {
-  "id": "ascend_vllm_ascend_605db33a",
+  "id": "ascend_vllm_ascend_51d0123e",
   "platform": "ascend",
   "name": "vllm-ascend on Huawei Ascend NPU",
   "framework": "vllm-ascend",

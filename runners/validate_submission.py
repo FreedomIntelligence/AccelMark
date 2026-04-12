@@ -215,7 +215,7 @@ def check_run_id_integrity(result: dict) -> list[str]:
 
     key = {
         "chip_name":         chip.get("name", "unknown"),
-        "chip_memory_gb":    round(float(chip.get("memory_gb", 0))),
+        "chip_memory_gb":    round(float(chip.get("memory_gb") or 0)),
         "chip_count":        chip_count,
         "interconnect":      chip.get("interconnect_intra_node") if chip_count > 1 else None,
         "runner_id":         result.get("implementation_id", "unknown"),
