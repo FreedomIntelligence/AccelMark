@@ -299,7 +299,10 @@
     "suites": {
       "suite_A": {
         "best_throughput_tokens_per_sec": 2327.2,
-        "best_online_max_qps": 5
+        "best_online_max_qps": 5,
+        "best_interactive_ttft_p99_ms": 57.6,
+        "best_sustained_throughput_tokens_per_sec": 439.3,
+        "throttle_ratio": 0.914
       },
       "suite_D": {
         "best_throughput_tokens_per_sec": 31.4,
