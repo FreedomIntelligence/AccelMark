@@ -46,5 +46,11 @@
     "submission_count": 7,
     "best_throughput_tokens_per_sec": 6158.21,
     "median_throughput_tokens_per_sec": 959.6
+  },
+  {
+    "name": "Huawei Ascend 910B2",
+    "submission_count": 1,
+    "best_throughput_tokens_per_sec": 31.45,
+    "median_throughput_tokens_per_sec": 31.4
   }
 ]

@@ -293,5 +293,17 @@
         "throttle_ratio": 0.76
       }
     }
+  },
+  "Huawei Ascend 910B2": {
+    "best_throughput_tokens_per_sec": 31.45,
+    "suites": {
+      "suite_D": {
+        "best_throughput_tokens_per_sec": 31.4,
+        "best_online_max_qps": 0,
+        "best_interactive_ttft_p99_ms": 4996.3,
+        "best_sustained_throughput_tokens_per_sec": 37.5,
+        "throttle_ratio": 0.799
+      }
+    }
   }
 }

@@ -376,5 +376,14 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 457.62
+  },
+  "huawei_ascend_910b2x1_suite_D_ascend_vllm_ascend_51d0123e_f3209502": {
+    "chip_name": "Huawei Ascend 910B2",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 31.45
   }
 }
