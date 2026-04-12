@@ -1,5 +1,5 @@
 # AccelMark — AMD ROCm vLLM runner dependencies
-# Tested combination: ROCm 6.2 + vLLM 0.6.6 + MI300X / MI250X
+# Tested combination: ROCm 7.0 + vLLM 0.9.2 + MI300X / MI250X
 #
 # ── Step 1: Install ROCm toolkit ─────────────────────────────────────────────
 #   https://rocm.docs.amd.com/
@@ -9,7 +9,7 @@
 #   vLLM ships a dedicated ROCm wheel on PyPI. Install it with the rocm extra
 #   so pip selects the ROCm build rather than the CUDA build:
 #
-#     pip install "vllm[rocm]==0.6.6.post1"
+#     pip install "vllm[rocm]==0.9.2"
 #
 #   If the rocm extra wheel is not available for your vLLM version, use the
 #   pre-built wheel from the official vLLM ROCm release page:
@@ -19,12 +19,12 @@
 #   separately — it will conflict with the ROCm torch bundled in the vLLM wheel.
 #
 # ── Step 3: Install remaining dependencies ───────────────────────────────────
-#   pip install -r runners/amd_vllm_rocm_d65c6686/requirements.txt
+#   pip install -r runners/amd_vllm_rocm_5355c2c6/requirements.txt
 
 # LLM inference — ROCm vLLM wheel (see Step 2 above)
 # Declared here so the version is documented alongside other deps.
 # If you installed via the pre-built wheel in Step 2, this line is a no-op.
-vllm[rocm]==0.6.6.post1
+vllm[rocm]==0.9.2
 
 # Transformers (for tokenizer and model loading)
 transformers==4.46.3

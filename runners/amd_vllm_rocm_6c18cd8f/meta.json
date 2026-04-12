@@ -1,5 +1,5 @@
 {
-  "id": "amd_vllm_rocm_5355c2c6",
+  "id": "amd_vllm_rocm_6c18cd8f",
   "platform": "amd",
   "name": "vLLM on AMD ROCm",
   "framework": "vLLM-ROCm",

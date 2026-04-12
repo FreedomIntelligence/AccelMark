@@ -132,6 +132,22 @@ class AMDVLLMROCmRunner(BenchmarkRunner):
         gpu_memory_util = cfg.get("gpu_memory_utilization", 0.90)
         extra_kwargs    = dict(cfg.get("engine_kwargs") or {})
 
+        # ── Filter engine_kwargs to only fields this vLLM version accepts ─────
+        # Avoids TypeError when the runner config YAML references a field that
+        # doesn't exist in the installed vLLM version (EngineArgs is a strict
+        # dataclass — unknown keyword arguments raise TypeError immediately).
+        try:
+            import dataclasses
+            from vllm.engine.arg_utils import EngineArgs as _EngineArgs
+            _valid = {f.name for f in dataclasses.fields(_EngineArgs)}
+            _dropped = {k: v for k, v in extra_kwargs.items() if k not in _valid}
+            if _dropped:
+                print(f"  Warning: engine_kwargs keys not supported by this "
+                      f"vLLM version and will be ignored: {list(_dropped)}")
+            extra_kwargs = {k: v for k, v in extra_kwargs.items() if k in _valid}
+        except Exception:
+            pass  # If introspection fails, pass kwargs as-is and let vLLM report the error
+
         effective_precision = getattr(self, "_effective_precision", "BF16").upper()
         precision           = getattr(self, "_precision", None) or effective_precision
 
@@ -402,6 +418,7 @@ class AMDVLLMROCmRunner(BenchmarkRunner):
             "data_parallel_size":     1,
         }
         self._chip_count = tp_size * pp_size
+        self._precision  = getattr(args, "precision", None)
         return args
 
     def get_extra_subprocess_args(self, args) -> list[str]:
