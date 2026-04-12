@@ -295,8 +295,12 @@
     }
   },
   "Huawei Ascend 910B2": {
-    "best_throughput_tokens_per_sec": 31.45,
+    "best_throughput_tokens_per_sec": 2327.24,
     "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 2327.2,
+        "best_online_max_qps": 5
+      },
       "suite_D": {
         "best_throughput_tokens_per_sec": 31.4,
         "best_online_max_qps": 0,
