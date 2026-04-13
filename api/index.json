@@ -204,6 +204,11 @@
         "best_interactive_ttft_p99_ms": 12.2,
         "best_sustained_throughput_tokens_per_sec": 4379.6,
         "throttle_ratio": 0.979
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 1587.2,
+        "best_scaling_efficiency_2x": 0.945,
+        "best_scaling_efficiency_4x": 0.544
       }
     }
   },
