@@ -1662,8 +1662,8 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 28.0,
     "ttft_p99_drift_ms": -0.7,
     "sustained_concurrency": 8,
-    "speculative_throughput": null,
-    "speculative_speedup": null,
+    "speculative_throughput": 1657.99,
+    "speculative_speedup": 0.709,
     "speculative_acceptance": null,
     "burst_degradation": 279.008,
     "burst_steady_p99": 202.64,
@@ -2204,7 +2204,11 @@ const LEADERBOARD_DATA = [
           }
         ]
       },
-      "speculative": null,
+      "speculative": {
+        "offline_tok_per_sec": 1657.99,
+        "acceptance_rate": null,
+        "mean_accepted_tokens": null
+      },
       "burst": {
         "burst_steady_qps": 5,
         "burst_peak_qps": 25,
