@@ -11,7 +11,9 @@
     ],
     "extra_scenarios": [
       "interactive",
-      "sustained"
+      "sustained",
+      "speculative",
+      "burst"
     ],
     "dataset": "sharegpt_standard_v1"
   },
@@ -27,7 +29,8 @@
     ],
     "extra_scenarios": [
       "sustained",
-      "interactive"
+      "interactive",
+      "burst"
     ],
     "dataset": "sharegpt_standard_v1"
   },
@@ -58,7 +61,8 @@
     "extra_scenarios": [
       "interactive",
       "sustained",
-      "online"
+      "online",
+      "speculative"
     ],
     "dataset": "sharegpt_longctx_v1"
   },
@@ -89,5 +93,21 @@
       "sustained"
     ],
     "dataset": "sharegpt_edge_v1"
+  },
+  "suite_G": {
+    "suite_id": "suite_G",
+    "description": "Multi-chip MoE inference, Mixtral-8x7B-Instruct. Tests sparse expert routing efficiency across chip architectures. Minimum 2 chips required (model requires ~90GB BF16).",
+    "model_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "extra_scenarios": [
+      "interactive",
+      "sustained"
+    ],
+    "dataset": "sharegpt_standard_v1"
   }
 }

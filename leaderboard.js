@@ -57,6 +57,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -28.8,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Huawei Ascend 910B2",
       "hw_vendor": "Huawei",
@@ -589,7 +596,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 52.3
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "ascend_vllm_ascend_51d0123e",
@@ -666,6 +675,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2,
     "ttft_p99_drift_ms": -36772.7,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Huawei Ascend 910B2",
       "hw_vendor": "Huawei",
@@ -1167,7 +1183,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 8387
           }
         ]
-      }
+      },
+      "speculative": null
     },
     "impl": {
       "id": "ascend_vllm_ascend_51d0123e",
@@ -1244,6 +1261,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -56.2,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Huawei Ascend 910B2",
       "hw_vendor": "Huawei",
@@ -1638,6 +1662,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 28.0,
     "ttft_p99_drift_ms": -0.7,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": 279.008,
+    "burst_steady_p99": 202.64,
+    "burst_p99": 56538.69,
+    "burst_sla_met": false,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-40GB",
       "hw_vendor": "NVIDIA",
@@ -1671,7 +1702,9 @@ const LEADERBOARD_DATA = [
         "offline",
         "online",
         "interactive",
-        "sustained"
+        "sustained",
+        "speculative",
+        "burst"
       ],
       "run_chip_counts": null,
       "run_num_runs": 3,
@@ -1686,7 +1719,7 @@ const LEADERBOARD_DATA = [
       "meta_submission_type": "individual",
       "meta_date": "2026-04-05",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 78.3,
+      "meta_elapsed_min": 94.4,
       "meta_model_load_sec": 66.2,
       "meta_start_time": "2026-04-05T23:49:35.273291+00:00",
       "meta_notes": null
@@ -2170,6 +2203,42 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 75.7
           }
         ]
+      },
+      "speculative": null,
+      "burst": {
+        "burst_steady_qps": 5,
+        "burst_peak_qps": 25,
+        "steady_ttft_p50_ms": 83.17,
+        "steady_ttft_p99_ms": 202.64,
+        "burst_ttft_p50_ms": 27555.16,
+        "burst_ttft_p99_ms": 56538.69,
+        "steady_requests_total": 1812,
+        "burst_requests_total": 2245,
+        "sla_met_during_burst": false,
+        "burst_degradation_ratio": 279.008,
+        "results_by_cycle": [
+          {
+            "cycle": 1,
+            "steady_requests": 581,
+            "burst_requests": 760,
+            "steady_ttft_p99_ms": 190.41,
+            "burst_ttft_p99_ms": 58948.5
+          },
+          {
+            "cycle": 2,
+            "steady_requests": 595,
+            "burst_requests": 734,
+            "steady_ttft_p99_ms": 197.12,
+            "burst_ttft_p99_ms": 53899.09
+          },
+          {
+            "cycle": 3,
+            "steady_requests": 636,
+            "burst_requests": 751,
+            "steady_ttft_p99_ms": 203.71,
+            "burst_ttft_p99_ms": 55878.56
+          }
+        ]
       }
     },
     "impl": {
@@ -2245,6 +2314,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-40GB",
       "hw_vendor": "NVIDIA",
@@ -2863,6 +2939,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": -433.1,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-40GB",
       "hw_vendor": "NVIDIA",
@@ -3364,7 +3447,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 29478.8
           }
         ]
-      }
+      },
+      "speculative": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -3439,6 +3523,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -363.2,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-40GB",
       "hw_vendor": "NVIDIA",
@@ -3831,6 +3922,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 21.0,
     "ttft_p99_drift_ms": 14.4,
     "sustained_concurrency": 4,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-40GB",
       "hw_vendor": "NVIDIA",
@@ -4365,7 +4463,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 117.1
           }
         ]
-      }
+      },
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -4440,6 +4539,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-40GB",
       "hw_vendor": "NVIDIA",
@@ -4595,6 +4701,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 16.0,
     "ttft_p99_drift_ms": -13.1,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -5127,7 +5240,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 73.5
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -5202,6 +5317,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -5396,6 +5518,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 11.0,
     "ttft_p99_drift_ms": -519.9,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -5897,7 +6026,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 22661.2
           }
         ]
-      }
+      },
+      "speculative": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -5972,6 +6102,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 1.0,
     "ttft_p99_drift_ms": -462.7,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -6364,6 +6501,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": 1.6,
     "sustained_concurrency": 4,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -6898,7 +7042,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 170.7
           }
         ]
-      }
+      },
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -6973,6 +7118,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A100-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -7123,6 +7275,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 4.0,
     "ttft_p99_drift_ms": 18.6,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A800-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -7655,7 +7814,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 83.6
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -7730,6 +7891,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -413.3,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A800-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -8231,7 +8399,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 21970.7
           }
         ]
-      }
+      },
+      "speculative": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -8306,6 +8475,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": -209.5,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A800-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -8698,6 +8874,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": -0.4,
     "sustained_concurrency": 4,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A800-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -9232,7 +9415,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 151.6
           }
         ]
-      }
+      },
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -9307,6 +9491,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA A800-SXM4-80GB",
       "hw_vendor": "NVIDIA",
@@ -9457,6 +9648,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -1.4,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 3090",
       "hw_vendor": "NVIDIA",
@@ -9989,7 +10187,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 151.6
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -10064,6 +10264,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 3090",
       "hw_vendor": "NVIDIA",
@@ -10682,6 +10889,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 6.0,
     "ttft_p99_drift_ms": -290.3,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 3090",
       "hw_vendor": "NVIDIA",
@@ -11074,6 +11288,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 3090",
       "hw_vendor": "NVIDIA",
@@ -11224,6 +11445,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": 4.7,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 4090 D",
       "hw_vendor": "NVIDIA",
@@ -11756,7 +11984,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 92.1
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -11831,6 +12061,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 4090 D",
       "hw_vendor": "NVIDIA",
@@ -12449,6 +12686,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -138.1,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 4090 D",
       "hw_vendor": "NVIDIA",
@@ -12841,6 +13085,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA GeForce RTX 4090 D",
       "hw_vendor": "NVIDIA",
@@ -12991,6 +13242,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": 10.9,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H200",
       "hw_vendor": "NVIDIA",
@@ -13523,7 +13781,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 119.0
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -13598,6 +13858,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H200",
       "hw_vendor": "NVIDIA",
@@ -14188,6 +14455,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 4.0,
     "ttft_p99_drift_ms": -88.7,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H200",
       "hw_vendor": "NVIDIA",
@@ -14689,7 +14963,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 11237.4
           }
         ]
-      }
+      },
+      "speculative": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -14764,6 +15039,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 1.0,
     "ttft_p99_drift_ms": -364.2,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H200",
       "hw_vendor": "NVIDIA",
@@ -15156,6 +15438,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 4.0,
     "ttft_p99_drift_ms": -1.5,
     "sustained_concurrency": 4,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H200",
       "hw_vendor": "NVIDIA",
@@ -15690,7 +15979,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 124.2
           }
         ]
-      }
+      },
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -15765,6 +16055,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H200",
       "hw_vendor": "NVIDIA",
@@ -15920,6 +16217,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": 5.0,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H20-3e",
       "hw_vendor": "NVIDIA",
@@ -16452,7 +16756,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 93.9
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -16527,6 +16833,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": -32.9,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H20-3e",
       "hw_vendor": "NVIDIA",
@@ -17028,7 +17341,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 43675.6
           }
         ]
-      }
+      },
+      "speculative": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -17103,6 +17417,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -415.9,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H20-3e",
       "hw_vendor": "NVIDIA",
@@ -17495,6 +17816,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 8.0,
     "ttft_p99_drift_ms": 1.8,
     "sustained_concurrency": 4,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H20-3e",
       "hw_vendor": "NVIDIA",
@@ -18029,7 +18357,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 207.1
           }
         ]
-      }
+      },
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -18104,6 +18433,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "NVIDIA H20-3e",
       "hw_vendor": "NVIDIA",
@@ -18254,6 +18590,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -1.1,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Tesla V100S-PCIE-32GB",
       "hw_vendor": "NVIDIA",
@@ -18786,7 +19129,9 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 151.8
           }
         ]
-      }
+      },
+      "speculative": null,
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -18861,6 +19206,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Tesla V100S-PCIE-32GB",
       "hw_vendor": "NVIDIA",
@@ -19028,6 +19380,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": 36319.1,
     "sustained_concurrency": 8,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Tesla V100S-PCIE-32GB",
       "hw_vendor": "NVIDIA",
@@ -19529,7 +19888,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 131179.3
           }
         ]
-      }
+      },
+      "speculative": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -19604,6 +19964,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": -405.5,
     "sustained_concurrency": 32,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Tesla V100S-PCIE-32GB",
       "hw_vendor": "NVIDIA",
@@ -19996,6 +20363,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": 37.2,
     "sustained_concurrency": 4,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Tesla V100S-PCIE-32GB",
       "hw_vendor": "NVIDIA",
@@ -20530,7 +20904,8 @@ const LEADERBOARD_DATA = [
             "ttft_ms_p99": 433.5
           }
         ]
-      }
+      },
+      "burst": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -20605,6 +20980,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Tesla V100S-PCIE-32GB",
       "hw_vendor": "NVIDIA",
@@ -20760,6 +21142,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Huawei Ascend 910B2",
       "hw_vendor": "Huawei",
@@ -20868,7 +21257,8 @@ const LEADERBOARD_DATA = [
         ],
         "max_valid_qps": 2
       },
-      "sustained": null
+      "sustained": null,
+      "burst": null
     },
     "impl": {
       "id": "ascend_vllm_ascend_51d0123e",
@@ -20945,6 +21335,13 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": null,
     "ttft_p99_drift_ms": null,
     "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
     "detail": {
       "hw_chip": "Huawei Ascend 910B2",
       "hw_vendor": "Huawei",
