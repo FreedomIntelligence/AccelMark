@@ -1,0 +1,62 @@
+{
+  "collected_at": "2026-04-13T01:42:46.972005+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 4090 D",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "570.169",
+      "firmware_version": null,
+      "compute_capability": "8.9",
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA GeForce RTX 4090 D",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "570.169",
+      "firmware_version": null,
+      "compute_capability": "8.9",
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA GeForce RTX 4090 D",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "570.169",
+      "firmware_version": null,
+      "compute_capability": "8.9",
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA GeForce RTX 4090 D",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "570.169",
+      "firmware_version": null,
+      "compute_capability": "8.9",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNODE\tNODE\tNODE\t9-20\t0\t\tN/A\nGPU1\tNODE\t X \tNODE\tNODE\t9-20\t0\t\tN/A\nGPU2\tNODE\tNODE\t X \tNODE\t\t1\t\tN/A\nGPU3\tNODE\tNODE\tNODE\t X \t\t1\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "AMD EPYC 9554 64-Core Processor",
+    "physical_cores": 128,
+    "logical_cores": 128,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 755.1,
+  "pcie_generation": "PCIe Gen 2",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": null,
+  "os": "Rocky Linux 8.10 (Green Obsidian)",
+  "python_version": "3.10.18",
+  "kernel_version": "4.18.0-553.el8_10.x86_64",
+  "runtime_version": "CUDA 12.4",
+  "pytorch_version": "2.5.1+cu124"
+}
