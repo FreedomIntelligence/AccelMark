@@ -192,9 +192,15 @@ python run.py --runner nvidia_vllm_47f5d58e \
 | **interactive** | TTFT p99 | Single-user latency when the system is idle |
 | **sustained** | sustained tok/s + throttle ratio | Whether throughput degrades over a long fixed-concurrency run (typically 30 min; Suite F uses 15 min) |
 | **accuracy** | subset score | Model output quality against an MMLU baseline |
+| **speculative** *(extra)* | tokens/sec + acceptance rate | Offline throughput with speculative decoding (draft model); also captures `task.runtime_metrics.acceptance_rate` if the runner implements `get_runtime_metrics()`. Suites A and D. |
+| **burst** *(extra)* | burst degradation ratio | TTFT p99 during burst windows vs steady windows; stress-tests KV cache eviction and scheduler resilience. Suites A and B. |
 
 Which scenarios are included in the default run and which are extras depends on
 the suite. Check the suite's `suite.json` or see [suites/README.md](suites/README.md).
+
+> **Running speculative on Suite A or D:** the draft model path is resolved
+> automatically from `speculative_draft_model_id` in the suite config (respecting
+> `configs/models_local.yaml`). No manual engine config is required.
 
 ### Key metrics
 
@@ -224,9 +230,11 @@ See [suites/README.md](suites/README.md) for full details on all suites and metr
 | D | ~22 min | Long-context (offline only) |
 | E | ~9 min | Up to 4× scaling |
 | F | ~10 min | offline + online + interactive |
+| G | ~35 min | MoE multi-chip (varies with chip count) |
 
 Sustained adds about **30 minutes** on datacenter suites (A–E); **Suite F** uses a **15-minute** sustained profile.
 Add interactive (~35 min on Suite A) by running with `--scenario interactive` or `--scenario all`.
+Add **speculative** (~3 min extra on Suite A, ~24 min extra on Suite D) or **burst** (~18 min extra on Suite A/B) with `--scenario speculative` / `--scenario burst`.
 
 ---
 

@@ -48,3 +48,15 @@ suites:
     # Consumer/edge GPU — enforce_eager often needed for pre-Ampere chips
     # enforce_eager: true
     max_num_seqs: 128
+
+# ── Speculative decoding (suite_A extra scenario) ─────────────────────────────
+# Uncomment this section to run the speculative scenario.
+# The draft model runs on the same GPU as the target model.
+# speculative decoding is configured via vLLM engine_kwargs.
+#
+# suites:
+#   suite_A:
+#     engine_kwargs:
+#       speculative_model: "meta-llama/Llama-3.2-1B-Instruct"
+#       num_speculative_tokens: 4
+#       speculative_draft_tensor_parallel_size: 1

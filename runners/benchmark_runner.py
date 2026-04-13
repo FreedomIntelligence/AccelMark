@@ -82,6 +82,14 @@ class InferenceRequest:
     extra:        dict           = dataclass_field(default_factory=dict)
 
 
+# ── Scenario constants ────────────────────────────────────────────────────────
+
+# Canonical order in which scenario metrics are merged into a suite result.
+_MERGE_SCENARIO_KEYS = [
+    "offline", "online", "interactive", "sustained", "training",
+    "speculative", "burst",
+]
+
 # ── Base class ────────────────────────────────────────────────────────────────
 
 class BenchmarkRunner(ABC):
@@ -404,6 +412,52 @@ class BenchmarkRunner(ABC):
         self._quantization_method if set, or fall back to None.
         """
         return getattr(self, "_quantization_method", None)
+
+    def get_runtime_metrics(self) -> Optional[dict]:
+        """
+        Return framework-specific runtime metrics collected during the last
+        inference run. Called once per scenario after inference completes.
+
+        Override in subclass to expose framework-internal statistics that
+        are meaningful for specific scenarios but not universally available.
+        Return None if no additional metrics are available or applicable.
+
+        Keys are entirely optional — return only what the framework exposes.
+        The base class records the result under task.runtime_metrics in
+        result.json. All keys are treated as supplementary information;
+        none are required for schema validation or leaderboard ranking.
+
+        Common use cases by scenario:
+
+            Speculative decoding (suite_A extra scenario):
+                {
+                    "acceptance_rate": 0.74,          # mean fraction of draft tokens accepted
+                    "mean_accepted_tokens": 2.96,     # mean accepted tokens per verification step
+                    "draft_model_id": "meta-llama/Llama-3.2-1B-Instruct",
+                    "num_speculative_tokens": 4       # configured speculation length
+                }
+
+            MoE inference (suite_G):
+                {
+                    "expert_load_balance": 0.12,      # std dev of expert activation frequency
+                    "mean_experts_per_token": 2.0     # mean number of experts activated per token
+                }
+
+            Long-context inference (suite_D):
+                {
+                    "kv_cache_utilization": 0.87      # fraction of KV cache budget used
+                }
+
+            PD disaggregation (future):
+                {
+                    "prefill_chips": 2,
+                    "decode_chips": 4,
+                    "kv_transfer_latency_ms": 12.3
+                }
+
+        Default: returns None (not reported).
+        """
+        return None
 
     def get_model_format(self) -> str:
         """
@@ -798,7 +852,7 @@ class BenchmarkRunner(ABC):
             default="default",
             help=(
                 "Scenario to run. "
-                "Standard values: offline, online, interactive, accuracy, sustained. "
+                "Standard values: offline, online, interactive, accuracy, sustained, speculative, burst. "
                 "'default' runs the suite's standard scenarios. "
                 "'all' runs default + extra scenarios defined in suite.json. "
                 "Valid scenarios for a suite are defined in its suite.json."
@@ -924,6 +978,28 @@ class BenchmarkRunner(ABC):
                     and "BF16" not in self._detect_supported_precisions(_acc_env_info)):
                 self._precision_dtype_override = "float16"
 
+            if (args.scenario == "speculative"
+                    and "speculative_model" not in self._precision_engine_kwargs):
+                _draft_id = suite.get("speculative_draft_model_id")
+                if _draft_id:
+                    _saved = (
+                        getattr(self, "_model_source", None),
+                        getattr(self, "_model_name_override", None),
+                        getattr(self, "_model_note_override", None),
+                    )
+                    _draft_path = self._resolve_model_path(_draft_id, None)
+                    (self._model_source,
+                     self._model_name_override,
+                     self._model_note_override) = _saved
+                    self._precision_engine_kwargs["speculative_model"] = _draft_path
+                    self._precision_engine_kwargs.setdefault(
+                        "num_speculative_tokens",
+                        suite.get("speculative_num_tokens", 4),
+                    )
+                    self._precision_engine_kwargs.setdefault(
+                        "speculative_draft_tensor_parallel_size", 1,
+                    )
+
             print(f"Loading {model_id} for accuracy check...")
             t_load = time.perf_counter()
             self._current_scenario = "accuracy"
@@ -1030,6 +1106,28 @@ class BenchmarkRunner(ABC):
                 and "BF16" not in self._detect_supported_precisions(env_info)):
             self._precision_dtype_override = "float16"
 
+        if (args.scenario == "speculative"
+                and "speculative_model" not in self._precision_engine_kwargs):
+            _draft_id = suite.get("speculative_draft_model_id")
+            if _draft_id:
+                _saved = (
+                    getattr(self, "_model_source", None),
+                    getattr(self, "_model_name_override", None),
+                    getattr(self, "_model_note_override", None),
+                )
+                _draft_path = self._resolve_model_path(_draft_id, None)
+                (self._model_source,
+                 self._model_name_override,
+                 self._model_note_override) = _saved
+                self._precision_engine_kwargs["speculative_model"] = _draft_path
+                self._precision_engine_kwargs.setdefault(
+                    "num_speculative_tokens",
+                    suite.get("speculative_num_tokens", 4),
+                )
+                self._precision_engine_kwargs.setdefault(
+                    "speculative_draft_tensor_parallel_size", 1,
+                )
+
         self.load_model(effective_model_path, {
             "tensor_parallel_size":   tp_size,
             "pipeline_parallel_size": pp_size,
@@ -1037,7 +1135,7 @@ class BenchmarkRunner(ABC):
             "data_parallel_size":     dp_size,
             "max_tokens":             suite.get("output_tokens_max", 512),
             "max_model_len":          suite.get("max_model_len"),
-            "use_async":              args.scenario not in ("offline", "accuracy"),
+            "use_async":              args.scenario not in ("offline", "accuracy", "speculative"),
         })
         model_load_seconds = round(time.perf_counter() - t_load_start, 1)
         print(f"Model loaded in {model_load_seconds}s")
@@ -1075,10 +1173,16 @@ class BenchmarkRunner(ABC):
         # Select inference function
         if args.scenario == "offline":
             inference_fn = self.inference_fn_offline
+        elif args.scenario == "speculative":
+            inference_fn = self.inference_fn_offline
         elif args.scenario == "sustained":
-            # Rate-controlled time-based run — uses async streaming engine
             if not self.SUPPORTS_STREAMING:
                 print(f"Error: sustained scenario requires SUPPORTS_STREAMING = True.")
+                sys.exit(1)
+            inference_fn = self.inference_fn_streaming
+        elif args.scenario == "burst":
+            if not self.SUPPORTS_STREAMING:
+                print(f"Error: burst scenario requires SUPPORTS_STREAMING = True.")
                 sys.exit(1)
             inference_fn = self.inference_fn_streaming
         elif self.SUPPORTS_STREAMING:
@@ -1126,7 +1230,7 @@ class BenchmarkRunner(ABC):
 
         # Inject peak memory
         peak_memory = self.get_peak_memory_gb()
-        if peak_memory and args.scenario == "offline":
+        if peak_memory and args.scenario in ("offline", "speculative"):
             offline = metrics.get("offline", {})
             for row in (offline.get("results_by_concurrency") or offline.get("results_by_batch_size", [])):
                 if not row.get("oom") and row.get("peak_memory_gb") is None:
@@ -1170,9 +1274,8 @@ class BenchmarkRunner(ABC):
         # Find all completed scenario subdirectories and merge them.
         # This updates results/<submission>/result.json incrementally.
         base_dir = Path(args.output_dir)
-        known_scenarios = ["offline", "online", "interactive", "sustained"]
         completed = [
-            s for s in known_scenarios
+            s for s in _MERGE_SCENARIO_KEYS
             if (base_dir / s / "result.json").exists()
         ]
         if completed:
@@ -1226,6 +1329,7 @@ class BenchmarkRunner(ABC):
             and (s != "online"      or self.SUPPORTS_ONLINE)
             and (s != "interactive" or self.SUPPORTS_STREAMING)
             and (s != "sustained"   or self.SUPPORTS_STREAMING)
+            and (s != "burst"       or self.SUPPORTS_STREAMING)
         ]
 
         results_summary = []
@@ -1494,9 +1598,10 @@ class BenchmarkRunner(ABC):
                 r = json.load(f)
             elapsed = r.get("meta", {}).get("benchmark_elapsed_minutes") or 0
             scenario_elapsed += elapsed
-            for key in ["offline", "online", "interactive", "sustained", "training"]:
-                if r.get("metrics", {}).get(key):
-                    merged_metrics[key] = r["metrics"][key]
+            m = r.get("metrics", {})
+            for key in _MERGE_SCENARIO_KEYS:
+                if m.get(key):
+                    merged_metrics[key] = m[key]
 
         # Always sum per-scenario elapsed times rather than using the orchestrator
         # wall-clock (total_elapsed_minutes). Summation is more accurate: it excludes
@@ -2050,6 +2155,7 @@ class BenchmarkRunner(ABC):
                     "data_parallel_size":     dp_size,
                 },
                 "extra_config": getattr(self, "_runner_config", None) or None,
+                "runtime_metrics": self.get_runtime_metrics() or None,
             },
             "metrics": metrics,
             "accuracy": {

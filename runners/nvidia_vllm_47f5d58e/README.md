@@ -6,12 +6,13 @@ AccelMark runner for NVIDIA GPUs using [vLLM](https://github.com/vllm-project/vl
 
 | Suite | Description | Notes |
 |-------|-------------|-------|
-| Suite A | Single-chip, Llama-3-8B | Reference suite |
-| Suite B | Multi-chip, Llama-3-70B | Requires 4× A100/H100 or equivalent |
+| Suite A | Single-chip, Llama-3-8B | Reference suite; supports speculative and burst extra scenarios |
+| Suite B | Multi-chip, Llama-3-70B | Requires 4× A100/H100 or equivalent; supports burst extra scenario |
 | Suite C | Quantization, Llama-3.1-8B | FP8 requires Hopper (H100); W8A8/W4A16 on Ampere+ |
-| Suite D | Long context ~28K input, Llama-3.1-8B (`max_model_len` 30,208) | |
+| Suite D | Long context ~28K input, Llama-3.1-8B (`max_model_len` 30,208) | Supports speculative extra scenario |
 | Suite E | Multi-chip scaling, Llama-3-8B | Requires NVLink for meaningful scaling results |
 | Suite F | Consumer/edge, Qwen2.5-0.5B | Single-chip; pre-Ampere supported with `--enforce-eager` |
+| Suite G | MoE multi-chip, Mixtral-8x7B-Instruct-v0.1 | Requires ≥2× A100-80GB (or ≥4× A100-40GB); `required_chips: auto` uses all available GPUs |
 
 ## Hardware compatibility
 
@@ -129,3 +130,8 @@ Minimum environment:
 - CUDA 11.8+ (12.x recommended)
 - Python 3.10+
 - vLLM ≥ 0.4.0 (≥ 0.6.0 recommended; CUDA 11.8 users are limited to ≤ 0.5.5)
+
+## TODO
+
+- **`get_runtime_metrics()` override for speculative decoding.** Add an override in `runner.py` to expose speculative decoding acceptance rate. Check vLLM's `AsyncEngineClient.get_decoding_stats()` or equivalent for the correct API call across vLLM 0.4.0–0.7.x. This triggers a runner hash change and `supersedes_chain` update. Prerequisite: test end-to-end speculative scenario run on hardware.
+- **SGLang equivalent.** Add the same `get_runtime_metrics()` override in the SGLang runner once the SGLang speculative stats API is confirmed.

@@ -7,7 +7,7 @@
   "max_model_len": 30208,
   "scenarios": {
     "default": ["accuracy", "offline"],
-    "extra": ["interactive", "sustained", "online"]
+    "extra": ["interactive", "sustained", "online", "speculative"]
   },
   "precision_required": "BF16",
   "allowed_precisions": ["BF16", "FP16"],
@@ -38,5 +38,8 @@
   "interactive_request_count": 100,
   "sustained_concurrency": 8,
   "duration_minutes": 30,
-  "sample_interval_seconds": 60
+  "sample_interval_seconds": 60,
+  "speculative_draft_model_id": "meta-llama/Llama-3.2-1B-Instruct",
+  "speculative_draft_model_revision": "9213176726f574b556790deb65791e0c5aa438b6",
+  "speculative_num_tokens": 4
 }

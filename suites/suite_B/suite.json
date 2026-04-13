@@ -6,7 +6,7 @@
   "dataset": "sharegpt_standard_v1",
   "scenarios": {
     "default": ["accuracy", "offline", "online"],
-    "extra": ["sustained", "interactive"]
+    "extra": ["sustained", "interactive", "burst"]
   },
   "precision_required": "BF16",
   "allowed_precisions": ["BF16", "FP16"],
@@ -40,5 +40,9 @@
   "_request_count_note": "offline uses request_count (100), online uses online_request_count (200; reduced from 500 \u2014 70B low-QPS levels are rate-bound, p95 is preserved, p99 is marginal at 200 reqs), interactive uses interactive_request_count (50; 70B decodes at ~33 tok/s on A800, making each request ~15s sequential \u2014 500 reqs \u00d7 3 runs \u2248 390 min; p90 is the reported tail metric for Suite B interactive)",
   "sustained_concurrency": 4,
   "duration_minutes": 30,
-  "sample_interval_seconds": 60
+  "sample_interval_seconds": 60,
+  "burst_steady_qps": 5,
+  "burst_peak_qps": 25,
+  "burst_duration_seconds": 30,
+  "burst_interval_seconds": 120
 }

@@ -228,7 +228,7 @@ Override these class attributes in your runner to declare what the framework sup
 
 | Flag | Default | Notes |
 |------|---------|-------|
-| `SUPPORTS_STREAMING` | `True` | Set `False` if no token streaming API — TTFT cannot be measured, online/interactive/sustained scenarios are skipped |
+| `SUPPORTS_STREAMING` | `True` | Set `False` if no token streaming API — TTFT cannot be measured, online/interactive/sustained/burst scenarios are skipped |
 | `SUPPORTS_BATCHING` | `True` | Set `False` if serial only (e.g. mlx-lm) — offline runs one prompt at a time |
 | `SUPPORTS_ONLINE` | `True` | Set `False` if framework cannot handle concurrent requests |
 | `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism — tensor_parallel_size from runner config and CLI is ignored; runner always uses 1 chip |
@@ -345,14 +345,16 @@ Use `run.py` at the repo root to run any runner:
 # List available runners
 python run.py --list
 
-# Run the default benchmark (offline + online + interactive + accuracy)
+# Run the default benchmark (accuracy → offline → online; exact defaults depend on suite)
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
 # Run a specific scenario only
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario offline
 
-# Run extra scenarios (e.g. sustained load test)
+# Run extra scenarios
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario sustained
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario speculative  # draft model auto-resolved from suite config
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario burst        # requires SUPPORTS_STREAMING = True
 
 # Run everything including extras
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario all

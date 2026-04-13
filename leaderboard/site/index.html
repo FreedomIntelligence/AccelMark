@@ -234,6 +234,7 @@
     .suite-pill.suite_D { background: #1e1040; color: #a78bfa; }
     .suite-pill.suite_E { background: #062d1e; color: #1D9E75; }
     .suite-pill.suite_F { background: #2d1a2e; color: #c084fc; }
+    .suite-pill.suite_G { background: #0a2d2d; color: #2dd4bf; }
 
     /* ── Scenario pill ────────────────────────────────────────── */
     .scenario-pill {
@@ -250,6 +251,8 @@
     .scenario-pill.sc-online      { background: #0c2d2d; color: #39d0d0; }
     .scenario-pill.sc-interactive { background: #1e1040; color: #a78bfa; }
     .scenario-pill.sc-sustained   { background: #0f2d14; color: #56d364; }
+    .scenario-pill.sc-speculative { background: #2d2300; color: #eab308; }
+    .scenario-pill.sc-burst       { background: #2d0c0c; color: #f87171; }
     .scenario-pill.sc-all         { background: #1c2028; color: #8b949e; }
 
     /* ── Card suite top border ────────────────────────────────── */
@@ -260,6 +263,7 @@
     .card.suite_D { border-top-color: #a78bfa; }
     .card.suite_E { border-top-color: #1D9E75; }
     .card.suite_F { border-top-color: #c084fc; }
+    .card.suite_G { border-top-color: #2dd4bf; }
 
     /* ── Modal suite top border ───────────────────────────────── */
     .modal.suite_A { border-top: 3px solid #58a6ff; }
@@ -268,6 +272,7 @@
     .modal.suite_D { border-top: 3px solid #a78bfa; }
     .modal.suite_E { border-top: 3px solid #1D9E75; }
     .modal.suite_F { border-top: 3px solid #c084fc; }
+    .modal.suite_G { border-top: 3px solid #2dd4bf; }
 
     /* ── Detail modal ─────────────────────────────────────── */
     .modal-backdrop {
@@ -505,6 +510,7 @@
     <div><span style="color:#a78bfa;font-weight:500">Suite D</span> — Single chip, Llama-3.1-8B. How does this chip handle ~28K-token long-context inputs?</div>
     <div><span style="color:#1D9E75;font-weight:500">Suite E</span> — 1×/2×/4×/8× chips, Llama-3-8B. Multi-chip scaling efficiency. Primary metric: 1× baseline tokens/sec.</div>
     <div><span style="color:#c084fc;font-weight:500">Suite F</span> — Single chip, Qwen2.5-0.5B. Consumer/edge inference. Designed for GPUs with ≥4 GB VRAM. Primary metric: offline tokens/sec.</div>
+    <div><span style="color:#2dd4bf;font-weight:500">Suite G</span> — Multi-chip, Mixtral-8x7B-Instruct (MoE, ~47B total / ~13B active). Minimum 2 chips. Tests sparse expert routing efficiency.</div>
   </div>
 </details>
 <details style="padding:0.75rem 2rem;border-bottom:1px solid #21262d;font-size:0.82rem;color:#8b949e;cursor:pointer">
@@ -516,6 +522,8 @@
     <div><span class="scenario-pill sc-online">Online</span> — Poisson-arrival load at increasing QPS levels. Reports maximum QPS where TTFT p99 stays within the suite SLA.</div>
     <div><span class="scenario-pill sc-interactive">Interactive</span> — One request at a time (serial). Measures isolated TTFT and TPOT with no queueing pressure.</div>
     <div><span class="scenario-pill sc-sustained">Sustained</span> — Fixed-concurrency run (typically 30 minutes; Suite F uses 15). Detects thermal throttling, memory fragmentation, and performance degradation over time.</div>
+    <div><span class="scenario-pill sc-speculative">Speculative</span> — Speculative decoding with a fixed draft model (Llama-3.2-1B). Measures throughput change when verification batching shifts the workload toward compute-bound.</div>
+    <div><span class="scenario-pill sc-burst">Burst</span> — Two-state bursty load test. Alternates between steady-state and 5× burst QPS. Measures KV cache eviction behavior and tail latency under transient overload.</div>
   </div>
 </details>
 <div class="controls">
@@ -528,6 +536,8 @@
     <option value="online">Online</option>
     <option value="interactive">Interactive</option>
     <option value="sustained">Sustained</option>
+    <option value="speculative">Speculative</option>
+    <option value="burst">Burst</option>
     <option value="all">All (suite-level)</option>
   </select>
   <select id="filter-tier">
@@ -550,6 +560,7 @@
     <option value="suite_D">Suite D — long context (~28K)</option>
     <option value="suite_E">Suite E — multi-chip scaling</option>
     <option value="suite_F">Suite F — consumer/edge inference</option>
+    <option value="suite_G">Suite G — MoE inference (Mixtral-8x7B)</option>
   </select>
   <input id="search" type="text" placeholder="Search chip or model…" style="width:200px">
   <div class="view-toggle">
@@ -659,6 +670,8 @@
     online:      { label: 'Online',       desc: 'Concurrent requests — max valid QPS & latency' },
     interactive: { label: 'Interactive',  desc: 'Single-stream — TTFT and TPOT percentiles' },
     sustained:   { label: 'Sustained',    desc: 'Long-run load stability & throttle detection' },
+    speculative: { label: 'Speculative', desc: 'Speculative decoding throughput with draft model' },
+    burst:       { label: 'Burst',       desc: 'Burst load — tail latency under traffic spikes' },
   };
 
   function scenarioPill(row) {
@@ -1325,6 +1338,7 @@
     else if (viz.type === 'suite_D') renderSuiteD(container, viz, row);
     else if (viz.type === 'suite_E') renderSuiteE(container, viz, row);
     else if (viz.type === 'suite_F') renderSuiteF(container, viz, row);
+    else if (viz.type === 'suite_G') renderSuiteG(container, viz, row);
     else if (viz.type === 'sustained') renderSustained(container, viz, row);
     else container.innerHTML = '<div style="padding:2rem;text-align:center;color:#8b949e">Visualization coming soon.</div>';
 
@@ -1415,6 +1429,37 @@
         { label: 'TPOT p99',  value: viz.interactive.tpot_p99  != null ? viz.interactive.tpot_p99.toFixed(1)  + ' ms' : null },
       ]));
     }
+
+    // ── Speculative ──
+    if (viz.speculative && viz.speculative.offline_tok_per_sec != null) {
+      el.appendChild(sectionTitle('Speculative decoding'));
+      const accPct = viz.speculative.acceptance_rate != null
+        ? (viz.speculative.acceptance_rate * 100).toFixed(1) + '%' : null;
+      el.appendChild(statChips([
+        { label: 'Speculative tok/s', value: viz.speculative.offline_tok_per_sec
+            ? viz.speculative.offline_tok_per_sec.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'amber' },
+        { label: 'Acceptance rate', value: accPct, cls: accPct ? 'green' : null },
+        { label: 'Mean accepted', value: viz.speculative.mean_accepted_tokens != null
+            ? viz.speculative.mean_accepted_tokens.toFixed(2) + ' tok' : null },
+      ]));
+    }
+
+    // ── Burst ──
+    if (viz.burst) {
+      el.appendChild(sectionTitle('Burst load'));
+      const degr = viz.burst.burst_degradation_ratio;
+      const degrCls = degr != null ? (degr < 2 ? 'green' : degr < 5 ? 'amber' : 'coral') : null;
+      el.appendChild(statChips([
+        { label: 'Degradation ratio', value: degr != null ? degr.toFixed(2) + '×' : null, cls: degrCls },
+        { label: 'Steady p99 TTFT', value: viz.burst.steady_ttft_p99_ms != null
+            ? viz.burst.steady_ttft_p99_ms.toFixed(0) + ' ms' : null },
+        { label: 'Burst p99 TTFT', value: viz.burst.burst_ttft_p99_ms != null
+            ? viz.burst.burst_ttft_p99_ms.toFixed(0) + ' ms' : null, cls: 'coral' },
+        { label: 'SLA met during burst', value: viz.burst.sla_met_during_burst != null
+            ? (viz.burst.sla_met_during_burst ? '✓' : '✗') : null,
+          cls: viz.burst.sla_met_during_burst ? 'green' : 'coral' },
+      ]));
+    }
   }
 
   // Suite B ─────────────────────────────────────────────────
@@ -1503,6 +1548,23 @@
         <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:2px;background:${C.teal};display:inline-block"></span>TPOT p50</span>`;
       el.appendChild(leg);
     }
+
+    // ── Burst ──
+    if (viz.burst) {
+      el.appendChild(sectionTitle('Burst load'));
+      const degr = viz.burst.burst_degradation_ratio;
+      const degrCls = degr != null ? (degr < 2 ? 'green' : degr < 5 ? 'amber' : 'coral') : null;
+      el.appendChild(statChips([
+        { label: 'Degradation ratio', value: degr != null ? degr.toFixed(2) + '×' : null, cls: degrCls },
+        { label: 'Steady p99 TTFT', value: viz.burst.steady_ttft_p99_ms != null
+            ? viz.burst.steady_ttft_p99_ms.toFixed(0) + ' ms' : null },
+        { label: 'Burst p99 TTFT', value: viz.burst.burst_ttft_p99_ms != null
+            ? viz.burst.burst_ttft_p99_ms.toFixed(0) + ' ms' : null, cls: 'coral' },
+        { label: 'SLA met during burst', value: viz.burst.sla_met_during_burst != null
+            ? (viz.burst.sla_met_during_burst ? '✓' : '✗') : null,
+          cls: viz.burst.sla_met_during_burst ? 'green' : 'coral' },
+      ]));
+    }
   }
 
   // Suite D ─────────────────────────────────────────────────
@@ -1585,6 +1647,20 @@
         },
         options: baseOpts('tokens / sec', v => v.toLocaleString(), 'concurrency')
       }));
+    }
+
+    // ── Speculative ──
+    if (viz.speculative && viz.speculative.offline_tok_per_sec != null) {
+      el.appendChild(sectionTitle('Speculative decoding'));
+      const accPct = viz.speculative.acceptance_rate != null
+        ? (viz.speculative.acceptance_rate * 100).toFixed(1) + '%' : null;
+      el.appendChild(statChips([
+        { label: 'Speculative tok/s', value: viz.speculative.offline_tok_per_sec
+            ? viz.speculative.offline_tok_per_sec.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'amber' },
+        { label: 'Acceptance rate', value: accPct, cls: accPct ? 'green' : null },
+        { label: 'Mean accepted', value: viz.speculative.mean_accepted_tokens != null
+            ? viz.speculative.mean_accepted_tokens.toFixed(2) + ' tok' : null },
+      ]));
     }
   }
 
@@ -2002,6 +2078,89 @@
         { label: 'TPOT p50', value: viz.interactive.tpot_p50 != null ? viz.interactive.tpot_p50.toFixed(1) + ' ms' : null, cls: 'green' },
         { label: 'TPOT p99', value: viz.interactive.tpot_p99 != null ? viz.interactive.tpot_p99.toFixed(1) + ' ms' : null },
       ]));
+    }
+  }
+
+  // Suite G (MoE) ──────────────────────────────────────────────
+  function renderSuiteG(el, viz, row) {
+    // ── Offline throughput ──
+    if (viz.offline && viz.offline.labels.length) {
+      el.appendChild(sectionTitle('Offline — throughput by concurrency'));
+      el.appendChild(statChips([
+        { label: 'Peak throughput', value: row.offline_throughput ? row.offline_throughput.toLocaleString(undefined,{maximumFractionDigits:0}) + ' tok/s' : null, cls: 'teal' },
+        { label: 'Peak memory', value: row.peak_memory_gb ? row.peak_memory_gb.toFixed(1) + ' GB' : null },
+      ]));
+      const { wrap, canvas } = mkCanvas('viz-g-offline', 180);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: viz.offline.labels,
+          datasets: [{
+            label: 'Throughput (tok/s)',
+            data: viz.offline.throughput,
+            backgroundColor: '#2dd4bf99',
+            borderColor: '#2dd4bf',
+            borderWidth: 1,
+            borderRadius: 3,
+          }]
+        },
+        options: baseOpts('tokens / sec', v => v.toLocaleString(), 'concurrency')
+      }));
+    }
+
+    // ── Online latency ──
+    if (viz.online && viz.online.labels.length) {
+      el.appendChild(sectionTitle('Online — TTFT & TPOT by QPS'));
+      const slaDiv = document.createElement('div');
+      slaDiv.style.cssText = 'margin-bottom:10px;font-size:12px;';
+      viz.online.labels.forEach((qps, i) => {
+        const pass = viz.online.sla_met[i];
+        slaDiv.innerHTML += `<span class="sla-row" style="display:inline-flex;margin-right:12px">
+          <span class="sla-dot ${pass ? 'pass' : 'fail'}"></span>
+          <span style="color:#8b949e">${qps} QPS</span>
+          <span style="color:${pass ? C.green : C.red}">${pass ? 'SLA met' : 'SLA fail'}</span>
+        </span>`;
+      });
+      el.appendChild(slaDiv);
+      const { wrap, canvas } = mkCanvas('viz-g-online', 200);
+      el.appendChild(wrap);
+      _activeCharts.push(new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: viz.online.labels,
+          datasets: [
+            { label: 'TTFT p50', data: viz.online.ttft_p50, borderColor: '#2dd4bf', backgroundColor: '#2dd4bf33', tension: 0.3, pointRadius: 4, fill: false },
+            { label: 'TTFT p90', data: viz.online.ttft_p90, borderColor: C.coral, backgroundColor: C.coral+'33', tension: 0.3, pointRadius: 4, fill: false, borderDash: [4,3] },
+            { label: 'TPOT p50', data: viz.online.tpot_p50, borderColor: C.teal, backgroundColor: C.teal+'33', tension: 0.3, pointRadius: 4, fill: false },
+          ]
+        },
+        options: baseOpts('latency (ms)', v => v >= 1000 ? (v/1000).toFixed(1)+'s' : v+'ms', 'target QPS')
+      }));
+    }
+
+    // ── Interactive ──
+    if (viz.interactive && viz.interactive.ttft_p50 != null) {
+      el.appendChild(sectionTitle('Interactive — single request latency'));
+      el.appendChild(statChips([
+        { label: 'TTFT p50',  value: viz.interactive.ttft_p50  != null ? viz.interactive.ttft_p50.toFixed(1)  + ' ms' : null, cls: 'teal' },
+        { label: 'TTFT p90',  value: viz.interactive.ttft_p90  != null ? viz.interactive.ttft_p90.toFixed(1)  + ' ms' : null },
+        { label: 'TTFT p99',  value: viz.interactive.ttft_p99  != null ? viz.interactive.ttft_p99.toFixed(1)  + ' ms' : null },
+        { label: 'TPOT p50',  value: viz.interactive.tpot_p50  != null ? viz.interactive.tpot_p50.toFixed(1)  + ' ms' : null, cls: 'green' },
+        { label: 'TPOT p99',  value: viz.interactive.tpot_p99  != null ? viz.interactive.tpot_p99.toFixed(1)  + ' ms' : null },
+      ]));
+    }
+
+    // ── Runtime metrics (expert stats, if available) ──
+    if (viz.runtime_metrics) {
+      const rm = viz.runtime_metrics;
+      const items = [];
+      if (rm.expert_load_balance != null) items.push({ label: 'Expert load balance (std)', value: rm.expert_load_balance.toFixed(3) });
+      if (rm.mean_experts_per_token != null) items.push({ label: 'Mean experts/token', value: rm.mean_experts_per_token.toFixed(1) });
+      if (items.length) {
+        el.appendChild(sectionTitle('MoE runtime metrics'));
+        el.appendChild(statChips(items));
+      }
     }
   }
 

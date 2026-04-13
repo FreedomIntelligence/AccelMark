@@ -13,7 +13,7 @@
 
     "suite_id": {
       "type": "string",
-      "description": "Suite identifier. Standard suites: suite_A through suite_F. Mini suites: mini-nano, mini-mini, mini-standard, mini-pro. Custom: 'custom'."
+      "description": "Suite identifier. Standard suites: suite_A through suite_G. Mini suites: mini-nano, mini-mini, mini-standard, mini-pro. Custom: 'custom'."
     },
 
     "implementation_id": {
@@ -124,14 +124,14 @@
       "properties": {
         "scenario": {
           "type": "string",
-          "enum": ["offline","online","interactive","multiturn","sustained","all"],
+          "enum": ["offline","online","interactive","multiturn","sustained","speculative","burst","all"],
           "description": "Single scenario run. Required for single-scenario submissions."
         },
         "scenarios_run": {
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["offline","online","interactive","sustained","accuracy"]
+            "enum": ["offline","online","interactive","multiturn","sustained","accuracy","speculative","burst"]
           },
           "description": "List of scenarios run. Used for suite-level submissions (--scenario all)."
         },
@@ -170,7 +170,12 @@
             "expert_parallel_size": { "type": ["integer","null"] }
           }
         },
-        "extra_config": { "type": ["object","null"] }
+        "extra_config": { "type": ["object","null"] },
+        "runtime_metrics": {
+          "type": ["object", "null"],
+          "description": "Framework-specific runtime metrics collected during inference. Keys are scenario-dependent and optional. See get_runtime_metrics() in benchmark_runner.py.",
+          "additionalProperties": true
+        }
       }
     },
 
@@ -409,6 +414,26 @@
                 }
               }
             }
+          }
+        },
+        "burst": {
+          "type": ["object", "null"],
+          "description": "Two-state bursty load test metrics",
+          "properties": {
+            "sla_ttft_ms":                  { "type": ["number", "null"] },
+            "burst_steady_qps":             { "type": ["number", "null"] },
+            "burst_peak_qps":               { "type": ["number", "null"] },
+            "burst_duration_seconds":       { "type": ["number", "null"] },
+            "burst_interval_seconds":       { "type": ["number", "null"] },
+            "steady_ttft_p50_ms":           { "type": ["number", "null"] },
+            "steady_ttft_p99_ms":           { "type": ["number", "null"] },
+            "burst_ttft_p50_ms":            { "type": ["number", "null"] },
+            "burst_ttft_p99_ms":            { "type": ["number", "null"] },
+            "steady_requests_total":        { "type": ["integer", "null"] },
+            "burst_requests_total":         { "type": ["integer", "null"] },
+            "sla_met_during_burst":         { "type": ["boolean", "null"] },
+            "burst_degradation_ratio":      { "type": ["number", "null"] },
+            "results_by_cycle":             { "type": ["array", "null"] }
           }
         }
       }

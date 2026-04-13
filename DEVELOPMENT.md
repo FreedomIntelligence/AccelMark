@@ -37,7 +37,8 @@ AccelMark/
 │   ├── suite_C/suite.json + suite.py + requests.jsonl
 │   ├── suite_D/suite.json + requests.jsonl
 │   ├── suite_E/suite.json + suite.py + requests.jsonl
-│   └── suite_F/suite.json + requests.jsonl
+│   ├── suite_F/suite.json + requests.jsonl
+│   └── suite_G/suite.json + requests.jsonl
 ├── datasets/
 │   ├── sharegpt_standard_v1/requests.jsonl  ← 500 prompts, ~280/310 tok
 │   ├── sharegpt_longctx_v1/requests.jsonl   ← 200 prompts, ~28K input tok (Suite D)
@@ -205,6 +206,26 @@ class LMDeployRunner(BenchmarkRunner):
             return torch.cuda.max_memory_allocated() / (1024 ** 3)
         except Exception:
             return None
+
+    # ── Optional: runtime metrics (speculative decoding, MoE, etc.) ──
+    def get_runtime_metrics(self) -> Optional[dict]:
+        """Return framework-specific metrics after each inference run.
+
+        Called once per scenario by the base class after `run()` completes.
+        Return a dict with string keys and numeric/string values, or None.
+        The result is stored verbatim in `task.runtime_metrics` of result.json
+        and surfaced on the leaderboard.
+
+        Example keys for speculative decoding:
+          acceptance_rate (float 0-1), mean_accepted_tokens (float),
+          draft_model_id (str)
+
+        Example keys for MoE routing:
+          expert_utilization_mean (float), load_balance_score (float)
+
+        Base-class default returns None (no extra metrics collected).
+        """
+        return None
 
     # ── Optional: framework metadata ─────────────────────────────────
     def _get_framework_name(self) -> str:
@@ -462,6 +483,8 @@ Before writing any files, answer these questions:
    online: include if latency under load matters
    interactive: include if single-user latency matters
    sustained: include as an extra if long-run stability matters
+   speculative: include as an extra if the suite targets compute-bound acceleration (draft model fields required: speculative_draft_model_id, speculative_draft_model_revision, speculative_num_tokens)
+   burst: include as an extra if the suite tests bursty traffic patterns (burst fields required: burst_steady_qps, burst_peak_qps, burst_duration_seconds, burst_interval_seconds); requires SUPPORTS_STREAMING = True in runner
 
 5. What chip count?
    1 chip: for suites that test per-chip capability
@@ -501,7 +524,18 @@ Copy the closest existing suite and modify. Required fields:
   "accuracy_threshold_delta": 0.1,
   "request_count": 200,
   "online_request_count": 500,
-  "interactive_request_count": 100
+  "interactive_request_count": 100,
+
+  "_comment_speculative": "Optional — add to scenarios.extra when testing speculative decoding",
+  "speculative_draft_model_id": "meta-llama/Llama-3.2-1B-Instruct",
+  "speculative_draft_model_revision": "<commit-sha>",
+  "speculative_num_tokens": 4,
+
+  "_comment_burst": "Optional — add to scenarios.extra when testing burst load (requires SUPPORTS_STREAMING = True)",
+  "burst_steady_qps": 5,
+  "burst_peak_qps": 25,
+  "burst_duration_seconds": 30,
+  "burst_interval_seconds": 120
 }
 ```
 
@@ -838,6 +872,8 @@ class InferenceResult:
 | online | TTFT distribution at each QPS level | `max_valid_qps` (highest QPS with p99 TTFT < SLA) |
 | interactive | TTFT distribution, serial requests | `ttft_ms_p99` |
 | sustained | Throughput + TTFT sampled every N seconds over 30 min | `sustained_throughput_tokens_per_sec`, `throttle_ratio` |
+| speculative | Offline throughput with draft model (same path as offline, engine uses speculative decoding) | `throughput_tokens_per_sec`; optional `task.runtime_metrics.acceptance_rate` if runner overrides `get_runtime_metrics()` |
+| burst | Two-state bursty load: alternates steady QPS and burst QPS windows | `burst_degradation_ratio` (burst_ttft_p99 / steady_ttft_p99); `sla_met_during_burst` |
 
 ---
 

@@ -56,7 +56,11 @@ nvidia_a100sxm480gbx1_suite_A_nvidia_vllm_0ac7f5ba/
 │   └── result.json
 ├── interactive/
 │   └── result.json
-└── sustained/               ← Present only if --scenario sustained was run
+├── sustained/               ← Present only if --scenario sustained was run
+│   └── result.json
+├── speculative/             ← Present only if --scenario speculative was run (Suites A, D)
+│   └── result.json
+└── burst/                   ← Present only if --scenario burst was run (Suites A, B)
     └── result.json
 ```
 

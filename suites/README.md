@@ -9,12 +9,13 @@ AI accelerators apples-to-apples.
 
 | Suite | Model | Chips | Scenarios | Purpose |
 |-------|-------|-------|-----------|---------|
-| [Suite A](#suite-a) | Llama-3-8B-Instruct | 1 | offline, online (+ interactive, sustained extra) | Standard single-chip inference. **Required for leaderboard entry.** |
-| [Suite B](#suite-b) | Llama-3-70B-Instruct | flexible | offline, online (+ interactive, sustained extra) | Large model multi-chip inference |
+| [Suite A](#suite-a) | Llama-3-8B-Instruct | 1 | offline, online (+ interactive, sustained, speculative, burst extra) | Standard single-chip inference. **Required for leaderboard entry.** |
+| [Suite B](#suite-b) | Llama-3-70B-Instruct | flexible | offline, online (+ interactive, sustained, burst extra) | Large model multi-chip inference |
 | [Suite C](#suite-c) | Llama-3.1-8B-Instruct | 1 | offline (+ online, sustained extra) | Quantization efficiency (BF16/FP8/W8A8/W8A16/W4A16) |
-| [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline (+ interactive, online, sustained extra) | Long-context inference (~28K input tokens) |
+| [Suite D](#suite-d) | Llama-3.1-8B-Instruct | 1 | offline (+ interactive, online, sustained, speculative extra) | Long-context inference (~28K input tokens) |
 | [Suite E](#suite-e) | Llama-3-8B-Instruct | 1×/2×/4×/8× | offline | Multi-chip scaling efficiency |
 | [Suite F](#suite-f) | Qwen2.5-0.5B-Instruct | 1 (recommended) | offline, online, interactive | Consumer/edge single-GPU inference |
+| [Suite G](#suite-g) | Mixtral-8x7B-Instruct-v0.1 | ≥2 (auto) | offline, online (+ interactive, sustained extra) | MoE multi-chip inference |
 
 ---
 
@@ -36,11 +37,14 @@ Default scenarios only:
 | A | online | 300 | Σ(elapsed × 3) / 3 QPS | ~7 min |
 | A | *(interactive — extra)* | 150 | 659s/run × 3 runs | *(~33 min)* |
 | A | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
+| A | *(speculative — extra)* | 100 | same as offline, draft model loaded | *(~3 min)* |
+| A | *(burst — extra)* | 300 | num_runs × (burst_interval + burst_duration) | *(~18 min)* |
 | | | | **Suite A default total** | **~13 min** |
 | B | offline | 100 | 21s/run × 4 × 3 conc | ~4 min |
 | B | online | 200 | Σ(elapsed × 3) / 4 QPS | ~23 min |
 | B | *(interactive — extra)* | 50 | 780s/run × 3 runs | *(~39 min)* |
 | B | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
+| B | *(burst — extra)* | 200 | num_runs × (burst_interval + burst_duration) | *(~18 min)* |
 | | | | **Suite B default total** | **~26 min** |
 | C | offline (×5 formats) | 100 | 4s/run × 4 × 3 conc × 5 fmt | ~22 min |
 | C | *(online — extra)* | 300 | Σ(elapsed × 3) / 4 QPS × 5 fmt | *(~48 min)* |
@@ -50,6 +54,7 @@ Default scenarios only:
 | D | *(interactive — extra)* | 100 | 1124s/run × 2 runs | *(~37 min)* |
 | D | *(online — extra)* | 200 | Σ(elapsed × 2) / 3 QPS | *(~38 min)* |
 | D | *(sustained — extra)* | — | 32 min fixed | *(~32 min)* |
+| D | *(speculative — extra)* | 50 | same as offline, draft model loaded | *(~24 min)* |
 | | | | **Suite D default total** | **~22 min** |
 | E | offline (1×/2×/4×) | 150 | per-chip runs × 4 × 3 conc | ~9 min |
 | | | | **Suite E default total** | **~9 min** |
@@ -59,7 +64,7 @@ Default scenarios only:
 | F | *(sustained — extra)* | — | 15 min fixed | *(~15 min)* |
 | | | | **Suite F default total** | **~10 min** |
 
-**Total default (all suites):** ~85 min · **Total all-scenarios:** ~420 min
+**Total default (A–F):** ~85 min · **Total all-scenarios (A–F):** ~420 min · **Suite G default:** ~35 min (2× chip; varies with MoE routing overhead)
 
 `rc` = request count per run. `elapsed` = `elapsed_seconds_median` from result.json (one run).
 Formula for offline: `elapsed × (num_runs + 1 warmup) × num_concurrency_levels`.
@@ -180,6 +185,47 @@ Run explicitly with `--scenario sustained`. Not part of the default run.
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario sustained
 ```
 
+### Speculative decoding scenario (extra)
+
+Runs the offline workload with a draft model loaded for speculative token generation.
+The loadgen path is identical to offline — only the engine configuration changes.
+
+```
+speculative_draft_model_id:       meta-llama/Llama-3.2-1B-Instruct
+speculative_draft_model_revision: 9213176726f574b556790deb65791e0c5aa438b6
+speculative_num_tokens:           4      — draft tokens proposed per step
+request_count:  100
+num_runs: 3 + 1 warmup
+Primary metric: throughput_tokens_per_sec (offline)
+```
+
+The draft model path is resolved automatically via `_resolve_model_path()` (respects
+`configs/models_local.yaml`). Runners may override `get_runtime_metrics()` to expose
+`acceptance_rate` and `mean_accepted_tokens` in `task.runtime_metrics`.
+
+```bash
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario speculative
+```
+
+### Burst load scenario (extra)
+
+Alternates between a steady arrival rate and a 5× burst. Tests KV cache eviction
+behavior and scheduler responsiveness under transient overload.
+
+```
+burst_steady_qps:        5    — QPS during steady windows
+burst_peak_qps:         25    — QPS during burst windows
+burst_duration_seconds: 30    — duration of each burst window
+burst_interval_seconds: 120   — duration of each steady window between bursts
+num_runs: 3 (cycles)
+online_request_count: 300     — request pool size (same as online)
+Primary metric: burst_degradation_ratio (burst_ttft_p99 / steady_ttft_p99)
+```
+
+```bash
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A --scenario burst
+```
+
 ---
 
 ## Suite B
@@ -211,6 +257,22 @@ duration_minutes: 30
 
 Run with `--scenario sustained`. Concurrency set to 4 because the 70B model
 occupies most GPU memory, leaving less room for KV cache than the 8B model.
+
+### Burst load scenario (extra)
+
+Same two-state burst pattern as Suite A, using `online_request_count` (200) as the
+request pool.
+
+```
+burst_steady_qps:        5
+burst_peak_qps:         25
+burst_duration_seconds: 30
+burst_interval_seconds: 120
+```
+
+```bash
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_B --scenario burst
+```
 
 ---
 
@@ -378,6 +440,24 @@ throttle onset at minute 13. Low absolute throughput is expected due to
 the ~28K input token prefill overhead — what matters is the throttle ratio
 relative to peak.
 
+### Speculative decoding scenario (extra)
+
+Runs the offline workload at ~28K context with a 1B draft model. Speculative
+decoding at long context is prefill-bound — acceptance rate and speedup
+will differ significantly from Suite A.
+
+```
+speculative_draft_model_id:       meta-llama/Llama-3.2-1B-Instruct
+speculative_draft_model_revision: 9213176726f574b556790deb65791e0c5aa438b6
+speculative_num_tokens:           4
+request_count: 50
+num_runs: 2 + 1 warmup
+```
+
+```bash
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_D --scenario speculative
+```
+
 ---
 
 ## Suite E
@@ -435,7 +515,7 @@ version rather than modifying the existing one.
 
 | Dataset | Used by | Prompts | Input p50 | Output p50 |
 |---|---|---|---|---|
-| `sharegpt_standard_v1` | Suite A, B, C, E | 500 | ~280 tokens | ~310 tokens |
+| `sharegpt_standard_v1` | Suite A, B, C, E, G | 500 | ~280 tokens | ~310 tokens |
 | `sharegpt_longctx_v1` | Suite D | 200 | p50 ~28,650 tokens | up to 256 (suite cap) |
 | `sharegpt_edge_v1` | Suite F | 500 | ~95 tokens | ~150 tokens |
 
@@ -553,6 +633,82 @@ multi-chip results over PCIe will show poor scaling efficiency and reflect
 the interconnect bottleneck rather than GPU capability. For apples-to-apples
 consumer comparisons, submit single-chip results.
 
+
+## Suite G
+
+**MoE multi-chip inference**
+
+```
+Model:     mistralai/Mixtral-8x7B-Instruct-v0.1
+Chips:     auto — minimum 2×A100-80GB or 4×A100-40GB (~90GB BF16)
+Precision: BF16
+```
+
+Suite G targets Mixture-of-Experts architectures. Mixtral-8x7B uses 8 experts
+per layer with top-2 routing (~47B total parameters, ~13B active per token).
+The model requires at least two datacenter GPUs due to its memory footprint.
+
+`required_chips` is set to `"auto"` — runners use all available GPUs via
+tensor parallelism. The leaderboard groups results by chip type and chip count
+naturally, so no scaling sweep is needed (unlike Suite E).
+
+### Scenarios
+
+Default scenarios match Suite A's offline + online workload at MoE scale.
+Optional interactive and sustained are available via `--scenario all`.
+
+```
+concurrency_levels:      [4, 16, 64]  — lower than Suite A due to larger memory footprint
+online_qps_levels:       [2, 10, 40]
+online_sla_ttft_ms:      500
+request_count:           100 (offline)
+online_request_count:    300
+interactive_request_count: 150
+num_runs:                3 + 1 warmup
+```
+
+### Sustained scenario (extra)
+
+```
+sustained_concurrency: 8
+duration_minutes: 30
+sample_interval_seconds: 60
+warmup_minutes: 2
+```
+
+### Runtime metrics
+
+Runners that expose MoE-specific statistics should override `get_runtime_metrics()`
+to return expert routing data:
+
+```python
+{
+    "expert_load_balance": 0.12,    # std dev of expert activation frequency
+    "mean_experts_per_token": 2.0   # mean number of experts activated per token
+}
+```
+
+These are recorded in `task.runtime_metrics` and displayed on the leaderboard
+but do not affect ranking.
+
+### Running Suite G
+
+```bash
+# 2-GPU machine (A100-80GB)
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_G
+
+# 4-GPU machine (A100-40GB)
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_G
+```
+
+### Accuracy baseline
+
+The MMLU accuracy baseline for Mixtral-8x7B is pending — `bf16_baseline_score`
+is set to `null` in `schema/accuracy_baselines.json`. Run the accuracy scenario
+on 2×A100-80GB BF16 to establish the baseline before accepting community
+submissions.
+
+---
 
 ## Adding a new suite
 

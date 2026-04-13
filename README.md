@@ -54,6 +54,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 | **D** | Llama-3.1-8B | 1 | How does this chip handle long-context (28K) inputs? | Offline tokens/sec |
 | **E** | Llama-3-8B | 1×/2×/4×/8× | How well does this chip scale? | Scaling efficiency |
 | **F** | Qwen2.5-0.5B | 1 | How fast is this consumer/edge GPU? | Offline tokens/sec |
+| **G** | Mixtral-8x7B-Instruct | ≥2 (auto) | How efficiently does this chip handle sparse MoE inference? | Offline tokens/sec |
+
+Suites A, B, and D also include optional **speculative decoding** and/or **burst load** extra scenarios — see [suites/README.md](suites/README.md) for per-suite details.
 
 See [suites/README.md](suites/README.md) for full specs, time budgets, SLA definitions, and metric descriptions.
 
@@ -63,12 +66,12 @@ See [suites/README.md](suites/README.md) for full specs, time budgets, SLA defin
 
 Reference runners live under `runners/` (see each folder’s `meta.json`). Checkmarks mark suites **implemented and runnable** with that runner in this repository.
 
-| Hardware | Runner folder | Framework | A | B | C | D | E | F |
-|----------|---------------|-----------|:-:|:-:|:-:|:-:|:-:|:-:|
-| NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| NVIDIA GPU | `nvidia_sglang_6da83845` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| AMD GPU | `amd_vllm_rocm_5355c2c6` | vLLM (ROCm) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Huawei Ascend NPU | `ascend_vllm_ascend_605db33a` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| Hardware | Runner folder | Framework | A | B | C | D | E | F | G |
+|----------|---------------|-----------|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| NVIDIA GPU | `nvidia_sglang_6da83845` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AMD GPU | `amd_vllm_rocm_5355c2c6` | vLLM (ROCm) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Huawei Ascend NPU | `ascend_vllm_ascend_605db33a` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
 
 Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 

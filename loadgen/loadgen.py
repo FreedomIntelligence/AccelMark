@@ -105,6 +105,12 @@ class AccelMarkLoadGen:
         elif scenario == "interactive":
             count = suite.get("interactive_request_count", suite.get("request_count"))
             self.warmup_runs = suite.get("interactive_warmup_runs", 0)
+        elif scenario == "burst":
+            count = suite.get("online_request_count", suite.get("request_count"))
+            self.warmup_runs = suite.get("online_warmup_runs", 0)
+        elif scenario == "speculative":
+            count = suite.get("request_count")
+            self.warmup_runs = suite.get("warmup_runs", 1)
         else:
             count = suite.get("request_count")
             self.warmup_runs = suite.get("warmup_runs", 1)
@@ -140,6 +146,11 @@ class AccelMarkLoadGen:
             return self._run_multiturn(inference_fn)
         elif self.scenario == "sustained":
             return self._run_sustained(inference_fn)
+        elif self.scenario == "burst":
+            return self._run_burst(inference_fn)
+        elif self.scenario == "speculative":
+            result = self._run_offline(inference_fn)
+            return {"speculative": result.get("offline", {})}
         else:
             raise ValueError(f"Unknown scenario: {self.scenario}")
 
@@ -361,8 +372,9 @@ class AccelMarkLoadGen:
         total_concurrency_levels = len(self.suite["concurrency_levels"])
 
         total_steps = self.suite["num_runs"] * total_concurrency_levels
+        _scenario_label = "Speculative Decoding" if self.scenario == "speculative" else "Offline"
         print(f"\n{'='*60}")
-        print(f"  AccelMark Offline Benchmark")
+        print(f"  AccelMark {_scenario_label} Benchmark")
         print(f"  Requests  : {len(self.requests)}")
         print(f"  Client concurrency levels: {self.suite['concurrency_levels']}")
         print(f"  Runs      : {self.suite['num_runs']} (+{self.warmup_runs} warmup)")
@@ -618,6 +630,155 @@ class AccelMarkLoadGen:
             "max_valid_qps": max_valid_qps,
             "results_by_qps": results_by_qps,
         }}
+
+    # ------------------------------------------------------------------
+    # Burst scenario
+    # ------------------------------------------------------------------
+
+    async def _run_burst_async(self, async_inference_fn) -> dict:
+        """
+        Two-state bursty load test.
+
+        Alternates between STEADY (burst_steady_qps) and BURST (burst_peak_qps)
+        arrival rates. Each state transition fires requests at the configured QPS
+        using Poisson inter-arrivals within the state window.
+
+        Suite parameters consumed:
+            burst_steady_qps        float  — QPS during steady state
+            burst_peak_qps          float  — QPS during burst windows
+            burst_duration_seconds  float  — duration of each burst window (seconds)
+            burst_interval_seconds  float  — duration of each steady window between bursts (seconds)
+            num_runs                int    — number of complete steady+burst cycles to run
+            online_sla_ttft_ms      int    — SLA threshold (same as online scenario)
+
+        Metrics returned:
+            steady_ttft_p99_ms      — p99 TTFT during steady-state windows
+            burst_ttft_p99_ms       — p99 TTFT during burst windows
+            steady_ttft_p50_ms
+            burst_ttft_p50_ms
+            steady_requests_total   — total requests that completed during all steady windows
+            burst_requests_total    — total requests that completed during all burst windows
+            sla_met_during_burst    — bool: p99 TTFT during burst < online_sla_ttft_ms
+            burst_degradation_ratio — burst_ttft_p99 / steady_ttft_p99 (higher = worse)
+            results_by_cycle        — per-cycle breakdown
+        """
+        loop = asyncio.get_event_loop()
+        sla_ms = self.suite["online_sla_ttft_ms"]
+        steady_qps = self.suite["burst_steady_qps"]
+        burst_qps = self.suite["burst_peak_qps"]
+        burst_dur = self.suite["burst_duration_seconds"]
+        steady_dur = self.suite["burst_interval_seconds"]
+        num_runs = self.suite.get("num_runs", 3)
+
+        all_steady_ttfts: list[float] = []
+        all_burst_ttfts: list[float] = []
+        results_by_cycle = []
+
+        all_samples: list[SampleRecord] = []
+
+        async def fire_window(qps: float, duration_secs: float, label: str):
+            """Fire requests at Poisson QPS for duration_secs. Returns list of InferenceResult."""
+            n_expected = max(1, int(qps * duration_secs * 1.5))
+            requests_pool = (self.requests * ((n_expected // len(self.requests)) + 2))[:n_expected]
+
+            inter_arrivals = [self._rng.expovariate(qps) for _ in range(n_expected)]
+            arrival_times = list(itertools.accumulate(inter_arrivals))
+
+            pairs = [(req, t) for req, t in zip(requests_pool, arrival_times) if t < duration_secs]
+            if not pairs:
+                return [], 0.0
+
+            t_start = loop.time()
+
+            async def send(req, t_arrival):
+                delay = t_arrival - (loop.time() - t_start)
+                if delay > 0:
+                    await asyncio.sleep(delay)
+                return await async_inference_fn(req)
+
+            results = list(await asyncio.gather(*[send(req, t) for req, t in pairs]))
+            elapsed = loop.time() - t_start
+            return results, elapsed
+
+        for cycle_idx in range(num_runs):
+            tqdm.write(f"[burst] cycle {cycle_idx + 1}/{num_runs} — steady({steady_qps} qps)...")
+
+            steady_results, steady_elapsed = await fire_window(steady_qps, steady_dur, "steady")
+            steady_ttfts = [r.first_token_time_ms for r in steady_results
+                            if r.success and r.first_token_time_ms is not None]
+
+            tqdm.write(f"[burst] cycle {cycle_idx + 1}/{num_runs} — burst({burst_qps} qps)...")
+
+            burst_results, burst_elapsed = await fire_window(burst_qps, burst_dur, "burst")
+            burst_ttfts = [r.first_token_time_ms for r in burst_results
+                           if r.success and r.first_token_time_ms is not None]
+
+            all_steady_ttfts.extend(steady_ttfts)
+            all_burst_ttfts.extend(burst_ttfts)
+
+            cycle_steady_p99 = float(np.percentile(steady_ttfts, 99)) if steady_ttfts else None
+            cycle_burst_p99  = float(np.percentile(burst_ttfts, 99)) if burst_ttfts else None
+
+            results_by_cycle.append({
+                "cycle": cycle_idx + 1,
+                "steady_requests": len(steady_ttfts),
+                "burst_requests": len(burst_ttfts),
+                "steady_ttft_p99_ms": round(cycle_steady_p99, 2) if cycle_steady_p99 else None,
+                "burst_ttft_p99_ms":  round(cycle_burst_p99, 2) if cycle_burst_p99 else None,
+            })
+
+            tqdm.write(
+                f"  [burst] cycle {cycle_idx + 1} — "
+                f"steady p99={cycle_steady_p99:.0f}ms  "
+                f"burst p99={cycle_burst_p99:.0f}ms"
+                if cycle_steady_p99 and cycle_burst_p99 else
+                f"  [burst] cycle {cycle_idx + 1} — insufficient data"
+            )
+
+        # Aggregate
+        steady_p50 = float(np.percentile(all_steady_ttfts, 50)) if all_steady_ttfts else None
+        steady_p99 = float(np.percentile(all_steady_ttfts, 99)) if all_steady_ttfts else None
+        burst_p50  = float(np.percentile(all_burst_ttfts, 50)) if all_burst_ttfts else None
+        burst_p99  = float(np.percentile(all_burst_ttfts, 99)) if all_burst_ttfts else None
+
+        sla_met_during_burst = (burst_p99 < sla_ms) if burst_p99 is not None else False
+        degradation = round(burst_p99 / steady_p99, 3) if (burst_p99 and steady_p99) else None
+
+        sla_icon = "✓" if sla_met_during_burst else "✗"
+        chip_str = f"  ({self.chip_count} chips)" if self.chip_count > 1 else ""
+        tqdm.write(
+            f"  [burst] burst_ttft_p99={burst_p99:.0f}ms  "
+            f"degradation={degradation:.2f}×  SLA {sla_icon}{chip_str}"
+            if burst_p99 and degradation else
+            f"  [burst] insufficient data"
+        )
+
+        self._write_samples(all_samples)
+        return {"burst": {
+            "sla_ttft_ms": sla_ms,
+            "burst_steady_qps": steady_qps,
+            "burst_peak_qps": burst_qps,
+            "burst_duration_seconds": burst_dur,
+            "burst_interval_seconds": steady_dur,
+            "steady_requests_total": sum(c["steady_requests"] for c in results_by_cycle),
+            "burst_requests_total": sum(c["burst_requests"] for c in results_by_cycle),
+            "steady_ttft_p50_ms": round(steady_p50, 2) if steady_p50 else None,
+            "steady_ttft_p99_ms": round(steady_p99, 2) if steady_p99 else None,
+            "burst_ttft_p50_ms":  round(burst_p50, 2) if burst_p50 else None,
+            "burst_ttft_p99_ms":  round(burst_p99, 2) if burst_p99 else None,
+            "sla_met_during_burst": sla_met_during_burst,
+            "burst_degradation_ratio": degradation,
+            "results_by_cycle": results_by_cycle,
+        }}
+
+    def _run_burst(self, inference_fn: Callable) -> dict:
+        """Sync entry point for burst scenario. Wraps _run_burst_async."""
+        if not asyncio.iscoroutinefunction(inference_fn):
+            raise TypeError(
+                "_run_burst requires an async inference_fn(request: InferenceRequest) -> InferenceResult."
+            )
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(self._run_burst_async(inference_fn))
 
     # ------------------------------------------------------------------
     # Interactive scenario

@@ -4,7 +4,7 @@ Shared request datasets used across benchmark suites.
 
 | Dataset | Suites |
 |---------|--------|
-| `sharegpt_standard_v1` | A, B, C, E |
+| `sharegpt_standard_v1` | A, B, C, E, G |
 | `sharegpt_longctx_v1` | D |
 | `sharegpt_edge_v1` | F |
 

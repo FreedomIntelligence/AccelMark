@@ -39,5 +39,10 @@
     "fp16_baseline_score": 0.37,
     "bf16_baseline_score": 0.41,
     "notes": "Measured on A100 SXM4 40GB, vLLM 0.6.6.post1, CUDA 12.1"
+  },
+  "mistralai/Mixtral-8x7B-Instruct-v0.1": {
+    "revision": "eba92302a2861cdc0098cc54bc9f17cb2c47eb61",
+    "bf16_baseline_score": 0.62,
+    "notes": "Measured on A100 SXM4 40GBx2, vLLM 0.6.6.post1, CUDA 12.1"
   }
 }

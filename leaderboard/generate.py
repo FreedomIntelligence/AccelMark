@@ -277,6 +277,39 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "samples":               samples,
         }
 
+    def _burst_block():
+        b = metrics.get("burst")
+        if not b:
+            return None
+        return {
+            "burst_steady_qps":             b.get("burst_steady_qps"),
+            "burst_peak_qps":               b.get("burst_peak_qps"),
+            "steady_ttft_p50_ms":           b.get("steady_ttft_p50_ms"),
+            "steady_ttft_p99_ms":           b.get("steady_ttft_p99_ms"),
+            "burst_ttft_p50_ms":            b.get("burst_ttft_p50_ms"),
+            "burst_ttft_p99_ms":            b.get("burst_ttft_p99_ms"),
+            "steady_requests_total":        b.get("steady_requests_total"),
+            "burst_requests_total":         b.get("burst_requests_total"),
+            "sla_met_during_burst":         b.get("sla_met_during_burst"),
+            "burst_degradation_ratio":      b.get("burst_degradation_ratio"),
+            "results_by_cycle":             b.get("results_by_cycle"),
+        }
+
+    def _speculative_block():
+        spec = metrics.get("speculative")
+        if not spec:
+            return None
+        task = result.get("task") or {}
+        rm   = task.get("runtime_metrics") or {}
+        rows = spec.get("results_by_concurrency") or spec.get("results_by_batch_size") or []
+        valid = [r for r in rows if not r.get("oom") and r.get("throughput_tokens_per_sec")]
+        tok_s = max((r["throughput_tokens_per_sec"] for r in valid), default=None) if valid else None
+        return {
+            "offline_tok_per_sec":  tok_s,
+            "acceptance_rate":      rm.get("acceptance_rate"),
+            "mean_accepted_tokens": rm.get("mean_accepted_tokens"),
+        }
+
     if suite == "suite_A":
         rows = _offline_rows()
         return {
@@ -289,6 +322,8 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "online":      _online_block(),
             "interactive": _interactive_block(),
             "sustained":   _sustained_block(),
+            "speculative": _speculative_block(),
+            "burst":       _burst_block(),
         }
 
     if suite == "suite_B":
@@ -303,6 +338,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             },
             "online":    _online_block(),
             "sustained": _sustained_block(),
+            "burst":     _burst_block(),
         }
 
     if suite == "suite_D":
@@ -316,6 +352,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             },
             "interactive": _interactive_block(),
             "sustained":   _sustained_block(),
+            "speculative": _speculative_block(),
         }
 
     if suite == "suite_C":
@@ -423,6 +460,23 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "sustained":   _sustained_block(),
         }
 
+    if suite == "suite_G":
+        task = result.get("task") or {}
+        rm   = task.get("runtime_metrics") or {}
+        rows = _offline_rows()
+        return {
+            "type":       "suite_G",
+            "offline": {
+                "labels":     _concurrency_labels(rows),
+                "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
+                "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+            },
+            "online":      _online_block(),
+            "interactive": _interactive_block(),
+            "sustained":   _sustained_block(),
+            "runtime_metrics": rm if rm else None,
+        }
+
     if metrics.get("sustained"):
         sustained = metrics.get("sustained", {})
         samples   = sustained.get("samples", [])
@@ -501,6 +555,35 @@ def extract_row(result: dict) -> dict:
         ttft_p99_drift_ms     = sustained.get("ttft_p99_drift_ms")
         sustained_concurrency = sustained.get("sustained_concurrency")
 
+    # ── Speculative ─────────────────────────────────────────────────────────
+    speculative_throughput = None
+    speculative_speedup    = None
+    speculative_acceptance = None
+    runtime_metrics        = task.get("runtime_metrics") or {}
+
+    speculative = metrics.get("speculative")
+    if speculative:
+        rows  = speculative.get("results_by_concurrency") or speculative.get("results_by_batch_size") or []
+        valid = [r for r in rows if not r.get("oom") and r.get("throughput_tokens_per_sec")]
+        if valid:
+            speculative_throughput = max(r["throughput_tokens_per_sec"] for r in valid)
+        speculative_acceptance = runtime_metrics.get("acceptance_rate")
+        if speculative_throughput and offline_throughput and offline_throughput > 0:
+            speculative_speedup = round(speculative_throughput / offline_throughput, 3)
+
+    # ── Burst ────────────────────────────────────────────────────────────────
+    burst_degradation      = None
+    burst_steady_p99       = None
+    burst_p99              = None
+    burst_sla_met          = None
+
+    burst = metrics.get("burst")
+    if burst:
+        burst_degradation = burst.get("burst_degradation_ratio")
+        burst_steady_p99  = burst.get("steady_ttft_p99_ms")
+        burst_p99         = burst.get("burst_ttft_p99_ms")
+        burst_sla_met     = burst.get("sla_met_during_burst")
+
     # ── Primary metric ────────────────────────────────────────────────────────
     scenario = task.get("scenario", "offline")
     if is_suite_level and suite_id not in ("suite_E", "suite_C", "suite_F"):
@@ -519,6 +602,12 @@ def extract_row(result: dict) -> dict:
     elif scenario == "sustained":
         primary_metric       = sustained_throughput
         primary_metric_label = "tok/s (sustained mean)"
+    elif scenario == "speculative":
+        primary_metric       = speculative_throughput
+        primary_metric_label = "tok/s (speculative offline)"
+    elif scenario == "burst":
+        primary_metric       = burst_degradation
+        primary_metric_label = "degradation ratio"
     else:
         primary_metric       = None
         primary_metric_label = None
@@ -692,6 +781,15 @@ def extract_row(result: dict) -> dict:
         "throttle_onset_minute":   throttle_onset_minute,
         "ttft_p99_drift_ms":       ttft_p99_drift_ms,
         "sustained_concurrency":   sustained_concurrency,
+        # Speculative
+        "speculative_throughput":   speculative_throughput,
+        "speculative_speedup":     speculative_speedup,
+        "speculative_acceptance":  speculative_acceptance,
+        # Burst
+        "burst_degradation":       burst_degradation,
+        "burst_steady_p99":        burst_steady_p99,
+        "burst_p99":               burst_p99,
+        "burst_sla_met":           burst_sla_met,
         # Panel data
         "detail": extract_detail(result),
         "viz":    extract_viz(result, metrics),
@@ -967,6 +1065,8 @@ def main():
             metric = row.get("quant_quality_eff") or 0
         elif suite_id == "suite_E":
             metric = row.get("scaling_efficiency_4x") or row.get("scaling_efficiency_2x") or 0
+        elif suite_id == "suite_G":
+            metric = row.get("offline_throughput") or 0
         elif suite_id == "suite_F":
             metric = row.get("offline_throughput") or 0
         else:
