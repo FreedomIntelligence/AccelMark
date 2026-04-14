@@ -37,7 +37,7 @@
   "request_count": 100,
   "_request_count_note": "offline uses request_count (100), online uses online_request_count (300), interactive uses interactive_request_count (150)",
   "online_request_count": 300,
-  "interactive_request_count": 150,
+  "interactive_request_count": 50,
   "sustained_concurrency": 8,
   "duration_minutes": 30,
   "sample_interval_seconds": 60
