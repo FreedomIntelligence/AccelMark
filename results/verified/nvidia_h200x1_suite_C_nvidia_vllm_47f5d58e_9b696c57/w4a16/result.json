@@ -11,7 +11,7 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-09T06:25:18.604886+00:00",
+    "collected_at": "2026-04-14T03:00:38.683903+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -157,7 +157,7 @@
         "bandwidth_gbps": null
       }
     ],
-    "os": "Ubuntu 22.04.5 LTS",
+    "os": "Alibaba Cloud Linux 3.2304 (Soaring Falcon)",
     "python_version": "3.10.18",
     "kernel_version": "5.15.0-140-generic",
     "runtime_version": "CUDA 12.4",
@@ -168,7 +168,7 @@
     "framework_version": "0.6.6.post1",
     "driver_version": "570.86.10",
     "runtime_version": "CUDA 12.4",
-    "os": "Ubuntu 22.04.5 LTS",
+    "os": "Alibaba Cloud Linux 3.2304 (Soaring Falcon)",
     "python_version": "3.10.18"
   },
   "model": {
@@ -205,103 +205,104 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 1,
-          "throughput_tokens_per_sec": 3674.53,
-          "throughput_tokens_per_sec_per_chip": 3674.53,
+          "throughput_tokens_per_sec": 3246.62,
+          "throughput_tokens_per_sec_per_chip": 3246.62,
           "elapsed_seconds_median": 10.5,
           "peak_memory_gb": 123.91,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
-          "_throughput_note": "output_only"
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
         },
         {
           "client_concurrency": 4,
-          "throughput_tokens_per_sec": 3612.83,
-          "throughput_tokens_per_sec_per_chip": 3612.83,
-          "elapsed_seconds_median": 10.7,
+          "throughput_tokens_per_sec": 3227.05,
+          "throughput_tokens_per_sec_per_chip": 3227.05,
+          "elapsed_seconds_median": 10.6,
           "peak_memory_gb": 123.91,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
-          "_throughput_note": "output_only"
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
         },
         {
           "client_concurrency": 16,
-          "throughput_tokens_per_sec": 3613.98,
-          "throughput_tokens_per_sec_per_chip": 3613.98,
+          "throughput_tokens_per_sec": 3203.34,
+          "throughput_tokens_per_sec_per_chip": 3203.34,
           "elapsed_seconds_median": 10.7,
           "peak_memory_gb": 123.91,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
-          "_throughput_note": "output_only"
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
         },
         {
           "client_concurrency": 64,
-          "throughput_tokens_per_sec": 3680.95,
-          "throughput_tokens_per_sec_per_chip": 3680.95,
-          "elapsed_seconds_median": 10.5,
+          "throughput_tokens_per_sec": 3215.94,
+          "throughput_tokens_per_sec_per_chip": 3215.94,
+          "elapsed_seconds_median": 10.6,
           "peak_memory_gb": 123.91,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
-          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs.",
-          "_throughput_note": "output_only"
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
         }
       ]
     },
     "online": {
+      "sla_ttft_ms": 500,
       "max_valid_qps": 10,
       "results_by_qps": [
         {
           "target_qps": 5,
           "achieved_qps": 5.0,
-          "ttft_ms_p50": 94.01,
-          "ttft_ms_p90": 181.99,
-          "ttft_ms_p99": 7880.84,
-          "tpot_ms_p50": 30.4,
-          "tpot_ms_p90": 53.61,
-          "tpot_ms_p99": 69.26,
-          "elapsed_seconds_median": 69.4,
-          "sla_met": false
+          "ttft_ms_p50": 83.78,
+          "ttft_ms_p90": 153.06,
+          "ttft_ms_p99": 215.82,
+          "tpot_ms_p50": 27.04,
+          "tpot_ms_p90": 38.73,
+          "tpot_ms_p99": 45.22,
+          "elapsed_seconds_median": 69.1,
+          "sla_met": true
         },
         {
           "target_qps": 10,
           "achieved_qps": 10.0,
-          "ttft_ms_p50": 147.98,
-          "ttft_ms_p90": 252.76,
-          "ttft_ms_p99": 373.91,
-          "tpot_ms_p50": 70.74,
-          "tpot_ms_p90": 100.14,
-          "tpot_ms_p99": 139.48,
-          "elapsed_seconds_median": 51.2,
+          "ttft_ms_p50": 149.47,
+          "ttft_ms_p90": 249.73,
+          "ttft_ms_p99": 368.51,
+          "tpot_ms_p50": 69.74,
+          "tpot_ms_p90": 100.35,
+          "tpot_ms_p99": 159.7,
+          "elapsed_seconds_median": 50.7,
           "sla_met": true
         },
         {
           "target_qps": 25,
           "achieved_qps": 25.0,
-          "ttft_ms_p50": 270.06,
-          "ttft_ms_p90": 589.24,
-          "ttft_ms_p99": 5182.59,
-          "tpot_ms_p50": 72.61,
-          "tpot_ms_p90": 129.33,
-          "tpot_ms_p99": 285.19,
-          "elapsed_seconds_median": 41.5,
+          "ttft_ms_p50": 270.77,
+          "ttft_ms_p90": 647.02,
+          "ttft_ms_p99": 4886.22,
+          "tpot_ms_p50": 71.37,
+          "tpot_ms_p90": 128.2,
+          "tpot_ms_p99": 343.36,
+          "elapsed_seconds_median": 40.8,
           "sla_met": false
         },
         {
           "target_qps": 50,
           "achieved_qps": 50.0,
-          "ttft_ms_p50": 2388.54,
-          "ttft_ms_p90": 3139.78,
-          "ttft_ms_p99": 7288.58,
-          "tpot_ms_p50": 66.31,
-          "tpot_ms_p90": 99.78,
-          "tpot_ms_p99": 1416.76,
-          "elapsed_seconds_median": 37.2,
+          "ttft_ms_p50": 1482.26,
+          "ttft_ms_p90": 2568.21,
+          "ttft_ms_p99": 6696.32,
+          "tpot_ms_p50": 65.17,
+          "tpot_ms_p90": 105.19,
+          "tpot_ms_p99": 1753.06,
+          "elapsed_seconds_median": 36.6,
           "sla_met": false
         }
       ]
@@ -315,148 +316,148 @@
         {
           "minute": 1.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 514.0,
-          "tokens_out": 31356,
+          "throughput_tokens_per_sec": 709.1,
+          "tokens_out": 42570,
           "tokens_in": 0,
-          "requests_completed": 92,
-          "ttft_ms_p50": 51.7,
-          "ttft_ms_p99": 282.1
+          "requests_completed": 122,
+          "ttft_ms_p50": 39.2,
+          "ttft_ms_p99": 210.2
         },
         {
           "minute": 2.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 641.3,
-          "tokens_out": 37869,
+          "throughput_tokens_per_sec": 681.7,
+          "tokens_out": 40900,
           "tokens_in": 0,
-          "requests_completed": 108,
-          "ttft_ms_p50": 51.5,
-          "ttft_ms_p99": 115.2
+          "requests_completed": 121,
+          "ttft_ms_p50": 40.5,
+          "ttft_ms_p99": 99.1
         },
         {
           "minute": 3.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 649.2,
-          "tokens_out": 38933,
+          "throughput_tokens_per_sec": 649.7,
+          "tokens_out": 38974,
           "tokens_in": 0,
           "requests_completed": 109,
-          "ttft_ms_p50": 51.7,
-          "ttft_ms_p99": 112.2
+          "ttft_ms_p50": 51.8,
+          "ttft_ms_p99": 61.2
         },
         {
           "minute": 4.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 658.0,
-          "tokens_out": 39484,
+          "throughput_tokens_per_sec": 636.0,
+          "tokens_out": 38171,
           "tokens_in": 0,
-          "requests_completed": 113,
-          "ttft_ms_p50": 51.6,
-          "ttft_ms_p99": 82.7
+          "requests_completed": 109,
+          "ttft_ms_p50": 51.7,
+          "ttft_ms_p99": 73.8
         },
         {
           "minute": 5.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 616.1,
-          "tokens_out": 36964,
+          "throughput_tokens_per_sec": 652.4,
+          "tokens_out": 39158,
           "tokens_in": 0,
-          "requests_completed": 110,
-          "ttft_ms_p50": 51.5,
-          "ttft_ms_p99": 111.1
+          "requests_completed": 112,
+          "ttft_ms_p50": 51.7,
+          "ttft_ms_p99": 78.2
         },
         {
           "minute": 6.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 641.2,
-          "tokens_out": 38476,
+          "throughput_tokens_per_sec": 628.1,
+          "tokens_out": 37681,
           "tokens_in": 0,
-          "requests_completed": 110,
-          "ttft_ms_p50": 51.5,
-          "ttft_ms_p99": 106.8
+          "requests_completed": 109,
+          "ttft_ms_p50": 51.6,
+          "ttft_ms_p99": 117.1
         },
         {
           "minute": 7.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 658.1,
-          "tokens_out": 39486,
+          "throughput_tokens_per_sec": 634.7,
+          "tokens_out": 38074,
           "tokens_in": 0,
-          "requests_completed": 110,
-          "ttft_ms_p50": 51.4,
-          "ttft_ms_p99": 65.1
+          "requests_completed": 108,
+          "ttft_ms_p50": 51.8,
+          "ttft_ms_p99": 111.9
         },
         {
           "minute": 8.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 650.8,
-          "tokens_out": 39070,
+          "throughput_tokens_per_sec": 648.4,
+          "tokens_out": 38914,
           "tokens_in": 0,
-          "requests_completed": 111,
-          "ttft_ms_p50": 51.6,
-          "ttft_ms_p99": 110.9
+          "requests_completed": 110,
+          "ttft_ms_p50": 51.7,
+          "ttft_ms_p99": 81.3
         },
         {
           "minute": 9.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 654.6,
-          "tokens_out": 39242,
+          "throughput_tokens_per_sec": 632.2,
+          "tokens_out": 37909,
           "tokens_in": 0,
-          "requests_completed": 114,
-          "ttft_ms_p50": 51.5,
-          "ttft_ms_p99": 75.9
+          "requests_completed": 107,
+          "ttft_ms_p50": 51.9,
+          "ttft_ms_p99": 85.5
         },
         {
           "minute": 10.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 636.6,
-          "tokens_out": 38205,
+          "throughput_tokens_per_sec": 652.0,
+          "tokens_out": 39118,
           "tokens_in": 0,
-          "requests_completed": 110,
-          "ttft_ms_p50": 51.5,
+          "requests_completed": 109,
+          "ttft_ms_p50": 52.3,
           "ttft_ms_p99": 82.8
         },
         {
           "minute": 11.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 635.0,
-          "tokens_out": 38103,
+          "throughput_tokens_per_sec": 628.6,
+          "tokens_out": 37723,
           "tokens_in": 0,
-          "requests_completed": 106,
-          "ttft_ms_p50": 51.5,
-          "ttft_ms_p99": 111.5
+          "requests_completed": 112,
+          "ttft_ms_p50": 51.7,
+          "ttft_ms_p99": 117.3
         },
         {
           "minute": 12.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 645.7,
-          "tokens_out": 38735,
+          "throughput_tokens_per_sec": 636.9,
+          "tokens_out": 38216,
           "tokens_in": 0,
-          "requests_completed": 110,
-          "ttft_ms_p50": 51.5,
-          "ttft_ms_p99": 114.2
+          "requests_completed": 112,
+          "ttft_ms_p50": 51.7,
+          "ttft_ms_p99": 126.0
         },
         {
           "minute": 13.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 650.5,
-          "tokens_out": 39054,
+          "throughput_tokens_per_sec": 641.2,
+          "tokens_out": 38488,
           "tokens_in": 0,
-          "requests_completed": 109,
-          "ttft_ms_p50": 51.5,
-          "ttft_ms_p99": 118.8
+          "requests_completed": 108,
+          "ttft_ms_p50": 51.7,
+          "ttft_ms_p99": 81.9
         },
         {
           "minute": 14.0,
           "is_warmup": false,
-          "throughput_tokens_per_sec": 641.2,
-          "tokens_out": 38463,
+          "throughput_tokens_per_sec": 653.8,
+          "tokens_out": 39226,
           "tokens_in": 0,
-          "requests_completed": 114,
-          "ttft_ms_p50": 51.6,
-          "ttft_ms_p99": 76.8
+          "requests_completed": 111,
+          "ttft_ms_p50": 51.7,
+          "ttft_ms_p99": 61.8
         }
       ],
-      "sustained_throughput_tokens_per_sec": 635.2,
-      "throttle_ratio": 0.781,
-      "throttle_onset_minute": 1.0,
-      "ttft_p99_drift_ms": -205.3
+      "sustained_throughput_tokens_per_sec": 648.9,
+      "throttle_ratio": 0.886,
+      "throttle_onset_minute": 4.0,
+      "ttft_p99_drift_ms": -148.4
     }
   },
   "accuracy": {
@@ -465,13 +466,13 @@
     "valid": true,
     "framework": "vLLM",
     "precision": "W4A16",
-    "notes": "Integrated accuracy check — used same vLLM instance as benchmark."
+    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
   },
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-09",
-    "time": "09:55:20",
+    "date": "2026-04-14",
+    "time": "14:07:15",
     "run_id": "23ac17fd",
     "run_name": "nvidia_h200x1_suite_C_nvidia_vllm_47f5d58e_23ac17fd",
     "flagged": null,
@@ -480,10 +481,10 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-09T09:52:30.208346+00:00",
-    "benchmark_end_time": "2026-04-09T09:55:20.945104+00:00",
-    "benchmark_elapsed_minutes": 28.3,
-    "model_load_seconds": 129.5,
+    "benchmark_start_time": "2026-04-14T06:04:21.352195+00:00",
+    "benchmark_end_time": "2026-04-14T06:07:15.771438+00:00",
+    "benchmark_elapsed_minutes": 27.8,
+    "model_load_seconds": 154.9,
     "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'sustained'] scenarios.",
     "scenario_dirs": {
       "offline": "results/verified/nvidia_h200x1_suite_C_nvidia_vllm_47f5d58e_9b696c57/w4a16/offline",

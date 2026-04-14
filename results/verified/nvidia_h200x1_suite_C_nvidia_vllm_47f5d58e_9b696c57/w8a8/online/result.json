@@ -11,7 +11,7 @@
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-04-09T06:25:18.604886+00:00",
+    "collected_at": "2026-04-14T03:00:38.683903+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -157,7 +157,7 @@
         "bandwidth_gbps": null
       }
     ],
-    "os": "Ubuntu 22.04.5 LTS",
+    "os": "Alibaba Cloud Linux 3.2304 (Soaring Falcon)",
     "python_version": "3.10.18",
     "kernel_version": "5.15.0-140-generic",
     "runtime_version": "CUDA 12.4",
@@ -168,7 +168,7 @@
     "framework_version": "0.6.6.post1",
     "driver_version": "570.86.10",
     "runtime_version": "CUDA 12.4",
-    "os": "Ubuntu 22.04.5 LTS",
+    "os": "Alibaba Cloud Linux 3.2304 (Soaring Falcon)",
     "python_version": "3.10.18"
   },
   "model": {
@@ -198,54 +198,55 @@
   },
   "metrics": {
     "online": {
+      "sla_ttft_ms": 500,
       "max_valid_qps": 10,
       "results_by_qps": [
         {
           "target_qps": 5,
           "achieved_qps": 5.0,
-          "ttft_ms_p50": 97.98,
-          "ttft_ms_p90": 1064.11,
-          "ttft_ms_p99": 9122.46,
-          "tpot_ms_p50": 33.13,
-          "tpot_ms_p90": 61.17,
-          "tpot_ms_p99": 91.42,
-          "elapsed_seconds_median": 71.7,
-          "sla_met": false
+          "ttft_ms_p50": 78.1,
+          "ttft_ms_p90": 148.95,
+          "ttft_ms_p99": 220.14,
+          "tpot_ms_p50": 25.28,
+          "tpot_ms_p90": 36.47,
+          "tpot_ms_p99": 43.76,
+          "elapsed_seconds_median": 68.4,
+          "sla_met": true
         },
         {
           "target_qps": 10,
           "achieved_qps": 10.0,
-          "ttft_ms_p50": 140.37,
-          "ttft_ms_p90": 243.19,
-          "ttft_ms_p99": 338.37,
-          "tpot_ms_p50": 71.18,
-          "tpot_ms_p90": 97.7,
-          "tpot_ms_p99": 145.92,
-          "elapsed_seconds_median": 51.5,
+          "ttft_ms_p50": 142.71,
+          "ttft_ms_p90": 240.83,
+          "ttft_ms_p99": 430.56,
+          "tpot_ms_p50": 69.65,
+          "tpot_ms_p90": 94.86,
+          "tpot_ms_p99": 143.98,
+          "elapsed_seconds_median": 51.4,
           "sla_met": true
         },
         {
           "target_qps": 25,
           "achieved_qps": 25.0,
-          "ttft_ms_p50": 278.03,
-          "ttft_ms_p90": 1706.47,
-          "ttft_ms_p99": 6437.87,
-          "tpot_ms_p50": 72.88,
-          "tpot_ms_p90": 122.27,
-          "tpot_ms_p99": 283.99,
-          "elapsed_seconds_median": 41.5,
+          "ttft_ms_p50": 279.21,
+          "ttft_ms_p90": 1474.58,
+          "ttft_ms_p99": 6658.71,
+          "tpot_ms_p50": 73.32,
+          "tpot_ms_p90": 122.45,
+          "tpot_ms_p99": 269.3,
+          "elapsed_seconds_median": 42.2,
           "sla_met": false
         },
         {
           "target_qps": 50,
           "achieved_qps": 50.0,
-          "ttft_ms_p50": 2087.38,
-          "ttft_ms_p90": 4420.24,
-          "ttft_ms_p99": 9050.01,
-          "tpot_ms_p50": 66.3,
-          "tpot_ms_p90": 96.91,
-          "tpot_ms_p99": 866.02,
-          "elapsed_seconds_median": 38.0,
+          "ttft_ms_p50": 1509.8,
+          "ttft_ms_p90": 3202.65,
+          "ttft_ms_p99": 8717.93,
+          "tpot_ms_p50": 67.34,
+          "tpot_ms_p90": 100.79,
+          "tpot_ms_p99": 1039.54,
+          "elapsed_seconds_median": 37.9,
           "sla_met": false
         }
       ]
@@ -260,8 +261,8 @@
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",
-    "date": "2026-04-09",
-    "time": "08:34:57",
+    "date": "2026-04-14",
+    "time": "12:45:59",
     "run_id": "99ec78b7",
     "run_name": "nvidia_h200x1_suite_C_nvidia_vllm_47f5d58e_99ec78b7",
     "flagged": null,
@@ -270,9 +271,9 @@
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-04-09T08:24:35.350774+00:00",
-    "benchmark_end_time": "2026-04-09T08:34:57.086256+00:00",
-    "benchmark_elapsed_minutes": 10.4,
-    "model_load_seconds": 170.0
+    "benchmark_start_time": "2026-04-14T04:36:01.806684+00:00",
+    "benchmark_end_time": "2026-04-14T04:45:59.518861+00:00",
+    "benchmark_elapsed_minutes": 10.0,
+    "model_load_seconds": 67.4
   }
 }

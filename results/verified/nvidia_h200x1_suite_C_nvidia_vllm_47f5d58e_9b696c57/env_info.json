@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-04-09T06:25:18.604886+00:00",
+  "collected_at": "2026-04-14T03:00:38.683903+00:00",
   "accelerators": [
     {
       "index": 0,
@@ -145,7 +145,7 @@
       "bandwidth_gbps": null
     }
   ],
-  "os": "Ubuntu 22.04.5 LTS",
+  "os": "Alibaba Cloud Linux 3.2304 (Soaring Falcon)",
   "python_version": "3.10.18",
   "kernel_version": "5.15.0-140-generic",
   "runtime_version": "CUDA 12.4",
