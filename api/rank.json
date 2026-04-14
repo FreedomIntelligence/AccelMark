@@ -321,7 +321,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 4084.5
+    "primary_metric": 3635.0
   },
   "nvidia_h200x1_suite_D_nvidia_vllm_47f5d58e_faeb37a8": {
     "chip_name": "NVIDIA H200",

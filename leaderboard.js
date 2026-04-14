@@ -15952,8 +15952,8 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 6922.94,
-    "primary_metric_label": "tokens/sec (W8A8)",
+    "primary_metric": 6232.46,
+    "primary_metric_label": "tokens/sec (FP8)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
     "online_max_qps": null,
@@ -15966,7 +15966,7 @@ const LEADERBOARD_DATA = [
     "tokens_per_watt": null,
     "accuracy_valid": null,
     "accuracy_score": null,
-    "date": "2026-04-09",
+    "date": "2026-04-14",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
     "notes": null,
@@ -15976,12 +15976,12 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_2x": null,
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
-    "quant_bf16_throughput": 6010.92,
-    "quant_best_throughput": 6922.94,
-    "quant_best_precision": "W8A8",
-    "quant_int8_speedup": 0.931,
-    "quant_int4_speedup": 0.612,
-    "quant_quality_eff": 4084.5,
+    "quant_bf16_throughput": 5367.47,
+    "quant_best_throughput": 6232.46,
+    "quant_best_precision": "FP8",
+    "quant_int8_speedup": 0.932,
+    "quant_int4_speedup": 0.605,
+    "quant_quality_eff": 3635.0,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -16009,7 +16009,7 @@ const LEADERBOARD_DATA = [
       "sw_framework_version": "0.6.6.post1",
       "sw_driver": "570.86.10",
       "sw_runtime": "CUDA 12.4",
-      "sw_os": "Ubuntu 22.04.5 LTS",
+      "sw_os": "Alibaba Cloud Linux 3.2304 (Soaring Falcon)",
       "sw_python": "3.10.18",
       "sw_pytorch": "2.5.1+cu124",
       "model_id": "meta-llama/Llama-3.1-8B-Instruct",
@@ -16040,11 +16040,11 @@ const LEADERBOARD_DATA = [
       "acc_notes": null,
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
-      "meta_date": "2026-04-09",
+      "meta_date": "2026-04-14",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 125.2,
-      "meta_model_load_sec": 66.0,
-      "meta_start_time": "2026-04-09T06:54:24.023124+00:00",
+      "meta_elapsed_min": 135.4,
+      "meta_model_load_sec": 146.0,
+      "meta_start_time": "2026-04-14T03:09:33.135632+00:00",
       "meta_notes": null
     },
     "viz": {
@@ -16057,43 +16057,43 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        6010.92,
-        null,
-        6922.94,
-        5597.65,
-        3680.95
+        5367.47,
+        6232.46,
+        6161.03,
+        5002.82,
+        3246.62
       ],
       "speedup": [
         1.0,
-        null,
-        1.152,
-        0.931,
-        0.612
+        1.161,
+        1.148,
+        0.932,
+        0.605
       ],
       "quality_efficiency": [
-        3426.2,
-        null,
-        4084.5,
-        3246.6,
-        2024.5
+        3059.5,
+        3552.5,
+        3635.0,
+        2901.6,
+        1785.6
       ],
       "accuracies": [
         0.57,
-        null,
+        0.57,
         0.59,
         0.58,
         0.55
       ],
       "acc_valid": [
         true,
-        null,
+        true,
         true,
         true,
         true
       ],
       "acc_deltas": [
         0.0,
-        null,
+        0.0,
         0.0,
         0.01,
         -0.02
@@ -16112,8 +16112,8 @@ const LEADERBOARD_DATA = [
         "compressed-tensors",
         "gptq"
       ],
-      "best_quality_eff": 4084.5,
-      "bf16_throughput": 6010.92,
+      "best_quality_eff": 3635.0,
+      "bf16_throughput": 5367.47,
       "online_by_precision": [
         {
           "precision": "BF16",
@@ -16125,16 +16125,44 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            79.31,
-            138.26,
-            265.79,
-            1501.18
+            82.54,
+            140.21,
+            263.86,
+            1253.64
           ],
           "ttft_p99": [
-            216.06,
-            318.64,
-            6199.07,
-            8268.06
+            239.3,
+            334.33,
+            6383.46,
+            8485.08
+          ],
+          "sla_met": [
+            true,
+            true,
+            false,
+            false
+          ]
+        },
+        {
+          "precision": "FP8",
+          "max_valid_qps": 10,
+          "qps_labels": [
+            "5",
+            "10",
+            "25",
+            "50"
+          ],
+          "ttft_p50": [
+            81.48,
+            140.55,
+            258.39,
+            1428.52
+          ],
+          "ttft_p99": [
+            230.02,
+            353.99,
+            6174.75,
+            8010.65
           ],
           "sla_met": [
             true,
@@ -16153,19 +16181,19 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            97.98,
-            140.37,
-            278.03,
-            2087.38
+            78.1,
+            142.71,
+            279.21,
+            1509.8
           ],
           "ttft_p99": [
-            9122.46,
-            338.37,
-            6437.87,
-            9050.01
+            220.14,
+            430.56,
+            6658.71,
+            8717.93
           ],
           "sla_met": [
-            false,
+            true,
             true,
             false,
             false
@@ -16173,7 +16201,7 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "W8A16",
-          "max_valid_qps": 5,
+          "max_valid_qps": 10,
           "qps_labels": [
             "5",
             "10",
@@ -16181,20 +16209,20 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            83.58,
-            145.61,
-            283.32,
-            2652.23
+            81.12,
+            143.71,
+            273.62,
+            2081.05
           ],
           "ttft_p99": [
-            329.49,
-            9665.8,
-            6677.77,
-            9716.68
+            220.03,
+            341.4,
+            6769.12,
+            8976.31
           ],
           "sla_met": [
             true,
-            false,
+            true,
             false,
             false
           ]
@@ -16209,19 +16237,19 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            94.01,
-            147.98,
-            270.06,
-            2388.54
+            83.78,
+            149.47,
+            270.77,
+            1482.26
           ],
           "ttft_p99": [
-            7880.84,
-            373.91,
-            5182.59,
-            7288.58
+            215.82,
+            368.51,
+            4886.22,
+            6696.32
           ],
           "sla_met": [
-            false,
+            true,
             true,
             false,
             false
@@ -16231,10 +16259,10 @@ const LEADERBOARD_DATA = [
       "sustained_by_precision": [
         {
           "precision": "BF16",
-          "sustained_throughput_tokens_per_sec": 707.3,
-          "throttle_ratio": 0.865,
-          "throttle_onset_minute": 13.0,
-          "ttft_p99_drift_ms": -145.7,
+          "sustained_throughput_tokens_per_sec": 634.4,
+          "throttle_ratio": 0.932,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -98.4,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -16253,20 +16281,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            703.2,
-            700.1,
-            723.8,
-            725.2,
-            721.8,
-            732.7,
-            716.9,
-            724.8,
-            726.4,
-            717.8,
-            724.6,
-            701.1,
-            649.4,
-            633.8
+            603.9,
+            639.3,
+            637.6,
+            627.8,
+            642.7,
+            627.0,
+            647.7,
+            648.1,
+            628.1,
+            643.9,
+            646.3,
+            622.3,
+            642.6,
+            623.9
           ],
           "is_warmup": [
             false,
@@ -16287,10 +16315,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "FP8",
-          "sustained_throughput_tokens_per_sec": 843.5,
-          "throttle_ratio": 0.845,
-          "throttle_onset_minute": 10.0,
-          "ttft_p99_drift_ms": 35.1,
+          "sustained_throughput_tokens_per_sec": 713.2,
+          "throttle_ratio": 0.942,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -64.2,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -16309,20 +16337,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            887.2,
-            887.6,
-            886.9,
-            888.0,
-            886.8,
-            888.0,
-            818.7,
-            819.3,
-            819.6,
-            750.8,
-            819.1,
-            819.4,
-            819.5,
-            818.6
+            736.5,
+            704.8,
+            712.4,
+            721.4,
+            693.5,
+            730.9,
+            693.7,
+            718.1,
+            709.6,
+            713.3,
+            704.2,
+            709.0,
+            717.9,
+            719.6
           ],
           "is_warmup": [
             false,
@@ -16343,10 +16371,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "W8A8",
-          "sustained_throughput_tokens_per_sec": 666.7,
-          "throttle_ratio": 0.644,
-          "throttle_onset_minute": 1.0,
-          "ttft_p99_drift_ms": -164.5,
+          "sustained_throughput_tokens_per_sec": 693.4,
+          "throttle_ratio": 0.741,
+          "throttle_onset_minute": 2.0,
+          "ttft_p99_drift_ms": -98.9,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -16365,20 +16393,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            460.1,
-            623.2,
-            608.6,
-            688.0,
-            714.4,
-            674.4,
-            704.5,
-            701.1,
-            684.5,
-            684.4,
-            714.3,
-            685.3,
-            695.7,
-            694.8
+            725.8,
+            628.5,
+            764.2,
+            762.3,
+            687.8,
+            711.9,
+            566.2,
+            699.3,
+            681.6,
+            697.1,
+            691.0,
+            702.4,
+            696.7,
+            692.8
           ],
           "is_warmup": [
             false,
@@ -16399,10 +16427,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "W8A16",
-          "sustained_throughput_tokens_per_sec": 654.2,
-          "throttle_ratio": 0.943,
-          "throttle_onset_minute": null,
-          "ttft_p99_drift_ms": -122.8,
+          "sustained_throughput_tokens_per_sec": 659.8,
+          "throttle_ratio": 0.891,
+          "throttle_onset_minute": 9.0,
+          "ttft_p99_drift_ms": -135.5,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -16421,20 +16449,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            679.6,
-            645.3,
-            652.2,
-            649.8,
-            664.7,
-            641.0,
-            652.8,
-            657.2,
-            663.8,
-            650.3,
-            666.7,
-            643.0,
-            643.1,
-            649.7
+            707.7,
+            713.1,
+            655.0,
+            646.0,
+            667.6,
+            651.8,
+            642.6,
+            649.4,
+            639.4,
+            667.3,
+            642.6,
+            664.1,
+            635.7,
+            654.3
           ],
           "is_warmup": [
             false,
@@ -16455,10 +16483,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "W4A16",
-          "sustained_throughput_tokens_per_sec": 635.2,
-          "throttle_ratio": 0.781,
-          "throttle_onset_minute": 1.0,
-          "ttft_p99_drift_ms": -205.3,
+          "sustained_throughput_tokens_per_sec": 648.9,
+          "throttle_ratio": 0.886,
+          "throttle_onset_minute": 4.0,
+          "ttft_p99_drift_ms": -148.4,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -16477,20 +16505,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            514.0,
-            641.3,
-            649.2,
-            658.0,
-            616.1,
+            709.1,
+            681.7,
+            649.7,
+            636.0,
+            652.4,
+            628.1,
+            634.7,
+            648.4,
+            632.2,
+            652.0,
+            628.6,
+            636.9,
             641.2,
-            658.1,
-            650.8,
-            654.6,
-            636.6,
-            635.0,
-            645.7,
-            650.5,
-            641.2
+            653.8
           ],
           "is_warmup": [
             false,
