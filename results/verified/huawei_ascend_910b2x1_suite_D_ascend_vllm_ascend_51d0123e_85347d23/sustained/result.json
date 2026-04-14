@@ -1,0 +1,504 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_D",
+  "implementation_id": "ascend_vllm_ascend_51d0123e",
+  "chip": {
+    "name": "Huawei Ascend 910B2",
+    "vendor": "Huawei",
+    "count": 1,
+    "memory_gb": 64.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-13T13:46:31.769617+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "Huawei Ascend 910B2",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.0.rc1.2",
+        "firmware_version": "7.7.0.3.220",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Kunpeng-920",
+      "physical_cores": 192,
+      "logical_cores": 192,
+      "numa_nodes": 8
+    },
+    "system_memory_gb": 2007.5,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "hns_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "hns_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "hns_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "hns_3",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_3",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_bond_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.13",
+    "kernel_version": "5.15.0-164-generic",
+    "runtime_version": "CANN 25.0.rc1.2",
+    "pytorch_version": "2.7.1+cpu"
+  },
+  "software": {
+    "framework": "vllm-ascend",
+    "framework_version": "0.11.0",
+    "driver_version": "25.0.rc1.2",
+    "runtime_version": "CANN 25.0.rc1.2",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.13"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "sustained",
+    "num_runs": 2,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null
+  },
+  "metrics": {
+    "sustained": {
+      "sustained_concurrency": 8,
+      "duration_minutes": 30,
+      "warmup_minutes": 2,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": true,
+          "throughput_tokens_per_sec": 12.8,
+          "tokens_out": 768,
+          "tokens_in": 0,
+          "requests_completed": 3,
+          "ttft_ms_p50": 9939.8,
+          "ttft_ms_p99": 14291.5
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 6934.3,
+          "ttft_ms_p99": 37267.8
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 7090.9,
+          "ttft_ms_p99": 7249.5
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 5981.5,
+          "ttft_ms_p99": 6619.0
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 6290.8,
+          "ttft_ms_p99": 7129.2
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 5821.0,
+          "ttft_ms_p99": 6856.4
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 38.4,
+          "tokens_out": 2304,
+          "tokens_in": 0,
+          "requests_completed": 9,
+          "ttft_ms_p50": 6430.3,
+          "ttft_ms_p99": 6998.8
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 6859.4,
+          "ttft_ms_p99": 7932.3
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 5517.6,
+          "ttft_ms_p99": 6118.4
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 6595.1,
+          "ttft_ms_p99": 7068.6
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 5642.5,
+          "ttft_ms_p99": 6249.2
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 6376.1,
+          "ttft_ms_p99": 7212.4
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 6338.1,
+          "ttft_ms_p99": 6858.9
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 5049.0,
+          "ttft_ms_p99": 6292.5
+        },
+        {
+          "minute": 15.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 51.2,
+          "tokens_out": 3072,
+          "tokens_in": 0,
+          "requests_completed": 12,
+          "ttft_ms_p50": 5909.5,
+          "ttft_ms_p99": 7750.6
+        },
+        {
+          "minute": 16.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 5690.8,
+          "ttft_ms_p99": 6748.6
+        },
+        {
+          "minute": 17.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 6170.1,
+          "ttft_ms_p99": 6837.9
+        },
+        {
+          "minute": 18.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 5597.4,
+          "ttft_ms_p99": 6960.4
+        },
+        {
+          "minute": 19.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 6187.6,
+          "ttft_ms_p99": 7696.3
+        },
+        {
+          "minute": 20.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 5199.0,
+          "ttft_ms_p99": 7141.5
+        },
+        {
+          "minute": 21.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 51.2,
+          "tokens_out": 3072,
+          "tokens_in": 0,
+          "requests_completed": 12,
+          "ttft_ms_p50": 6654.0,
+          "ttft_ms_p99": 7293.6
+        },
+        {
+          "minute": 22.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 38.4,
+          "tokens_out": 2304,
+          "tokens_in": 0,
+          "requests_completed": 9,
+          "ttft_ms_p50": 6228.5,
+          "ttft_ms_p99": 6837.1
+        },
+        {
+          "minute": 23.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 51.2,
+          "tokens_out": 3072,
+          "tokens_in": 0,
+          "requests_completed": 12,
+          "ttft_ms_p50": 5598.6,
+          "ttft_ms_p99": 6433.1
+        },
+        {
+          "minute": 24.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 51.2,
+          "tokens_out": 3072,
+          "tokens_in": 0,
+          "requests_completed": 12,
+          "ttft_ms_p50": 5695.9,
+          "ttft_ms_p99": 6889.1
+        },
+        {
+          "minute": 25.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 38.4,
+          "tokens_out": 2304,
+          "tokens_in": 0,
+          "requests_completed": 9,
+          "ttft_ms_p50": 6069.4,
+          "ttft_ms_p99": 6363.4
+        },
+        {
+          "minute": 26.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 51.2,
+          "tokens_out": 3072,
+          "tokens_in": 0,
+          "requests_completed": 12,
+          "ttft_ms_p50": 6300.4,
+          "ttft_ms_p99": 7011.6
+        },
+        {
+          "minute": 27.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 6086.3,
+          "ttft_ms_p99": 7075.6
+        },
+        {
+          "minute": 28.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 42.7,
+          "tokens_out": 2560,
+          "tokens_in": 0,
+          "requests_completed": 10,
+          "ttft_ms_p50": 5170.6,
+          "ttft_ms_p99": 6375.1
+        },
+        {
+          "minute": 29.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 46.9,
+          "tokens_out": 2816,
+          "tokens_in": 0,
+          "requests_completed": 11,
+          "ttft_ms_p50": 5919.7,
+          "ttft_ms_p99": 6968.7
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 45.4,
+      "throttle_ratio": 0.75,
+      "throttle_onset_minute": 3.0,
+      "ttft_p99_drift_ms": -30299.1
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-13",
+    "time": "14:23:01",
+    "run_id": "85347d23",
+    "run_name": "huawei_ascend_910b2x1_suite_D_ascend_vllm_ascend_51d0123e_85347d23",
+    "flagged": null,
+    "reproduce_script": "runners/ascend_vllm_ascend_51d0123e/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-13T13:52:01.821636+00:00",
+    "benchmark_end_time": "2026-04-13T14:23:01.838963+00:00",
+    "benchmark_elapsed_minutes": 31.0,
+    "model_load_seconds": 123.4
+  }
+}
