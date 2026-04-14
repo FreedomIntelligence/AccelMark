@@ -24,12 +24,6 @@
     "median_throughput_tokens_per_sec": 2709.5
   },
   {
-    "name": "Huawei Ascend 910B2",
-    "submission_count": 5,
-    "best_throughput_tokens_per_sec": 8186.66,
-    "median_throughput_tokens_per_sec": 2327.2
-  },
-  {
     "name": "NVIDIA A100-SXM4-80GB",
     "submission_count": 6,
     "best_throughput_tokens_per_sec": 7093.64,
@@ -52,5 +46,11 @@
     "submission_count": 6,
     "best_throughput_tokens_per_sec": 6158.21,
     "median_throughput_tokens_per_sec": 763.2
+  },
+  {
+    "name": "Huawei Ascend 910B2",
+    "submission_count": 8,
+    "best_throughput_tokens_per_sec": 4248.22,
+    "median_throughput_tokens_per_sec": 1535.7
   }
 ]

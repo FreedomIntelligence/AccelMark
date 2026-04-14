@@ -1,30 +1,75 @@
 {
-  "huawei_ascend_910b2x1_suite_A_ascend_vllm_ascend_51d0123e_17ef2837": {
+  "huawei_ascend_910b2x1_suite_A_ascend_vllm_ascend_51d0123e_c3eeb06f": {
     "chip_name": "Huawei Ascend 910B2",
     "suite_id": "suite_A",
     "tier": "verified",
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 2327.24
+    "primary_metric": 1630.41
   },
-  "huawei_ascend_910b2x1_suite_D_ascend_vllm_ascend_51d0123e_f3209502": {
+  "huawei_ascend_910b2x1_suite_D_ascend_vllm_ascend_51d0123e_85347d23": {
     "chip_name": "Huawei Ascend 910B2",
     "suite_id": "suite_D",
     "tier": "verified",
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 31.45
+    "primary_metric": 54.25
   },
-  "huawei_ascend_910b2x1_suite_F_ascend_vllm_ascend_51d0123e_774527ab": {
+  "huawei_ascend_910b2x1_suite_F_ascend_vllm_ascend_51d0123e_543795fa": {
     "chip_name": "Huawei Ascend 910B2",
     "suite_id": "suite_F",
     "tier": "verified",
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 8186.66
+    "primary_metric": 4248.22
+  },
+  "huawei_ascend_910b2x8_suite_B_ascend_vllm_ascend_51d0123e_760fe1e6": {
+    "chip_name": "Huawei Ascend 910B2",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 1089.28
+  },
+  "huawei_ascend_910b2x4_suite_B_ascend_vllm_ascend_51d0123e_901f2c99": {
+    "chip_name": "Huawei Ascend 910B2",
+    "suite_id": "suite_B",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 813.51
+  },
+  "huawei_ascend_910b2x4_suite_E_ascend_vllm_ascend_51d0123e_8b7f36fc": {
+    "chip_name": "Huawei Ascend 910B2",
+    "suite_id": "suite_E",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 2824.42
+  },
+  "huawei_ascend_910b2x8_suite_E_ascend_vllm_ascend_51d0123e_0e4d0571": {
+    "chip_name": "Huawei Ascend 910B2",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 2111.24
+  },
+  "huawei_ascend_910b2x8_suite_G_ascend_vllm_ascend_51d0123e_cb5371bc": {
+    "chip_name": "Huawei Ascend 910B2",
+    "suite_id": "suite_G",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1440.92
   },
   "nvidia_a100_sxm4_40gbx1_suite_A_nvidia_vllm_47f5d58e_24f08c8a": {
     "chip_name": "NVIDIA A100-SXM4-40GB",
@@ -403,23 +448,5 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 1131.63
-  },
-  "huawei_ascend_910b2x4_suite_B_ascend_vllm_ascend_51d0123e_901f2c99": {
-    "chip_name": "Huawei Ascend 910B2",
-    "suite_id": "suite_B",
-    "tier": "community",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
-    "primary_metric": 813.51
-  },
-  "huawei_ascend_910b2x4_suite_E_ascend_vllm_ascend_51d0123e_8b7f36fc": {
-    "chip_name": "Huawei Ascend 910B2",
-    "suite_id": "suite_E",
-    "tier": "community",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
-    "primary_metric": 2824.42
   }
 }
