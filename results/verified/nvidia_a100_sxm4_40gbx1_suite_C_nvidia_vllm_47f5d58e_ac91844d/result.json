@@ -1488,7 +1488,7 @@
         "engine_kwargs": {
           "quantization": "compressed-tensors"
         },
-        "_note": "INT8 weights, FP16 activations. Weight-only quantization — reduces memory bandwidth, not compute dtype."
+        "_note": "INT8 weights, FP16 activations. Weight-only quantization \u2014 reduces memory bandwidth, not compute dtype."
       },
       "W4A16": {
         "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
@@ -1496,7 +1496,7 @@
         "engine_kwargs": {
           "quantization": "gptq"
         },
-        "_note": "INT4 weights, FP16 activations via GPTQ Marlin kernels. Weight-only quantization — larger memory saving than W8A16."
+        "_note": "INT4 weights, FP16 activations via GPTQ Marlin kernels. Weight-only quantization \u2014 larger memory saving than W8A16."
       }
     }
   }

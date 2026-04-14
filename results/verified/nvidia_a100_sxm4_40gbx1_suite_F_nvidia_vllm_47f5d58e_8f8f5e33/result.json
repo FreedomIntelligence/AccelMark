@@ -369,7 +369,7 @@
     "valid": true,
     "framework": "vLLM",
     "precision": "BF16",
-    "notes": "Integrated accuracy check — used same vLLM instance as benchmark."
+    "notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark."
   },
   "meta": {
     "submitted_by": "JuhaoLiang1997",

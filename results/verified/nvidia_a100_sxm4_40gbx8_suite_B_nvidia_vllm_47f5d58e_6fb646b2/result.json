@@ -159,7 +159,8 @@
       "offline",
       "online",
       "sustained",
-      "interactive"
+      "interactive",
+      "burst"
     ],
     "parallelism": {
       "tensor_parallel_size": 8,
@@ -581,6 +582,44 @@
       "tpot_ms_p99": 21.11,
       "peak_memory_gb": null,
       "elapsed_seconds_median": 361.8
+    },
+    "burst": {
+      "sla_ttft_ms": 1000,
+      "burst_steady_qps": 5,
+      "burst_peak_qps": 25,
+      "burst_duration_seconds": 30,
+      "burst_interval_seconds": 120,
+      "steady_requests_total": 1812,
+      "burst_requests_total": 2245,
+      "steady_ttft_p50_ms": 123.68,
+      "steady_ttft_p99_ms": 283.25,
+      "burst_ttft_p50_ms": 29661.59,
+      "burst_ttft_p99_ms": 68000.37,
+      "sla_met_during_burst": false,
+      "burst_degradation_ratio": 240.072,
+      "results_by_cycle": [
+        {
+          "cycle": 1,
+          "steady_requests": 581,
+          "burst_requests": 760,
+          "steady_ttft_p99_ms": 326.84,
+          "burst_ttft_p99_ms": 69655.39
+        },
+        {
+          "cycle": 2,
+          "steady_requests": 595,
+          "burst_requests": 734,
+          "steady_ttft_p99_ms": 257.56,
+          "burst_ttft_p99_ms": 64822.93
+        },
+        {
+          "cycle": 3,
+          "steady_requests": 636,
+          "burst_requests": 751,
+          "steady_ttft_p99_ms": 269.31,
+          "burst_ttft_p99_ms": 68000.32
+        }
+      ]
     }
   },
   "accuracy": {
@@ -606,14 +645,15 @@
     "notes": null,
     "benchmark_start_time": "2026-04-12T17:28:30.041004+00:00",
     "benchmark_end_time": "2026-04-12T17:32:50.744293+00:00",
-    "benchmark_elapsed_minutes": 65.5,
+    "benchmark_elapsed_minutes": 78.4,
     "model_load_seconds": 88.9,
-    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'sustained', 'interactive'] scenarios.",
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'sustained', 'interactive', 'burst'] scenarios.",
     "scenario_dirs": {
       "offline": "results/verified/nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_6fb646b2/offline",
       "online": "results/verified/nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_6fb646b2/online",
       "sustained": "results/verified/nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_6fb646b2/sustained",
-      "interactive": "results/verified/nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_6fb646b2/interactive"
+      "interactive": "results/verified/nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_6fb646b2/interactive",
+      "burst": "results/verified/nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_6fb646b2/burst"
     }
   }
 }
