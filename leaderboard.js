@@ -4536,7 +4536,7 @@ const LEADERBOARD_DATA = [
     "date": "2026-04-14",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/ascend_vllm_ascend_d4aa9fda/runner.py",
-    "notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed.",
+    "notes": null,
     "run_id": "74d19743",
     "run_name": "huawei_ascend_ascend910x1_suite_A_ascend_vllm_ascend_d4aa9fda_74d19743",
     "flagged": null,
@@ -4554,8 +4554,8 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 21.0,
     "ttft_p99_drift_ms": -8.0,
     "sustained_concurrency": 8,
-    "speculative_throughput": null,
-    "speculative_speedup": null,
+    "speculative_throughput": 1858.56,
+    "speculative_speedup": 0.984,
     "speculative_acceptance": null,
     "burst_degradation": 360.157,
     "burst_steady_p99": 110.66,
@@ -4595,6 +4595,7 @@ const LEADERBOARD_DATA = [
         "online",
         "interactive",
         "sustained",
+        "speculative",
         "burst"
       ],
       "run_chip_counts": null,
@@ -4603,17 +4604,17 @@ const LEADERBOARD_DATA = [
       "run_pp": 1,
       "run_dp": 1,
       "acc_score": 0.61,
-      "acc_baseline_delta": 0.01,
+      "acc_baseline_delta": 0.02,
       "acc_valid": true,
       "acc_notes": "Integrated accuracy check \u2014 used same vllm-ascend instance as benchmark.",
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
       "meta_date": "2026-04-14",
       "meta_reproduce_script": "runners/ascend_vllm_ascend_d4aa9fda/runner.py",
-      "meta_elapsed_min": 105.1,
+      "meta_elapsed_min": 109.0,
       "meta_model_load_sec": 56.5,
       "meta_start_time": "2026-04-14T18:35:57.991130+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed."
+      "meta_notes": null
     },
     "viz": {
       "type": "suite_A",
@@ -5095,7 +5096,11 @@ const LEADERBOARD_DATA = [
           }
         ]
       },
-      "speculative": null,
+      "speculative": {
+        "offline_tok_per_sec": 1858.56,
+        "acceptance_rate": null,
+        "mean_accepted_tokens": null
+      },
       "burst": {
         "burst_steady_qps": 5,
         "burst_peak_qps": 25,
