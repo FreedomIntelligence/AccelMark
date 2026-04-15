@@ -39,7 +39,7 @@ const LEADERBOARD_DATA = [
     "date": "2026-04-14",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/ascend_vllm_ascend_d4aa9fda/runner.py",
-    "notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed.",
+    "notes": null,
     "run_id": "a2777c30",
     "run_name": "huawei_ascend_910b2x1_suite_A_ascend_vllm_ascend_d4aa9fda_a2777c30",
     "flagged": null,
@@ -57,8 +57,8 @@ const LEADERBOARD_DATA = [
     "throttle_onset_minute": 2.0,
     "ttft_p99_drift_ms": -21.4,
     "sustained_concurrency": 8,
-    "speculative_throughput": null,
-    "speculative_speedup": null,
+    "speculative_throughput": 1718.23,
+    "speculative_speedup": 1.011,
     "speculative_acceptance": null,
     "burst_degradation": 361.412,
     "burst_steady_p99": 172.05,
@@ -98,6 +98,7 @@ const LEADERBOARD_DATA = [
         "online",
         "interactive",
         "sustained",
+        "speculative",
         "burst"
       ],
       "run_chip_counts": null,
@@ -113,10 +114,10 @@ const LEADERBOARD_DATA = [
       "meta_submission_type": "individual",
       "meta_date": "2026-04-14",
       "meta_reproduce_script": "runners/ascend_vllm_ascend_d4aa9fda/runner.py",
-      "meta_elapsed_min": 122.1,
+      "meta_elapsed_min": 126.2,
       "meta_model_load_sec": 76.2,
       "meta_start_time": "2026-04-14T14:21:45.435917+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed."
+      "meta_notes": null
     },
     "viz": {
       "type": "suite_A",
@@ -598,7 +599,11 @@ const LEADERBOARD_DATA = [
           }
         ]
       },
-      "speculative": null,
+      "speculative": {
+        "offline_tok_per_sec": 1718.23,
+        "acceptance_rate": null,
+        "mean_accepted_tokens": null
+      },
       "burst": {
         "burst_steady_qps": 5,
         "burst_peak_qps": 25,
