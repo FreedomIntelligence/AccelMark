@@ -61,8 +61,7 @@
     "extra_scenarios": [
       "interactive",
       "sustained",
-      "online",
-      "speculative"
+      "online"
     ],
     "dataset": "sharegpt_longctx_v1"
   },

@@ -106,5 +106,68 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 7848.84
+  },
+  "nvidia_geforce_rtx_3090x1_suite_A_nvidia_vllm_47f5d58e_e95e2caa": {
+    "chip_name": "NVIDIA GeForce RTX 3090",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1001.2
+  },
+  "nvidia_geforce_rtx_3090x1_suite_F_nvidia_vllm_47f5d58e_faf550ec": {
+    "chip_name": "NVIDIA GeForce RTX 3090",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 8961.38
+  },
+  "nvidia_geforce_rtx_3090x4_suite_E_nvidia_vllm_47f5d58e_81ca6d0e": {
+    "chip_name": "NVIDIA GeForce RTX 3090",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1065.49
+  },
+  "nvidia_geforce_rtx_4090_dx1_suite_A_nvidia_vllm_47f5d58e_d6543f77": {
+    "chip_name": "NVIDIA GeForce RTX 4090 D",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1461.83
+  },
+  "nvidia_geforce_rtx_4090_dx1_suite_C_nvidia_vllm_47f5d58e_b59b0798": {
+    "chip_name": "NVIDIA GeForce RTX 4090 D",
+    "suite_id": "suite_C",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1701.6
+  },
+  "nvidia_geforce_rtx_4090_dx1_suite_F_nvidia_vllm_47f5d58e_06662a14": {
+    "chip_name": "NVIDIA GeForce RTX 4090 D",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 14273.14
+  },
+  "nvidia_geforce_rtx_4090_dx4_suite_E_nvidia_vllm_47f5d58e_bba67533": {
+    "chip_name": "NVIDIA GeForce RTX 4090 D",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1633.89
   }
 }
