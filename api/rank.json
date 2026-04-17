@@ -215,6 +215,33 @@
     "percentile": 100.0,
     "primary_metric": 11972.12
   },
+  "nvidia_a800_sxm4_80gbx8_suite_B_nvidia_vllm_47f5d58e_de0853fa": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1803.59
+  },
+  "nvidia_a800_sxm4_80gbx8_suite_E_nvidia_vllm_47f5d58e_74d08a7a": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3341.37
+  },
+  "nvidia_a800_sxm4_80gbx8_suite_G_nvidia_vllm_47f5d58e_d31ba78b": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_G",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3428.42
+  },
   "nvidia_geforce_rtx_3090x1_suite_A_nvidia_vllm_47f5d58e_e95e2caa": {
     "chip_name": "NVIDIA GeForce RTX 3090",
     "suite_id": "suite_A",
