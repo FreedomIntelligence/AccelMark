@@ -12,6 +12,12 @@
     "median_throughput_tokens_per_sec": 1667.7
   },
   {
+    "name": "NVIDIA H200",
+    "submission_count": 7,
+    "best_throughput_tokens_per_sec": 12862.12,
+    "median_throughput_tokens_per_sec": 5334.3
+  },
+  {
     "name": "NVIDIA A800-SXM4-80GB",
     "submission_count": 4,
     "best_throughput_tokens_per_sec": 11972.12,
