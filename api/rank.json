@@ -143,6 +143,33 @@
     "percentile": 100.0,
     "primary_metric": 10805.85
   },
+  "nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_14410aea": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1704.71
+  },
+  "nvidia_a100_sxm4_40gbx8_suite_E_nvidia_vllm_47f5d58e_e76a4402": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3000.59
+  },
+  "nvidia_a100_sxm4_40gbx8_suite_G_nvidia_vllm_47f5d58e_08de2dc2": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_G",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3217.83
+  },
   "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_A",
@@ -305,6 +332,33 @@
     "percentile": 100.0,
     "primary_metric": 1633.89
   },
+  "nvidia_geforce_rtx_4090x1_suite_A_nvidia_vllm_47f5d58e_675e325e": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1452.3
+  },
+  "nvidia_geforce_rtx_4090x1_suite_C_nvidia_vllm_47f5d58e_6d7e1d48": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_C",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1675.2
+  },
+  "nvidia_geforce_rtx_4090x1_suite_F_nvidia_vllm_47f5d58e_b228454f": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 11440.55
+  },
   "nvidia_geforce_rtx_5090x1_suite_A_nvidia_vllm_47f5d58e_b8f8ed0f": {
     "chip_name": "NVIDIA GeForce RTX 5090",
     "suite_id": "suite_A",
@@ -431,6 +485,33 @@
     "percentile": 100.0,
     "primary_metric": 11716.68
   },
+  "nvidia_h20_3ex8_suite_B_nvidia_vllm_47f5d58e_76ce4cd0": {
+    "chip_name": "NVIDIA H20-3e",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1694.75
+  },
+  "nvidia_h20_3ex8_suite_E_nvidia_vllm_47f5d58e_f0d031f5": {
+    "chip_name": "NVIDIA H20-3e",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 2485.62
+  },
+  "nvidia_h20_3ex8_suite_G_nvidia_vllm_47f5d58e_7bd76bb5": {
+    "chip_name": "NVIDIA H20-3e",
+    "suite_id": "suite_G",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3757.41
+  },
   "nvidia_rtx_a6000x1_suite_A_nvidia_vllm_47f5d58e_7cd0b745": {
     "chip_name": "NVIDIA RTX A6000",
     "suite_id": "suite_A",
@@ -466,6 +547,24 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 798.25
+  },
+  "nvidia_rtx_a6000x8_suite_E_nvidia_vllm_47f5d58e_334507e5": {
+    "chip_name": "NVIDIA RTX A6000",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1929.75
+  },
+  "nvidia_rtx_a6000x8_suite_G_nvidia_vllm_47f5d58e_a8cf2a0f": {
+    "chip_name": "NVIDIA RTX A6000",
+    "suite_id": "suite_G",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1681.33
   },
   "tesla_v100s_pcie_32gbx1_suite_A_nvidia_vllm_47f5d58e_48261ecc": {
     "chip_name": "Tesla V100S-PCIE-32GB",
@@ -520,5 +619,14 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 1172.42
+  },
+  "tesla_v100s_pcie_32gbx8_suite_G_nvidia_vllm_47f5d58e_2ef567be": {
+    "chip_name": "Tesla V100S-PCIE-32GB",
+    "suite_id": "suite_G",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1026.12
   }
 }

@@ -115,6 +115,25 @@
         "best_interactive_ttft_p99_ms": 19.5,
         "best_sustained_throughput_tokens_per_sec": 3972.5,
         "throttle_ratio": 0.963
+      },
+      "suite_B": {
+        "best_throughput_tokens_per_sec": 1704.7,
+        "best_online_max_qps": 25,
+        "best_interactive_ttft_p99_ms": 120.8,
+        "best_sustained_throughput_tokens_per_sec": 164.3,
+        "throttle_ratio": 0.806
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 3000.6,
+        "best_scaling_efficiency_2x": 0.725,
+        "best_scaling_efficiency_4x": 0.47
+      },
+      "suite_G": {
+        "best_throughput_tokens_per_sec": 3217.8,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 1988.4,
+        "best_sustained_throughput_tokens_per_sec": 472.7,
+        "throttle_ratio": 0.902
       }
     }
   },
@@ -250,6 +269,29 @@
       }
     }
   },
+  "NVIDIA GeForce RTX 4090": {
+    "best_throughput_tokens_per_sec": 11440.55,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 1452.3,
+        "best_online_max_qps": 0.0,
+        "best_interactive_ttft_p99_ms": 97.3,
+        "best_sustained_throughput_tokens_per_sec": 339.8,
+        "throttle_ratio": 0.91
+      },
+      "suite_C": {
+        "best_quality_efficiency": 1675.2,
+        "best_quality_efficiency_format": "FP8"
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 11440.5,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 46.2,
+        "best_sustained_throughput_tokens_per_sec": 1698.1,
+        "throttle_ratio": 0.922
+      }
+    }
+  },
   "NVIDIA GeForce RTX 5090": {
     "best_throughput_tokens_per_sec": 15323.19,
     "suites": {
@@ -353,6 +395,25 @@
         "best_interactive_ttft_p99_ms": 43.5,
         "best_sustained_throughput_tokens_per_sec": 1771.6,
         "throttle_ratio": 0.953
+      },
+      "suite_B": {
+        "best_throughput_tokens_per_sec": 1694.8,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 166.7,
+        "best_sustained_throughput_tokens_per_sec": 176.0,
+        "throttle_ratio": 0.847
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 2485.6,
+        "best_scaling_efficiency_2x": 0.772,
+        "best_scaling_efficiency_4x": 0.548
+      },
+      "suite_G": {
+        "best_throughput_tokens_per_sec": 3757.4,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 666.4,
+        "best_sustained_throughput_tokens_per_sec": 561.2,
+        "throttle_ratio": 0.936
       }
     }
   },
@@ -387,6 +448,18 @@
         "best_interactive_ttft_p99_ms": 279.8,
         "best_sustained_throughput_tokens_per_sec": 105.3,
         "throttle_ratio": 0.764
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 1929.8,
+        "best_scaling_efficiency_2x": 0.716,
+        "best_scaling_efficiency_4x": 0.433
+      },
+      "suite_G": {
+        "best_throughput_tokens_per_sec": 1681.3,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 561.1,
+        "best_sustained_throughput_tokens_per_sec": 343.0,
+        "throttle_ratio": 0.893
       }
     }
   },
@@ -429,6 +502,13 @@
         "best_throughput_tokens_per_sec": 1172.4,
         "best_scaling_efficiency_2x": 0.743,
         "best_scaling_efficiency_4x": 0.455
+      },
+      "suite_G": {
+        "best_throughput_tokens_per_sec": 1026.1,
+        "best_online_max_qps": 2,
+        "best_interactive_ttft_p99_ms": 709.4,
+        "best_sustained_throughput_tokens_per_sec": 293.9,
+        "throttle_ratio": 0.811
       }
     }
   }
