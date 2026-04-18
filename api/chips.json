@@ -60,6 +60,12 @@
     "median_throughput_tokens_per_sec": 1065.5
   },
   {
+    "name": "Google TPU v5e",
+    "submission_count": 1,
+    "best_throughput_tokens_per_sec": 8127.1,
+    "median_throughput_tokens_per_sec": 8127.1
+  },
+  {
     "name": "Tesla V100S-PCIE-32GB",
     "submission_count": 7,
     "best_throughput_tokens_per_sec": 7870.64,
@@ -70,6 +76,12 @@
     "submission_count": 6,
     "best_throughput_tokens_per_sec": 7848.84,
     "median_throughput_tokens_per_sec": 1763.7
+  },
+  {
+    "name": "Google TPU v6e",
+    "submission_count": 3,
+    "best_throughput_tokens_per_sec": 6857.53,
+    "median_throughput_tokens_per_sec": 2775.6
   },
   {
     "name": "Huawei Ascend 910B2",
