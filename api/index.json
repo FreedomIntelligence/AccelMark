@@ -341,6 +341,36 @@
       }
     }
   },
+  "NVIDIA H100 80GB HBM3": {
+    "best_throughput_tokens_per_sec": 18910.96,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 5128.3,
+        "best_online_max_qps": 25,
+        "best_interactive_ttft_p99_ms": 29.6,
+        "best_sustained_throughput_tokens_per_sec": 907.1,
+        "throttle_ratio": 0.948
+      },
+      "suite_C": {
+        "best_quality_efficiency": 3789.0,
+        "best_quality_efficiency_format": "FP8"
+      },
+      "suite_D": {
+        "best_throughput_tokens_per_sec": 160.4,
+        "best_online_max_qps": 0.0,
+        "best_interactive_ttft_p99_ms": 1149.0,
+        "best_sustained_throughput_tokens_per_sec": 142.6,
+        "throttle_ratio": 0.8
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 18911.0,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 12.9,
+        "best_sustained_throughput_tokens_per_sec": 6144.7,
+        "throttle_ratio": 0.96
+      }
+    }
+  },
   "NVIDIA H200": {
     "best_throughput_tokens_per_sec": 12862.12,
     "suites": {
@@ -439,6 +469,25 @@
       }
     }
   },
+  "NVIDIA L4": {
+    "best_throughput_tokens_per_sec": 7188.02,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 366.1,
+        "best_online_max_qps": 0.0,
+        "best_interactive_ttft_p99_ms": 271.4,
+        "best_sustained_throughput_tokens_per_sec": 116.6,
+        "throttle_ratio": 0.748
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 7188.0,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 26.6,
+        "best_sustained_throughput_tokens_per_sec": 2837.3,
+        "throttle_ratio": 0.983
+      }
+    }
+  },
   "NVIDIA RTX A6000": {
     "best_throughput_tokens_per_sec": 10433.7,
     "suites": {
@@ -482,6 +531,18 @@
         "best_interactive_ttft_p99_ms": 561.1,
         "best_sustained_throughput_tokens_per_sec": 343.0,
         "throttle_ratio": 0.893
+      }
+    }
+  },
+  "Tesla T4": {
+    "best_throughput_tokens_per_sec": 5125.58,
+    "suites": {
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 5125.6,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 42.8,
+        "best_sustained_throughput_tokens_per_sec": 2006.9,
+        "throttle_ratio": 0.982
       }
     }
   },

@@ -1,5 +1,11 @@
 [
   {
+    "name": "NVIDIA H100 80GB HBM3",
+    "submission_count": 4,
+    "best_throughput_tokens_per_sec": 18910.96,
+    "median_throughput_tokens_per_sec": 4458.7
+  },
+  {
     "name": "NVIDIA GeForce RTX 5090",
     "submission_count": 3,
     "best_throughput_tokens_per_sec": 15323.19,
@@ -78,10 +84,22 @@
     "median_throughput_tokens_per_sec": 1763.7
   },
   {
+    "name": "NVIDIA L4",
+    "submission_count": 2,
+    "best_throughput_tokens_per_sec": 7188.02,
+    "median_throughput_tokens_per_sec": 3777.1
+  },
+  {
     "name": "Google TPU v6e",
     "submission_count": 3,
     "best_throughput_tokens_per_sec": 6857.53,
     "median_throughput_tokens_per_sec": 2775.6
+  },
+  {
+    "name": "Tesla T4",
+    "submission_count": 1,
+    "best_throughput_tokens_per_sec": 5125.58,
+    "median_throughput_tokens_per_sec": 5125.6
   },
   {
     "name": "Huawei Ascend 910B2",

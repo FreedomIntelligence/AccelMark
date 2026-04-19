@@ -422,6 +422,42 @@
     "percentile": 100.0,
     "primary_metric": 15323.19
   },
+  "nvidia_h100_80gb_hbm3x1_suite_A_nvidia_vllm_47f5d58e_831c95a7": {
+    "chip_name": "NVIDIA H100 80GB HBM3",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 5128.31
+  },
+  "nvidia_h100_80gb_hbm3x1_suite_C_nvidia_vllm_47f5d58e_a4a8716a": {
+    "chip_name": "NVIDIA H100 80GB HBM3",
+    "suite_id": "suite_C",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 3789.0
+  },
+  "nvidia_h100_80gb_hbm3x1_suite_D_nvidia_vllm_47f5d58e_02748da4": {
+    "chip_name": "NVIDIA H100 80GB HBM3",
+    "suite_id": "suite_D",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 160.38
+  },
+  "nvidia_h100_80gb_hbm3x1_suite_F_nvidia_vllm_47f5d58e_2c0b7beb": {
+    "chip_name": "NVIDIA H100 80GB HBM3",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 18910.96
+  },
   "nvidia_h200x1_suite_A_nvidia_vllm_47f5d58e_29b2ec38": {
     "chip_name": "NVIDIA H200",
     "suite_id": "suite_A",
@@ -548,6 +584,24 @@
     "percentile": 100.0,
     "primary_metric": 3757.41
   },
+  "nvidia_l4x1_suite_A_nvidia_vllm_47f5d58e_b991b4c1": {
+    "chip_name": "NVIDIA L4",
+    "suite_id": "suite_A",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 366.08
+  },
+  "nvidia_l4x1_suite_F_nvidia_vllm_47f5d58e_d58fa923": {
+    "chip_name": "NVIDIA L4",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 7188.02
+  },
   "nvidia_rtx_a6000x1_suite_A_nvidia_vllm_47f5d58e_7cd0b745": {
     "chip_name": "NVIDIA RTX A6000",
     "suite_id": "suite_A",
@@ -601,6 +655,15 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 1681.33
+  },
+  "tesla_t4x1_suite_F_nvidia_vllm_47f5d58e_4660bc0b": {
+    "chip_name": "Tesla T4",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 5125.58
   },
   "tesla_v100s_pcie_32gbx1_suite_A_nvidia_vllm_47f5d58e_48261ecc": {
     "chip_name": "Tesla V100S-PCIE-32GB",
