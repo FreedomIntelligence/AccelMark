@@ -66,6 +66,12 @@
     "median_throughput_tokens_per_sec": 1065.5
   },
   {
+    "name": "NVIDIA RTX 6000 Ada Generation",
+    "submission_count": 4,
+    "best_throughput_tokens_per_sec": 8248.35,
+    "median_throughput_tokens_per_sec": 1703.6
+  },
+  {
     "name": "Google TPU v5e",
     "submission_count": 1,
     "best_throughput_tokens_per_sec": 8127.1,

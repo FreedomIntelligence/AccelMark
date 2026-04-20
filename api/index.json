@@ -488,6 +488,36 @@
       }
     }
   },
+  "NVIDIA RTX 6000 Ada Generation": {
+    "best_throughput_tokens_per_sec": 8248.35,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 1860.0,
+        "best_online_max_qps": 5,
+        "best_interactive_ttft_p99_ms": 102.3,
+        "best_sustained_throughput_tokens_per_sec": 376.2,
+        "throttle_ratio": 0.901
+      },
+      "suite_C": {
+        "best_quality_efficiency": 1547.2,
+        "best_quality_efficiency_format": "FP8"
+      },
+      "suite_D": {
+        "best_throughput_tokens_per_sec": 33.2,
+        "best_online_max_qps": 0.0,
+        "best_interactive_ttft_p99_ms": 6197.3,
+        "best_sustained_throughput_tokens_per_sec": 32.3,
+        "throttle_ratio": 0.461
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 8248.4,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 54.6,
+        "best_sustained_throughput_tokens_per_sec": 2895.0,
+        "throttle_ratio": 0.773
+      }
+    }
+  },
   "NVIDIA RTX A6000": {
     "best_throughput_tokens_per_sec": 10433.7,
     "suites": {
