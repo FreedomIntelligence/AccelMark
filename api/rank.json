@@ -404,6 +404,33 @@
     "percentile": 100.0,
     "primary_metric": 11440.55
   },
+  "nvidia_geforce_rtx_4090x8_suite_B_nvidia_vllm_47f5d58e_cfd0bdc8": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_B",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 442.95
+  },
+  "nvidia_geforce_rtx_4090x8_suite_E_nvidia_vllm_47f5d58e_54dccbd0": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_E",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1609.89
+  },
+  "nvidia_geforce_rtx_4090x8_suite_G_nvidia_vllm_47f5d58e_a4179ecc": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_G",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1361.9
+  },
   "nvidia_geforce_rtx_5090x1_suite_A_nvidia_vllm_47f5d58e_b8f8ed0f": {
     "chip_name": "NVIDIA GeForce RTX 5090",
     "suite_id": "suite_A",
