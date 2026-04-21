@@ -27319,21 +27319,21 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_A",
     "scenario": "all",
-    "primary_metric": 5730.96,
+    "primary_metric": 4677.49,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 5731.0,
-    "offline_throughput": 5730.96,
+    "tokens_per_sec_per_chip": 4677.5,
+    "offline_throughput": 4677.49,
     "online_max_qps": 5,
-    "interactive_ttft_p99": 36.48,
+    "interactive_ttft_p99": 52.8,
     "peak_memory_gb": 123.76,
     "memory_utilization_pct": 88.1,
-    "memory_efficiency_toks_per_gb": 46.3,
+    "memory_efficiency_toks_per_gb": 37.8,
     "min_price_usd_per_hr": 3.99,
-    "cost_efficiency_toks_per_dollar_hr": 1436.0,
+    "cost_efficiency_toks_per_dollar_hr": 1172.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.61,
-    "date": "2026-04-15",
+    "date": "2026-04-20",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
     "notes": null,
@@ -27349,17 +27349,17 @@ const LEADERBOARD_DATA = [
     "quant_int8_speedup": null,
     "quant_int4_speedup": null,
     "quant_quality_eff": null,
-    "sustained_throughput": 709.2,
-    "throttle_ratio": 0.791,
-    "throttle_onset_minute": 4.0,
-    "ttft_p99_drift_ms": 45.9,
+    "sustained_throughput": 856.3,
+    "throttle_ratio": 0.956,
+    "throttle_onset_minute": null,
+    "ttft_p99_drift_ms": -3.5,
     "sustained_concurrency": 8,
-    "speculative_throughput": 1965.64,
-    "speculative_speedup": 0.343,
+    "speculative_throughput": 1280.94,
+    "speculative_speedup": 0.274,
     "speculative_acceptance": null,
-    "burst_degradation": 472.28,
-    "burst_steady_p99": 83.68,
-    "burst_p99": 39522.08,
+    "burst_degradation": 441.975,
+    "burst_steady_p99": 72.62,
+    "burst_p99": 32097.12,
     "burst_sla_met": false,
     "detail": {
       "hw_chip": "NVIDIA H200",
@@ -27404,16 +27404,16 @@ const LEADERBOARD_DATA = [
       "run_pp": 1,
       "run_dp": 1,
       "acc_score": 0.61,
-      "acc_baseline_delta": 0.02,
+      "acc_baseline_delta": 0.01,
       "acc_valid": true,
       "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
-      "meta_date": "2026-04-15",
+      "meta_date": "2026-04-20",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 73.2,
-      "meta_model_load_sec": 104.1,
-      "meta_start_time": "2026-04-15T10:15:40.803524+00:00",
+      "meta_elapsed_min": 73.9,
+      "meta_model_load_sec": 74.3,
+      "meta_start_time": "2026-04-20T05:57:16.891452+00:00",
       "meta_notes": null
     },
     "viz": {
@@ -27425,9 +27425,9 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          4863.23,
-          4856.79,
-          5730.96
+          4645.18,
+          4668.71,
+          4677.49
         ],
         "memory_gb": [
           123.76,
@@ -27442,19 +27442,19 @@ const LEADERBOARD_DATA = [
           "100"
         ],
         "ttft_p50": [
-          45.43,
-          69.22,
-          129.35
+          37.42,
+          69.41,
+          122.48
         ],
         "ttft_p90": [
-          60.21,
-          107.71,
-          1970.46
+          53.33,
+          104.29,
+          1866.43
         ],
         "tpot_p50": [
-          14.16,
-          56.85,
-          60.58
+          10.93,
+          49.0,
+          51.84
         ],
         "sla_met": [
           true,
@@ -27464,12 +27464,12 @@ const LEADERBOARD_DATA = [
         "max_valid_qps": 5
       },
       "interactive": {
-        "ttft_p50": 27.89,
-        "ttft_p90": 31.57,
-        "ttft_p99": 36.48,
-        "tpot_p50": 7.62,
-        "tpot_p90": 7.73,
-        "tpot_p99": 7.96
+        "ttft_p50": 34.3,
+        "ttft_p90": 42.0,
+        "ttft_p99": 52.8,
+        "tpot_p50": 7.63,
+        "tpot_p90": 7.81,
+        "tpot_p99": 8.02
       },
       "sustained": {
         "minutes": [
@@ -27504,66 +27504,66 @@ const LEADERBOARD_DATA = [
           29.0
         ],
         "throughput": [
-          796.7,
-          851.5,
-          842.9,
-          677.1,
-          719.3,
-          673.5,
-          699.1,
-          702.7,
-          686.1,
-          706.4,
-          676.1,
-          719.9,
-          690.8,
-          711.4,
-          703.6,
-          704.7,
-          700.4,
-          699.5,
-          694.9,
-          707.4,
-          674.7,
-          705.4,
-          705.4,
-          713.4,
-          690.6,
-          696.4,
-          701.8,
-          696.1,
-          705.6
+          806.2,
+          847.2,
+          842.1,
+          845.6,
+          836.1,
+          864.8,
+          847.9,
+          838.5,
+          843.9,
+          850.7,
+          839.8,
+          864.9,
+          868.0,
+          866.1,
+          860.4,
+          870.9,
+          867.7,
+          864.5,
+          840.8,
+          860.4,
+          874.7,
+          860.5,
+          844.6,
+          866.3,
+          845.7,
+          866.0,
+          866.0,
+          867.2,
+          864.6
         ],
         "ttft_p99": [
-          90.1,
-          36.4,
-          36.9,
-          67.8,
-          64.9,
-          83.9,
-          80.5,
-          81.7,
-          65.9,
-          62.0,
-          63.4,
-          67.9,
-          76.1,
-          66.9,
-          83.8,
-          69.0,
-          66.6,
-          78.2,
-          62.4,
-          76.0,
-          67.4,
-          76.6,
-          61.8,
-          84.8,
-          82.9,
-          80.8,
-          65.6,
-          60.5,
-          82.3
+          110.9,
+          55.9,
+          51.7,
+          46.1,
+          52.3,
+          52.3,
+          52.9,
+          52.5,
+          50.1,
+          49.6,
+          49.9,
+          52.0,
+          50.4,
+          50.4,
+          49.0,
+          50.9,
+          48.1,
+          49.2,
+          62.5,
+          50.8,
+          53.8,
+          47.7,
+          51.3,
+          52.1,
+          50.7,
+          50.5,
+          49.1,
+          49.6,
+          52.4
         ],
         "is_warmup": [
           true,
@@ -27599,340 +27599,340 @@ const LEADERBOARD_DATA = [
         "sustained_concurrency": 8,
         "duration_minutes": 30,
         "warmup_minutes": 2,
-        "sustained_throughput": 709.2,
-        "throttle_ratio": 0.791,
-        "throttle_onset_minute": 4.0,
-        "ttft_p99_drift_ms": 45.9,
+        "sustained_throughput": 856.3,
+        "throttle_ratio": 0.956,
+        "throttle_onset_minute": null,
+        "ttft_p99_drift_ms": -3.5,
         "samples": [
           {
             "minute": 1.0,
             "is_warmup": true,
-            "throughput_tokens_per_sec": 796.7,
-            "tokens_out": 47806,
+            "throughput_tokens_per_sec": 806.2,
+            "tokens_out": 48397,
             "tokens_in": 0,
-            "requests_completed": 142,
-            "ttft_ms_p50": 29.6,
-            "ttft_ms_p99": 90.1
+            "requests_completed": 144,
+            "ttft_ms_p50": 34.4,
+            "ttft_ms_p99": 110.9
           },
           {
             "minute": 2.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 851.5,
-            "tokens_out": 51103,
+            "throughput_tokens_per_sec": 847.2,
+            "tokens_out": 50829,
             "tokens_in": 0,
-            "requests_completed": 147,
-            "ttft_ms_p50": 28.5,
-            "ttft_ms_p99": 36.4
+            "requests_completed": 146,
+            "ttft_ms_p50": 33.9,
+            "ttft_ms_p99": 55.9
           },
           {
             "minute": 3.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 842.9,
-            "tokens_out": 50563,
+            "throughput_tokens_per_sec": 842.1,
+            "tokens_out": 50509,
             "tokens_in": 0,
-            "requests_completed": 146,
-            "ttft_ms_p50": 28.4,
-            "ttft_ms_p99": 36.9
+            "requests_completed": 147,
+            "ttft_ms_p50": 33.3,
+            "ttft_ms_p99": 51.7
           },
           {
             "minute": 4.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 677.1,
-            "tokens_out": 40626,
+            "throughput_tokens_per_sec": 845.6,
+            "tokens_out": 50758,
             "tokens_in": 0,
-            "requests_completed": 117,
-            "ttft_ms_p50": 54.4,
-            "ttft_ms_p99": 67.8
+            "requests_completed": 145,
+            "ttft_ms_p50": 33.9,
+            "ttft_ms_p99": 46.1
           },
           {
             "minute": 5.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 719.3,
-            "tokens_out": 43163,
+            "throughput_tokens_per_sec": 836.1,
+            "tokens_out": 50174,
             "tokens_in": 0,
-            "requests_completed": 123,
-            "ttft_ms_p50": 52.4,
-            "ttft_ms_p99": 64.9
+            "requests_completed": 145,
+            "ttft_ms_p50": 32.3,
+            "ttft_ms_p99": 52.3
           },
           {
             "minute": 6.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 673.5,
-            "tokens_out": 40403,
+            "throughput_tokens_per_sec": 864.8,
+            "tokens_out": 51894,
             "tokens_in": 0,
-            "requests_completed": 117,
-            "ttft_ms_p50": 52.3,
-            "ttft_ms_p99": 83.9
+            "requests_completed": 148,
+            "ttft_ms_p50": 32.3,
+            "ttft_ms_p99": 52.3
           },
           {
             "minute": 7.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 699.1,
-            "tokens_out": 41942,
+            "throughput_tokens_per_sec": 847.9,
+            "tokens_out": 50879,
             "tokens_in": 0,
-            "requests_completed": 119,
-            "ttft_ms_p50": 51.9,
-            "ttft_ms_p99": 80.5
+            "requests_completed": 146,
+            "ttft_ms_p50": 32.8,
+            "ttft_ms_p99": 52.9
           },
           {
             "minute": 8.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 702.7,
-            "tokens_out": 42186,
+            "throughput_tokens_per_sec": 838.5,
+            "tokens_out": 50306,
             "tokens_in": 0,
-            "requests_completed": 126,
-            "ttft_ms_p50": 52.4,
-            "ttft_ms_p99": 81.7
+            "requests_completed": 145,
+            "ttft_ms_p50": 32.6,
+            "ttft_ms_p99": 52.5
           },
           {
             "minute": 9.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 686.1,
-            "tokens_out": 41166,
+            "throughput_tokens_per_sec": 843.9,
+            "tokens_out": 50629,
             "tokens_in": 0,
-            "requests_completed": 117,
-            "ttft_ms_p50": 53.1,
-            "ttft_ms_p99": 65.9
+            "requests_completed": 145,
+            "ttft_ms_p50": 32.9,
+            "ttft_ms_p99": 50.1
           },
           {
             "minute": 10.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 706.4,
-            "tokens_out": 42372,
+            "throughput_tokens_per_sec": 850.7,
+            "tokens_out": 51045,
             "tokens_in": 0,
-            "requests_completed": 121,
-            "ttft_ms_p50": 51.2,
-            "ttft_ms_p99": 62.0
+            "requests_completed": 150,
+            "ttft_ms_p50": 33.0,
+            "ttft_ms_p99": 49.6
           },
           {
             "minute": 11.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 676.1,
-            "tokens_out": 40558,
+            "throughput_tokens_per_sec": 839.8,
+            "tokens_out": 50393,
             "tokens_in": 0,
-            "requests_completed": 117,
-            "ttft_ms_p50": 52.2,
-            "ttft_ms_p99": 63.4
+            "requests_completed": 144,
+            "ttft_ms_p50": 33.7,
+            "ttft_ms_p99": 49.9
           },
           {
             "minute": 12.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 719.9,
-            "tokens_out": 43218,
+            "throughput_tokens_per_sec": 864.9,
+            "tokens_out": 51876,
             "tokens_in": 0,
-            "requests_completed": 123,
-            "ttft_ms_p50": 52.4,
-            "ttft_ms_p99": 67.9
+            "requests_completed": 150,
+            "ttft_ms_p50": 32.8,
+            "ttft_ms_p99": 52.0
           },
           {
             "minute": 13.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 690.8,
-            "tokens_out": 41422,
+            "throughput_tokens_per_sec": 868.0,
+            "tokens_out": 52076,
             "tokens_in": 0,
-            "requests_completed": 123,
-            "ttft_ms_p50": 51.2,
-            "ttft_ms_p99": 76.1
+            "requests_completed": 150,
+            "ttft_ms_p50": 32.4,
+            "ttft_ms_p99": 50.4
           },
           {
             "minute": 14.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 711.4,
-            "tokens_out": 42693,
+            "throughput_tokens_per_sec": 866.1,
+            "tokens_out": 51962,
             "tokens_in": 0,
-            "requests_completed": 122,
-            "ttft_ms_p50": 51.7,
-            "ttft_ms_p99": 66.9
+            "requests_completed": 151,
+            "ttft_ms_p50": 33.0,
+            "ttft_ms_p99": 50.4
           },
           {
             "minute": 15.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 703.6,
-            "tokens_out": 42203,
+            "throughput_tokens_per_sec": 860.4,
+            "tokens_out": 51617,
             "tokens_in": 0,
-            "requests_completed": 122,
-            "ttft_ms_p50": 51.3,
-            "ttft_ms_p99": 83.8
+            "requests_completed": 147,
+            "ttft_ms_p50": 33.5,
+            "ttft_ms_p99": 49.0
           },
           {
             "minute": 16.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 704.7,
-            "tokens_out": 42317,
+            "throughput_tokens_per_sec": 870.9,
+            "tokens_out": 52262,
             "tokens_in": 0,
-            "requests_completed": 120,
-            "ttft_ms_p50": 51.7,
-            "ttft_ms_p99": 69.0
+            "requests_completed": 152,
+            "ttft_ms_p50": 32.1,
+            "ttft_ms_p99": 50.9
           },
           {
             "minute": 17.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 700.4,
-            "tokens_out": 42011,
+            "throughput_tokens_per_sec": 867.7,
+            "tokens_out": 52076,
             "tokens_in": 0,
-            "requests_completed": 123,
-            "ttft_ms_p50": 51.4,
-            "ttft_ms_p99": 66.6
+            "requests_completed": 150,
+            "ttft_ms_p50": 33.1,
+            "ttft_ms_p99": 48.1
           },
           {
             "minute": 18.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 699.5,
-            "tokens_out": 41976,
+            "throughput_tokens_per_sec": 864.5,
+            "tokens_out": 51874,
             "tokens_in": 0,
-            "requests_completed": 121,
-            "ttft_ms_p50": 51.7,
-            "ttft_ms_p99": 78.2
+            "requests_completed": 150,
+            "ttft_ms_p50": 32.1,
+            "ttft_ms_p99": 49.2
           },
           {
             "minute": 19.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 694.9,
-            "tokens_out": 41684,
+            "throughput_tokens_per_sec": 840.8,
+            "tokens_out": 50434,
             "tokens_in": 0,
-            "requests_completed": 119,
-            "ttft_ms_p50": 52.8,
-            "ttft_ms_p99": 62.4
+            "requests_completed": 145,
+            "ttft_ms_p50": 34.4,
+            "ttft_ms_p99": 62.5
           },
           {
             "minute": 20.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 707.4,
-            "tokens_out": 42459,
+            "throughput_tokens_per_sec": 860.4,
+            "tokens_out": 51639,
             "tokens_in": 0,
-            "requests_completed": 124,
-            "ttft_ms_p50": 51.3,
-            "ttft_ms_p99": 76.0
+            "requests_completed": 151,
+            "ttft_ms_p50": 32.3,
+            "ttft_ms_p99": 50.8
           },
           {
             "minute": 21.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 674.7,
-            "tokens_out": 40461,
+            "throughput_tokens_per_sec": 874.7,
+            "tokens_out": 52463,
             "tokens_in": 0,
-            "requests_completed": 116,
-            "ttft_ms_p50": 52.1,
-            "ttft_ms_p99": 67.4
+            "requests_completed": 149,
+            "ttft_ms_p50": 32.8,
+            "ttft_ms_p99": 53.8
           },
           {
             "minute": 22.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 705.4,
-            "tokens_out": 42345,
+            "throughput_tokens_per_sec": 860.5,
+            "tokens_out": 51644,
             "tokens_in": 0,
-            "requests_completed": 123,
-            "ttft_ms_p50": 51.9,
-            "ttft_ms_p99": 76.6
+            "requests_completed": 151,
+            "ttft_ms_p50": 32.5,
+            "ttft_ms_p99": 47.7
           },
           {
             "minute": 23.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 705.4,
-            "tokens_out": 42307,
+            "throughput_tokens_per_sec": 844.6,
+            "tokens_out": 50678,
             "tokens_in": 0,
-            "requests_completed": 123,
-            "ttft_ms_p50": 51.6,
-            "ttft_ms_p99": 61.8
+            "requests_completed": 144,
+            "ttft_ms_p50": 33.1,
+            "ttft_ms_p99": 51.3
           },
           {
             "minute": 24.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 713.4,
-            "tokens_out": 42810,
+            "throughput_tokens_per_sec": 866.3,
+            "tokens_out": 51964,
             "tokens_in": 0,
-            "requests_completed": 121,
-            "ttft_ms_p50": 51.2,
-            "ttft_ms_p99": 84.8
+            "requests_completed": 153,
+            "ttft_ms_p50": 33.3,
+            "ttft_ms_p99": 52.1
           },
           {
             "minute": 25.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 690.6,
-            "tokens_out": 41420,
+            "throughput_tokens_per_sec": 845.7,
+            "tokens_out": 50752,
             "tokens_in": 0,
-            "requests_completed": 120,
-            "ttft_ms_p50": 53.7,
-            "ttft_ms_p99": 82.9
+            "requests_completed": 144,
+            "ttft_ms_p50": 32.9,
+            "ttft_ms_p99": 50.7
           },
           {
             "minute": 26.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 696.4,
-            "tokens_out": 41787,
+            "throughput_tokens_per_sec": 866.0,
+            "tokens_out": 51976,
             "tokens_in": 0,
-            "requests_completed": 119,
-            "ttft_ms_p50": 51.8,
-            "ttft_ms_p99": 80.8
+            "requests_completed": 151,
+            "ttft_ms_p50": 32.6,
+            "ttft_ms_p99": 50.5
           },
           {
             "minute": 27.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 701.8,
-            "tokens_out": 42100,
+            "throughput_tokens_per_sec": 866.0,
+            "tokens_out": 51928,
             "tokens_in": 0,
-            "requests_completed": 125,
-            "ttft_ms_p50": 51.1,
-            "ttft_ms_p99": 65.6
+            "requests_completed": 149,
+            "ttft_ms_p50": 32.6,
+            "ttft_ms_p99": 49.1
           },
           {
             "minute": 28.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 696.1,
-            "tokens_out": 41764,
+            "throughput_tokens_per_sec": 867.2,
+            "tokens_out": 52051,
             "tokens_in": 0,
-            "requests_completed": 119,
-            "ttft_ms_p50": 51.8,
-            "ttft_ms_p99": 60.5
+            "requests_completed": 152,
+            "ttft_ms_p50": 32.9,
+            "ttft_ms_p99": 49.6
           },
           {
             "minute": 29.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 705.6,
-            "tokens_out": 42363,
+            "throughput_tokens_per_sec": 864.6,
+            "tokens_out": 51858,
             "tokens_in": 0,
-            "requests_completed": 122,
-            "ttft_ms_p50": 52.2,
-            "ttft_ms_p99": 82.3
+            "requests_completed": 148,
+            "ttft_ms_p50": 33.5,
+            "ttft_ms_p99": 52.4
           }
         ]
       },
       "speculative": {
-        "offline_tok_per_sec": 1965.64,
+        "offline_tok_per_sec": 1280.94,
         "acceptance_rate": null,
         "mean_accepted_tokens": null
       },
       "burst": {
         "burst_steady_qps": 5,
         "burst_peak_qps": 25,
-        "steady_ttft_p50_ms": 46.63,
-        "steady_ttft_p99_ms": 83.68,
-        "burst_ttft_p50_ms": 14831.71,
-        "burst_ttft_p99_ms": 39522.08,
+        "steady_ttft_p50_ms": 41.66,
+        "steady_ttft_p99_ms": 72.62,
+        "burst_ttft_p50_ms": 10508.29,
+        "burst_ttft_p99_ms": 32097.12,
         "steady_requests_total": 1812,
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
-        "burst_degradation_ratio": 472.28,
+        "burst_degradation_ratio": 441.975,
         "results_by_cycle": [
           {
             "cycle": 1,
             "steady_requests": 581,
             "burst_requests": 760,
-            "steady_ttft_p99_ms": 79.45,
-            "burst_ttft_p99_ms": 38831.06
+            "steady_ttft_p99_ms": 72.37,
+            "burst_ttft_p99_ms": 32217.75
           },
           {
             "cycle": 2,
             "steady_requests": 595,
             "burst_requests": 734,
-            "steady_ttft_p99_ms": 111.45,
-            "burst_ttft_p99_ms": 36753.81
+            "steady_ttft_p99_ms": 83.42,
+            "burst_ttft_p99_ms": 29912.71
           },
           {
             "cycle": 3,
             "steady_requests": 636,
             "burst_requests": 751,
-            "steady_ttft_p99_ms": 83.09,
-            "burst_ttft_p99_ms": 40101.38
+            "steady_ttft_p99_ms": 70.79,
+            "burst_ttft_p99_ms": 32289.73
           }
         ]
       }
@@ -27964,18 +27964,18 @@ const LEADERBOARD_DATA = [
     "framework": "vLLM",
     "framework_version": "0.7.3",
     "model": "Llama-3.1-8B-Instruct",
-    "precision": "BF16",
-    "precision_fallback": false,
-    "precision_emulated": false,
+    "precision": "FP8",
+    "precision_fallback": true,
+    "precision_emulated": true,
     "effective_dtype": "bfloat16",
-    "quantization_method": null,
+    "quantization_method": "compressed-tensors",
     "model_source": "local",
     "model_name": null,
     "model_format": "HuggingFace original",
     "architecture": "dense",
     "suite": "suite_C",
     "scenario": "all",
-    "primary_metric": 6195.58,
+    "primary_metric": 6308.33,
     "primary_metric_label": "tokens/sec (FP8)",
     "tokens_per_sec_per_chip": null,
     "offline_throughput": null,
@@ -27987,9 +27987,9 @@ const LEADERBOARD_DATA = [
     "min_price_usd_per_hr": 3.99,
     "cost_efficiency_toks_per_dollar_hr": null,
     "tokens_per_watt": null,
-    "accuracy_valid": null,
-    "accuracy_score": null,
-    "date": "2026-04-14",
+    "accuracy_valid": true,
+    "accuracy_score": 0.56,
+    "date": "2026-04-20",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
     "notes": null,
@@ -27999,12 +27999,12 @@ const LEADERBOARD_DATA = [
     "scaling_efficiency_2x": null,
     "scaling_efficiency_4x": null,
     "scaling_base_throughput": null,
-    "quant_bf16_throughput": 5333.35,
-    "quant_best_throughput": 6195.58,
+    "quant_bf16_throughput": 4694.9,
+    "quant_best_throughput": 6308.33,
     "quant_best_precision": "FP8",
-    "quant_int8_speedup": 0.955,
-    "quant_int4_speedup": 0.615,
-    "quant_quality_eff": 3626.5,
+    "quant_int8_speedup": 0.92,
+    "quant_int4_speedup": 0.75,
+    "quant_quality_eff": 3785.0,
     "sustained_throughput": null,
     "throttle_ratio": null,
     "throttle_onset_minute": null,
@@ -28022,7 +28022,7 @@ const LEADERBOARD_DATA = [
       "hw_vendor": "NVIDIA",
       "hw_count": 1,
       "hw_memory_gb": 140.4,
-      "hw_interconnect_intra": "NVLink 18 (full mesh)",
+      "hw_interconnect_intra": null,
       "hw_interconnect_inter": null,
       "hw_cpu": "INTEL(R) XEON(R) PLATINUM 8558, 96 cores",
       "hw_system_memory_gb": 2015.5,
@@ -28036,15 +28036,15 @@ const LEADERBOARD_DATA = [
       "sw_python": "3.10.18",
       "sw_pytorch": "2.5.1+cu124",
       "model_id": "meta-llama/Llama-3.1-8B-Instruct",
-      "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+      "model_revision": "12fd6884d2585dd4d020373e7f39f74507b31866",
       "model_name": null,
-      "model_note": null,
+      "model_note": "FP8 quantized by RedHatAI using llm-compressor. Weights and activations in FP8. Native speedup on H100/MI300X; computed in BF16 on A100.",
       "model_source": "local",
       "model_arch": "dense",
       "model_params_b": 8.0,
-      "model_precision": "BF16",
+      "model_precision": "FP8",
       "model_effective_dtype": "bfloat16",
-      "model_quant_method": null,
+      "model_quant_method": "compressed-tensors",
       "model_format": "HuggingFace original",
       "run_scenarios": [
         "accuracy",
@@ -28057,17 +28057,17 @@ const LEADERBOARD_DATA = [
       "run_tp": 1,
       "run_pp": 1,
       "run_dp": 1,
-      "acc_score": null,
-      "acc_baseline_delta": null,
-      "acc_valid": null,
-      "acc_notes": null,
+      "acc_score": 0.56,
+      "acc_baseline_delta": 0.0,
+      "acc_valid": true,
+      "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
-      "meta_date": "2026-04-14",
+      "meta_date": "2026-04-20",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 136.6,
-      "meta_model_load_sec": 108.5,
-      "meta_start_time": "2026-04-14T13:31:27.543833+00:00",
+      "meta_elapsed_min": 109.3,
+      "meta_model_load_sec": 82.8,
+      "meta_start_time": "2026-04-20T06:15:24.762178+00:00",
       "meta_notes": null
     },
     "viz": {
@@ -28080,30 +28080,30 @@ const LEADERBOARD_DATA = [
         "W4A16"
       ],
       "throughput": [
-        5333.35,
-        6195.58,
-        6146.56,
-        5093.12,
-        3278.96
+        4694.9,
+        6308.33,
+        4955.02,
+        4332.92,
+        3498.32
       ],
       "speedup": [
         1.0,
-        1.162,
-        1.152,
-        0.955,
-        0.615
+        1.34,
+        1.06,
+        0.92,
+        0.75
       ],
       "quality_efficiency": [
-        3040.0,
-        3531.5,
-        3626.5,
-        2954.0,
-        1803.4
+        2629.1,
+        3785.0,
+        2873.9,
+        2513.1,
+        1924.1
       ],
       "accuracies": [
-        0.57,
-        0.57,
-        0.59,
+        0.56,
+        0.6,
+        0.58,
         0.58,
         0.55
       ],
@@ -28116,9 +28116,9 @@ const LEADERBOARD_DATA = [
       ],
       "acc_deltas": [
         0.0,
-        0.0,
-        0.0,
-        0.01,
+        0.02,
+        -0.01,
+        -0.01,
         -0.02
       ],
       "effective_dtypes": [
@@ -28135,8 +28135,8 @@ const LEADERBOARD_DATA = [
         "compressed-tensors",
         "gptq"
       ],
-      "best_quality_eff": 3626.5,
-      "bf16_throughput": 5333.35,
+      "best_quality_eff": 3785.0,
+      "bf16_throughput": 4694.9,
       "online_by_precision": [
         {
           "precision": "BF16",
@@ -28148,16 +28148,16 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            80.71,
-            142.5,
-            269.72,
-            2064.76
+            44.63,
+            67.73,
+            68.78,
+            75.17
           ],
           "ttft_p99": [
-            226.87,
-            323.16,
-            6304.2,
-            8827.12
+            77.84,
+            108.45,
+            1635.02,
+            5797.72
           ],
           "sla_met": [
             true,
@@ -28176,16 +28176,16 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            80.73,
-            144.09,
-            260.37,
-            1480.98
+            54.35,
+            75.3,
+            77.81,
+            82.62
           ],
           "ttft_p99": [
-            236.1,
-            349.19,
-            6155.12,
-            8110.73
+            90.21,
+            118.53,
+            2299.07,
+            5796.69
           ],
           "sla_met": [
             true,
@@ -28204,16 +28204,16 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            81.02,
-            142.65,
-            259.16,
-            2061.47
+            55.82,
+            110.14,
+            122.83,
+            135.84
           ],
           "ttft_p99": [
-            238.13,
-            355.49,
-            6680.53,
-            8834.02
+            101.24,
+            180.79,
+            5549.92,
+            9828.66
           ],
           "sla_met": [
             true,
@@ -28232,16 +28232,16 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            80.96,
-            139.2,
-            251.25,
-            1559.76
+            50.77,
+            73.93,
+            75.83,
+            87.06
           ],
           "ttft_p99": [
-            228.42,
-            379.07,
-            6750.84,
-            8622.9
+            82.68,
+            123.59,
+            1953.3,
+            6897.55
           ],
           "sla_met": [
             true,
@@ -28260,16 +28260,16 @@ const LEADERBOARD_DATA = [
             "50"
           ],
           "ttft_p50": [
-            92.58,
-            162.02,
-            276.95,
-            2145.55
+            50.62,
+            108.06,
+            123.35,
+            140.97
           ],
           "ttft_p99": [
-            235.64,
-            344.76,
-            6744.23,
-            9369.29
+            85.95,
+            181.01,
+            5133.94,
+            7362.14
           ],
           "sla_met": [
             true,
@@ -28282,10 +28282,10 @@ const LEADERBOARD_DATA = [
       "sustained_by_precision": [
         {
           "precision": "BF16",
-          "sustained_throughput_tokens_per_sec": 709.4,
-          "throttle_ratio": 0.868,
-          "throttle_onset_minute": 13.0,
-          "ttft_p99_drift_ms": -149.4,
+          "sustained_throughput_tokens_per_sec": 705.0,
+          "throttle_ratio": 0.843,
+          "throttle_onset_minute": 2.0,
+          "ttft_p99_drift_ms": -52.7,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -28304,20 +28304,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            709.5,
-            703.8,
-            729.3,
-            727.1,
-            713.1,
-            728.9,
-            721.0,
-            715.9,
-            726.3,
-            734.4,
-            716.6,
-            727.1,
-            641.9,
-            637.4
+            793.2,
+            700.7,
+            720.2,
+            684.8,
+            694.8,
+            714.9,
+            668.5,
+            719.1,
+            702.1,
+            684.7,
+            694.6,
+            715.3,
+            668.3,
+            709.2
           ],
           "is_warmup": [
             false,
@@ -28338,10 +28338,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "FP8",
-          "sustained_throughput_tokens_per_sec": 713.4,
-          "throttle_ratio": 0.888,
-          "throttle_onset_minute": 4.0,
-          "ttft_p99_drift_ms": -69.4,
+          "sustained_throughput_tokens_per_sec": 753.8,
+          "throttle_ratio": 0.918,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -23.7,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -28360,20 +28360,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            736.7,
-            762.2,
-            721.6,
-            676.8,
-            719.7,
-            711.0,
-            715.7,
-            695.0,
-            712.8,
-            702.3,
-            727.1,
-            685.7,
-            708.4,
-            712.4
+            800.0,
+            740.3,
+            752.5,
+            767.4,
+            740.6,
+            746.0,
+            735.2,
+            751.5,
+            734.5,
+            755.5,
+            748.0,
+            772.0,
+            758.7,
+            750.4
           ],
           "is_warmup": [
             false,
@@ -28394,10 +28394,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "W8A8",
-          "sustained_throughput_tokens_per_sec": 694.7,
-          "throttle_ratio": 0.932,
-          "throttle_onset_minute": null,
-          "ttft_p99_drift_ms": -100.3,
+          "sustained_throughput_tokens_per_sec": 769.2,
+          "throttle_ratio": 0.84,
+          "throttle_onset_minute": 4.0,
+          "ttft_p99_drift_ms": -9.9,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -28416,20 +28416,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            730.5,
-            688.0,
-            700.2,
-            690.9,
-            686.4,
-            704.0,
-            690.4,
-            691.5,
-            700.7,
-            690.2,
-            695.2,
-            680.6,
-            692.2,
-            685.2
+            837.8,
+            869.0,
+            857.9,
+            778.2,
+            730.3,
+            745.7,
+            730.9,
+            739.9,
+            730.8,
+            767.2,
+            747.3,
+            755.7,
+            736.8,
+            741.9
           ],
           "is_warmup": [
             false,
@@ -28450,10 +28450,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "W8A16",
-          "sustained_throughput_tokens_per_sec": 708.2,
+          "sustained_throughput_tokens_per_sec": 704.5,
           "throttle_ratio": 0.878,
-          "throttle_onset_minute": 11.0,
-          "ttft_p99_drift_ms": -145.8,
+          "throttle_onset_minute": 3.0,
+          "ttft_p99_drift_ms": -55.3,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -28472,20 +28472,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            710.4,
-            720.8,
-            741.0,
-            742.8,
-            739.9,
-            728.3,
-            734.6,
-            723.4,
-            737.2,
-            704.2,
-            664.2,
-            654.3,
-            662.2,
-            652.2
+            778.7,
+            762.7,
+            691.1,
+            694.6,
+            695.3,
+            684.2,
+            688.8,
+            710.9,
+            683.6,
+            702.7,
+            690.5,
+            701.4,
+            684.6,
+            694.3
           ],
           "is_warmup": [
             false,
@@ -28506,10 +28506,10 @@ const LEADERBOARD_DATA = [
         },
         {
           "precision": "W4A16",
-          "sustained_throughput_tokens_per_sec": 649.9,
-          "throttle_ratio": 0.886,
-          "throttle_onset_minute": 4.0,
-          "ttft_p99_drift_ms": -146.9,
+          "sustained_throughput_tokens_per_sec": 678.3,
+          "throttle_ratio": 0.916,
+          "throttle_onset_minute": null,
+          "ttft_p99_drift_ms": -60.9,
           "duration_minutes": 15,
           "minutes": [
             1.0,
@@ -28528,20 +28528,20 @@ const LEADERBOARD_DATA = [
             14.0
           ],
           "throughput": [
-            713.6,
-            677.3,
-            649.8,
-            636.1,
-            652.4,
-            646.2,
-            633.3,
-            649.0,
-            638.9,
-            655.1,
-            642.4,
-            636.4,
-            632.1,
-            636.4
+            721.7,
+            667.0,
+            687.0,
+            672.0,
+            665.5,
+            674.5,
+            700.6,
+            661.2,
+            675.9,
+            672.5,
+            678.4,
+            680.4,
+            666.3,
+            673.8
           ],
           "is_warmup": [
             false,
@@ -28600,21 +28600,21 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_D",
     "scenario": "all",
-    "primary_metric": 171.93,
+    "primary_metric": 176.08,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 171.9,
-    "offline_throughput": 171.93,
+    "tokens_per_sec_per_chip": 176.1,
+    "offline_throughput": 176.08,
     "online_max_qps": 0.0,
-    "interactive_ttft_p99": 1246.31,
+    "interactive_ttft_p99": 1249.43,
     "peak_memory_gb": 125.69,
     "memory_utilization_pct": 89.5,
     "memory_efficiency_toks_per_gb": 1.4,
     "min_price_usd_per_hr": 3.99,
-    "cost_efficiency_toks_per_dollar_hr": 43.0,
+    "cost_efficiency_toks_per_dollar_hr": 44.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.56,
-    "date": "2026-04-15",
+    "date": "2026-04-21",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
     "notes": null,
@@ -28630,13 +28630,13 @@ const LEADERBOARD_DATA = [
     "quant_int8_speedup": null,
     "quant_int4_speedup": null,
     "quant_quality_eff": null,
-    "sustained_throughput": 132.9,
-    "throttle_ratio": 0.6,
+    "sustained_throughput": 139.0,
+    "throttle_ratio": 0.799,
     "throttle_onset_minute": 2.0,
-    "ttft_p99_drift_ms": -55.8,
+    "ttft_p99_drift_ms": 167.4,
     "sustained_concurrency": 8,
-    "speculative_throughput": 170.37,
-    "speculative_speedup": 0.991,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
     "speculative_acceptance": null,
     "burst_degradation": null,
     "burst_steady_p99": null,
@@ -28675,8 +28675,7 @@ const LEADERBOARD_DATA = [
         "offline",
         "interactive",
         "sustained",
-        "online",
-        "speculative"
+        "online"
       ],
       "run_chip_counts": null,
       "run_num_runs": 2,
@@ -28684,16 +28683,16 @@ const LEADERBOARD_DATA = [
       "run_pp": 1,
       "run_dp": 1,
       "acc_score": 0.56,
-      "acc_baseline_delta": -0.01,
+      "acc_baseline_delta": 0.0,
       "acc_valid": true,
       "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
-      "meta_date": "2026-04-15",
+      "meta_date": "2026-04-21",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 87.9,
-      "meta_model_load_sec": 92.2,
-      "meta_start_time": "2026-04-15T11:51:12.230490+00:00",
+      "meta_elapsed_min": 70.8,
+      "meta_model_load_sec": 64.9,
+      "meta_start_time": "2026-04-21T05:51:23.643595+00:00",
       "meta_notes": null
     },
     "viz": {
@@ -28704,8 +28703,8 @@ const LEADERBOARD_DATA = [
           "4"
         ],
         "throughput": [
-          171.93,
-          171.87
+          176.08,
+          176.04
         ],
         "memory_gb": [
           125.69,
@@ -28713,12 +28712,12 @@ const LEADERBOARD_DATA = [
         ]
       },
       "interactive": {
-        "ttft_p50": 1165.86,
-        "ttft_p90": 1218.3,
-        "ttft_p99": 1246.31,
-        "tpot_p50": 16.06,
-        "tpot_p90": 37.77,
-        "tpot_p99": 38.28
+        "ttft_p50": 1162.77,
+        "ttft_p90": 1214.72,
+        "ttft_p99": 1249.43,
+        "tpot_p50": 14.68,
+        "tpot_p90": 15.23,
+        "tpot_p99": 15.83
       },
       "sustained": {
         "minutes": [
@@ -28754,65 +28753,65 @@ const LEADERBOARD_DATA = [
         ],
         "throughput": [
           136.5,
+          136.6,
+          136.5,
+          136.6,
+          136.5,
+          136.5,
+          136.6,
+          136.6,
+          136.5,
+          136.4,
+          170.1,
+          137.0,
+          136.5,
+          136.5,
+          136.6,
           136.5,
           136.6,
           136.4,
           136.5,
           136.6,
-          136.6,
-          136.4,
-          136.5,
-          136.5,
-          136.6,
-          136.6,
-          136.5,
           170.7,
           136.5,
-          136.6,
-          136.5,
-          136.5,
           136.5,
           136.6,
+          136.6,
           136.5,
           136.6,
           136.5,
-          136.5,
-          136.5,
-          102.4,
-          102.4,
-          102.4,
-          102.4
+          136.5
         ],
         "ttft_p99": [
-          8963.0,
-          8820.9,
-          9176.4,
-          8956.3,
-          8856.4,
-          8937.8,
-          8997.3,
-          8784.8,
-          8953.2,
-          9216.8,
-          8878.1,
-          8972.0,
-          8937.4,
-          8997.5,
-          8962.6,
-          9045.1,
-          8876.3,
-          8942.7,
-          8916.6,
-          8884.3,
-          8945.3,
-          9029.0,
-          9012.8,
-          8965.0,
-          8923.9,
-          9296.6,
-          8837.0,
-          8984.0,
-          8765.1
+          8990.5,
+          8888.6,
+          9251.9,
+          9040.3,
+          8943.5,
+          8982.4,
+          8957.4,
+          8865.6,
+          8978.9,
+          9253.4,
+          8916.8,
+          8975.7,
+          8948.4,
+          9084.4,
+          8999.2,
+          9002.4,
+          8952.5,
+          8994.5,
+          8948.4,
+          8949.1,
+          8979.8,
+          9009.4,
+          8885.1,
+          8973.3,
+          9188.2,
+          8949.2,
+          9004.1,
+          8811.4,
+          9056.0
         ],
         "is_warmup": [
           true,
@@ -28848,10 +28847,10 @@ const LEADERBOARD_DATA = [
         "sustained_concurrency": 8,
         "duration_minutes": 30,
         "warmup_minutes": 2,
-        "sustained_throughput": 132.9,
-        "throttle_ratio": 0.6,
+        "sustained_throughput": 139.0,
+        "throttle_ratio": 0.799,
         "throttle_onset_minute": 2.0,
-        "ttft_p99_drift_ms": -55.8,
+        "ttft_p99_drift_ms": 167.4,
         "samples": [
           {
             "minute": 1.0,
@@ -28860,38 +28859,38 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5327.1,
-            "ttft_ms_p99": 8963.0
+            "ttft_ms_p50": 5290.6,
+            "ttft_ms_p99": 8990.5
           },
           {
             "minute": 2.0,
-            "is_warmup": false,
-            "throughput_tokens_per_sec": 136.5,
-            "tokens_out": 8192,
-            "tokens_in": 0,
-            "requests_completed": 32,
-            "ttft_ms_p50": 5215.6,
-            "ttft_ms_p99": 8820.9
-          },
-          {
-            "minute": 3.0,
             "is_warmup": false,
             "throughput_tokens_per_sec": 136.6,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5178.9,
-            "ttft_ms_p99": 9176.4
+            "ttft_ms_p50": 5352.0,
+            "ttft_ms_p99": 8888.6
+          },
+          {
+            "minute": 3.0,
+            "is_warmup": false,
+            "throughput_tokens_per_sec": 136.5,
+            "tokens_out": 8192,
+            "tokens_in": 0,
+            "requests_completed": 32,
+            "ttft_ms_p50": 5418.2,
+            "ttft_ms_p99": 9251.9
           },
           {
             "minute": 4.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.4,
+            "throughput_tokens_per_sec": 136.6,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5277.4,
-            "ttft_ms_p99": 8956.3
+            "ttft_ms_p50": 5316.9,
+            "ttft_ms_p99": 9040.3
           },
           {
             "minute": 5.0,
@@ -28900,18 +28899,18 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5118.8,
-            "ttft_ms_p99": 8856.4
+            "ttft_ms_p50": 5161.3,
+            "ttft_ms_p99": 8943.5
           },
           {
             "minute": 6.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.6,
+            "throughput_tokens_per_sec": 136.5,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5132.1,
-            "ttft_ms_p99": 8937.8
+            "ttft_ms_p50": 5175.8,
+            "ttft_ms_p99": 8982.4
           },
           {
             "minute": 7.0,
@@ -28920,18 +28919,18 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5351.3,
-            "ttft_ms_p99": 8997.3
+            "ttft_ms_p50": 5216.2,
+            "ttft_ms_p99": 8957.4
           },
           {
             "minute": 8.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.4,
+            "throughput_tokens_per_sec": 136.6,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5215.3,
-            "ttft_ms_p99": 8784.8
+            "ttft_ms_p50": 5284.7,
+            "ttft_ms_p99": 8865.6
           },
           {
             "minute": 9.0,
@@ -28940,38 +28939,38 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5204.5,
-            "ttft_ms_p99": 8953.2
+            "ttft_ms_p50": 5199.0,
+            "ttft_ms_p99": 8978.9
           },
           {
             "minute": 10.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.5,
+            "throughput_tokens_per_sec": 136.4,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5278.1,
-            "ttft_ms_p99": 9216.8
+            "ttft_ms_p50": 5458.8,
+            "ttft_ms_p99": 9253.4
           },
           {
             "minute": 11.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.6,
-            "tokens_out": 8192,
+            "throughput_tokens_per_sec": 170.1,
+            "tokens_out": 10240,
             "tokens_in": 0,
-            "requests_completed": 32,
-            "ttft_ms_p50": 5131.3,
-            "ttft_ms_p99": 8878.1
+            "requests_completed": 40,
+            "ttft_ms_p50": 5168.1,
+            "ttft_ms_p99": 8916.8
           },
           {
             "minute": 12.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.6,
+            "throughput_tokens_per_sec": 137.0,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5211.2,
-            "ttft_ms_p99": 8972.0
+            "ttft_ms_p50": 5163.7,
+            "ttft_ms_p99": 8975.7
           },
           {
             "minute": 13.0,
@@ -28980,58 +28979,58 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5229.5,
-            "ttft_ms_p99": 8937.4
+            "ttft_ms_p50": 5211.5,
+            "ttft_ms_p99": 8948.4
           },
           {
             "minute": 14.0,
-            "is_warmup": false,
-            "throughput_tokens_per_sec": 170.7,
-            "tokens_out": 10240,
-            "tokens_in": 0,
-            "requests_completed": 40,
-            "ttft_ms_p50": 5257.6,
-            "ttft_ms_p99": 8997.5
-          },
-          {
-            "minute": 15.0,
             "is_warmup": false,
             "throughput_tokens_per_sec": 136.5,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5215.6,
-            "ttft_ms_p99": 8962.6
+            "ttft_ms_p50": 5259.7,
+            "ttft_ms_p99": 9084.4
           },
           {
-            "minute": 16.0,
+            "minute": 15.0,
             "is_warmup": false,
             "throughput_tokens_per_sec": 136.6,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5326.9,
-            "ttft_ms_p99": 9045.1
+            "ttft_ms_p50": 5237.1,
+            "ttft_ms_p99": 8999.2
+          },
+          {
+            "minute": 16.0,
+            "is_warmup": false,
+            "throughput_tokens_per_sec": 136.5,
+            "tokens_out": 8192,
+            "tokens_in": 0,
+            "requests_completed": 32,
+            "ttft_ms_p50": 5265.5,
+            "ttft_ms_p99": 9002.4
           },
           {
             "minute": 17.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.5,
+            "throughput_tokens_per_sec": 136.6,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5142.5,
-            "ttft_ms_p99": 8876.3
+            "ttft_ms_p50": 5179.1,
+            "ttft_ms_p99": 8952.5
           },
           {
             "minute": 18.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.5,
+            "throughput_tokens_per_sec": 136.4,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5157.0,
-            "ttft_ms_p99": 8942.7
+            "ttft_ms_p50": 5178.7,
+            "ttft_ms_p99": 8994.5
           },
           {
             "minute": 19.0,
@@ -29040,8 +29039,8 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5187.6,
-            "ttft_ms_p99": 8916.6
+            "ttft_ms_p50": 5174.4,
+            "ttft_ms_p99": 8948.4
           },
           {
             "minute": 20.0,
@@ -29050,28 +29049,28 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5273.9,
-            "ttft_ms_p99": 8884.3
+            "ttft_ms_p50": 5286.7,
+            "ttft_ms_p99": 8949.1
           },
           {
             "minute": 21.0,
+            "is_warmup": false,
+            "throughput_tokens_per_sec": 170.7,
+            "tokens_out": 10240,
+            "tokens_in": 0,
+            "requests_completed": 40,
+            "ttft_ms_p50": 5315.6,
+            "ttft_ms_p99": 8979.8
+          },
+          {
+            "minute": 22.0,
             "is_warmup": false,
             "throughput_tokens_per_sec": 136.5,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5315.5,
-            "ttft_ms_p99": 8945.3
-          },
-          {
-            "minute": 22.0,
-            "is_warmup": false,
-            "throughput_tokens_per_sec": 136.6,
-            "tokens_out": 8192,
-            "tokens_in": 0,
-            "requests_completed": 32,
-            "ttft_ms_p50": 5337.0,
-            "ttft_ms_p99": 9029.0
+            "ttft_ms_p50": 5281.9,
+            "ttft_ms_p99": 9009.4
           },
           {
             "minute": 23.0,
@@ -29080,76 +29079,72 @@ const LEADERBOARD_DATA = [
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5199.0,
-            "ttft_ms_p99": 9012.8
+            "ttft_ms_p50": 5146.4,
+            "ttft_ms_p99": 8885.1
           },
           {
             "minute": 24.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.5,
+            "throughput_tokens_per_sec": 136.6,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5169.3,
-            "ttft_ms_p99": 8965.0
+            "ttft_ms_p50": 5169.2,
+            "ttft_ms_p99": 8973.3
           },
           {
             "minute": 25.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 136.5,
+            "throughput_tokens_per_sec": 136.6,
             "tokens_out": 8192,
             "tokens_in": 0,
             "requests_completed": 32,
-            "ttft_ms_p50": 5186.1,
-            "ttft_ms_p99": 8923.9
+            "ttft_ms_p50": 5104.8,
+            "ttft_ms_p99": 9188.2
           },
           {
             "minute": 26.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 102.4,
-            "tokens_out": 6144,
+            "throughput_tokens_per_sec": 136.5,
+            "tokens_out": 8192,
             "tokens_in": 0,
-            "requests_completed": 24,
-            "ttft_ms_p50": 5334.6,
-            "ttft_ms_p99": 9296.6
+            "requests_completed": 32,
+            "ttft_ms_p50": 5277.7,
+            "ttft_ms_p99": 8949.2
           },
           {
             "minute": 27.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 102.4,
-            "tokens_out": 6144,
+            "throughput_tokens_per_sec": 136.6,
+            "tokens_out": 8192,
             "tokens_in": 0,
-            "requests_completed": 24,
-            "ttft_ms_p50": 5267.5,
-            "ttft_ms_p99": 8837.0
+            "requests_completed": 32,
+            "ttft_ms_p50": 5349.5,
+            "ttft_ms_p99": 9004.1
           },
           {
             "minute": 28.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 102.4,
-            "tokens_out": 6144,
+            "throughput_tokens_per_sec": 136.5,
+            "tokens_out": 8192,
             "tokens_in": 0,
-            "requests_completed": 24,
-            "ttft_ms_p50": 5328.8,
-            "ttft_ms_p99": 8984.0
+            "requests_completed": 32,
+            "ttft_ms_p50": 5137.6,
+            "ttft_ms_p99": 8811.4
           },
           {
             "minute": 29.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 102.4,
-            "tokens_out": 6144,
+            "throughput_tokens_per_sec": 136.5,
+            "tokens_out": 8192,
             "tokens_in": 0,
-            "requests_completed": 24,
-            "ttft_ms_p50": 5161.2,
-            "ttft_ms_p99": 8765.1
+            "requests_completed": 32,
+            "ttft_ms_p50": 5218.1,
+            "ttft_ms_p99": 9056.0
           }
         ]
       },
-      "speculative": {
-        "offline_tok_per_sec": 170.37,
-        "acceptance_rate": null,
-        "mean_accepted_tokens": null
-      }
+      "speculative": null
     },
     "impl": {
       "id": "nvidia_vllm_47f5d58e",
@@ -29189,21 +29184,21 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_F",
     "scenario": "all",
-    "primary_metric": 12862.12,
+    "primary_metric": 8134.36,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 12862.1,
-    "offline_throughput": 12862.12,
+    "tokens_per_sec_per_chip": 8134.4,
+    "offline_throughput": 8134.36,
     "online_max_qps": 10,
-    "interactive_ttft_p99": 44.76,
-    "peak_memory_gb": 123.42,
+    "interactive_ttft_p99": 41.78,
+    "peak_memory_gb": 123.47,
     "memory_utilization_pct": 87.9,
-    "memory_efficiency_toks_per_gb": 104.2,
+    "memory_efficiency_toks_per_gb": 65.9,
     "min_price_usd_per_hr": 3.99,
-    "cost_efficiency_toks_per_dollar_hr": 3224.0,
+    "cost_efficiency_toks_per_dollar_hr": 2039.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
-    "accuracy_score": 0.39,
-    "date": "2026-04-09",
+    "accuracy_score": 0.41,
+    "date": "2026-04-20",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
     "notes": null,
@@ -29219,10 +29214,10 @@ const LEADERBOARD_DATA = [
     "quant_int8_speedup": null,
     "quant_int4_speedup": null,
     "quant_quality_eff": null,
-    "sustained_throughput": 1425.4,
-    "throttle_ratio": 0.826,
+    "sustained_throughput": 2946.2,
+    "throttle_ratio": 0.832,
     "throttle_onset_minute": 1.0,
-    "ttft_p99_drift_ms": -364.2,
+    "ttft_p99_drift_ms": -61.3,
     "sustained_concurrency": 32,
     "speculative_throughput": null,
     "speculative_speedup": null,
@@ -29236,7 +29231,7 @@ const LEADERBOARD_DATA = [
       "hw_vendor": "NVIDIA",
       "hw_count": 1,
       "hw_memory_gb": 140.4,
-      "hw_interconnect_intra": "NVLink 18 (full mesh)",
+      "hw_interconnect_intra": null,
       "hw_interconnect_inter": null,
       "hw_cpu": "INTEL(R) XEON(R) PLATINUM 8558, 96 cores",
       "hw_system_memory_gb": 2015.5,
@@ -29271,17 +29266,17 @@ const LEADERBOARD_DATA = [
       "run_tp": 1,
       "run_pp": 1,
       "run_dp": 1,
-      "acc_score": 0.39,
-      "acc_baseline_delta": 0.01,
+      "acc_score": 0.41,
+      "acc_baseline_delta": 0.03,
       "acc_valid": true,
       "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
-      "meta_date": "2026-04-09",
+      "meta_date": "2026-04-20",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 28.0,
-      "meta_model_load_sec": 81.6,
-      "meta_start_time": "2026-04-09T06:29:41.271125+00:00",
+      "meta_elapsed_min": 24.9,
+      "meta_model_load_sec": 83.8,
+      "meta_start_time": "2026-04-20T06:48:14.587032+00:00",
       "meta_notes": null
     },
     "viz": {
@@ -29293,14 +29288,14 @@ const LEADERBOARD_DATA = [
           "64"
         ],
         "throughput": [
-          7489.26,
-          12862.12,
-          12855.15
+          7857.99,
+          8008.17,
+          8134.36
         ],
         "memory_gb": [
-          123.42,
-          123.42,
-          123.42
+          123.47,
+          123.47,
+          123.47
         ]
       },
       "online": {
@@ -29309,16 +29304,16 @@ const LEADERBOARD_DATA = [
           "40"
         ],
         "ttft_p50": [
-          96.56,
-          316.72
+          30.75,
+          53.4
         ],
         "ttft_p90": [
-          175.51,
-          1462.92
+          46.45,
+          81.63
         ],
         "tpot_p50": [
-          47.79,
-          73.78
+          8.37,
+          46.94
         ],
         "sla_met": [
           true,
@@ -29327,12 +29322,12 @@ const LEADERBOARD_DATA = [
         "max_valid_qps": 10
       },
       "interactive": {
-        "ttft_p50": 36.01,
-        "ttft_p90": 39.94,
-        "ttft_p99": 44.76,
-        "tpot_p50": 5.17,
-        "tpot_p90": 5.75,
-        "tpot_p99": 5.94
+        "ttft_p50": 25.37,
+        "ttft_p90": 33.72,
+        "ttft_p99": 41.78,
+        "tpot_p50": 3.77,
+        "tpot_p90": 4.1,
+        "tpot_p99": 4.54
       },
       "sustained": {
         "minutes": [
@@ -29352,36 +29347,36 @@ const LEADERBOARD_DATA = [
           14.0
         ],
         "throughput": [
-          1306.2,
-          1417.0,
-          1440.4,
-          1411.2,
-          1413.3,
-          1581.2,
-          1523.2,
-          1435.7,
-          1342.6,
-          1396.7,
-          1408.2,
-          1415.5,
-          1436.7,
-          1427.3
+          2737.0,
+          2875.8,
+          2917.9,
+          2812.9,
+          2672.9,
+          2846.2,
+          2884.1,
+          2849.8,
+          2799.9,
+          3204.9,
+          3168.4,
+          3138.2,
+          3128.2,
+          3211.1
         ],
         "ttft_p99": [
-          474.4,
-          113.4,
-          107.4,
-          113.2,
-          116.8,
-          98.2,
-          105.2,
-          107.0,
-          106.1,
-          107.1,
-          104.2,
-          115.4,
-          124.0,
-          110.2
+          103.4,
+          47.1,
+          46.0,
+          46.1,
+          45.8,
+          46.3,
+          45.3,
+          44.9,
+          45.8,
+          40.3,
+          43.1,
+          43.1,
+          41.2,
+          42.1
         ],
         "is_warmup": [
           false,
@@ -29402,150 +29397,150 @@ const LEADERBOARD_DATA = [
         "sustained_concurrency": 32,
         "duration_minutes": 15,
         "warmup_minutes": 1,
-        "sustained_throughput": 1425.4,
-        "throttle_ratio": 0.826,
+        "sustained_throughput": 2946.2,
+        "throttle_ratio": 0.832,
         "throttle_onset_minute": 1.0,
-        "ttft_p99_drift_ms": -364.2,
+        "ttft_p99_drift_ms": -61.3,
         "samples": [
           {
             "minute": 1.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1306.2,
-            "tokens_out": 78384,
+            "throughput_tokens_per_sec": 2737.0,
+            "tokens_out": 164334,
             "tokens_in": 0,
-            "requests_completed": 382,
-            "ttft_ms_p50": 47.5,
-            "ttft_ms_p99": 474.4
+            "requests_completed": 786,
+            "ttft_ms_p50": 29.0,
+            "ttft_ms_p99": 103.4
           },
           {
             "minute": 2.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1417.0,
-            "tokens_out": 85072,
+            "throughput_tokens_per_sec": 2875.8,
+            "tokens_out": 172520,
             "tokens_in": 0,
-            "requests_completed": 406,
-            "ttft_ms_p50": 43.4,
-            "ttft_ms_p99": 113.4
+            "requests_completed": 825,
+            "ttft_ms_p50": 27.5,
+            "ttft_ms_p99": 47.1
           },
           {
             "minute": 3.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1440.4,
-            "tokens_out": 86447,
+            "throughput_tokens_per_sec": 2917.9,
+            "tokens_out": 175118,
             "tokens_in": 0,
-            "requests_completed": 415,
-            "ttft_ms_p50": 42.8,
-            "ttft_ms_p99": 107.4
+            "requests_completed": 833,
+            "ttft_ms_p50": 27.1,
+            "ttft_ms_p99": 46.0
           },
           {
             "minute": 4.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1411.2,
-            "tokens_out": 84648,
+            "throughput_tokens_per_sec": 2812.9,
+            "tokens_out": 168773,
             "tokens_in": 0,
-            "requests_completed": 406,
-            "ttft_ms_p50": 43.4,
-            "ttft_ms_p99": 113.2
+            "requests_completed": 805,
+            "ttft_ms_p50": 28.2,
+            "ttft_ms_p99": 46.1
           },
           {
             "minute": 5.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1413.3,
-            "tokens_out": 84790,
+            "throughput_tokens_per_sec": 2672.9,
+            "tokens_out": 160359,
             "tokens_in": 0,
-            "requests_completed": 404,
-            "ttft_ms_p50": 43.1,
-            "ttft_ms_p99": 116.8
+            "requests_completed": 762,
+            "ttft_ms_p50": 28.2,
+            "ttft_ms_p99": 45.8
           },
           {
             "minute": 6.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1581.2,
-            "tokens_out": 94859,
+            "throughput_tokens_per_sec": 2846.2,
+            "tokens_out": 170750,
             "tokens_in": 0,
-            "requests_completed": 454,
-            "ttft_ms_p50": 41.6,
-            "ttft_ms_p99": 98.2
+            "requests_completed": 813,
+            "ttft_ms_p50": 27.5,
+            "ttft_ms_p99": 46.3
           },
           {
             "minute": 7.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1523.2,
-            "tokens_out": 91411,
+            "throughput_tokens_per_sec": 2884.1,
+            "tokens_out": 173045,
             "tokens_in": 0,
-            "requests_completed": 436,
-            "ttft_ms_p50": 42.0,
-            "ttft_ms_p99": 105.2
+            "requests_completed": 824,
+            "ttft_ms_p50": 27.2,
+            "ttft_ms_p99": 45.3
           },
           {
             "minute": 8.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1435.7,
-            "tokens_out": 86128,
+            "throughput_tokens_per_sec": 2849.8,
+            "tokens_out": 171032,
             "tokens_in": 0,
-            "requests_completed": 409,
-            "ttft_ms_p50": 43.0,
-            "ttft_ms_p99": 107.0
+            "requests_completed": 817,
+            "ttft_ms_p50": 27.4,
+            "ttft_ms_p99": 44.9
           },
           {
             "minute": 9.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1342.6,
-            "tokens_out": 80519,
+            "throughput_tokens_per_sec": 2799.9,
+            "tokens_out": 167980,
             "tokens_in": 0,
-            "requests_completed": 386,
-            "ttft_ms_p50": 44.3,
-            "ttft_ms_p99": 106.1
+            "requests_completed": 800,
+            "ttft_ms_p50": 27.0,
+            "ttft_ms_p99": 45.8
           },
           {
             "minute": 10.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1396.7,
-            "tokens_out": 83821,
+            "throughput_tokens_per_sec": 3204.9,
+            "tokens_out": 192262,
             "tokens_in": 0,
-            "requests_completed": 400,
-            "ttft_ms_p50": 44.0,
-            "ttft_ms_p99": 107.1
+            "requests_completed": 911,
+            "ttft_ms_p50": 24.6,
+            "ttft_ms_p99": 40.3
           },
           {
             "minute": 11.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1408.2,
-            "tokens_out": 84477,
+            "throughput_tokens_per_sec": 3168.4,
+            "tokens_out": 190078,
             "tokens_in": 0,
-            "requests_completed": 402,
-            "ttft_ms_p50": 43.2,
-            "ttft_ms_p99": 104.2
+            "requests_completed": 905,
+            "ttft_ms_p50": 25.0,
+            "ttft_ms_p99": 43.1
           },
           {
             "minute": 12.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1415.5,
-            "tokens_out": 84933,
+            "throughput_tokens_per_sec": 3138.2,
+            "tokens_out": 188369,
             "tokens_in": 0,
-            "requests_completed": 408,
-            "ttft_ms_p50": 43.1,
-            "ttft_ms_p99": 115.4
+            "requests_completed": 896,
+            "ttft_ms_p50": 25.0,
+            "ttft_ms_p99": 43.1
           },
           {
             "minute": 13.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1436.7,
-            "tokens_out": 86203,
+            "throughput_tokens_per_sec": 3128.2,
+            "tokens_out": 187591,
             "tokens_in": 0,
-            "requests_completed": 412,
-            "ttft_ms_p50": 43.0,
-            "ttft_ms_p99": 124.0
+            "requests_completed": 896,
+            "ttft_ms_p50": 24.8,
+            "ttft_ms_p99": 41.2
           },
           {
             "minute": 14.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 1427.3,
-            "tokens_out": 85654,
+            "throughput_tokens_per_sec": 3211.1,
+            "tokens_out": 192764,
             "tokens_in": 0,
-            "requests_completed": 409,
-            "ttft_ms_p50": 43.8,
-            "ttft_ms_p99": 110.2
+            "requests_completed": 913,
+            "ttft_ms_p50": 24.8,
+            "ttft_ms_p99": 42.1
           }
         ]
       }
@@ -29588,21 +29583,21 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_B",
     "scenario": "all",
-    "primary_metric": 3553.46,
+    "primary_metric": 3294.95,
     "primary_metric_label": "tokens/sec (offline)",
-    "tokens_per_sec_per_chip": 444.2,
-    "offline_throughput": 3553.46,
-    "online_max_qps": 10,
-    "interactive_ttft_p99": 193.03,
+    "tokens_per_sec_per_chip": 411.9,
+    "offline_throughput": 3294.95,
+    "online_max_qps": 25,
+    "interactive_ttft_p99": 98.75,
     "peak_memory_gb": 116.69,
     "memory_utilization_pct": 83.1,
-    "memory_efficiency_toks_per_gb": 30.5,
+    "memory_efficiency_toks_per_gb": 28.2,
     "min_price_usd_per_hr": 3.99,
-    "cost_efficiency_toks_per_dollar_hr": 891.0,
+    "cost_efficiency_toks_per_dollar_hr": 826.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
-    "accuracy_score": 0.76,
-    "date": "2026-04-09",
+    "accuracy_score": 0.77,
+    "date": "2026-04-20",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
     "notes": null,
@@ -29618,17 +29613,17 @@ const LEADERBOARD_DATA = [
     "quant_int8_speedup": null,
     "quant_int4_speedup": null,
     "quant_quality_eff": null,
-    "sustained_throughput": 241.2,
-    "throttle_ratio": 0.807,
-    "throttle_onset_minute": 4.0,
-    "ttft_p99_drift_ms": -1.5,
+    "sustained_throughput": 255.8,
+    "throttle_ratio": 0.715,
+    "throttle_onset_minute": 5.0,
+    "ttft_p99_drift_ms": 54.4,
     "sustained_concurrency": 4,
     "speculative_throughput": null,
     "speculative_speedup": null,
     "speculative_acceptance": null,
-    "burst_degradation": 134.102,
-    "burst_steady_p99": 455.88,
-    "burst_p99": 61134.32,
+    "burst_degradation": 337.063,
+    "burst_steady_p99": 145.92,
+    "burst_p99": 49185.51,
     "burst_sla_met": false,
     "detail": {
       "hw_chip": "NVIDIA H200",
@@ -29671,17 +29666,17 @@ const LEADERBOARD_DATA = [
       "run_tp": 8,
       "run_pp": 1,
       "run_dp": 1,
-      "acc_score": 0.76,
-      "acc_baseline_delta": -0.01,
+      "acc_score": 0.77,
+      "acc_baseline_delta": 0.0,
       "acc_valid": true,
       "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
-      "meta_date": "2026-04-09",
+      "meta_date": "2026-04-20",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 66.6,
-      "meta_model_load_sec": 225.9,
-      "meta_start_time": "2026-04-09T05:15:57.669560+00:00",
+      "meta_elapsed_min": 64.8,
+      "meta_model_load_sec": 215.4,
+      "meta_start_time": "2026-04-20T16:15:21.499811+00:00",
       "meta_notes": null
     },
     "viz": {
@@ -29693,14 +29688,14 @@ const LEADERBOARD_DATA = [
           "128"
         ],
         "throughput": [
-          3215.83,
-          3406.6,
-          3553.46
+          3190.66,
+          3294.95,
+          3207.36
         ],
         "throughput_per_chip": [
-          401.98,
-          425.82,
-          444.18
+          398.83,
+          411.87,
+          400.92
         ],
         "memory_gb": [
           116.69,
@@ -29716,30 +29711,30 @@ const LEADERBOARD_DATA = [
           "25"
         ],
         "ttft_p50": [
-          75.45,
-          129.63,
-          246.59,
-          590.95
+          68.76,
+          81.1,
+          103.48,
+          125.59
         ],
         "ttft_p90": [
-          146.06,
-          254.27,
-          433.62,
-          823.09
+          95.38,
+          108.99,
+          135.9,
+          165.36
         ],
         "tpot_p50": [
-          18.54,
-          38.8,
-          58.77,
-          52.71
+          17.14,
+          25.9,
+          43.57,
+          48.88
         ],
         "sla_met": [
           true,
           true,
           true,
-          false
+          true
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 25
       },
       "sustained": {
         "minutes": [
@@ -29774,66 +29769,66 @@ const LEADERBOARD_DATA = [
           29.0
         ],
         "throughput": [
-          264.4,
-          283.6,
-          281.0,
-          237.6,
-          240.6,
-          232.5,
-          236.4,
-          238.2,
-          242.7,
-          241.5,
-          231.0,
-          244.4,
-          236.3,
-          242.5,
-          235.3,
-          230.9,
-          237.7,
+          285.5,
+          307.1,
+          310.1,
+          323.8,
+          254.6,
           243.4,
-          235.9,
-          240.4,
-          232.4,
-          240.7,
-          246.4,
-          232.5,
-          239.3,
-          233.9,
-          235.6,
-          252.2,
-          228.8
+          252.6,
+          244.6,
+          263.1,
+          231.4,
+          257.0,
+          238.4,
+          254.2,
+          246.9,
+          253.2,
+          240.1,
+          261.5,
+          242.0,
+          243.4,
+          252.0,
+          253.8,
+          243.0,
+          257.3,
+          234.4,
+          250.3,
+          260.0,
+          236.9,
+          254.1,
+          253.6
         ],
         "ttft_p99": [
-          377.1,
-          125.7,
-          111.3,
-          126.7,
-          130.3,
-          130.4,
-          133.4,
-          179.6,
-          125.1,
-          180.3,
-          125.2,
-          125.8,
-          122.8,
-          128.4,
-          127.1,
-          125.1,
-          181.6,
-          115.5,
-          214.4,
-          126.3,
-          126.4,
-          122.6,
-          127.1,
-          129.2,
-          126.1,
-          187.0,
-          126.4,
-          126.2,
-          124.2
+          355.7,
+          78.3,
+          66.6,
+          66.0,
+          123.5,
+          162.0,
+          116.7,
+          123.4,
+          158.0,
+          119.8,
+          160.2,
+          124.5,
+          137.7,
+          124.3,
+          124.5,
+          165.6,
+          122.9,
+          158.5,
+          114.9,
+          121.1,
+          112.0,
+          142.3,
+          128.2,
+          134.9,
+          167.8,
+          118.9,
+          120.6,
+          116.4,
+          132.7
         ],
         "is_warmup": [
           true,
@@ -29869,335 +29864,335 @@ const LEADERBOARD_DATA = [
         "sustained_concurrency": 4,
         "duration_minutes": 30,
         "warmup_minutes": 2,
-        "sustained_throughput": 241.2,
-        "throttle_ratio": 0.807,
-        "throttle_onset_minute": 4.0,
-        "ttft_p99_drift_ms": -1.5,
+        "sustained_throughput": 255.8,
+        "throttle_ratio": 0.715,
+        "throttle_onset_minute": 5.0,
+        "ttft_p99_drift_ms": 54.4,
         "samples": [
           {
             "minute": 1.0,
             "is_warmup": true,
-            "throughput_tokens_per_sec": 264.4,
-            "tokens_out": 15872,
+            "throughput_tokens_per_sec": 285.5,
+            "tokens_out": 17142,
             "tokens_in": 0,
-            "requests_completed": 47,
-            "ttft_ms_p50": 61.8,
-            "ttft_ms_p99": 377.1
+            "requests_completed": 52,
+            "ttft_ms_p50": 58.6,
+            "ttft_ms_p99": 355.7
           },
           {
             "minute": 2.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 283.6,
-            "tokens_out": 17018,
+            "throughput_tokens_per_sec": 307.1,
+            "tokens_out": 18426,
             "tokens_in": 0,
-            "requests_completed": 49,
-            "ttft_ms_p50": 51.5,
-            "ttft_ms_p99": 125.7
+            "requests_completed": 53,
+            "ttft_ms_p50": 47.4,
+            "ttft_ms_p99": 78.3
           },
           {
             "minute": 3.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 281.0,
-            "tokens_out": 16856,
+            "throughput_tokens_per_sec": 310.1,
+            "tokens_out": 18609,
             "tokens_in": 0,
-            "requests_completed": 49,
-            "ttft_ms_p50": 51.4,
-            "ttft_ms_p99": 111.3
+            "requests_completed": 54,
+            "ttft_ms_p50": 55.6,
+            "ttft_ms_p99": 66.6
           },
           {
             "minute": 4.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 237.6,
-            "tokens_out": 14259,
+            "throughput_tokens_per_sec": 323.8,
+            "tokens_out": 19428,
             "tokens_in": 0,
-            "requests_completed": 43,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 126.7
+            "requests_completed": 55,
+            "ttft_ms_p50": 45.1,
+            "ttft_ms_p99": 66.0
           },
           {
             "minute": 5.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 240.6,
-            "tokens_out": 14435,
+            "throughput_tokens_per_sec": 254.6,
+            "tokens_out": 15267,
             "tokens_in": 0,
-            "requests_completed": 39,
-            "ttft_ms_p50": 103.0,
-            "ttft_ms_p99": 130.3
+            "requests_completed": 46,
+            "ttft_ms_p50": 103.5,
+            "ttft_ms_p99": 123.5
           },
           {
             "minute": 6.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 232.5,
-            "tokens_out": 13953,
+            "throughput_tokens_per_sec": 243.4,
+            "tokens_out": 14602,
             "tokens_in": 0,
-            "requests_completed": 41,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 130.4
+            "requests_completed": 42,
+            "ttft_ms_p50": 105.2,
+            "ttft_ms_p99": 162.0
           },
           {
             "minute": 7.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 236.4,
-            "tokens_out": 14183,
+            "throughput_tokens_per_sec": 252.6,
+            "tokens_out": 15162,
             "tokens_in": 0,
-            "requests_completed": 42,
-            "ttft_ms_p50": 102.5,
-            "ttft_ms_p99": 133.4
+            "requests_completed": 44,
+            "ttft_ms_p50": 104.1,
+            "ttft_ms_p99": 116.7
           },
           {
             "minute": 8.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 238.2,
-            "tokens_out": 14291,
+            "throughput_tokens_per_sec": 244.6,
+            "tokens_out": 14675,
             "tokens_in": 0,
-            "requests_completed": 42,
-            "ttft_ms_p50": 102.5,
-            "ttft_ms_p99": 179.6
+            "requests_completed": 45,
+            "ttft_ms_p50": 105.9,
+            "ttft_ms_p99": 123.4
           },
           {
             "minute": 9.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 242.7,
-            "tokens_out": 14559,
+            "throughput_tokens_per_sec": 263.1,
+            "tokens_out": 15788,
             "tokens_in": 0,
-            "requests_completed": 42,
-            "ttft_ms_p50": 102.2,
-            "ttft_ms_p99": 125.1
+            "requests_completed": 44,
+            "ttft_ms_p50": 104.3,
+            "ttft_ms_p99": 158.0
           },
           {
             "minute": 10.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 241.5,
-            "tokens_out": 14490,
+            "throughput_tokens_per_sec": 231.4,
+            "tokens_out": 13881,
             "tokens_in": 0,
             "requests_completed": 41,
-            "ttft_ms_p50": 102.7,
-            "ttft_ms_p99": 180.3
+            "ttft_ms_p50": 104.8,
+            "ttft_ms_p99": 119.8
           },
           {
             "minute": 11.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 231.0,
-            "tokens_out": 13866,
+            "throughput_tokens_per_sec": 257.0,
+            "tokens_out": 15418,
             "tokens_in": 0,
-            "requests_completed": 41,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 125.2
+            "requests_completed": 43,
+            "ttft_ms_p50": 104.2,
+            "ttft_ms_p99": 160.2
           },
           {
             "minute": 12.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 244.4,
-            "tokens_out": 14659,
+            "throughput_tokens_per_sec": 238.4,
+            "tokens_out": 14305,
             "tokens_in": 0,
-            "requests_completed": 40,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 125.8
+            "requests_completed": 44,
+            "ttft_ms_p50": 104.1,
+            "ttft_ms_p99": 124.5
           },
           {
             "minute": 13.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 236.3,
-            "tokens_out": 14187,
+            "throughput_tokens_per_sec": 254.2,
+            "tokens_out": 15242,
             "tokens_in": 0,
             "requests_completed": 43,
-            "ttft_ms_p50": 102.7,
-            "ttft_ms_p99": 122.8
+            "ttft_ms_p50": 104.1,
+            "ttft_ms_p99": 137.7
           },
           {
             "minute": 14.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 242.5,
-            "tokens_out": 14553,
+            "throughput_tokens_per_sec": 246.9,
+            "tokens_out": 14816,
             "tokens_in": 0,
-            "requests_completed": 42,
-            "ttft_ms_p50": 102.7,
-            "ttft_ms_p99": 128.4
+            "requests_completed": 43,
+            "ttft_ms_p50": 103.7,
+            "ttft_ms_p99": 124.3
           },
           {
             "minute": 15.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 235.3,
-            "tokens_out": 14116,
+            "throughput_tokens_per_sec": 253.2,
+            "tokens_out": 15205,
             "tokens_in": 0,
-            "requests_completed": 42,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 127.1
+            "requests_completed": 45,
+            "ttft_ms_p50": 103.7,
+            "ttft_ms_p99": 124.5
           },
           {
             "minute": 16.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 230.9,
-            "tokens_out": 13849,
+            "throughput_tokens_per_sec": 240.1,
+            "tokens_out": 14405,
             "tokens_in": 0,
-            "requests_completed": 41,
-            "ttft_ms_p50": 103.3,
-            "ttft_ms_p99": 125.1
+            "requests_completed": 43,
+            "ttft_ms_p50": 104.4,
+            "ttft_ms_p99": 165.6
           },
           {
             "minute": 17.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 237.7,
-            "tokens_out": 14264,
+            "throughput_tokens_per_sec": 261.5,
+            "tokens_out": 15689,
             "tokens_in": 0,
-            "requests_completed": 38,
-            "ttft_ms_p50": 102.9,
-            "ttft_ms_p99": 181.6
+            "requests_completed": 45,
+            "ttft_ms_p50": 104.9,
+            "ttft_ms_p99": 122.9
           },
           {
             "minute": 18.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 243.4,
-            "tokens_out": 14607,
+            "throughput_tokens_per_sec": 242.0,
+            "tokens_out": 14511,
             "tokens_in": 0,
-            "requests_completed": 44,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 115.5
+            "requests_completed": 40,
+            "ttft_ms_p50": 104.5,
+            "ttft_ms_p99": 158.5
           },
           {
             "minute": 19.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 235.9,
-            "tokens_out": 14159,
+            "throughput_tokens_per_sec": 243.4,
+            "tokens_out": 14604,
             "tokens_in": 0,
-            "requests_completed": 41,
-            "ttft_ms_p50": 102.9,
-            "ttft_ms_p99": 214.4
+            "requests_completed": 44,
+            "ttft_ms_p50": 103.8,
+            "ttft_ms_p99": 114.9
           },
           {
             "minute": 20.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 240.4,
-            "tokens_out": 14418,
+            "throughput_tokens_per_sec": 252.0,
+            "tokens_out": 15121,
             "tokens_in": 0,
-            "requests_completed": 41,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 126.3
+            "requests_completed": 44,
+            "ttft_ms_p50": 105.3,
+            "ttft_ms_p99": 121.1
           },
           {
             "minute": 21.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 232.4,
-            "tokens_out": 13946,
+            "throughput_tokens_per_sec": 253.8,
+            "tokens_out": 15227,
             "tokens_in": 0,
-            "requests_completed": 43,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 126.4
+            "requests_completed": 44,
+            "ttft_ms_p50": 104.5,
+            "ttft_ms_p99": 112.0
           },
           {
             "minute": 22.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 240.7,
-            "tokens_out": 14441,
+            "throughput_tokens_per_sec": 243.0,
+            "tokens_out": 14586,
             "tokens_in": 0,
-            "requests_completed": 39,
-            "ttft_ms_p50": 102.5,
-            "ttft_ms_p99": 122.6
+            "requests_completed": 42,
+            "ttft_ms_p50": 104.9,
+            "ttft_ms_p99": 142.3
           },
           {
             "minute": 23.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 246.4,
-            "tokens_out": 14788,
+            "throughput_tokens_per_sec": 257.3,
+            "tokens_out": 15440,
             "tokens_in": 0,
-            "requests_completed": 43,
-            "ttft_ms_p50": 102.5,
-            "ttft_ms_p99": 127.1
+            "requests_completed": 46,
+            "ttft_ms_p50": 105.7,
+            "ttft_ms_p99": 128.2
           },
           {
             "minute": 24.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 232.5,
-            "tokens_out": 13947,
+            "throughput_tokens_per_sec": 234.4,
+            "tokens_out": 14065,
             "tokens_in": 0,
-            "requests_completed": 40,
-            "ttft_ms_p50": 102.6,
-            "ttft_ms_p99": 129.2
+            "requests_completed": 42,
+            "ttft_ms_p50": 105.4,
+            "ttft_ms_p99": 134.9
           },
           {
             "minute": 25.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 239.3,
-            "tokens_out": 14370,
+            "throughput_tokens_per_sec": 250.3,
+            "tokens_out": 15018,
             "tokens_in": 0,
-            "requests_completed": 43,
-            "ttft_ms_p50": 102.5,
-            "ttft_ms_p99": 126.1
+            "requests_completed": 41,
+            "ttft_ms_p50": 104.6,
+            "ttft_ms_p99": 167.8
           },
           {
             "minute": 26.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 233.9,
-            "tokens_out": 14029,
+            "throughput_tokens_per_sec": 260.0,
+            "tokens_out": 15593,
             "tokens_in": 0,
-            "requests_completed": 40,
-            "ttft_ms_p50": 103.4,
-            "ttft_ms_p99": 187.0
+            "requests_completed": 45,
+            "ttft_ms_p50": 104.3,
+            "ttft_ms_p99": 118.9
           },
           {
             "minute": 27.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 235.6,
-            "tokens_out": 14131,
+            "throughput_tokens_per_sec": 236.9,
+            "tokens_out": 14214,
             "tokens_in": 0,
             "requests_completed": 42,
-            "ttft_ms_p50": 102.2,
-            "ttft_ms_p99": 126.4
+            "ttft_ms_p50": 104.9,
+            "ttft_ms_p99": 120.6
           },
           {
             "minute": 28.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 252.2,
-            "tokens_out": 15135,
+            "throughput_tokens_per_sec": 254.1,
+            "tokens_out": 15248,
             "tokens_in": 0,
-            "requests_completed": 44,
-            "ttft_ms_p50": 102.2,
-            "ttft_ms_p99": 126.2
+            "requests_completed": 45,
+            "ttft_ms_p50": 104.1,
+            "ttft_ms_p99": 116.4
           },
           {
             "minute": 29.0,
             "is_warmup": false,
-            "throughput_tokens_per_sec": 228.8,
-            "tokens_out": 13726,
+            "throughput_tokens_per_sec": 253.6,
+            "tokens_out": 15218,
             "tokens_in": 0,
-            "requests_completed": 38,
-            "ttft_ms_p50": 102.4,
-            "ttft_ms_p99": 124.2
+            "requests_completed": 44,
+            "ttft_ms_p50": 104.3,
+            "ttft_ms_p99": 132.7
           }
         ]
       },
       "burst": {
         "burst_steady_qps": 5,
         "burst_peak_qps": 25,
-        "steady_ttft_p50_ms": 163.4,
-        "steady_ttft_p99_ms": 455.88,
-        "burst_ttft_p50_ms": 32094.56,
-        "burst_ttft_p99_ms": 61134.32,
+        "steady_ttft_p50_ms": 84.5,
+        "steady_ttft_p99_ms": 145.92,
+        "burst_ttft_p50_ms": 20202.98,
+        "burst_ttft_p99_ms": 49185.51,
         "steady_requests_total": 1812,
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
-        "burst_degradation_ratio": 134.102,
+        "burst_degradation_ratio": 337.063,
         "results_by_cycle": [
           {
             "cycle": 1,
             "steady_requests": 581,
             "burst_requests": 760,
-            "steady_ttft_p99_ms": 491.87,
-            "burst_ttft_p99_ms": 61333.62
+            "steady_ttft_p99_ms": 162.85,
+            "burst_ttft_p99_ms": 50054.22
           },
           {
             "cycle": 2,
             "steady_requests": 595,
             "burst_requests": 734,
-            "steady_ttft_p99_ms": 454.46,
-            "burst_ttft_p99_ms": 58091.55
+            "steady_ttft_p99_ms": 130.4,
+            "burst_ttft_p99_ms": 45964.04
           },
           {
             "cycle": 3,
             "steady_requests": 636,
             "burst_requests": 751,
-            "steady_ttft_p99_ms": 432.19,
-            "burst_ttft_p99_ms": 61553.53
+            "steady_ttft_p99_ms": 140.51,
+            "burst_ttft_p99_ms": 48993.46
           }
         ]
       }
@@ -30240,30 +30235,30 @@ const LEADERBOARD_DATA = [
     "architecture": "dense",
     "suite": "suite_E",
     "scenario": "all",
-    "primary_metric": 6560.55,
+    "primary_metric": 7098.8,
     "primary_metric_label": "tokens/sec (1x baseline)",
     "tokens_per_sec_per_chip": null,
-    "offline_throughput": 6560.55,
+    "offline_throughput": 7098.8,
     "online_max_qps": null,
     "interactive_ttft_p99": null,
     "peak_memory_gb": null,
     "memory_utilization_pct": null,
     "memory_efficiency_toks_per_gb": null,
     "min_price_usd_per_hr": 3.99,
-    "cost_efficiency_toks_per_dollar_hr": 1644.0,
+    "cost_efficiency_toks_per_dollar_hr": 1779.0,
     "tokens_per_watt": null,
     "accuracy_valid": true,
     "accuracy_score": 0.61,
-    "date": "2026-04-09",
+    "date": "2026-04-20",
     "submitted_by": "JuhaoLiang1997",
     "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
     "notes": null,
     "run_id": "f005e907",
     "run_name": "nvidia_h200x8_suite_E_nvidia_vllm_47f5d58e_f005e907",
     "flagged": null,
-    "scaling_efficiency_2x": 0.602,
-    "scaling_efficiency_4x": 0.329,
-    "scaling_base_throughput": 6560.55,
+    "scaling_efficiency_2x": 0.626,
+    "scaling_efficiency_4x": 0.365,
+    "scaling_base_throughput": 7098.8,
     "quant_bf16_throughput": null,
     "quant_best_throughput": null,
     "quant_best_precision": null,
@@ -30330,11 +30325,11 @@ const LEADERBOARD_DATA = [
       "acc_notes": "Integrated accuracy check \u2014 used same vLLM instance as benchmark.",
       "meta_submitted_by": "JuhaoLiang1997",
       "meta_submission_type": "individual",
-      "meta_date": "2026-04-09",
+      "meta_date": "2026-04-20",
       "meta_reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
-      "meta_elapsed_min": 5.8,
-      "meta_model_load_sec": 80.4,
-      "meta_start_time": "2026-04-09T10:51:23.776481+00:00",
+      "meta_elapsed_min": 5.0,
+      "meta_model_load_sec": 82.1,
+      "meta_start_time": "2026-04-20T18:34:28.542311+00:00",
       "meta_notes": null
     },
     "viz": {
@@ -30346,22 +30341,22 @@ const LEADERBOARD_DATA = [
         8
       ],
       "throughput": [
-        6560.55,
-        7894.6,
-        8634.13,
-        9108.78
+        7098.8,
+        8893.79,
+        10355.16,
+        11081.55
       ],
       "efficiency_pct": [
         100.0,
-        60.2,
-        32.9,
-        17.4
+        62.6,
+        36.5,
+        19.5
       ],
       "throughput_per_chip": [
-        6560.55,
-        3947.3,
-        2158.53,
-        1138.6
+        7098.8,
+        4446.9,
+        2588.79,
+        1385.19
       ]
     },
     "impl": {
