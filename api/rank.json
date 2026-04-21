@@ -1,4 +1,13 @@
 {
+  "apple_m1x1_suite_F_apple_mlx_lm_9546b8b5_2349a925": {
+    "chip_name": "Apple M1",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 51.0
+  },
   "google_tpu_v5ex1_suite_F_google_vllm_tpu_68cc9ffa_300ac34c": {
     "chip_name": "Google TPU v5e",
     "suite_id": "suite_F",

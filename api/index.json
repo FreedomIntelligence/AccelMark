@@ -1,4 +1,12 @@
 {
+  "Apple M1": {
+    "best_throughput_tokens_per_sec": 51.0,
+    "suites": {
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 51.0
+      }
+    }
+  },
   "Google TPU v5e": {
     "best_throughput_tokens_per_sec": 8127.1,
     "suites": {

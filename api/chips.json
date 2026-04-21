@@ -112,5 +112,11 @@
     "submission_count": 6,
     "best_throughput_tokens_per_sec": 4941.13,
     "median_throughput_tokens_per_sec": 1665.5
+  },
+  {
+    "name": "Apple M1",
+    "submission_count": 1,
+    "best_throughput_tokens_per_sec": 51.0,
+    "median_throughput_tokens_per_sec": 51.0
   }
 ]
