@@ -501,7 +501,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 4677.49
+    "primary_metric": 5730.96
   },
   "nvidia_h200x1_suite_C_nvidia_vllm_47f5d58e_f07c60f8": {
     "chip_name": "NVIDIA H200",
@@ -510,7 +510,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 3785.0
+    "primary_metric": 3626.5
   },
   "nvidia_h200x1_suite_D_nvidia_vllm_47f5d58e_62a36028": {
     "chip_name": "NVIDIA H200",
@@ -519,7 +519,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 176.08
+    "primary_metric": 171.93
   },
   "nvidia_h200x1_suite_F_nvidia_vllm_47f5d58e_53471efa": {
     "chip_name": "NVIDIA H200",
@@ -528,7 +528,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 8134.36
+    "primary_metric": 12862.12
   },
   "nvidia_h200x8_suite_B_nvidia_vllm_47f5d58e_b727568e": {
     "chip_name": "NVIDIA H200",
@@ -537,7 +537,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 3294.95
+    "primary_metric": 3553.46
   },
   "nvidia_h200x8_suite_E_nvidia_vllm_47f5d58e_f005e907": {
     "chip_name": "NVIDIA H200",
@@ -546,7 +546,7 @@
     "rank": 1,
     "total": 1,
     "percentile": 100.0,
-    "primary_metric": 7098.8
+    "primary_metric": 6560.55
   },
   "nvidia_h200x8_suite_G_nvidia_vllm_47f5d58e_7f7a270e": {
     "chip_name": "NVIDIA H200",

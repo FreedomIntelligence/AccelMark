@@ -399,44 +399,44 @@
     }
   },
   "NVIDIA H200": {
-    "best_throughput_tokens_per_sec": 8134.36,
+    "best_throughput_tokens_per_sec": 12862.12,
     "suites": {
       "suite_A": {
-        "best_throughput_tokens_per_sec": 4677.5,
+        "best_throughput_tokens_per_sec": 5731.0,
         "best_online_max_qps": 5,
-        "best_interactive_ttft_p99_ms": 52.8,
-        "best_sustained_throughput_tokens_per_sec": 856.3,
-        "throttle_ratio": 0.956
+        "best_interactive_ttft_p99_ms": 36.5,
+        "best_sustained_throughput_tokens_per_sec": 709.2,
+        "throttle_ratio": 0.791
       },
       "suite_C": {
-        "best_quality_efficiency": 3785.0,
-        "best_quality_efficiency_format": "FP8"
+        "best_quality_efficiency": 3626.5,
+        "best_quality_efficiency_format": "W8A8"
       },
       "suite_D": {
-        "best_throughput_tokens_per_sec": 176.1,
+        "best_throughput_tokens_per_sec": 171.9,
         "best_online_max_qps": 0.0,
-        "best_interactive_ttft_p99_ms": 1249.4,
-        "best_sustained_throughput_tokens_per_sec": 139.0,
-        "throttle_ratio": 0.799
+        "best_interactive_ttft_p99_ms": 1246.3,
+        "best_sustained_throughput_tokens_per_sec": 132.9,
+        "throttle_ratio": 0.6
       },
       "suite_F": {
-        "best_throughput_tokens_per_sec": 8134.4,
+        "best_throughput_tokens_per_sec": 12862.1,
         "best_online_max_qps": 10,
-        "best_interactive_ttft_p99_ms": 41.8,
-        "best_sustained_throughput_tokens_per_sec": 2946.2,
-        "throttle_ratio": 0.832
+        "best_interactive_ttft_p99_ms": 44.8,
+        "best_sustained_throughput_tokens_per_sec": 1425.4,
+        "throttle_ratio": 0.826
       },
       "suite_B": {
-        "best_throughput_tokens_per_sec": 3294.9,
-        "best_online_max_qps": 25,
-        "best_interactive_ttft_p99_ms": 98.8,
-        "best_sustained_throughput_tokens_per_sec": 255.8,
-        "throttle_ratio": 0.715
+        "best_throughput_tokens_per_sec": 3553.5,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 193.0,
+        "best_sustained_throughput_tokens_per_sec": 241.2,
+        "throttle_ratio": 0.807
       },
       "suite_E": {
-        "best_throughput_tokens_per_sec": 7098.8,
-        "best_scaling_efficiency_2x": 0.626,
-        "best_scaling_efficiency_4x": 0.365
+        "best_throughput_tokens_per_sec": 6560.6,
+        "best_scaling_efficiency_2x": 0.602,
+        "best_scaling_efficiency_4x": 0.329
       },
       "suite_G": {
         "best_throughput_tokens_per_sec": 5334.3,
