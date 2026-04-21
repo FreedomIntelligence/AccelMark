@@ -496,6 +496,18 @@
       }
     }
   },
+  "NVIDIA RTX 4000 Ada Generation": {
+    "best_throughput_tokens_per_sec": 9380.99,
+    "suites": {
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 9381.0,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 16.6,
+        "best_sustained_throughput_tokens_per_sec": 3880.8,
+        "throttle_ratio": 0.982
+      }
+    }
+  },
   "NVIDIA RTX 6000 Ada Generation": {
     "best_throughput_tokens_per_sec": 8248.35,
     "suites": {

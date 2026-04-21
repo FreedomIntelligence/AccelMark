@@ -611,6 +611,15 @@
     "percentile": 100.0,
     "primary_metric": 7188.02
   },
+  "nvidia_rtx_4000_ada_generationx1_suite_F_nvidia_vllm_47f5d58e_125c6b61": {
+    "chip_name": "NVIDIA RTX 4000 Ada Generation",
+    "suite_id": "suite_F",
+    "tier": "verified",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 9380.99
+  },
   "nvidia_rtx_6000_ada_generationx1_suite_A_nvidia_vllm_47f5d58e_bd3b5d27": {
     "chip_name": "NVIDIA RTX 6000 Ada Generation",
     "suite_id": "suite_A",

@@ -60,6 +60,12 @@
     "median_throughput_tokens_per_sec": 1624.3
   },
   {
+    "name": "NVIDIA RTX 4000 Ada Generation",
+    "submission_count": 1,
+    "best_throughput_tokens_per_sec": 9380.99,
+    "median_throughput_tokens_per_sec": 9381.0
+  },
+  {
     "name": "NVIDIA GeForce RTX 3090",
     "submission_count": 3,
     "best_throughput_tokens_per_sec": 8961.38,
