@@ -1,0 +1,38 @@
+# AccelMark — NVIDIA SGLang runner dependencies
+# Tested combination: torch 2.5.1 + sglang 0.4.x + CUDA 12.1
+#
+# SGLang install — use the official release wheel:
+#   pip install sglang[all]
+# or for a pinned version:
+#   pip install "sglang[all]==0.4.0"
+#
+# See https://sgl-project.github.io/start/install.html for full options.
+
+# Core
+torch==2.5.1
+torchvision==0.20.1
+torchaudio==2.5.1
+
+# LLM inference
+sglang[all]>=0.4.0
+
+# Transformers (for tokenizer)
+transformers==4.46.3
+tokenizers>=0.20.0
+huggingface-hub>=0.25.0
+accelerate>=0.34.0
+
+# AccelMark dependencies
+numpy>=1.24.0
+jsonschema>=4.0.0
+psutil>=5.9.0
+tqdm>=4.66.0
+
+# NVIDIA monitoring
+nvidia-ml-py>=12.0.0
+
+# Async support
+aiohttp>=3.9.0
+
+# Config file parsing
+pyyaml>=6.0
