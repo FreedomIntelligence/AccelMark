@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "NVIDIA L4",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 22.5,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-18T06:20:31.115148+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA L4",
+        "vendor": "NVIDIA",
+        "memory_gb": 22.5,
+        "driver_version": "580.82.07",
+        "firmware_version": null,
+        "compute_capability": "8.9",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t0-11\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+      "physical_cores": 6,
+      "logical_cores": 12,
+      "numa_nodes": 1
+    },
+    "system_memory_gb": 53.0,
+    "pcie_generation": "PCIe Gen 1",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": null,
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13",
+    "kernel_version": "6.6.113+",
+    "runtime_version": "CUDA 12.4",
+    "pytorch_version": "2.5.1+cu124"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.7.3",
+    "driver_version": "580.82.07",
+    "runtime_version": "CUDA 12.4",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "huggingface",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 0.0,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 41177.07,
+          "ttft_ms_p90": 107727.21,
+          "ttft_ms_p99": 118987.61,
+          "tpot_ms_p50": 118.65,
+          "tpot_ms_p90": 164.26,
+          "tpot_ms_p99": 344.55,
+          "elapsed_seconds_median": 217.7,
+          "sla_met": false
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 60759.78,
+          "ttft_ms_p90": 145098.03,
+          "ttft_ms_p99": 164051.61,
+          "tpot_ms_p50": 117.51,
+          "tpot_ms_p90": 218.89,
+          "tpot_ms_p99": 862.12,
+          "elapsed_seconds_median": 216.8,
+          "sla_met": false
+        },
+        {
+          "target_qps": 100,
+          "achieved_qps": 100.0,
+          "ttft_ms_p50": 65422.57,
+          "ttft_ms_p90": 153852.66,
+          "ttft_ms_p99": 166037.06,
+          "tpot_ms_p50": 116.6,
+          "tpot_ms_p90": 218.97,
+          "tpot_ms_p99": 833.45,
+          "elapsed_seconds_median": 216.4,
+          "sla_met": false
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-18",
+    "time": "07:18:39",
+    "run_id": "b991b4c1",
+    "run_name": "nvidia_l4x1_suite_A_nvidia_vllm_47f5d58e_b991b4c1",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-18T06:46:07.719473+00:00",
+    "benchmark_end_time": "2026-04-18T07:18:39.386798+00:00",
+    "benchmark_elapsed_minutes": 32.5,
+    "model_load_seconds": 61.3
+  }
+}

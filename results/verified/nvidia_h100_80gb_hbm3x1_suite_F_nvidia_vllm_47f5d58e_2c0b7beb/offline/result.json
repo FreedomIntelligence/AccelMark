@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_F",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "NVIDIA H100 80GB HBM3",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 79.6,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-18T07:38:56.845167+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA H100 80GB HBM3",
+        "vendor": "NVIDIA",
+        "memory_gb": 79.6,
+        "driver_version": "580.82.07",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t0-25\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8481C CPU @ 2.70GHz",
+      "physical_cores": 13,
+      "logical_cores": 26,
+      "numa_nodes": 1
+    },
+    "system_memory_gb": 230.0,
+    "pcie_generation": "PCIe Gen 4",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": null,
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13",
+    "kernel_version": "6.6.113+",
+    "runtime_version": "CUDA 12.4",
+    "pytorch_version": "2.5.1+cu124"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.7.3",
+    "driver_version": "580.82.07",
+    "runtime_version": "CUDA 12.4",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13"
+  },
+  "model": {
+    "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "huggingface",
+    "architecture": "dense",
+    "parameter_count_b": 0.5,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "offline",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 4,
+          "throughput_tokens_per_sec": 18910.96,
+          "throughput_tokens_per_sec_per_chip": 18910.96,
+          "throughput_tokens_per_sec_total": 28181.19,
+          "elapsed_seconds_median": 2.2,
+          "peak_memory_gb": 68.91,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 16,
+          "throughput_tokens_per_sec": 17997.85,
+          "throughput_tokens_per_sec_per_chip": 17997.85,
+          "throughput_tokens_per_sec_total": 26820.47,
+          "elapsed_seconds_median": 2.3,
+          "peak_memory_gb": 68.91,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 64,
+          "throughput_tokens_per_sec": 18129.5,
+          "throughput_tokens_per_sec_per_chip": 18129.5,
+          "throughput_tokens_per_sec_total": 27016.67,
+          "elapsed_seconds_median": 2.3,
+          "peak_memory_gb": 68.91,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-18",
+    "time": "07:42:14",
+    "run_id": "2c0b7beb",
+    "run_name": "nvidia_h100_80gb_hbm3x1_suite_F_nvidia_vllm_47f5d58e_2c0b7beb",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-18T07:41:46.352260+00:00",
+    "benchmark_end_time": "2026-04-18T07:42:14.471676+00:00",
+    "benchmark_elapsed_minutes": 0.5,
+    "model_load_seconds": 69.8
+  }
+}

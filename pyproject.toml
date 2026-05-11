@@ -1,0 +1,20 @@
+[project]
+name = "accelmark"
+version = "0.1.0"
+description = "LLM inference benchmarking framework for multiple hardware platforms"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+
+dependencies = [
+    "jsonschema>=4.0.0",
+    "numpy>=1.24",
+    "pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["loadgen*"]

@@ -1,0 +1,48 @@
+{
+  "meta-llama/Meta-Llama-3-8B-Instruct": {
+    "revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "bf16_baseline_score": 0.60,
+    "notes": "Measured on A100 SXM4 80GB, vLLM 0.7.3, CUDA 12.1"
+  },
+  "meta-llama/Llama-3.1-8B-Instruct": {
+    "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "bf16_baseline_score": 0.56,
+    "notes": "Measured on A100 SXM4 80GB, vLLM 0.7.3, CUDA 12.1"
+  },
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-FP8": {
+    "revision": "12fd6884d2585dd4d020373e7f39f74507b31866",
+    "fp8_baseline_score": 0.58,
+    "notes": "Measured on A100 SXM4 80GB, vLLM 0.7.3, CUDA 12.1"
+  },
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a8": {
+    "revision": "e2bfb7d92784ad7d1b606c2f9644d3cefb2ec708",
+    "w8a8_baseline_score": 0.59,
+    "notes": "Measured on A100 SXM4 80GB, vLLM 0.7.3, CUDA 12.1"
+  },
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w8a16": {
+    "revision": "38e03ba250017bf8ed3eeecd3a744e21f6b994a9",
+    "w8a16_baseline_score": 0.59,
+    "notes": "Measured on A100 SXM4 80GB, vLLM 0.7.3, CUDA 12.1"
+  },
+  "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16": {
+    "revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e",
+    "w4a16_baseline_score": 0.57,
+    "notes": "Measured on A100 SXM4 80GB, vLLM 0.7.3, CUDA 12.1"
+  },
+  "meta-llama/Meta-Llama-3-70B-Instruct": {
+    "revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "bf16_baseline_score": 0.77,
+    "notes": "Measured on A100 SXM4 80GBx4, vLLM 0.7.3, CUDA 12.1"
+  },
+  "Qwen/Qwen2.5-0.5B-Instruct": {
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "fp16_baseline_score": 0.37,
+    "bf16_baseline_score": 0.38,
+    "notes": "Measured on A100 SXM4 80GB, vLLM 0.7.3, CUDA 12.1"
+  },
+  "mistralai/Mixtral-8x7B-Instruct-v0.1": {
+    "revision": "eba92302a2861cdc0098cc54bc9f17cb2c47eb61",
+    "bf16_baseline_score": 0.62,
+    "notes": "Measured on A100 SXM4 40GBx2, vLLM 0.7.3, CUDA 12.1"
+  }
+}

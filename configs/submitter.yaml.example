@@ -1,0 +1,7 @@
+# Copy this file to configs/submitter.yaml and fill in your details.
+# configs/submitter.yaml is gitignored — do not commit it.
+
+submitted_by: your_github_username
+submission_type: individual   # individual / vendor / research
+organization: null            # optional
+contact: null                 # optional email

@@ -1,0 +1,32 @@
+# AccelMark -- NVIDIA platform dependencies
+# Tested combination: torch 2.5.1 + vLLM 0.7.3 + CUDA 12.1
+
+# Core
+torch==2.5.1
+torchvision==0.20.1
+torchaudio==2.5.1
+
+# LLM inference
+vllm==0.7.3
+
+# Transformers stack (versions from tested environment)
+transformers==4.57.6
+tokenizers==0.22.2
+huggingface-hub==0.35.0
+accelerate==1.10.1
+safetensors==0.6.2
+
+# AccelMark dependencies
+numpy==1.26.4
+jsonschema==4.25.1
+psutil==7.1.0
+tqdm==4.67.1
+
+# NVIDIA monitoring (for power and GPU stats)
+nvidia-ml-py==13.580.82
+
+# Async support
+aiohttp==3.12.15
+
+# Config file parsing
+PyYAML==6.0.2

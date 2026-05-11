@@ -1,0 +1,73 @@
+{
+  "collected_at": "2026-04-15T21:06:47.839201+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA H20-3e",
+      "vendor": "NVIDIA",
+      "memory_gb": 140.4,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "9.0",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": "\tGPU0\tNIC0\tNIC1\tNIC2\tNIC3\tNIC4\tNIC5\tNIC6\tNIC7\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tPIX\tPIX\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t0-47,96-143\t0\t\tN/A\nNIC0\tPIX\t X \tPIX\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC1\tPIX\tPIX\t X \tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC2\tNODE\tNODE\tNODE\t X \tNODE\tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC3\tNODE\tNODE\tNODE\tNODE\t X \tSYS\tSYS\tSYS\tSYS\t\t\t\t\nNIC4\tSYS\tSYS\tSYS\tSYS\tSYS\t X \tPIX\tNODE\tNODE\t\t\t\t\nNIC5\tSYS\tSYS\tSYS\tSYS\tSYS\tPIX\t X \tNODE\tNODE\t\t\t\t\nNIC6\tSYS\tSYS\tSYS\tSYS\tSYS\tNODE\tNODE\t X \tPIX\t\t\t\t\nNIC7\tSYS\tSYS\tSYS\tSYS\tSYS\tNODE\tNODE\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n  NIC3: mlx5_3\n  NIC4: mlx5_4\n  NIC5: mlx5_5\n  NIC6: mlx5_6\n  NIC7: mlx5_7\n\n",
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "INTEL(R) XEON(R) PLATINUM 8558",
+    "physical_cores": 96,
+    "logical_cores": 192,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 1511.5,
+  "pcie_generation": "PCIe Gen 5",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_1",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_3",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_4",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_5",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_6",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_7",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.4 LTS",
+  "python_version": "3.10.12",
+  "kernel_version": "5.15.0-60-generic",
+  "runtime_version": "CUDA 12.5",
+  "pytorch_version": "2.4.0a0+f70bd71a48.nv24.06"
+}

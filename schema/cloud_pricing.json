@@ -1,0 +1,185 @@
+{
+  "_meta": {
+    "description": "Cloud rental prices for AI accelerators used in AccelMark evaluations.",
+    "last_updated": "2026-04",
+    "note": "Prices are on-demand single-GPU hourly rates in USD unless noted. Spot/preemptible prices are typically 50-70% lower. Prices vary by region, commitment tier, and availability. Sources checked April 2026.",
+    "estimated_note": "Entries marked estimated:true reflect prices derived from public announcements, regional platform listings, or community reports where official English-language pricing pages were unavailable. Treat as approximate.",
+    "reference_price_note": "reference_price_usd_per_hr is the single price used in AccelMark cost-efficiency analysis. It is the lowest verified on-demand price across providers, or the estimated price where marked."
+  },
+
+  "Tesla T4": {
+    "architecture": "Turing", "release_year": 2018,
+    "reference_price_usd_per_hr": 0.15, "estimated": false,
+    "providers": [
+      {"name": "GCP n1+T4 GPU portion", "price_usd_per_hr": 0.15, "source": "cloud.google.com/compute/gpus-pricing"},
+      {"name": "AWS g4dn.xlarge GPU portion", "price_usd_per_hr": 0.15, "source": "aws.amazon.com/ec2/pricing/on-demand"},
+      {"name": "RunPod T4 spot", "price_usd_per_hr": 0.10, "source": "runpod.io/pricing"}
+    ]
+  },
+
+  "Tesla V100S-PCIE-32GB": {
+    "architecture": "Volta", "release_year": 2018,
+    "reference_price_usd_per_hr": 0.80, "estimated": false,
+    "providers": [
+      {"name": "Lambda Labs V100 on-demand", "price_usd_per_hr": 0.80, "source": "lambdalabs.com/service/gpu-cloud"},
+      {"name": "RunPod V100 on-demand", "price_usd_per_hr": 0.89, "source": "runpod.io/pricing"}
+    ]
+  },
+
+  "NVIDIA GeForce RTX 3090": {
+    "architecture": "Ampere", "release_year": 2020,
+    "reference_price_usd_per_hr": 0.35, "estimated": false,
+    "providers": [
+      {"name": "RunPod RTX 3090 on-demand", "price_usd_per_hr": 0.35, "source": "runpod.io/pricing"},
+      {"name": "Vast.ai RTX 3090 median ask", "price_usd_per_hr": 0.30, "source": "vast.ai"}
+    ]
+  },
+
+  "NVIDIA RTX A6000": {
+    "architecture": "Ampere", "release_year": 2020,
+    "reference_price_usd_per_hr": 0.58, "estimated": false,
+    "providers": [
+      {"name": "Lambda Labs RTX A6000 on-demand", "price_usd_per_hr": 0.58, "source": "lambdalabs.com/service/gpu-cloud"},
+      {"name": "RunPod RTX A6000 on-demand", "price_usd_per_hr": 0.62, "source": "runpod.io/pricing"}
+    ]
+  },
+
+  "NVIDIA A100-SXM4-40GB": {
+    "architecture": "Ampere", "release_year": 2020,
+    "reference_price_usd_per_hr": 1.10, "estimated": false,
+    "providers": [
+      {"name": "Lambda Labs A100 40GB on-demand", "price_usd_per_hr": 1.10, "source": "lambdalabs.com/service/gpu-cloud"},
+      {"name": "CoreWeave A100 40GB on-demand", "price_usd_per_hr": 1.79, "source": "coreweave.com/pricing"}
+    ]
+  },
+
+  "NVIDIA A100-SXM4-80GB": {
+    "architecture": "Ampere", "release_year": 2020,
+    "reference_price_usd_per_hr": 1.50, "estimated": false,
+    "providers": [
+      {"name": "Lambda Labs A100 80GB on-demand", "price_usd_per_hr": 1.50, "source": "lambdalabs.com/service/gpu-cloud"},
+      {"name": "AWS p4d.24xlarge per GPU", "price_usd_per_hr": 3.20, "note": "Full instance", "source": "aws.amazon.com/ec2/pricing/on-demand"},
+      {"name": "GCP a2-highgpu-1g", "price_usd_per_hr": 3.67, "source": "cloud.google.com/compute/gpus-pricing"},
+      {"name": "Azure NC A100 v4 per GPU", "price_usd_per_hr": 3.40, "source": "azure.microsoft.com/pricing/details/virtual-machines"}
+    ]
+  },
+
+  "NVIDIA A800-SXM4-80GB": {
+    "architecture": "Ampere", "release_year": 2022,
+    "reference_price_usd_per_hr": 1.80, "estimated": true,
+    "providers": [
+      {"name": "阿里云 ecs.gn7i per GPU", "price_usd_per_hr": 2.80, "estimated": true, "note": "Converted from CNY at 2026-04 rate; China-market only", "source": "aliyun.com/price/product"},
+      {"name": "腾讯云 GN10Xp per GPU", "price_usd_per_hr": 2.50, "estimated": true, "note": "Converted from CNY", "source": "cloud.tencent.com/price/cvm"}
+    ]
+  },
+
+  "NVIDIA L4": {
+    "architecture": "Ada Lovelace", "release_year": 2023,
+    "reference_price_usd_per_hr": 0.20, "estimated": false,
+    "providers": [
+      {"name": "RunPod L4 on-demand", "price_usd_per_hr": 0.20, "source": "runpod.io/pricing"},
+      {"name": "GCP g2-standard-4 GPU portion", "price_usd_per_hr": 0.71, "note": "Full instance includes CPU/RAM", "source": "cloud.google.com/compute/gpus-pricing"},
+      {"name": "AWS g6.xlarge per GPU", "price_usd_per_hr": 0.81, "note": "Full instance", "source": "aws.amazon.com/ec2/pricing/on-demand"}
+    ]
+  },
+
+  "NVIDIA GeForce RTX 4090": {
+    "architecture": "Ada Lovelace", "release_year": 2022,
+    "reference_price_usd_per_hr": 0.44, "estimated": false,
+    "providers": [
+      {"name": "RunPod RTX 4090 on-demand", "price_usd_per_hr": 0.44, "source": "runpod.io/pricing"},
+      {"name": "Lambda Labs RTX 4090 on-demand", "price_usd_per_hr": 0.50, "source": "lambdalabs.com/service/gpu-cloud"}
+    ]
+  },
+
+  "NVIDIA GeForce RTX 4090 D": {
+    "architecture": "Ada Lovelace", "release_year": 2023,
+    "reference_price_usd_per_hr": 0.50, "estimated": true,
+    "providers": [
+      {"name": "阿里云 RTX 4090D per GPU", "price_usd_per_hr": 0.50, "estimated": true, "note": "China-market only export variant; estimated from CNY listings", "source": "aliyun.com/price/product"}
+    ]
+  },
+
+  "NVIDIA H100 80GB HBM3": {
+    "architecture": "Hopper", "release_year": 2023,
+    "reference_price_usd_per_hr": 2.49, "estimated": false,
+    "providers": [
+      {"name": "Lambda Labs H100 SXM5 on-demand", "price_usd_per_hr": 2.49, "source": "lambdalabs.com/service/gpu-cloud"},
+      {"name": "CoreWeave H100 SXM5 on-demand", "price_usd_per_hr": 2.79, "source": "coreweave.com/pricing"},
+      {"name": "RunPod H100 SXM on-demand", "price_usd_per_hr": 2.49, "source": "runpod.io/pricing"},
+      {"name": "AWS p5.48xlarge per GPU", "price_usd_per_hr": 4.90, "note": "Full instance", "source": "aws.amazon.com/ec2/pricing/on-demand"},
+      {"name": "GCP h3-highgpu-8g per GPU", "price_usd_per_hr": 5.10, "source": "cloud.google.com/compute/gpus-pricing"}
+    ]
+  },
+
+  "NVIDIA H20-3e": {
+    "architecture": "Hopper", "release_year": 2024,
+    "reference_price_usd_per_hr": 2.00, "estimated": true,
+    "providers": [
+      {"name": "阿里云 H20 per GPU", "price_usd_per_hr": 2.00, "estimated": true, "note": "Export-restricted H20 variant; China-market cloud only. Converted from CNY at 2026-04 rate.", "source": "aliyun.com/price/product"},
+      {"name": "华为云 H20 per GPU", "price_usd_per_hr": 2.10, "estimated": true, "note": "Converted from CNY", "source": "huaweicloud.com/pricing"}
+    ]
+  },
+
+  "NVIDIA H200": {
+    "architecture": "Hopper", "release_year": 2024,
+    "reference_price_usd_per_hr": 3.99, "estimated": false,
+    "providers": [
+      {"name": "CoreWeave H200 SXM on-demand", "price_usd_per_hr": 3.99, "source": "coreweave.com/pricing"},
+      {"name": "Lambda Labs H200 on-demand", "price_usd_per_hr": 3.99, "source": "lambdalabs.com/service/gpu-cloud"},
+      {"name": "RunPod H200 SXM on-demand", "price_usd_per_hr": 3.99, "source": "runpod.io/pricing"}
+    ]
+  },
+
+  "NVIDIA GeForce RTX 5090": {
+    "architecture": "Blackwell", "release_year": 2025,
+    "reference_price_usd_per_hr": 0.75, "estimated": true,
+    "providers": [
+      {"name": "RunPod RTX 5090 early access", "price_usd_per_hr": 0.75, "estimated": true, "note": "Not widely available on cloud platforms as of 2026-04; estimated from RunPod early access and community listings.", "source": "runpod.io/pricing"}
+    ]
+  },
+
+  "Huawei Ascend 910B2": {
+    "architecture": "Da Vinci 2.0", "release_year": 2023,
+    "reference_price_usd_per_hr": 1.40, "estimated": true,
+    "providers": [
+      {"name": "华为云 Ascend 910B per card", "price_usd_per_hr": 1.40, "estimated": true, "note": "Converted from approx. CNY 10/hr at 2026-04 rate; official page in Chinese.", "source": "huaweicloud.com/product/modelarts"},
+      {"name": "阿里云 Ascend 910B per card", "price_usd_per_hr": 1.50, "estimated": true, "note": "Converted from CNY", "source": "aliyun.com/price/product"}
+    ]
+  },
+
+  "Huawei Ascend Ascend910": {
+    "architecture": "Da Vinci 2.0 (910C, dual-die)", "release_year": 2024,
+    "reference_price_usd_per_hr": 2.50, "estimated": true,
+    "providers": [
+      {"name": "华为云 Ascend 910C per card", "price_usd_per_hr": 2.50, "estimated": true, "note": "910C combines two 910B dies; price estimated at approximately 2x the 910B rate. Limited public availability. Converted from CNY.", "source": "huaweicloud.com/product/modelarts"}
+    ]
+  },
+
+  "Google TPU v5e": {
+    "architecture": "TPU v5e", "release_year": 2023,
+    "reference_price_usd_per_hr": 1.20, "estimated": false,
+    "providers": [
+      {"name": "GCP TPU v5e-1 on-demand (1 chip)", "price_usd_per_hr": 1.20, "source": "cloud.google.com/tpu/pricing"},
+      {"name": "GCP TPU v5e-1 spot (1 chip)", "price_usd_per_hr": 0.36, "source": "cloud.google.com/tpu/pricing"}
+    ]
+  },
+
+  "Google TPU v6e": {
+    "architecture": "TPU v6e (Trillium)", "release_year": 2024,
+    "reference_price_usd_per_hr": 2.10, "estimated": false,
+    "providers": [
+      {"name": "GCP TPU v6e-1 on-demand (1 chip)", "price_usd_per_hr": 2.10, "source": "cloud.google.com/tpu/pricing"},
+      {"name": "GCP TPU v6e-1 spot (1 chip)", "price_usd_per_hr": 0.63, "source": "cloud.google.com/tpu/pricing"}
+    ]
+  },
+
+  "AMD Instinct MI300X": {
+    "architecture": "CDNA3", "release_year": 2023,
+    "reference_price_usd_per_hr": 4.80, "estimated": false,
+    "providers": [
+      {"name": "Azure ND MI300X v5 per GPU", "price_usd_per_hr": 4.80, "source": "azure.microsoft.com/pricing/details/virtual-machines"},
+      {"name": "Oracle OCI A10 equivalent (MI300X)", "price_usd_per_hr": 4.50, "estimated": true, "note": "Estimated; MI300X availability varies by cloud", "source": "oracle.com/cloud/compute/gpu-pricing"}
+    ]
+  }
+}

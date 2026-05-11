@@ -1,0 +1,123 @@
+{
+  "collected_at": "2026-04-16T07:06:06.992072+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    },
+    {
+      "index": 1,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    },
+    {
+      "index": 2,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    },
+    {
+      "index": 3,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    },
+    {
+      "index": 4,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    },
+    {
+      "index": 5,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    },
+    {
+      "index": 6,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    },
+    {
+      "index": 7,
+      "name": "Tesla V100S-PCIE-32GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 32.0,
+      "driver_version": "565.57.01",
+      "firmware_version": null,
+      "compute_capability": "7.0",
+      "supports_bf16": false
+    }
+  ],
+  "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tGPU4\tGPU5\tGPU6\tGPU7\tNIC0\tNIC1\tNIC2\tNIC3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tPIX\tPXB\tPXB\tPXB\tPXB\tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nGPU1\tPIX\t X \tPXB\tPXB\tPXB\tPXB\tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nGPU2\tPXB\tPXB\t X \tPXB\tPXB\tPXB\tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nGPU3\tPXB\tPXB\tPXB\t X \tPIX\tPXB\tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nGPU4\tPXB\tPXB\tPXB\tPIX\t X \tPXB\tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nGPU5\tPXB\tPXB\tPXB\tPXB\tPXB\t X \tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nGPU6\tPXB\tPXB\tPXB\tPXB\tPXB\tPXB\t X \tPXB\tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nGPU7\tPXB\tPXB\tPXB\tPXB\tPXB\tPXB\tPXB\t X \tNODE\tNODE\tSYS\tSYS\t0-19,40-59\t0\t\tN/A\nNIC0\tNODE\tNODE\tNODE\tNODE\tNODE\tNODE\tNODE\tNODE\t X \tPIX\tSYS\tSYS\t\t\t\t\nNIC1\tNODE\tNODE\tNODE\tNODE\tNODE\tNODE\tNODE\tNODE\tPIX\t X \tSYS\tSYS\t\t\t\t\nNIC2\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t X \tPIX\t\t\t\t\nNIC3\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n  NIC3: mlx5_3\n\n",
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz",
+    "physical_cores": 40,
+    "logical_cores": 80,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 1007.5,
+  "pcie_generation": "PCIe Gen 3",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_1",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_3",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.4 LTS",
+  "python_version": "3.10.12",
+  "kernel_version": "5.15.0-60-generic",
+  "runtime_version": "CUDA 12.5",
+  "pytorch_version": "2.4.0a0+f70bd71a48.nv24.06"
+}

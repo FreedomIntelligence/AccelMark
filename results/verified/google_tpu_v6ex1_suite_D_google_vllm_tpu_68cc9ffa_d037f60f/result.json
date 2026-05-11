@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_D",
+  "implementation_id": "google_vllm_tpu_68cc9ffa",
+  "chip": {
+    "name": "Google TPU v6e",
+    "vendor": "Google",
+    "count": 1,
+    "memory_gb": 32.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-18T04:20:36.458487+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Google TPU v6e",
+        "vendor": "Google",
+        "memory_gb": 32.0,
+        "driver_version": "JAX 0.8.1",
+        "firmware_version": null,
+        "tpu_type": "v6e-1",
+        "tpu_node_name": null,
+        "num_cores_per_chip": 1,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "AMD EPYC 9B14",
+      "physical_cores": 22,
+      "logical_cores": 44,
+      "numa_nodes": 1
+    },
+    "system_memory_gb": 172.9,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": null,
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13",
+    "kernel_version": "6.6.113+",
+    "runtime_version": "JAX 0.8.1",
+    "pytorch_version": "2.9.0+cpu"
+  },
+  "software": {
+    "framework": "vllm-tpu",
+    "framework_version": "0.13.3",
+    "driver_version": "JAX 0.8.1",
+    "runtime_version": "JAX 0.8.1",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "huggingface",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 2,
+    "extra_config": {
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    }
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 1,
+          "throughput_tokens_per_sec": 54.52,
+          "throughput_tokens_per_sec_per_chip": 54.52,
+          "throughput_tokens_per_sec_total": 6154.08,
+          "elapsed_seconds_median": 234.8,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 4,
+          "throughput_tokens_per_sec": 54.52,
+          "throughput_tokens_per_sec_per_chip": 54.52,
+          "throughput_tokens_per_sec_total": 6153.89,
+          "elapsed_seconds_median": 234.8,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.55,
+    "baseline_delta": -0.01,
+    "valid": true,
+    "framework": "vllm-tpu",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vllm-tpu instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-18",
+    "time": "04:48:33",
+    "run_id": "d037f60f",
+    "run_name": "google_tpu_v6ex1_suite_D_google_vllm_tpu_68cc9ffa_d037f60f",
+    "flagged": null,
+    "reproduce_script": "runners/google_vllm_tpu_68cc9ffa/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-18T04:25:04.523831+00:00",
+    "benchmark_end_time": "2026-04-18T04:48:33.233434+00:00",
+    "benchmark_elapsed_minutes": 23.5,
+    "model_load_seconds": 68.9,
+    "benchmark_elapsed_minutes_note": "Total across ['offline'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/verified/google_tpu_v6ex1_suite_D_google_vllm_tpu_68cc9ffa_d037f60f/offline"
+    }
+  }
+}

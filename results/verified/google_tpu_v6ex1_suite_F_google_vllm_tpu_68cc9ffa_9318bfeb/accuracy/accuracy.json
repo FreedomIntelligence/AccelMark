@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.28,
+  "baseline_delta": -0.1,
+  "valid": true,
+  "framework": "vllm-tpu",
+  "precision": "BF16",
+  "notes": "Integrated accuracy check \u2014 used same vllm-tpu instance as benchmark."
+}

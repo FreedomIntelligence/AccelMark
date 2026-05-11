@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.61,
+  "baseline_delta": 0.02,
+  "valid": true,
+  "framework": "vllm-ascend",
+  "precision": "BF16",
+  "notes": "Integrated accuracy check \u2014 used same vllm-ascend instance as benchmark."
+}

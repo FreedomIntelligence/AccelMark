@@ -1,0 +1,11 @@
+{
+  "id": "ascend_vllm_ascend_d4aa9fda",
+  "platform": "ascend",
+  "name": "vllm-ascend on Huawei Ascend NPU",
+  "framework": "vllm-ascend",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "AccelMark runner for Huawei Ascend 910B/910C NPUs using vllm-ascend (vLLM community fork for CANN). Supports Suites A–F. NPU memory queried via torch_npu. FP8 excluded: not supported on current Ascend 910B/910C hardware. W4A16 uses gptq backend (Marlin kernels not available on CANN).",
+  "supersedes_chain": [],
+  "notes": "Fixes vs initial version: _last_accuracy_outputs added to inference_fn_offline; gpu_memory_utilization read from runner config and passed to engine; engine_kwargs filtered against EngineArgs fields to prevent TypeError on startup.",
+  "created": "2026-04-03"
+}

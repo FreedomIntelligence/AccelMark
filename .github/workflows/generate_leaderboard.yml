@@ -1,0 +1,93 @@
+name: Generate Leaderboard
+
+# Triggers only when results/ changes land on main.
+# This covers both direct merges and squash merges.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'results/**'
+
+  # Allow manual trigger from Actions tab (useful for first deploy)
+  workflow_dispatch:
+
+jobs:
+  validate-runners:
+    name: Validate runner folders
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install jsonschema
+
+      - name: Validate all runner meta.json files and hashes
+        run: python runners/validate_runners.py
+
+  generate:
+    name: Generate and deploy leaderboard
+    runs-on: ubuntu-latest
+    needs: [validate-runners]
+    permissions:
+      contents: write   # needed to push to gh-pages branch
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install jsonschema --quiet
+
+      - name: Generate leaderboard
+        run: |
+          python leaderboard/generate.py
+
+      - name: Verify output files exist
+        run: |
+          echo "Checking generated files..."
+          ls -la leaderboard/site/
+          ls -la leaderboard/site/api/ || echo "Warning: api/ directory not generated"
+
+          # Fail if leaderboard.js is missing
+          if [ ! -f "leaderboard/site/leaderboard.js" ]; then
+            echo "ERROR: leaderboard.js was not generated"
+            exit 1
+          fi
+
+          echo "Generated files:"
+          wc -l leaderboard/site/leaderboard.js
+          cat leaderboard/site/api/chips.json 2>/dev/null || echo "(no chips yet)"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./leaderboard/site
+          publish_branch: gh-pages
+          # Keep existing files on gh-pages (don't wipe non-generated files)
+          keep_files: false
+          # Commit message
+          commit_message: "leaderboard: auto-update from ${{ github.sha }}"
+          # Add a .nojekyll file so GitHub Pages serves files as-is
+          enable_jekyll: false
+
+      - name: Print leaderboard URL
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.event.repository.name }}"
+          echo "Leaderboard deployed to: https://${OWNER}.github.io/${REPO}/"
+          echo "API endpoint: https://${OWNER}.github.io/${REPO}/api/index.json"

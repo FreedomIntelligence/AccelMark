@@ -1,0 +1,130 @@
+{
+  "collected_at": "2026-04-14T13:33:53.407463+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 4,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 5,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 6,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 7,
+      "name": "Huawei Ascend 910B2",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.0.rc1.2",
+      "firmware_version": "7.7.0.3.220",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": null,
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "Kunpeng-920",
+    "physical_cores": 192,
+    "logical_cores": 192,
+    "numa_nodes": 8
+  },
+  "system_memory_gb": 2007.5,
+  "pcie_generation": "unknown",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "hns_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "hns_1",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "hns_2",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "hns_3",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_3",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_bond_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.5 LTS",
+  "python_version": "3.11.14",
+  "kernel_version": "5.15.0-164-generic",
+  "runtime_version": "CANN 25.0.rc1.2",
+  "pytorch_version": "2.9.0+cpu"
+}

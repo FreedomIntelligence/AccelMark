@@ -1,0 +1,186 @@
+name: Validate Submission
+
+# Triggers only when results/ directory is touched in a PR.
+# Schema changes, script changes, and doc changes do not trigger this.
+on:
+  pull_request:
+    paths:
+      - 'results/**'
+      - 'runners/**'
+
+jobs:
+  validate-runners:
+    name: Validate runner folders
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install jsonschema
+
+      - name: Detect changed runner folders
+        id: changed
+        run: |
+          # Runner folders always match the schema pattern: {platform}_{name}_{8hexchars}
+          # Filter on that regex instead of an allowlist — nothing to keep in sync.
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          FOLDERS=""
+          while IFS= read -r f; do
+            if echo "$f" | grep -qE '^runners/[^/]+/'; then
+              folder=$(echo "$f" | cut -d'/' -f2)
+              if echo "$folder" | grep -qE '^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$'; then
+                FOLDERS="$FOLDERS $folder"
+              fi
+            fi
+          done <<< "$CHANGED"
+          FOLDERS=$(echo "$FOLDERS" | tr ' ' '\n' | sort -u | grep -v '^$' | tr '\n' ' ')
+          echo "folders=$FOLDERS" >> $GITHUB_OUTPUT
+          echo "Detected runner folders: ${FOLDERS:-none}"
+
+      - name: Validate changed runner folders
+        if: steps.changed.outputs.folders != ''
+        id: validate_runners
+        run: |
+          FAILED=0
+          for folder in ${{ steps.changed.outputs.folders }}; do
+            runner_path="runners/$folder"
+            [ -d "$runner_path" ] || continue
+            echo "::group::Validating $folder"
+            if ! python runners/validate_runners.py --dir "$runner_path"; then
+              echo "::error file=runners/$folder/meta.json::Validation failed for $folder"
+              FAILED=1
+            fi
+            echo "::endgroup::"
+          done
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          [ $FAILED -eq 0 ] || exit 1
+
+      - name: No runner folders changed
+        if: steps.changed.outputs.folders == ''
+        run: echo "No runner folders changed in this PR — skipping."
+
+  validate:
+    name: Validate result submissions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          # Fetch base branch so we can diff against it
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install jsonschema --quiet
+
+      - name: Find changed submission directories
+        id: find_dirs
+        run: |
+          # Get list of changed files vs base branch
+          git fetch origin ${{ github.base_ref }} --quiet
+          CHANGED_DIRS=$(
+            git diff --name-only origin/${{ github.base_ref }}...HEAD \
+            | grep '^results/' \
+            | awk -F'/' 'NF>=3 {print $1"/"$2"/"$3}' \
+            | sort -u
+          )
+          echo "Found changed directories:"
+          echo "$CHANGED_DIRS"
+          # Write to file to handle spaces/newlines safely
+          echo "$CHANGED_DIRS" > /tmp/changed_dirs.txt
+          # Also export count
+          COUNT=$(echo "$CHANGED_DIRS" | grep -c . || true)
+          echo "count=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Validate each submission
+        run: |
+          FAILED=0
+          PASSED=0
+          SKIPPED=0
+
+          while IFS= read -r DIR; do
+            # Skip empty lines
+            [ -z "$DIR" ] && continue
+
+            # Skip .gitkeep and non-directories
+            if [ ! -d "$DIR" ]; then
+              echo "Skipping non-directory: $DIR"
+              SKIPPED=$((SKIPPED + 1))
+              continue
+            fi
+
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Validating: $DIR"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+            if python runners/validate_submission.py --dir "$DIR"; then
+              echo "✓ PASSED: $DIR"
+              PASSED=$((PASSED + 1))
+            else
+              echo "✗ FAILED: $DIR"
+              FAILED=$((FAILED + 1))
+            fi
+
+          done < /tmp/changed_dirs.txt
+
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Summary: $PASSED passed, $FAILED failed, $SKIPPED skipped"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+          if [ "$FAILED" -gt 0 ]; then
+            echo ""
+            echo "PR blocked: $FAILED submission(s) failed validation."
+            echo "Fix the errors listed above before merging."
+            exit 1
+          fi
+
+      - name: Comment on PR with validation summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const outcome = '${{ job.status }}';
+            const icon   = outcome === 'success' ? '✅' : '❌';
+            const status = outcome === 'success' ? 'All submissions valid' : 'Validation failed';
+            const marker = '<!-- accelmark-validation-comment -->';
+            const body   = `${marker}\n## ${icon} AccelMark Validation: ${status}\n\nSee the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`;
+
+            // Update existing bot comment rather than accumulating new ones
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

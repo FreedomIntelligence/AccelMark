@@ -1,0 +1,265 @@
+name: Process Community Submission
+
+# Triggered when an issue is labeled "community-submission"
+# (The OpenClaw Skill creates issues with this label)
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  process:
+    name: Extract and validate submission from issue
+    # Only run for the specific label
+    if: github.event.label.name == 'community-submission'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install jsonschema numpy --quiet
+
+      - name: Extract result JSON from issue body
+        id: extract
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body;
+            const issueNumber = context.payload.issue.number;
+
+            // Extract JSON from code block in issue body
+            const match = body.match(/```json\n([\s\S]*?)\n```/);
+            if (!match) {
+              core.setFailed('No JSON code block found in issue body');
+              return;
+            }
+
+            let result;
+            try {
+              result = JSON.parse(match[1]);
+            } catch (e) {
+              core.setFailed(`Invalid JSON in issue: ${e.message}`);
+              return;
+            }
+
+            // Use run_name from result.json - computed deterministically by benchmark_runner.
+            // Falls back to constructing from parts for older results that predate this field.
+            let dirName = result.meta?.run_name;
+            if (!dirName) {
+              const chip   = (result.chip?.name || 'unknown')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_|_$/g, '');
+              const count  = result.chip?.count || 1;
+              const suite  = result.suite_id || 'unknown';
+              const runner = result.implementation_id || 'unknown';
+              const runId  = result.meta?.run_id || 'unknown';
+              dirName = `${chip}x${count}_${suite}_${runner}_${runId}`;
+            }
+
+            core.setOutput('dir_name', dirName);
+            core.setOutput('issue_number', issueNumber);
+            core.setOutput('result_json', JSON.stringify(result));
+            core.setOutput('run_id', result.meta?.run_id || '');
+
+            console.log(`Submission directory: ${dirName}`);
+
+      - name: Check for duplicate submission
+        id: duplicate_check
+        run: |
+          RUN_ID="${{ steps.extract.outputs.run_id }}"
+
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "unknown" ]; then
+            echo "No run_id in submission - skipping duplicate check"
+            echo "is_duplicate=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Search all existing community result.json files for same run_id
+          # NOTE: runs BEFORE Write result files so $DIR does not exist yet
+          EXISTING=""
+          for f in $(find results/community -name "result.json" 2>/dev/null); do
+              MATCH=$(python3 -c "import json,sys; r=json.load(open(sys.argv[1])); print('yes' if r.get('meta',{}).get('run_id')=='$RUN_ID' else '')" "$f" 2>/dev/null || echo "")
+            if [ "$MATCH" = "yes" ]; then
+              EXISTING="$f"
+              break
+            fi
+          done
+
+          if [ -n "$EXISTING" ]; then
+            echo "Found existing result with run_id=$RUN_ID at: $EXISTING"
+            echo "existing_path=$EXISTING" >> $GITHUB_OUTPUT
+            echo "is_duplicate=true" >> $GITHUB_OUTPUT
+          else
+            echo "No duplicate found for run_id=$RUN_ID"
+            echo "is_duplicate=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Handle duplicate submission
+        if: steps.duplicate_check.outputs.is_duplicate == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING="${{ steps.duplicate_check.outputs.existing_path }}"
+          ISSUE="${{ steps.extract.outputs.issue_number }}"
+          EXISTING_DIR=$(dirname "$EXISTING")
+
+          # New scenarios from step output (file not written yet)
+          NEW_SCENARIOS=$(python3 -c "import json,sys; r=json.loads(sys.argv[1]); s=sorted(r.get('task',{}).get('scenarios_run',[])); print(','.join(s) if s else 'none')" '${{ steps.extract.outputs.result_json }}' 2>/dev/null || echo "unknown")
+
+          OLD_SCENARIOS=$(python3 -c "import json,sys; r=json.load(open(sys.argv[1])); s=sorted(r.get('task',{}).get('scenarios_run',[])); print(','.join(s) if s else 'none')" "$EXISTING" 2>/dev/null || echo "unknown")
+
+          echo "Existing scenarios: $OLD_SCENARIOS"
+          echo "New scenarios:      $NEW_SCENARIOS"
+
+          if [ "$NEW_SCENARIOS" = "$OLD_SCENARIOS" ]; then
+            gh issue comment "$ISSUE" \
+              --body "Duplicate submission detected. A result with the same hardware, software, suite, and submitter already exists at \`${EXISTING_DIR}\` with scenarios: \`${OLD_SCENARIOS}\`. If this is intentional (e.g. after a framework update), update \`meta.framework_version\` in your result.json and resubmit."
+            echo "Rejected: duplicate with same scenarios"
+            exit 1
+          else
+            gh issue comment "$ISSUE" \
+              --body "Note: An existing result with the same run_id was found at \`${EXISTING_DIR}\` (scenarios: \`${OLD_SCENARIOS}\`). This new submission has scenarios: \`${NEW_SCENARIOS}\`. Continuing - this looks like an update."
+          fi
+
+      - name: Write result files
+        run: |
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+          mkdir -p "$DIR"
+
+          # Write result.json, set meta.log_file to null (local artifact, not submitted)
+          echo '${{ steps.extract.outputs.result_json }}' | python -m json.tool > "$DIR/result.json"
+          python3 -c "import json; f=open('$DIR/result.json'); r=json.load(f); f.close(); r.get('meta',{}).update({'log_file':None}); open('$DIR/result.json','w').write(json.dumps(r,indent=2))"
+          echo "meta.log_file set to null"
+
+          # Create env_info.json - extract from environment block if present, else reconstruct
+          python3 -c "
+          import json, sys
+
+          with open('$DIR/result.json') as f:
+              result = json.load(f)
+
+          chip = result.get('chip', {})
+          software = result.get('software', {})
+
+          env = result.get('environment')
+          if not env:
+              # fallback for old results without environment block
+              env = {
+                  'collected_at': result.get('meta', {}).get('date', '2026-01-01') + 'T00:00:00Z',
+                  'accelerators': [{
+                      'index': 0,
+                      'name': chip.get('name', 'Unknown'),
+                      'memory_gb': chip.get('memory_gb', 0),
+                      'driver_version': software.get('driver_version', 'unknown'),
+                      'firmware_version': None,
+                  }],
+                  'accelerator_topology': None,
+                  'cpu': {
+                      'model': 'unknown',
+                      'physical_cores': 1,
+                      'logical_cores': 1,
+                      'numa_nodes': 1,
+                  },
+                  'system_memory_gb': 0,
+                  'pcie_generation': 'unknown',
+                  'cpu_accelerator_bandwidth_gbs': None,
+                  'network_interfaces': None,
+                  'kernel_version': 'unknown',
+                  'runtime_version': software.get('runtime_version', 'unknown'),
+              }
+              print('env_info.json reconstructed from chip data')
+          else:
+              print('env_info.json extracted from result.json')
+
+          with open('$DIR/env_info.json', 'w') as f:
+              json.dump(env, f, indent=2)
+
+          # Create accuracy/accuracy.json from the accuracy block in result.json
+          import os
+          acc = result.get('accuracy')
+          if acc:
+              os.makedirs('$DIR/accuracy', exist_ok=True)
+              with open('$DIR/accuracy/accuracy.json', 'w') as f:
+                  json.dump(acc, f, indent=2)
+              print('accuracy/accuracy.json created')
+          else:
+              print('No accuracy block in result.json - skipping accuracy.json')
+
+          "
+
+      - name: Run validation
+        id: validate
+        run: |
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+          if python runners/validate_submission.py --dir "$DIR"; then
+            echo "valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit files and create PR
+        if: steps.validate.outputs.valid == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DIR="results/community/${{ steps.extract.outputs.dir_name }}"
+          BRANCH="submission/${{ steps.extract.outputs.dir_name }}"
+          ISSUE="${{ steps.extract.outputs.issue_number }}"
+
+          # Configure git
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create and switch to submission branch
+          git checkout -b "$BRANCH"
+
+          # Stage the result files written in the previous step
+          # Note: run.log is gitignored intentionally - not committed
+          git add "$DIR/result.json" "$DIR/env_info.json"
+          # accuracy/accuracy.json may exist if accuracy data was in result.json
+          [ -f "$DIR/accuracy/accuracy.json" ] && git add "$DIR/accuracy/accuracy.json" || true
+
+          # Commit
+          git commit -m "community: add submission from issue #${ISSUE}"
+
+          # Delete remote branch if it exists from a previous failed run, then push fresh
+          git push origin --delete "$BRANCH" 2>/dev/null || true
+          git push origin "$BRANCH"
+
+          # Generate summary table and build PR body file
+          python3 runners/gen_pr_summary.py "$DIR/result.json" > /tmp/pr_summary.md
+
+          printf "Auto-generated from Issue #%s\n\n## Submission summary\n\n" "$ISSUE" > /tmp/pr_body.md
+          cat /tmp/pr_summary.md >> /tmp/pr_body.md
+          printf "\nCloses #%s" "$ISSUE" >> /tmp/pr_body.md
+
+          # Create PR (or get existing one if already created)
+          PR_URL=$(gh pr create \
+            --title "[community] ${{ steps.extract.outputs.dir_name }}" \
+            --body-file /tmp/pr_body.md \
+            --base main \
+            --head "$BRANCH" 2>/dev/null) || \
+          PR_URL=$(gh pr view "$BRANCH" --json url -q .url)
+
+          # Comment on the issue with PR link
+          gh issue comment "$ISSUE" --body "Validation passed. PR created: ${PR_URL} - your result will appear on the leaderboard after the PR is reviewed and merged."
+
+
+      - name: Comment failure on issue
+        if: steps.validate.outputs.valid == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue comment "${{ steps.extract.outputs.issue_number }}" \
+            --body "Validation failed. See the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details. Fix the errors and ask a maintainer to re-apply the community-submission label to retry."

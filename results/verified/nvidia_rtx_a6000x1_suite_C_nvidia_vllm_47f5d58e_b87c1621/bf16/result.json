@@ -1,0 +1,427 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "NVIDIA RTX A6000",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 48.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-16T09:27:03.024396+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA RTX A6000",
+        "vendor": "NVIDIA",
+        "memory_gb": 48.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.6",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA RTX A6000",
+        "vendor": "NVIDIA",
+        "memory_gb": 48.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.6",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA RTX A6000",
+        "vendor": "NVIDIA",
+        "memory_gb": 48.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.6",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA RTX A6000",
+        "vendor": "NVIDIA",
+        "memory_gb": 48.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.6",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tNIC0\tNIC1\tNIC2\tNIC3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tPIX\tPXB\tPXB\tNODE\tPXB\tSYS\tSYS\t0-37,76-113\t0\t\tN/A\nGPU1\tPIX\t X \tPXB\tPXB\tNODE\tPXB\tSYS\tSYS\t0-37,76-113\t0\t\tN/A\nGPU2\tPXB\tPXB\t X \tPXB\tNODE\tPXB\tSYS\tSYS\t0-37,76-113\t0\t\tN/A\nGPU3\tPXB\tPXB\tPXB\t X \tNODE\tPXB\tSYS\tSYS\t0-37,76-113\t0\t\tN/A\nNIC0\tNODE\tNODE\tNODE\tNODE\t X \tNODE\tSYS\tSYS\t\t\t\t\nNIC1\tPXB\tPXB\tPXB\tPXB\tNODE\t X \tSYS\tSYS\t\t\t\t\nNIC2\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t X \tPIX\t\t\t\t\nNIC3\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n  NIC3: mlx5_3\n\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8368 CPU @ 2.40GHz",
+      "physical_cores": 76,
+      "logical_cores": 152,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.5,
+    "pcie_generation": "PCIe Gen 4",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_3",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.1",
+    "pytorch_version": "2.5.1+cu121"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.7.3",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.18"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online",
+      "sustained"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": {
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    }
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 1,
+          "throughput_tokens_per_sec": 1535.84,
+          "throughput_tokens_per_sec_per_chip": 1535.84,
+          "elapsed_seconds_median": 23.4,
+          "peak_memory_gb": 40.7,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 4,
+          "throughput_tokens_per_sec": 1530.92,
+          "throughput_tokens_per_sec_per_chip": 1530.92,
+          "elapsed_seconds_median": 23.5,
+          "peak_memory_gb": 40.7,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 16,
+          "throughput_tokens_per_sec": 1542.59,
+          "throughput_tokens_per_sec_per_chip": 1542.59,
+          "elapsed_seconds_median": 23.3,
+          "peak_memory_gb": 40.7,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 64,
+          "throughput_tokens_per_sec": 1539.72,
+          "throughput_tokens_per_sec_per_chip": 1539.72,
+          "elapsed_seconds_median": 23.3,
+          "peak_memory_gb": 40.7,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    },
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 5,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 130.67,
+          "ttft_ms_p90": 194.59,
+          "ttft_ms_p99": 257.74,
+          "tpot_ms_p50": 68.73,
+          "tpot_ms_p90": 84.54,
+          "tpot_ms_p99": 102.65,
+          "elapsed_seconds_median": 84.3,
+          "sla_met": true
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 162.18,
+          "ttft_ms_p90": 276.8,
+          "ttft_ms_p99": 825.19,
+          "tpot_ms_p50": 107.59,
+          "tpot_ms_p90": 140.82,
+          "tpot_ms_p99": 210.69,
+          "elapsed_seconds_median": 71.6,
+          "sla_met": false
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 643.38,
+          "ttft_ms_p90": 2558.8,
+          "ttft_ms_p99": 12409.03,
+          "tpot_ms_p50": 114.66,
+          "tpot_ms_p90": 178.67,
+          "tpot_ms_p99": 2142.33,
+          "elapsed_seconds_median": 64.6,
+          "sla_met": false
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 3928.71,
+          "ttft_ms_p90": 7413.77,
+          "ttft_ms_p99": 17363.82,
+          "tpot_ms_p50": 112.53,
+          "tpot_ms_p90": 174.49,
+          "tpot_ms_p99": 4197.08,
+          "elapsed_seconds_median": 63.7,
+          "sla_met": false
+        }
+      ]
+    },
+    "sustained": {
+      "sustained_concurrency": 8,
+      "duration_minutes": 15,
+      "warmup_minutes": 1,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 253.7,
+          "tokens_out": 15227,
+          "tokens_in": 0,
+          "requests_completed": 46,
+          "ttft_ms_p50": 89.6,
+          "ttft_ms_p99": 377.8
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 275.2,
+          "tokens_out": 16516,
+          "tokens_in": 0,
+          "requests_completed": 45,
+          "ttft_ms_p50": 81.3,
+          "ttft_ms_p99": 134.8
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 290.4,
+          "tokens_out": 17421,
+          "tokens_in": 0,
+          "requests_completed": 50,
+          "ttft_ms_p50": 86.6,
+          "ttft_ms_p99": 156.4
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 285.6,
+          "tokens_out": 17143,
+          "tokens_in": 0,
+          "requests_completed": 47,
+          "ttft_ms_p50": 86.9,
+          "ttft_ms_p99": 132.7
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 280.0,
+          "tokens_out": 16796,
+          "tokens_in": 0,
+          "requests_completed": 48,
+          "ttft_ms_p50": 83.9,
+          "ttft_ms_p99": 129.6
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 282.0,
+          "tokens_out": 16919,
+          "tokens_in": 0,
+          "requests_completed": 45,
+          "ttft_ms_p50": 88.9,
+          "ttft_ms_p99": 130.5
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 285.6,
+          "tokens_out": 17141,
+          "tokens_in": 0,
+          "requests_completed": 48,
+          "ttft_ms_p50": 79.8,
+          "ttft_ms_p99": 131.6
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 271.1,
+          "tokens_out": 16263,
+          "tokens_in": 0,
+          "requests_completed": 43,
+          "ttft_ms_p50": 87.2,
+          "ttft_ms_p99": 120.2
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 256.0,
+          "tokens_out": 15360,
+          "tokens_in": 0,
+          "requests_completed": 40,
+          "ttft_ms_p50": 92.8,
+          "ttft_ms_p99": 136.3
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 265.8,
+          "tokens_out": 15954,
+          "tokens_in": 0,
+          "requests_completed": 47,
+          "ttft_ms_p50": 89.3,
+          "ttft_ms_p99": 131.5
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 266.7,
+          "tokens_out": 15998,
+          "tokens_in": 0,
+          "requests_completed": 43,
+          "ttft_ms_p50": 89.7,
+          "ttft_ms_p99": 141.7
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 262.5,
+          "tokens_out": 15752,
+          "tokens_in": 0,
+          "requests_completed": 46,
+          "ttft_ms_p50": 91.3,
+          "ttft_ms_p99": 129.9
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 266.7,
+          "tokens_out": 15999,
+          "tokens_in": 0,
+          "requests_completed": 43,
+          "ttft_ms_p50": 81.5,
+          "ttft_ms_p99": 138.5
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 266.6,
+          "tokens_out": 15998,
+          "tokens_in": 0,
+          "requests_completed": 47,
+          "ttft_ms_p50": 92.1,
+          "ttft_ms_p99": 145.0
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 272.0,
+      "throttle_ratio": 0.874,
+      "throttle_onset_minute": 1.0,
+      "ttft_p99_drift_ms": -232.8
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to populate."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-16",
+    "time": "09:35:37",
+    "run_id": "b87c1621",
+    "run_name": "nvidia_rtx_a6000x1_suite_C_nvidia_vllm_47f5d58e_b87c1621",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-16T09:29:22.824337+00:00",
+    "benchmark_end_time": "2026-04-16T09:35:37.683257+00:00",
+    "benchmark_elapsed_minutes": 35.8,
+    "model_load_seconds": 63.8,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'sustained'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/verified/nvidia_rtx_a6000x1_suite_C_nvidia_vllm_47f5d58e_b87c1621/bf16/offline",
+      "online": "results/verified/nvidia_rtx_a6000x1_suite_C_nvidia_vllm_47f5d58e_b87c1621/bf16/online",
+      "sustained": "results/verified/nvidia_rtx_a6000x1_suite_C_nvidia_vllm_47f5d58e_b87c1621/bf16/sustained"
+    }
+  }
+}

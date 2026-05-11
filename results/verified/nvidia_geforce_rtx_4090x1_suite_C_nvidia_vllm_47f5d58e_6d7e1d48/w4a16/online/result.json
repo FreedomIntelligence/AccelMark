@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "NVIDIA GeForce RTX 4090",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 24.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-17T07:09:02.289144+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 4090",
+        "vendor": "NVIDIA",
+        "memory_gb": 24.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.9",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA GeForce RTX 4090",
+        "vendor": "NVIDIA",
+        "memory_gb": 24.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.9",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA GeForce RTX 4090",
+        "vendor": "NVIDIA",
+        "memory_gb": 24.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.9",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA GeForce RTX 4090",
+        "vendor": "NVIDIA",
+        "memory_gb": 24.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.9",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tPXB\tPXB\tPXB\t0-31,64-95\t0\t\tN/A\nGPU1\tPXB\t X \tPXB\tPXB\t0-31,64-95\t0\t\tN/A\nGPU2\tPXB\tPXB\t X \tPXB\t0-31,64-95\t0\t\tN/A\nGPU3\tPXB\tPXB\tPXB\t X \t0-31,64-95\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "INTEL(R) XEON(R) GOLD 6530",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.6,
+    "pcie_generation": "PCIe Gen 1",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": null,
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.12",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.5",
+    "pytorch_version": "2.4.0a0+f70bd71a48.nv24.06"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.7.3",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.5",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.12"
+  },
+  "model": {
+    "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+    "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e",
+    "model_name": null,
+    "model_note": "INT4 weight-only quantization by RedHatAI using AWQ. Weights INT4, activations FP16.",
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "W4A16",
+    "effective_dtype": "float16",
+    "quantization_method": "gptq",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    },
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 10,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 100.56,
+          "ttft_ms_p90": 142.45,
+          "ttft_ms_p99": 208.18,
+          "tpot_ms_p50": 38.68,
+          "tpot_ms_p90": 57.73,
+          "tpot_ms_p99": 66.55,
+          "elapsed_seconds_median": 73.9,
+          "sla_met": true
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 142.28,
+          "ttft_ms_p90": 225.59,
+          "ttft_ms_p99": 449.58,
+          "tpot_ms_p50": 92.65,
+          "tpot_ms_p90": 123.71,
+          "tpot_ms_p99": 176.12,
+          "elapsed_seconds_median": 63.4,
+          "sla_met": true
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 295.67,
+          "ttft_ms_p90": 946.15,
+          "ttft_ms_p99": 8421.18,
+          "tpot_ms_p50": 105.85,
+          "tpot_ms_p90": 166.37,
+          "tpot_ms_p99": 631.79,
+          "elapsed_seconds_median": 58.1,
+          "sla_met": false
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 2353.49,
+          "ttft_ms_p90": 5899.54,
+          "ttft_ms_p99": 13100.13,
+          "tpot_ms_p50": 105.83,
+          "tpot_ms_p90": 175.04,
+          "tpot_ms_p99": 2445.99,
+          "elapsed_seconds_median": 56.5,
+          "sla_met": false
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-17",
+    "time": "21:08:43",
+    "run_id": "05208948",
+    "run_name": "nvidia_geforce_rtx_4090x1_suite_C_nvidia_vllm_47f5d58e_05208948",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-17T20:56:08.526673+00:00",
+    "benchmark_end_time": "2026-04-17T21:08:42.983764+00:00",
+    "benchmark_elapsed_minutes": 12.6,
+    "model_load_seconds": 69.3
+  }
+}

@@ -1,0 +1,29 @@
+# AccelMark runner config — nvidia_sglang_df27d2dd (SGLang on NVIDIA)
+#
+# Copy this file to runner_nvidia_sglang_df27d2dd.yaml (remove .example suffix)
+# and edit as needed for your hardware.
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults ────────────────────────────────────────────────────────────
+
+# Tensor parallel size — number of GPUs to use (default: 1)
+tensor_parallel_size: 1
+
+# Disable CUDA graph. Equivalent to vLLM's enforce_eager.
+# Set to true if you encounter CUDA graph errors on older hardware.
+disable_cuda_graph: false
+
+# Fraction of GPU memory for the KV cache (SGLang: mem_fraction_static, default: 0.88)
+mem_fraction_static: 0.88
+
+# Pass-through kwargs forwarded directly to sglang.Engine() / sglang.AsyncEngine().
+# See SGLang docs for valid keys.
+# engine_kwargs:
+#   chunked_prefill_size: 512
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+
+suites:
+  suite_D:
+    mem_fraction_static: 0.80

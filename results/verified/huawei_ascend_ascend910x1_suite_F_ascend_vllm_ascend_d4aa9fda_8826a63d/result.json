@@ -1,0 +1,495 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_F",
+  "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+  "chip": {
+    "name": "Huawei Ascend Ascend910",
+    "vendor": "Huawei",
+    "count": 1,
+    "memory_gb": 64.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-14T17:53:55.634702+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 0,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "aarch64",
+      "physical_cores": 320,
+      "logical_cores": 640,
+      "numa_nodes": 8
+    },
+    "system_memory_gb": 2013.4,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "rocep162s0f0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "rocep162s0f1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.14",
+    "kernel_version": "5.10.0-216.0.0.115.oe2203sp4.aarch64",
+    "runtime_version": "CANN 25.2.3",
+    "pytorch_version": "2.9.0+cpu"
+  },
+  "software": {
+    "framework": "vllm-ascend",
+    "framework_version": "0.18.0rc1",
+    "driver_version": "25.2.3",
+    "runtime_version": "CANN 25.2.3",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.14"
+  },
+  "model": {
+    "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 0.5,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online",
+      "interactive",
+      "sustained"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": null
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 4,
+          "throughput_tokens_per_sec": 7826.11,
+          "throughput_tokens_per_sec_per_chip": 7826.11,
+          "elapsed_seconds_median": 5.3,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 16,
+          "throughput_tokens_per_sec": 7848.84,
+          "throughput_tokens_per_sec_per_chip": 7848.84,
+          "elapsed_seconds_median": 5.4,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 64,
+          "throughput_tokens_per_sec": 7841.07,
+          "throughput_tokens_per_sec_per_chip": 7841.07,
+          "elapsed_seconds_median": 5.3,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    },
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 10,
+      "results_by_qps": [
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 41.05,
+          "ttft_ms_p90": 55.94,
+          "ttft_ms_p99": 68.3,
+          "tpot_ms_p50": 14.33,
+          "tpot_ms_p90": 15.06,
+          "tpot_ms_p99": 15.58,
+          "elapsed_seconds_median": 34.9,
+          "sla_met": true
+        },
+        {
+          "target_qps": 40,
+          "achieved_qps": 40.0,
+          "ttft_ms_p50": 101.71,
+          "ttft_ms_p90": 2141.19,
+          "ttft_ms_p99": 2800.85,
+          "tpot_ms_p50": 21.22,
+          "tpot_ms_p90": 23.16,
+          "tpot_ms_p99": 25.46,
+          "elapsed_seconds_median": 13.6,
+          "sla_met": false
+        }
+      ]
+    },
+    "interactive": {
+      "ttft_ms_p50": 26.97,
+      "ttft_ms_p90": 32.16,
+      "ttft_ms_p99": 42.9,
+      "tpot_ms_p50": 12.04,
+      "tpot_ms_p90": 12.29,
+      "tpot_ms_p99": 12.47,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 381.9
+    },
+    "sustained": {
+      "sustained_concurrency": 32,
+      "duration_minutes": 15,
+      "warmup_minutes": 1,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2121.0,
+          "tokens_out": 127308,
+          "tokens_in": 0,
+          "requests_completed": 614,
+          "ttft_ms_p50": 45.1,
+          "ttft_ms_p99": 273.4
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2228.7,
+          "tokens_out": 133751,
+          "tokens_in": 0,
+          "requests_completed": 634,
+          "ttft_ms_p50": 42.5,
+          "ttft_ms_p99": 66.8
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2201.3,
+          "tokens_out": 132105,
+          "tokens_in": 0,
+          "requests_completed": 630,
+          "ttft_ms_p50": 42.3,
+          "ttft_ms_p99": 67.6
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2198.4,
+          "tokens_out": 131870,
+          "tokens_in": 0,
+          "requests_completed": 625,
+          "ttft_ms_p50": 42.1,
+          "ttft_ms_p99": 64.2
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2215.7,
+          "tokens_out": 132894,
+          "tokens_in": 0,
+          "requests_completed": 633,
+          "ttft_ms_p50": 42.2,
+          "ttft_ms_p99": 65.0
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2232.6,
+          "tokens_out": 134041,
+          "tokens_in": 0,
+          "requests_completed": 640,
+          "ttft_ms_p50": 42.0,
+          "ttft_ms_p99": 65.1
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2225.4,
+          "tokens_out": 133508,
+          "tokens_in": 0,
+          "requests_completed": 640,
+          "ttft_ms_p50": 42.5,
+          "ttft_ms_p99": 66.0
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2220.6,
+          "tokens_out": 133156,
+          "tokens_in": 0,
+          "requests_completed": 633,
+          "ttft_ms_p50": 42.6,
+          "ttft_ms_p99": 65.5
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2187.0,
+          "tokens_out": 131319,
+          "tokens_in": 0,
+          "requests_completed": 625,
+          "ttft_ms_p50": 42.5,
+          "ttft_ms_p99": 65.3
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2241.5,
+          "tokens_out": 134436,
+          "tokens_in": 0,
+          "requests_completed": 641,
+          "ttft_ms_p50": 42.3,
+          "ttft_ms_p99": 59.9
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2245.4,
+          "tokens_out": 134769,
+          "tokens_in": 0,
+          "requests_completed": 646,
+          "ttft_ms_p50": 42.0,
+          "ttft_ms_p99": 65.8
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2250.2,
+          "tokens_out": 135002,
+          "tokens_in": 0,
+          "requests_completed": 648,
+          "ttft_ms_p50": 41.7,
+          "ttft_ms_p99": 64.7
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2255.4,
+          "tokens_out": 135330,
+          "tokens_in": 0,
+          "requests_completed": 645,
+          "ttft_ms_p50": 41.7,
+          "ttft_ms_p99": 65.8
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 2227.6,
+          "tokens_out": 133571,
+          "tokens_in": 0,
+          "requests_completed": 637,
+          "ttft_ms_p50": 42.4,
+          "ttft_ms_p99": 55.9
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 2217.9,
+      "throttle_ratio": 0.94,
+      "throttle_onset_minute": null,
+      "ttft_p99_drift_ms": -217.5
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.42,
+    "baseline_delta": 0.04,
+    "valid": true,
+    "framework": "vllm-ascend",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vllm-ascend instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-14",
+    "time": "18:42:17",
+    "run_id": "8826a63d",
+    "run_name": "huawei_ascend_ascend910x1_suite_F_ascend_vllm_ascend_d4aa9fda_8826a63d",
+    "flagged": null,
+    "reproduce_script": "runners/ascend_vllm_ascend_d4aa9fda/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-14T18:41:13.853447+00:00",
+    "benchmark_end_time": "2026-04-14T18:42:17.962887+00:00",
+    "benchmark_elapsed_minutes": 37.8,
+    "model_load_seconds": 48.9,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'interactive', 'sustained'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/verified/huawei_ascend_ascend910x1_suite_F_ascend_vllm_ascend_d4aa9fda_8826a63d/offline",
+      "online": "results/verified/huawei_ascend_ascend910x1_suite_F_ascend_vllm_ascend_d4aa9fda_8826a63d/online",
+      "interactive": "results/verified/huawei_ascend_ascend910x1_suite_F_ascend_vllm_ascend_d4aa9fda_8826a63d/interactive",
+      "sustained": "results/verified/huawei_ascend_ascend910x1_suite_F_ascend_vllm_ascend_d4aa9fda_8826a63d/sustained"
+    }
+  }
+}

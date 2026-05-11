@@ -1,0 +1,11 @@
+{
+  "id": "google_vllm_tpu_68cc9ffa",
+  "platform": "google",
+  "name": "vllm-tpu on Google TPU (tpu-inference)",
+  "framework": "vllm-tpu",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "AccelMark runner for Google Cloud TPU using vllm-tpu (tpu-inference JAX/XLA backend). BF16 only, offline scenario. Supports JAX-native architectures: LlamaForCausalLM, Qwen3ForCausalLM. Compatible with v5e, v6e, v7x.",
+  "supersedes_chain": [],
+  "notes": "Qwen2ForCausalLM (Qwen2.5-0.5B-Instruct) is not supported by tpu-inference JAX registry — use models_local.yaml to substitute Qwen3-0.6B for Suite F. Two Colab/Jupyter patches applied at module level: VLLM_ENABLE_V1_MULTIPROCESSING=0 and suppress_stdout no-op. Validated on v5e-1 (Colab); should work on v6e and v7x without code changes.",
+  "created": "2026-04-18"
+}

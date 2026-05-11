@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.4,
+  "baseline_delta": 0.03,
+  "valid": true,
+  "framework": "mlx-lm",
+  "precision": "FP16",
+  "notes": "Integrated accuracy check \u2014 used same mlx-lm instance as benchmark."
+}

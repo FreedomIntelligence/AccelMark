@@ -1,0 +1,292 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_D",
+  "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+  "chip": {
+    "name": "Huawei Ascend Ascend910",
+    "vendor": "Huawei",
+    "count": 1,
+    "memory_gb": 64.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-14T10:44:51.031567+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 0,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "Huawei Ascend Ascend910",
+        "vendor": "Huawei",
+        "memory_gb": 64.0,
+        "driver_version": "25.2.3",
+        "firmware_version": "7.7.0.10.220",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "aarch64",
+      "physical_cores": 320,
+      "logical_cores": 640,
+      "numa_nodes": 8
+    },
+    "system_memory_gb": 2013.4,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "rocep162s0f0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "rocep162s0f1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.14",
+    "kernel_version": "5.10.0-216.0.0.115.oe2203sp4.aarch64",
+    "runtime_version": "CANN 25.2.3",
+    "pytorch_version": "2.9.0+cpu"
+  },
+  "software": {
+    "framework": "vllm-ascend",
+    "framework_version": "0.18.0rc1",
+    "driver_version": "25.2.3",
+    "runtime_version": "CANN 25.2.3",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.14"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 2,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "online": {
+      "sla_ttft_ms": 5000,
+      "max_valid_qps": 0.0,
+      "results_by_qps": [
+        {
+          "target_qps": 0.5,
+          "achieved_qps": 0.5,
+          "ttft_ms_p50": 122618.28,
+          "ttft_ms_p90": 226612.92,
+          "ttft_ms_p99": 240455.55,
+          "tpot_ms_p50": 177.36,
+          "tpot_ms_p90": 180.05,
+          "tpot_ms_p99": 181.1,
+          "elapsed_seconds_median": 449.8,
+          "sla_met": false
+        },
+        {
+          "target_qps": 1,
+          "achieved_qps": 1.0,
+          "ttft_ms_p50": 158141.72,
+          "ttft_ms_p90": 294466.42,
+          "ttft_ms_p99": 321682.22,
+          "tpot_ms_p50": 178.46,
+          "tpot_ms_p90": 180.7,
+          "tpot_ms_p99": 182.05,
+          "elapsed_seconds_median": 453.5,
+          "sla_met": false
+        },
+        {
+          "target_qps": 2,
+          "achieved_qps": 2.0,
+          "ttft_ms_p50": 192144.59,
+          "ttft_ms_p90": 351649.17,
+          "ttft_ms_p99": 385099.66,
+          "tpot_ms_p50": 178.53,
+          "tpot_ms_p90": 181.07,
+          "tpot_ms_p99": 182.2,
+          "elapsed_seconds_median": 451.6,
+          "sla_met": false
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-14",
+    "time": "18:42:46",
+    "run_id": "6c1e7ffe",
+    "run_name": "huawei_ascend_ascend910x1_suite_D_ascend_vllm_ascend_d4aa9fda_6c1e7ffe",
+    "flagged": null,
+    "reproduce_script": "runners/ascend_vllm_ascend_d4aa9fda/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-14T17:57:36.488801+00:00",
+    "benchmark_end_time": "2026-04-14T18:42:46.352321+00:00",
+    "benchmark_elapsed_minutes": 45.2,
+    "model_load_seconds": 65.9
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "collected_at": "2026-04-14T14:54:54.356070+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 0,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 4,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 4,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 5,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 5,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 6,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 6,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 7,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    },
+    {
+      "index": 7,
+      "name": "Huawei Ascend Ascend910",
+      "vendor": "Huawei",
+      "memory_gb": 64.0,
+      "driver_version": "25.2.3",
+      "firmware_version": "7.7.0.10.220",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": null,
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "aarch64",
+    "physical_cores": 320,
+    "logical_cores": 640,
+    "numa_nodes": 8
+  },
+  "system_memory_gb": 2013.4,
+  "pcie_generation": "unknown",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "rocep162s0f0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "rocep162s0f1",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.5 LTS",
+  "python_version": "3.11.14",
+  "kernel_version": "5.10.0-216.0.0.115.oe2203sp4.aarch64",
+  "runtime_version": "CANN 25.2.3",
+  "pytorch_version": "2.9.0+cpu"
+}

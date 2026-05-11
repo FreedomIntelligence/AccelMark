@@ -1,0 +1,62 @@
+# AccelMark runner config — nvidia_vllm_47f5d58e (vLLM on NVIDIA)
+#
+# Copy this file to runner_nvidia_vllm_47f5d58e.yaml (remove .example suffix)
+# and edit as needed for your hardware. The actual .yaml is gitignored.
+#
+# These settings adapt the runner to your hardware environment.
+# They are recorded in result.json task.extra_config for transparency
+# but are NOT part of the benchmark identity (not hashed into run_id).
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults (apply to all suites) ─────────────────────────────────────
+
+# Tensor parallel size — number of GPUs to use (default: 1)
+tensor_parallel_size: 1
+
+# Disable CUDAGraph/compilation. Required for pre-Ampere GPUs (V100, T4).
+# Set to true if you encounter CUDA graph errors on older hardware.
+enforce_eager: false
+
+# Maximum number of sequences in a batch (default: 512).
+# Reduce on low-memory GPUs: 128 for 16 GB, 64 for 12 GB or less.
+max_num_seqs: 512
+
+# Fraction of GPU memory reserved for the KV cache (default: 0.90).
+# Reduce if you get OOM errors: try 0.80 for tighter memory budgets.
+gpu_memory_utilization: 0.90
+
+# Pass-through kwargs forwarded directly to vLLM LLM() / AsyncEngineArgs().
+# Use for any vLLM setting not listed above. See vLLM docs for valid keys:
+# https://docs.vllm.ai/en/latest/api/vllm/engine/arg_utils.html
+# engine_kwargs:
+#   swap_space: 8
+#   max_seq_len_to_capture: 4096
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+# Keys here override the global defaults above for a specific suite only.
+# Only the section matching the current suite is used — other suite sections
+# are never loaded or recorded.
+
+suites:
+  suite_D:
+    # Long-context suite — reduce batch size and reserve more memory.
+    max_num_seqs: 64
+    gpu_memory_utilization: 0.85
+
+  suite_F:
+    # Consumer/edge GPU — enforce_eager often needed for pre-Ampere chips
+    # enforce_eager: true
+    max_num_seqs: 128
+
+# ── Speculative decoding (suite_A extra scenario) ─────────────────────────────
+# Uncomment this section to run the speculative scenario.
+# The draft model runs on the same GPU as the target model.
+# speculative decoding is configured via vLLM engine_kwargs.
+#
+# suites:
+#   suite_A:
+#     engine_kwargs:
+#       speculative_model: "meta-llama/Llama-3.2-1B-Instruct"
+#       num_speculative_tokens: 4
+#       speculative_draft_tensor_parallel_size: 1

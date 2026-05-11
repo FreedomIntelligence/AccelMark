@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_D",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "NVIDIA H20-3e",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 140.4,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-16T09:22:41.455727+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA H20-3e",
+        "vendor": "NVIDIA",
+        "memory_gb": 140.4,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "9.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tNIC0\tNIC1\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV18\tNV18\tNV18\tNODE\tSYS\t0-47,96-143\t0\t\tN/A\nGPU1\tNV18\t X \tNV18\tNV18\tNODE\tSYS\t0-47,96-143\t0\t\tN/A\nGPU2\tNV18\tNV18\t X \tNV18\tPIX\tSYS\t0-47,96-143\t0\t\tN/A\nGPU3\tNV18\tNV18\tNV18\t X \tNODE\tSYS\t0-47,96-143\t0\t\tN/A\nNIC0\tNODE\tNODE\tPIX\tNODE\t X \tSYS\t\t\t\t\nNIC1\tSYS\tSYS\tSYS\tSYS\tSYS\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n\n",
+    "intra_node_interconnect": "NVLink",
+    "cpu": {
+      "model": "INTEL(R) XEON(R) PLATINUM 8558",
+      "physical_cores": 96,
+      "logical_cores": 192,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1511.5,
+    "pcie_generation": "PCIe Gen 5",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.12",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.5",
+    "pytorch_version": "2.4.0a0+f70bd71a48.nv24.06"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.7.3",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.5",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.12"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "interactive",
+    "num_runs": 2,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    },
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "interactive": {
+      "ttft_ms_p50": 4654.9,
+      "ttft_ms_p90": 4841.23,
+      "ttft_ms_p99": 4940.53,
+      "tpot_ms_p50": 35.31,
+      "tpot_ms_p90": 36.05,
+      "tpot_ms_p99": 37.05,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 1167.1
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-16",
+    "time": "10:45:32",
+    "run_id": "60c91bf0",
+    "run_name": "nvidia_h20_3ex1_suite_D_nvidia_vllm_47f5d58e_60c91bf0",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-16T10:06:38.347981+00:00",
+    "benchmark_end_time": "2026-04-16T10:45:32.519577+00:00",
+    "benchmark_elapsed_minutes": 38.9,
+    "model_load_seconds": 73.2
+  }
+}

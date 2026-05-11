@@ -1,0 +1,62 @@
+{
+  "collected_at": "2026-04-15T14:29:58.792380+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 3090",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "525.89.02",
+      "firmware_version": null,
+      "compute_capability": "8.6",
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA GeForce RTX 3090",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "525.89.02",
+      "firmware_version": null,
+      "compute_capability": "8.6",
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA GeForce RTX 3090",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "525.89.02",
+      "firmware_version": null,
+      "compute_capability": "8.6",
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA GeForce RTX 3090",
+      "vendor": "NVIDIA",
+      "memory_gb": 24.0,
+      "driver_version": "525.89.02",
+      "firmware_version": null,
+      "compute_capability": "8.6",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tCPU Affinity\tNUMA Affinity\nGPU0\t X \tPIX\tNODE\tNODE\t0-11,52-63\t0\nGPU1\tPIX\t X \tNODE\tNODE\t0-11,52-63\t0\nGPU2\tNODE\tNODE\t X \tPIX\t0-11,52-63\t0\nGPU3\tNODE\tNODE\tPIX\t X \t0-11,52-63\t0\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "Intel(R) Xeon(R) Gold 6278C CPU @ 2.60GHz",
+    "physical_cores": 52,
+    "logical_cores": 104,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 376.6,
+  "pcie_generation": "PCIe Gen 1",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": null,
+  "os": "Ubuntu 20.04.6 LTS",
+  "python_version": "3.10.16",
+  "kernel_version": "5.8.0-43-generic",
+  "runtime_version": "CUDA 12.4",
+  "pytorch_version": "2.5.1+cu124"
+}

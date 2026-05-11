@@ -1,0 +1,761 @@
+"""
+Generate mini/requests.jsonl with 200 diverse prompts.
+
+Distribution:
+  - 80 conversational (everyday questions, chitchat, advice)
+  - 60 summarization (paste a paragraph, ask to summarize)
+  - 40 code generation (write a function, fix a bug, explain code)
+  - 20 reasoning (math word problems, logic puzzles, step-by-step analysis)
+
+Run:
+    python mini/generate_requests.py
+"""
+
+import json
+import math
+from pathlib import Path
+
+OUTPUT_PATH = Path(__file__).parent / "requests.jsonl"
+
+
+# ---------------------------------------------------------------------------
+# Prompt banks
+# ---------------------------------------------------------------------------
+
+CONVERSATIONAL = [
+    "What's the best way to learn a new language as an adult?",
+    "Can you recommend some good habits for improving sleep quality?",
+    "What are some fun weekend activities for families with young kids?",
+    "How do I politely decline a dinner invitation from a colleague?",
+    "What's a good gift idea for someone who has everything?",
+    "How can I stay motivated when working from home?",
+    "What are some tips for reducing daily stress?",
+    "I'm feeling overwhelmed with my to-do list. Any advice?",
+    "What's the difference between a job and a career?",
+    "Can you suggest some easy recipes for a beginner cook?",
+    "How do I start a conversation with a stranger at a networking event?",
+    "What are some signs that a friendship has become toxic?",
+    "How do you manage work-life balance effectively?",
+    "What should I look for when buying my first car?",
+    "How do I set up a simple home budget?",
+    "What's the best way to apologize to a friend after an argument?",
+    "Any tips for preparing for a long road trip?",
+    "How do I stop procrastinating on important tasks?",
+    "What are some good books to read on a rainy weekend?",
+    "How do I deal with a noisy neighbor without causing conflict?",
+    "What are some easy ways to be more eco-friendly at home?",
+    "Can you suggest some indoor plants that are hard to kill?",
+    "What's a good morning routine that sets you up for a productive day?",
+    "How do I pick a good wine for a dinner party?",
+    "What are some simple exercises I can do without gym equipment?",
+    "How do I make small talk without it feeling awkward?",
+    "What's the best way to study for an exam the night before?",
+    "Can you recommend some ways to meet new people in a new city?",
+    "What should I know before adopting a dog for the first time?",
+    "How do I gracefully handle criticism at work?",
+    "What are some habits of highly productive people?",
+    "How do I know when it's time to change careers?",
+    "What's the difference between sympathy and empathy?",
+    "How do I stay organized when I have too many projects at once?",
+    "What are some signs of burnout and how do you recover?",
+    "Can you explain what mindfulness is in everyday terms?",
+    "How do I build confidence when speaking in public?",
+    "What are some practical ways to save money each month?",
+    "How do I find a good mentor in my industry?",
+    "What are some conversation topics that are always safe at parties?",
+    "How do I deal with impostor syndrome at a new job?",
+    "What are the benefits of journaling and how do I start?",
+    "How do I handle disagreements with my manager professionally?",
+    "What should I pack for a week-long camping trip?",
+    "How do I choose between two equally good job offers?",
+    "What's the best way to make a first impression at a job interview?",
+    "Can you suggest some healthy snacks that I can prep on Sundays?",
+    "How do I stop being so hard on myself when I make mistakes?",
+    "What are some tips for maintaining long-distance friendships?",
+    "How do I know if I'm ready to move in with my partner?",
+    "What are some ways to make a small apartment feel more spacious?",
+    "How do I break a bad habit that I've had for years?",
+    "What should I consider before starting a vegetarian diet?",
+    "How do I teach myself to be a better listener?",
+    "What's the easiest way to start investing for retirement?",
+    "How do I choose the right sunscreen for my skin type?",
+    "What are some things to do when you're bored at home?",
+    "How do I cope with seasonal affective disorder in winter?",
+    "What's the difference between a manager and a leader?",
+    "How do I negotiate a higher salary when accepting a job offer?",
+    "Can you give me some tips for traveling solo for the first time?",
+    "How do I stay focused during long virtual meetings?",
+    "What are some good hobbies to pick up as an adult?",
+    "How do I set boundaries without feeling guilty?",
+    "What are some early signs of anxiety I should watch for?",
+    "How do I make my commute more enjoyable and productive?",
+    "What's the best way to declutter a messy home?",
+    "How do I start meditating if I've never done it before?",
+    "What are some respectful ways to disagree with someone?",
+    "How do I become more comfortable with uncertainty?",
+    "What's the best approach for learning to cook from scratch?",
+    "How do I politely tell someone they have food in their teeth?",
+    "What should I do when I feel unmotivated for days on end?",
+    "How do I manage my energy levels throughout the day?",
+    "What's a good strategy for reading more books this year?",
+    "How do I build a positive relationship with my in-laws?",
+    "What are some ways to make meetings more efficient?",
+    "What's the best way to handle criticism on social media?",
+    "How do I stay calm in a stressful situation?",
+    "What are some easy ways to improve my posture?",
+]
+
+SUMMARIZATION = [
+    (
+        "The Amazon rainforest, often called the 'lungs of the Earth,' covers over 5.5 million square "
+        "kilometers across nine countries in South America. It produces around 20% of the world's "
+        "oxygen and is home to more than 10% of all known species. Deforestation, driven by agriculture, "
+        "logging, and infrastructure development, has reduced the forest by nearly 20% in the past fifty "
+        "years. Scientists warn that if this continues, the forest could reach a tipping point where it "
+        "can no longer sustain itself and begins to transition to savanna. Please summarize this passage in two sentences."
+    ),
+    (
+        "Quantum computing uses quantum bits, or qubits, which can exist in multiple states simultaneously "
+        "due to superposition. Unlike classical bits that are either 0 or 1, qubits can be both at once, "
+        "allowing quantum computers to process a vast number of possibilities simultaneously. Entanglement, "
+        "another quantum property, links qubits so the state of one instantly influences another. These "
+        "properties allow quantum computers to solve certain problems exponentially faster than classical "
+        "computers, particularly in cryptography, drug discovery, and optimization. Summarize this in plain language."
+    ),
+    (
+        "The French Revolution, which began in 1789, fundamentally transformed France and influenced "
+        "the world. Driven by Enlightenment ideals, economic hardship, and resentment of aristocratic "
+        "privilege, ordinary citizens rose against the monarchy. The Revolution abolished feudalism, "
+        "declared the rights of man, and culminated in the execution of King Louis XVI. It also triggered "
+        "the Reign of Terror, during which thousands were guillotined. Napoleon Bonaparte eventually "
+        "rose from the chaos to lead France into an era of military conquest. Summarize the key events."
+    ),
+    (
+        "Sleep is essential for physical and mental health. During sleep, the brain consolidates memories, "
+        "clears metabolic waste, and regulates hormones. Adults typically need seven to nine hours per night, "
+        "yet surveys show that a significant portion of the population consistently gets less. Chronic sleep "
+        "deprivation is linked to increased risk of obesity, diabetes, cardiovascular disease, and depression. "
+        "Good sleep hygiene includes maintaining a consistent schedule, limiting screen time before bed, "
+        "and keeping the bedroom cool and dark. Please write a brief summary of the main points."
+    ),
+    (
+        "The Industrial Revolution, which started in Britain in the late eighteenth century, transformed "
+        "manufacturing, agriculture, transportation, and society. Steam power replaced human and animal "
+        "labor, enabling factories to produce goods on an unprecedented scale. Railways connected cities "
+        "and accelerated trade. Urbanization surged as workers moved from rural areas to industrial towns. "
+        "While it raised living standards for many, it also created dangerous working conditions, child "
+        "labor, and significant pollution. Summarize this passage in three bullet points."
+    ),
+    (
+        "Climate change refers to long-term shifts in global temperatures and weather patterns. While "
+        "natural factors such as volcanic eruptions have historically caused climate fluctuations, "
+        "since the mid-twentieth century human activities—particularly the burning of fossil fuels—have "
+        "become the dominant driver. Rising carbon dioxide levels trap heat in the atmosphere, leading "
+        "to melting ice caps, rising sea levels, more intense storms, and disruptions to ecosystems. "
+        "International agreements like the Paris Accord aim to limit warming to 1.5 degrees Celsius "
+        "above pre-industrial levels. Provide a concise summary."
+    ),
+    (
+        "Photosynthesis is the process by which green plants, algae, and some bacteria convert sunlight, "
+        "carbon dioxide, and water into glucose and oxygen. It occurs primarily in chloroplasts, organelles "
+        "containing the green pigment chlorophyll. The process involves two stages: the light-dependent "
+        "reactions, which capture solar energy to produce ATP and NADPH, and the light-independent reactions "
+        "(Calvin cycle), which use that energy to build glucose molecules. Photosynthesis is the foundation "
+        "of most food chains on Earth. Summarize this explanation for a high school student."
+    ),
+    (
+        "The human immune system is a complex network of cells, tissues, and organs that work together to "
+        "defend the body against pathogens. The innate immune system provides a rapid, non-specific first "
+        "line of defense, while the adaptive immune system mounts a slower but highly targeted response. "
+        "Key players include white blood cells such as neutrophils, macrophages, and lymphocytes. T cells "
+        "and B cells are central to the adaptive response, with B cells producing antibodies that neutralize "
+        "specific threats. Please summarize this paragraph concisely."
+    ),
+    (
+        "Artificial intelligence has evolved dramatically since its inception in the 1950s. Early AI relied "
+        "on rule-based systems and symbolic logic, but these struggled with ambiguity and complexity. "
+        "The rise of machine learning in the 1980s and 1990s allowed systems to learn from data rather than "
+        "following explicit rules. Deep learning, a subset of machine learning using neural networks, "
+        "has since produced breakthroughs in image recognition, natural language processing, and game-playing. "
+        "Today, large language models can generate coherent text, answer questions, and assist with complex tasks. "
+        "Summarize the history of AI in two sentences."
+    ),
+    (
+        "The Silk Road was a network of trade routes connecting China to the Mediterranean world, active "
+        "from around 130 BCE to 1453 CE. Merchants carried silk, spices, glassware, and precious metals "
+        "across thousands of miles. Beyond goods, the routes facilitated the exchange of ideas, religions, "
+        "technologies, and cultures. Buddhism spread from India to East Asia along these roads, while "
+        "paper and gunpowder traveled westward from China. The Black Death also traveled the Silk Road "
+        "westward in the fourteenth century. Summarize the significance of the Silk Road."
+    ),
+    (
+        "The ocean covers more than 70% of Earth's surface and plays a crucial role in regulating climate. "
+        "It absorbs about 30% of the carbon dioxide released by human activities and more than 90% of "
+        "the excess heat produced by greenhouse gases. Ocean currents redistribute heat around the planet, "
+        "influencing weather patterns. However, warming and acidification of the oceans threaten coral reefs, "
+        "marine biodiversity, and fisheries. Rising sea levels pose risks to coastal communities worldwide. "
+        "Write a two-sentence summary of this passage."
+    ),
+    (
+        "In economics, supply and demand is a fundamental model describing how prices are determined in a "
+        "market. When demand for a good increases and supply remains constant, prices rise. When supply "
+        "increases and demand stays the same, prices fall. The equilibrium price is where the quantity "
+        "demanded equals the quantity supplied. Factors that shift demand include income changes, consumer "
+        "preferences, and the price of substitute goods. Factors that shift supply include production costs "
+        "and technological advances. Summarize this economic concept briefly."
+    ),
+    (
+        "William Shakespeare, born in Stratford-upon-Avon in 1564, is widely regarded as the greatest "
+        "writer in the English language. He wrote 37 plays, 154 sonnets, and several longer poems. His "
+        "works explore universal themes such as love, power, jealousy, betrayal, and mortality. Plays like "
+        "Hamlet, Macbeth, Othello, and King Lear are considered masterpieces of world literature. "
+        "Shakespeare's language introduced over 1,700 words to English, many of which are still in use "
+        "today. Please summarize Shakespeare's impact in two to three sentences."
+    ),
+    (
+        "Vaccines work by training the immune system to recognize and fight specific pathogens without "
+        "causing disease. They typically contain weakened or inactivated forms of a pathogen, or specific "
+        "proteins from it. When the immune system encounters the vaccine, it produces antibodies and memory "
+        "cells. If the person is later exposed to the actual pathogen, their immune system can mount a "
+        "rapid response. Vaccines have eradicated smallpox, nearly eliminated polio, and prevented millions "
+        "of deaths annually. Summarize how vaccines protect against disease."
+    ),
+    (
+        "The Big Bang theory is the prevailing cosmological model explaining the origin of the universe. "
+        "It proposes that the universe began as an extremely hot and dense single point approximately "
+        "13.8 billion years ago, and has been expanding ever since. In the first fractions of a second, "
+        "fundamental particles formed. Within minutes, these particles combined to form the first atomic "
+        "nuclei. Hydrogen and helium were the first elements, and over millions of years, gravity pulled "
+        "matter together to form stars and galaxies. Summarize this in plain terms."
+    ),
+    (
+        "Plastic pollution is one of the most pressing environmental challenges of our time. Since the "
+        "mass production of plastics began in the 1950s, humans have produced more than 8 billion metric "
+        "tons of plastic. Only about 9% has been recycled; the rest has been incinerated or ended up in "
+        "landfills and the environment. Plastics in the ocean break down into microplastics that enter "
+        "the food chain, harming wildlife and potentially human health. Reducing plastic production and "
+        "improving waste management are critical steps. Write a concise summary."
+    ),
+    (
+        "The Renaissance, meaning 'rebirth,' was a period of cultural, artistic, and intellectual revival "
+        "in Europe from the 14th to the 17th century. It began in Italy, partly triggered by the rediscovery "
+        "of classical Greek and Roman texts. Artists like Leonardo da Vinci and Michelangelo created works "
+        "that redefined visual representation. Thinkers such as Erasmus and Petrarch championed humanism, "
+        "emphasizing individual potential and reason. The invention of the printing press by Gutenberg "
+        "accelerated the spread of new ideas. Summarize the Renaissance in two to three sentences."
+    ),
+    (
+        "DNA, or deoxyribonucleic acid, is the molecule that carries genetic information in living "
+        "organisms. It consists of two strands forming a double helix, made up of four chemical bases: "
+        "adenine, thymine, guanine, and cytosine. The sequence of these bases encodes the instructions "
+        "for building proteins. During cell division, DNA is replicated so each new cell receives a "
+        "complete copy. Mutations—changes in the DNA sequence—can occur spontaneously or be caused by "
+        "environmental factors, and they drive evolution. Write a brief summary of DNA's role."
+    ),
+    (
+        "Globalization refers to the increasing interconnectedness of economies, cultures, and populations "
+        "across the world. Driven by advances in transportation, communication, and trade policy, "
+        "globalization has enabled goods, capital, and ideas to flow freely across borders. It has lifted "
+        "millions out of poverty in developing countries and created a global consumer culture. Critics, "
+        "however, point to job losses in manufacturing-heavy economies, cultural homogenization, and "
+        "the exploitation of cheap labor in developing nations. Summarize the main benefits and drawbacks."
+    ),
+    (
+        "The human brain contains approximately 86 billion neurons, each connected to thousands of others "
+        "through synapses. These connections enable everything from basic motor functions to complex "
+        "abstract thinking. The brain is divided into regions with specialized functions: the frontal "
+        "lobe handles decision-making and personality, the hippocampus is crucial for memory, and the "
+        "amygdala processes emotions. Neuroplasticity allows the brain to reorganize itself in response "
+        "to learning and experience, even in adulthood. Please summarize the key facts about the brain."
+    ),
+    (
+        "Water covers about 71% of the Earth's surface, but only about 2.5% of it is fresh water. "
+        "Of that freshwater, about 68% is locked in glaciers and ice caps. Only a tiny fraction is "
+        "accessible as surface water in rivers and lakes. Water scarcity affects more than 2 billion "
+        "people worldwide, a number expected to grow as climate change intensifies droughts and "
+        "population continues to rise. Sustainable water management has become one of the central "
+        "challenges of the 21st century. Summarize the issue of global water availability."
+    ),
+    (
+        "The Apollo 11 mission, launched on July 16, 1969, was the first crewed spaceflight to land "
+        "on the Moon. Astronauts Neil Armstrong, Buzz Aldrin, and Michael Collins traveled to the Moon "
+        "on a Saturn V rocket. Armstrong and Aldrin descended to the lunar surface in the Eagle lander "
+        "on July 20, while Collins remained in orbit. Armstrong became the first human to walk on the "
+        "Moon, famously declaring 'one small step for man, one giant leap for mankind.' They returned "
+        "safely to Earth on July 24. Summarize the Apollo 11 mission briefly."
+    ),
+    (
+        "The gig economy refers to a labor market characterized by short-term contracts and freelance "
+        "work as opposed to permanent employment. Platforms like Uber, Airbnb, and Fiverr have grown "
+        "rapidly, enabling individuals to offer services on a flexible basis. Proponents argue it offers "
+        "workers greater autonomy and flexibility. Critics, however, note that gig workers typically lack "
+        "benefits such as health insurance, paid leave, and pension contributions, making their financial "
+        "situations precarious. Governments around the world are grappling with how to regulate this "
+        "sector. Please summarize the gig economy and its controversies."
+    ),
+    (
+        "Antibiotics are drugs that kill or inhibit the growth of bacteria. Since the discovery of "
+        "penicillin by Alexander Fleming in 1928, antibiotics have saved countless lives and transformed "
+        "medicine. However, overuse and misuse—particularly in livestock farming and inappropriate "
+        "prescribing—have led to the rise of antibiotic-resistant bacteria. These so-called 'superbugs' "
+        "pose a growing threat to global health, as common infections could become untreatable. The "
+        "WHO has declared antimicrobial resistance one of the greatest threats to global health. "
+        "Write a concise summary of this passage."
+    ),
+    (
+        "The stock market is a collection of exchanges where buyers and sellers trade shares of publicly "
+        "listed companies. Prices fluctuate based on supply and demand, influenced by company performance, "
+        "economic indicators, and investor sentiment. Stock markets serve as a mechanism for companies to "
+        "raise capital and for investors to grow their wealth over time. However, they can be volatile—"
+        "sudden drops, known as corrections or crashes, can wipe out significant value. Diversification "
+        "and long-term investing are commonly recommended strategies to manage this risk. Summarize how "
+        "the stock market works and its risks."
+    ),
+    (
+        "Black holes are regions of spacetime where gravity is so strong that nothing—not even light—can "
+        "escape. They form when massive stars collapse at the end of their life cycles. The boundary "
+        "beyond which escape is impossible is called the event horizon. At the center lies the singularity, "
+        "a point of infinite density. Despite being invisible, black holes can be detected by their "
+        "gravitational effects on nearby matter and light. In 2019, the Event Horizon Telescope captured "
+        "the first image of a black hole's shadow. Please summarize what black holes are."
+    ),
+    (
+        "Blockchain is a distributed ledger technology that records transactions across a network of "
+        "computers in a way that makes them transparent and difficult to alter. Each block in the chain "
+        "contains a cryptographic hash of the previous block, a timestamp, and transaction data. "
+        "Bitcoin, the first cryptocurrency, introduced blockchain in 2008. Beyond cryptocurrency, "
+        "blockchain has potential applications in supply chain management, healthcare records, voting "
+        "systems, and smart contracts. Critics note concerns about energy consumption and scalability. "
+        "Summarize what blockchain is and its main applications."
+    ),
+    (
+        "Migration refers to the movement of people from one place to another, whether within a country "
+        "or across international borders. People migrate for many reasons: economic opportunity, family "
+        "reunification, education, conflict, or climate change. International migration has increased "
+        "dramatically in recent decades, with the UN estimating over 280 million international migrants "
+        "worldwide. While migrants often contribute significantly to host economies, migration also raises "
+        "complex questions about cultural integration, resource distribution, and national identity. "
+        "Write a brief summary of this passage."
+    ),
+    (
+        "Social media platforms like Facebook, Instagram, Twitter, and TikTok have transformed the way "
+        "people communicate and consume information. They allow users to share content instantly with a "
+        "global audience and connect with communities around shared interests. However, they have also "
+        "been linked to increased anxiety and depression, particularly in young people, and have become "
+        "vectors for misinformation and political polarization. Questions about data privacy, algorithmic "
+        "manipulation, and the concentration of power in a few tech giants are driving calls for regulation. "
+        "Summarize the benefits and harms of social media."
+    ),
+    (
+        "The Mediterranean diet, traditionally followed by people in countries like Greece, Italy, and "
+        "Spain, emphasizes fruits, vegetables, whole grains, legumes, nuts, and olive oil, with moderate "
+        "consumption of fish and dairy and limited red meat. Numerous studies have linked it to reduced "
+        "risk of heart disease, type 2 diabetes, certain cancers, and cognitive decline. Researchers "
+        "attribute its benefits to its high content of antioxidants, healthy fats, and fiber. It has "
+        "been recognized by the WHO as one of the healthiest dietary patterns in the world. "
+        "Summarize the Mediterranean diet and its health benefits."
+    ),
+    (
+        "Nuclear energy generates electricity through nuclear fission, the process of splitting heavy "
+        "atomic nuclei such as uranium-235 or plutonium-239. The heat produced by fission is used to "
+        "generate steam, which drives turbines. Nuclear power produces minimal greenhouse gas emissions "
+        "during operation, making it an attractive option for reducing carbon emissions. However, it "
+        "carries risks including radioactive waste disposal, the potential for accidents like Chernobyl "
+        "and Fukushima, and the high cost of building new plants. Summarize the pros and cons of nuclear "
+        "energy in this passage."
+    ),
+    (
+        "The Internet of Things (IoT) refers to the network of physical objects—devices, vehicles, "
+        "appliances—embedded with sensors, software, and connectivity that allow them to collect and "
+        "exchange data. Smart home devices, wearable health monitors, connected industrial equipment, "
+        "and autonomous vehicles are all examples. IoT has the potential to improve efficiency, reduce "
+        "costs, and enable new services. However, it also raises serious concerns about privacy, security, "
+        "and the risk of cyberattacks on critical infrastructure. Please write a brief summary of IoT."
+    ),
+    (
+        "The Olympic Games are the world's leading international sporting event, held every four years "
+        "(with summer and winter editions alternating every two years). They bring together thousands of "
+        "athletes from over 200 countries to compete in dozens of sports. First held in ancient Greece "
+        "around 776 BCE, the modern Games were revived in 1896 in Athens. The Olympics are intended to "
+        "promote peace, friendship, and fair competition. However, they have also been subject to "
+        "controversies including doping scandals, political boycotts, and concerns about the economic "
+        "burden on host cities. Summarize the Olympics briefly."
+    ),
+    (
+        "Electric vehicles (EVs) run on battery-powered electric motors rather than internal combustion "
+        "engines. They produce zero tailpipe emissions, reducing urban air pollution and contributing to "
+        "climate goals. Battery costs have fallen dramatically in recent years, making EVs increasingly "
+        "competitive with conventional cars. Challenges include limited driving range, long charging "
+        "times, inadequate charging infrastructure in many regions, and the environmental impact of "
+        "mining lithium and cobalt for batteries. Many governments are offering incentives to accelerate "
+        "EV adoption. Summarize the state of electric vehicles."
+    ),
+    (
+        "The concept of universal basic income (UBI) proposes that all citizens receive a regular, "
+        "unconditional cash payment from the government, regardless of employment status. Proponents "
+        "argue it could reduce poverty, simplify the welfare system, and cushion workers displaced "
+        "by automation. Critics raise concerns about cost, inflation, and the potential for reduced "
+        "work incentives. Several pilot programs have been conducted around the world, with mixed results. "
+        "Finland ran a two-year experiment from 2017 to 2018, reporting improvements in wellbeing. "
+        "Summarize the debate around universal basic income."
+    ),
+    (
+        "The Renaissance polymath Leonardo da Vinci (1452–1519) is best known for his paintings, "
+        "including the Mona Lisa and The Last Supper, but his interests and talents extended far beyond "
+        "art. He filled thousands of notebook pages with observations and designs covering anatomy, "
+        "engineering, optics, botany, geology, and hydraulics. His anatomical drawings were among the "
+        "most accurate of his time, produced by dissecting human corpses. His designs anticipated "
+        "inventions such as the helicopter, tank, and solar power. Summarize Leonardo da Vinci's "
+        "contributions in this passage."
+    ),
+    (
+        "CRISPR-Cas9 is a revolutionary gene-editing technology that allows scientists to precisely "
+        "cut and modify DNA sequences. Derived from a natural defense mechanism found in bacteria, "
+        "it uses a guide RNA to direct the Cas9 protein to a specific location in the genome. Once "
+        "there, Cas9 makes a cut, enabling genes to be deleted, corrected, or inserted. CRISPR has "
+        "potential applications in treating genetic diseases, improving crops, and even eradicating "
+        "infectious diseases. Ethical concerns surround its use in human embryos and the possibility "
+        "of 'designer babies.' Please summarize CRISPR technology."
+    ),
+    (
+        "The Great Wall of China is one of the most remarkable architectural feats in human history. "
+        "Built over many centuries by various Chinese dynasties, it stretches more than 21,000 kilometers "
+        "across northern China. Its primary purpose was to protect against nomadic invasions from the "
+        "north. The wall also served as a signal system, trade route, and symbol of imperial power. "
+        "Construction required the labor of millions of workers, many of whom died during its building. "
+        "The most well-known sections were built during the Ming dynasty (1368–1644). Summarize this "
+        "passage about the Great Wall."
+    ),
+    (
+        "Machine learning is a branch of artificial intelligence in which systems learn from data "
+        "to improve their performance on tasks without being explicitly programmed. Supervised learning "
+        "involves training on labeled examples, while unsupervised learning finds patterns in unlabeled "
+        "data. Reinforcement learning trains agents to take actions that maximize cumulative reward. "
+        "Applications include spam detection, recommendation systems, medical diagnosis, fraud detection, "
+        "and image recognition. The quality and diversity of training data is crucial to the performance "
+        "of ML models. Please summarize the key points about machine learning."
+    ),
+    (
+        "Urbanization is the process by which populations shift from rural to urban areas. Today, more "
+        "than 55% of the world's population lives in cities, up from just 30% in 1950. This trend is "
+        "expected to continue, with projections suggesting 68% urban population by 2050. Cities drive "
+        "economic growth and innovation, offering better access to jobs, education, and healthcare. "
+        "However, rapid urbanization also brings challenges: housing shortages, traffic congestion, "
+        "pollution, and the growth of informal settlements. Sustainable urban planning is crucial to "
+        "managing these pressures. Summarize the key points about urbanization."
+    ),
+    (
+        "The United Nations was founded in 1945 after World War II, with the primary goals of maintaining "
+        "international peace and security, promoting human rights, fostering social and economic development, "
+        "and providing a forum for cooperation among nations. It has 193 member states and operates through "
+        "six main organs, including the Security Council and the General Assembly. The UN has played a "
+        "significant role in peacekeeping operations, humanitarian aid, and the development of international "
+        "law. Critics point to its limited enforcement power and the veto rights of the five permanent "
+        "Security Council members. Summarize the role of the United Nations."
+    ),
+    (
+        "Stress is the body's natural response to challenges or threats. In the short term, it can "
+        "sharpen focus and boost performance—this is known as acute stress. However, chronic stress, "
+        "caused by ongoing pressures such as work demands, financial problems, or relationship issues, "
+        "can have serious health consequences. It is linked to conditions including cardiovascular disease, "
+        "weakened immunity, anxiety, depression, and digestive problems. Effective stress management "
+        "strategies include exercise, mindfulness meditation, adequate sleep, and social support. "
+        "Summarize the effects of chronic stress and ways to manage it."
+    ),
+    (
+        "Space exploration has expanded our understanding of the universe and produced numerous "
+        "technological spinoffs. The Space Race of the 1950s and 1960s, driven by Cold War competition "
+        "between the US and USSR, culminated in the Apollo Moon landings. Since then, robotic missions "
+        "have explored every planet in our solar system. The International Space Station has served as "
+        "a laboratory for research into the effects of microgravity on the human body. Private companies "
+        "like SpaceX are now developing reusable rockets that dramatically reduce the cost of reaching orbit. "
+        "Summarize the history and current state of space exploration."
+    ),
+    (
+        "Inflation refers to the general increase in prices over time, which reduces the purchasing "
+        "power of money. It is typically measured by the Consumer Price Index (CPI), which tracks the "
+        "cost of a representative basket of goods and services. Moderate inflation is considered normal "
+        "and even desirable in a growing economy. However, high inflation erodes savings, creates "
+        "uncertainty, and can lead to social unrest. Central banks, like the Federal Reserve, use "
+        "monetary policy tools such as interest rate adjustments to control inflation. Summarize the "
+        "key concepts related to inflation."
+    ),
+    (
+        "Forests cover about 31% of the Earth's land area and provide critical ecosystem services. "
+        "They absorb carbon dioxide, store water, regulate local climates, and harbor the majority of "
+        "terrestrial biodiversity. Tropical rainforests are particularly biodiverse, hosting millions "
+        "of species. Deforestation—for agriculture, logging, urban expansion, and mining—is destroying "
+        "forests at an alarming rate. The loss of forests contributes significantly to greenhouse gas "
+        "emissions and biodiversity loss. Reforestation and sustainable land use are key strategies for "
+        "protecting these vital ecosystems. Summarize the importance of forests."
+    ),
+    (
+        "Exercise has profound benefits for both physical and mental health. Regular physical activity "
+        "reduces the risk of chronic diseases including heart disease, type 2 diabetes, and certain "
+        "cancers. It strengthens muscles and bones, improves flexibility, and helps maintain a healthy "
+        "weight. For mental health, exercise releases endorphins and other neurotransmitters that "
+        "reduce stress, anxiety, and depression. Even moderate activity—such as 30 minutes of brisk "
+        "walking five times per week—can have significant benefits. The WHO recommends at least 150 "
+        "minutes of moderate exercise per week for adults. Summarize the benefits of regular exercise."
+    ),
+    (
+        "The Enlightenment was an intellectual movement in 18th-century Europe that championed reason, "
+        "individualism, and skepticism of traditional authority. Thinkers like John Locke, Voltaire, "
+        "Jean-Jacques Rousseau, and Immanuel Kant challenged religious dogma and absolutist governments. "
+        "Enlightenment ideas about natural rights, the social contract, and the separation of powers "
+        "directly influenced the American and French Revolutions. The movement also promoted scientific "
+        "inquiry and education as means to improve society. It laid the intellectual foundations for "
+        "modern democracy and human rights. Summarize the Enlightenment."
+    ),
+    (
+        "Mental health disorders are among the leading causes of disability worldwide, affecting about "
+        "one in four people at some point in their lives. Common conditions include depression, anxiety "
+        "disorders, bipolar disorder, and schizophrenia. Despite their prevalence, stigma and limited "
+        "access to care mean that the majority of people with mental health disorders go untreated. "
+        "Treatment typically involves a combination of medication and psychotherapy. Emerging approaches "
+        "include digital mental health tools and community-based care. Investing in mental health systems "
+        "is increasingly recognized as a global health priority. Summarize the key points about mental health."
+    ),
+    (
+        "The discovery of penicillin by Alexander Fleming in 1928 marked a turning point in medicine. "
+        "Before antibiotics, infections from minor wounds could be fatal, and diseases like tuberculosis "
+        "and pneumonia killed millions annually. Penicillin and subsequently developed antibiotics "
+        "dramatically reduced mortality from bacterial infections. However, decades of overuse have "
+        "led to the emergence of antibiotic-resistant bacteria. MRSA, drug-resistant tuberculosis, "
+        "and carbapenem-resistant Enterobacteriaceae are among the most dangerous examples. Global "
+        "coordination is needed to preserve the effectiveness of existing antibiotics. Summarize this."
+    ),
+    (
+        "Renewable energy sources—including solar, wind, hydroelectric, geothermal, and biomass—"
+        "generate electricity without depleting natural resources or emitting greenhouse gases. The "
+        "cost of solar and wind energy has fallen by more than 80% over the past decade, making them "
+        "increasingly competitive with fossil fuels. In 2023, renewables accounted for nearly 30% of "
+        "global electricity generation. Challenges include the intermittent nature of solar and wind "
+        "power and the need for large-scale energy storage solutions. Transitioning to renewables is "
+        "central to global efforts to limit climate change. Please summarize renewable energy."
+    ),
+    (
+        "The human body has approximately 37 trillion cells, each performing specific functions. Cells "
+        "are organized into tissues, which form organs, which work together in organ systems. The basic "
+        "unit of life, each cell contains a nucleus with genetic material, mitochondria for energy "
+        "production, and various other organelles. Stem cells are undifferentiated cells that can develop "
+        "into specialized cell types, making them important for growth, repair, and potential medical "
+        "therapies. Cancer occurs when cells divide uncontrollably and invade surrounding tissues. "
+        "Summarize the key points about cells in the human body."
+    ),
+    (
+        "The World Trade Organization (WTO) is an international body that governs global trade rules "
+        "among nations. Founded in 1995, it replaced the General Agreement on Tariffs and Trade (GATT). "
+        "The WTO facilitates negotiations on trade agreements, resolves trade disputes between member "
+        "countries, and monitors national trade policies. It operates on principles of non-discrimination, "
+        "transparency, and predictability. Critics argue that the WTO favors wealthier countries and "
+        "limits developing nations' ability to protect their industries. Supporters say it has reduced "
+        "trade barriers and promoted economic growth. Summarize the role of the WTO."
+    ),
+    (
+        "Emotional intelligence (EQ) refers to the ability to recognize, understand, manage, and "
+        "effectively use one's own emotions and those of others. Psychologist Daniel Goleman popularized "
+        "the concept in his 1995 book, identifying five components: self-awareness, self-regulation, "
+        "motivation, empathy, and social skills. Research suggests that EQ is a better predictor of "
+        "professional success than IQ in many contexts. High emotional intelligence is linked to better "
+        "leadership, teamwork, and interpersonal relationships. EQ can be developed through practice "
+        "and self-reflection. Summarize the concept of emotional intelligence."
+    ),
+    (
+        "The printing press, invented by Johannes Gutenberg around 1440, revolutionized the spread of "
+        "information. Before its invention, books were copied by hand, making them expensive and rare. "
+        "The press allowed texts to be reproduced quickly and cheaply, dramatically increasing literacy "
+        "and the availability of knowledge. It facilitated the Protestant Reformation, the Scientific "
+        "Revolution, and the Enlightenment by spreading new ideas rapidly across Europe. It is often "
+        "cited as one of the most transformative inventions in human history. Summarize this passage."
+    ),
+    (
+        "Biodiversity refers to the variety of life on Earth at all levels, from genes to ecosystems. "
+        "It underpins ecosystem services that humans depend on: clean air and water, fertile soils, "
+        "pollination, climate regulation, and natural medicines. Scientists estimate that Earth is "
+        "experiencing a sixth mass extinction, driven by habitat destruction, overexploitation, "
+        "invasive species, pollution, and climate change. Species are disappearing at a rate roughly "
+        "100 to 1,000 times higher than the natural background rate. Protecting biodiversity requires "
+        "preserving natural habitats and reducing human pressures on ecosystems. Summarize this passage."
+    ),
+    (
+        "The Cold War, lasting roughly from 1947 to 1991, was a period of geopolitical tension between "
+        "the United States and the Soviet Union and their respective allies. Rather than direct military "
+        "conflict between the two superpowers, the rivalry played out through proxy wars, arms races, "
+        "space exploration competition, and ideological struggle. Key episodes included the Berlin "
+        "Blockade, Korean War, Cuban Missile Crisis, and the Vietnam War. The Cold War ended with the "
+        "dissolution of the Soviet Union in 1991. Its legacy continues to shape international relations "
+        "today. Summarize the key aspects of the Cold War."
+    ),
+    (
+        "Nanotechnology involves the manipulation of matter at the scale of individual atoms and "
+        "molecules, typically at dimensions between 1 and 100 nanometers. At this scale, materials "
+        "exhibit unique properties not seen in bulk form. Applications include targeted drug delivery, "
+        "where nanoparticles carry medicine directly to cancer cells, as well as stronger and lighter "
+        "materials, more efficient solar cells, and improved water filtration. Despite its promise, "
+        "nanotechnology raises concerns about the toxicity of engineered nanoparticles and the "
+        "environmental impact of their release. Please summarize this passage about nanotechnology."
+    ),
+    (
+        "The concept of democracy dates back to ancient Athens, where citizens directly voted on "
+        "laws and policies in the 5th century BCE. Modern democracies are typically representative, "
+        "where elected officials make decisions on behalf of constituents. Core principles include "
+        "free and fair elections, protection of individual rights, rule of law, and separation of powers. "
+        "Democracy has spread globally since the end of the Cold War, though researchers note a more "
+        "recent trend of democratic backsliding in some countries. Autocrats increasingly use legal "
+        "mechanisms to consolidate power. Summarize the concept of democracy."
+    ),
+    (
+        "Nutrition science studies how food affects the human body at the molecular, cellular, and "
+        "systemic level. Macronutrients—carbohydrates, proteins, and fats—provide energy and building "
+        "materials for tissues. Micronutrients, including vitamins and minerals, are required in smaller "
+        "amounts but are essential for metabolic processes. Poor nutrition is a leading cause of "
+        "preventable disease, contributing to obesity, malnutrition, and deficiencies. The relationship "
+        "between diet and health is complex, and nutrition research is often subject to conflicting "
+        "findings and industry influence. Please write a brief summary of nutrition science."
+    ),
+    (
+        "The ozone layer is a region of Earth's stratosphere, about 15 to 35 kilometers above the "
+        "surface, that absorbs most of the Sun's ultraviolet radiation. In the 1970s and 80s, scientists "
+        "discovered that chlorofluorocarbons (CFCs), used in refrigerants and aerosol sprays, were "
+        "depleting the ozone layer, creating a 'hole' over Antarctica. This led to the Montreal Protocol "
+        "in 1987, an international agreement to phase out ozone-depleting substances. As a result, the "
+        "ozone layer has been slowly recovering. The Montreal Protocol is widely considered one of the "
+        "most successful environmental treaties. Summarize the ozone layer issue."
+    ),
+]
+
+CODE_GENERATION = [
+    "Write a Python function that takes a list of integers and returns the two numbers that add up to a given target sum.",
+    "Write a JavaScript function that debounces another function by a given number of milliseconds.",
+    "Implement a binary search algorithm in Python that returns the index of a target value in a sorted list.",
+    "Write a Python class for a simple stack data structure with push, pop, peek, and is_empty methods.",
+    "Write a SQL query that finds the top 5 customers by total order value from a table called 'orders' with columns customer_id, amount, and date.",
+    "Write a Python decorator that logs the execution time of any function it wraps.",
+    "Implement a function in Python that checks whether a given string is a valid palindrome, ignoring spaces and punctuation.",
+    "Write a Python function that flattens a nested list of arbitrary depth into a single flat list.",
+    "Write a React component that displays a counter with increment and decrement buttons, using useState.",
+    "Write a Python function that reads a CSV file and returns a dictionary grouping rows by a specified column.",
+    "Implement a simple LRU (Least Recently Used) cache in Python with a fixed capacity.",
+    "Write a Python function that generates all permutations of a given list.",
+    "Write a Bash script that finds all Python files in the current directory tree older than 30 days and deletes them.",
+    "Write a Python function that converts a Roman numeral string to an integer.",
+    "Implement a function that determines whether two strings are anagrams of each other in Python.",
+    "Write a Python function that merges two sorted lists into a single sorted list without using the built-in sort.",
+    "Write a Python function using asyncio that fetches URLs from a list concurrently and returns their HTTP status codes.",
+    "Write a TypeScript function that deep-clones an object, handling nested arrays and objects.",
+    "Write a Python function that parses a log file line by line and extracts lines matching a given regex pattern.",
+    "Explain what this Python code does and identify any bugs: `def fib(n): return n if n <= 1 else fib(n-1) + fib(n-2)`",
+    "Write a Python function that counts the frequency of each word in a string and returns the top N most common words.",
+    "Write a Python context manager that suppresses specified exceptions within its block.",
+    "Write a Python function that converts a given number of seconds into a human-readable string like '2 hours, 15 minutes, 3 seconds'.",
+    "Implement a basic rate limiter in Python that allows at most N calls per second.",
+    "Write a Python function that takes a dictionary and returns a new dictionary with keys and values swapped.",
+    "Write a SQL query that finds employees who earn more than their department average salary.",
+    "Write a Python function that validates an email address using regular expressions.",
+    "Implement a simple graph traversal (BFS) in Python given an adjacency list representation.",
+    "Write a Python script that takes a JSON file path as an argument and pretty-prints its contents.",
+    "Write a Python function that computes the Levenshtein edit distance between two strings.",
+    "Write a Python dataclass for a 'Product' with fields name, price, and quantity_in_stock, including a method to compute total inventory value.",
+    "Write a Python function that serializes a Python object to JSON and saves it to a file, then deserializes it back.",
+    "Implement a simple publish-subscribe event system in Python.",
+    "Write a Python function that takes a list of file paths and returns those that match a given glob pattern.",
+    "Write a Python generator that yields Fibonacci numbers indefinitely.",
+    "Write a Python function to detect cycles in a directed graph using DFS.",
+    "Write a Python function that retries a given function up to N times with exponential backoff.",
+    "Write a SQL query to find duplicate rows in a table based on two specific columns.",
+    "Write a Python function that converts a CamelCase string to snake_case.",
+    "Implement a binary tree in Python with insert, search, and in-order traversal methods.",
+]
+
+REASONING = [
+    "A train leaves Station A at 9:00 AM traveling at 60 mph toward Station B, which is 210 miles away. Another train leaves Station B at 10:00 AM traveling at 90 mph toward Station A. At what time do the two trains meet? Show your reasoning step by step.",
+    "You have a 3-liter jug and a 5-liter jug with no markings. You need to measure exactly 4 liters of water. Explain step by step how you would do it.",
+    "A farmer has both chickens and rabbits. There are 20 heads and 56 legs in total. How many chickens and how many rabbits does the farmer have? Show your work.",
+    "In a class of 30 students, 18 play football, 15 play basketball, and 7 play both. How many students play neither sport? Explain your reasoning.",
+    "If you have a 10x10 chessboard and you remove two opposite corner squares, can you tile the remaining 98 squares with 1x2 dominoes? Why or why not? Reason carefully.",
+    "Three friends, Alice, Bob, and Carol, each bought a different item: a book, a pen, and a notebook. Alice did not buy the pen. Bob did not buy the book. Carol did not buy the notebook. What did each person buy? Show your logic.",
+    "A snail climbs a 10-meter pole. During the day it climbs 3 meters, but at night it slides back 2 meters. How many days does it take to reach the top? Explain your reasoning.",
+    "You have 8 identical-looking balls, but one is slightly heavier. Using a balance scale with only 2 weighings, how do you identify the heavier ball? Describe the strategy step by step.",
+    "If a shirt costs $9 more than a pair of socks, and together they cost $10, how much does each item cost? Show your reasoning.",
+    "A store reduces the price of a laptop by 20%, then later increases the reduced price by 20%. What is the final price as a percentage of the original price? Show your work.",
+    "What comes next in this sequence: 2, 6, 12, 20, 30, 42, ...? Explain the pattern.",
+    "You are in a room with two doors. One leads to freedom, the other to danger. There are two guards: one always tells the truth, one always lies. You can ask one guard one question. What do you ask to find the safe door? Reason through this carefully.",
+    "A ball is thrown straight up with an initial speed of 20 m/s. Assuming gravity decelerates it at 10 m/s², how high does it go, and when does it return to the ground? Show the calculations.",
+    "There are 100 lockers in a row, all initially closed. 100 students walk past. The first student opens every locker. The second student closes every 2nd locker. The third toggles every 3rd locker. And so on. Which lockers are open at the end? Explain why.",
+    "If the probability of rain on any given day is 0.3, what is the probability that it rains at least once in a 5-day period? Show your calculation.",
+    "A car travels from City A to City B at 40 mph, and returns at 60 mph. What is the average speed for the entire trip? Explain why you cannot simply average 40 and 60.",
+    "Explain the Monty Hall problem: you pick one of three doors. The host reveals a goat behind another door. Should you switch? Justify your answer with probability.",
+    "A rectangular field is twice as long as it is wide. If the area is 200 square meters, what are the dimensions? Show your work step by step.",
+    "If you stack pennies to the height of the Eiffel Tower (330 meters), approximately how many pennies would you need? Estimate the thickness of a penny and show your reasoning.",
+    "There are five houses in a row, each of a different color. In each house lives a person of a different nationality. Use these clues to determine who owns the fish: The Brit lives in the red house. The Swede keeps dogs as pets. The Dane drinks tea. The green house is on the left of the white house. The green house owner drinks coffee. The person who smokes Pall Mall rears birds. The owner of the yellow house smokes Dunhill. The man living in the center house drinks milk. The Norwegian lives in the first house. The man who smokes Blends lives next to the one who keeps cats. The man who keeps horses lives next to the man who smokes Dunhill. The owner who smokes BlueMaster drinks beer. The German smokes Prince. The Norwegian lives next to the blue house. The man who smokes Blends has a neighbor who drinks water. Work through this step by step.",
+]
+
+# Ensure counts match targets
+assert len(CONVERSATIONAL) == 80
+assert len(SUMMARIZATION) == 60
+assert len(CODE_GENERATION) == 40
+assert len(REASONING) == 20
+
+
+def estimate_tokens(text: str) -> int:
+    """Word-count approximation: words × 1.3 ≈ tokens."""
+    return max(1, round(len(text.split()) * 1.3))
+
+
+def build_requests() -> list[dict]:
+    records = []
+    req_id = 0
+
+    groups = [
+        ("conversational", CONVERSATIONAL),
+        ("summarization", [p for p in SUMMARIZATION]),
+        ("code", CODE_GENERATION),
+        ("reasoning", REASONING),
+    ]
+
+    for prompt_type, prompts in groups:
+        for prompt in prompts:
+            records.append({
+                "request_id": req_id,
+                "prompt": prompt,
+                "input_tokens_approx": estimate_tokens(prompt),
+                "prompt_type": prompt_type,
+            })
+            req_id += 1
+
+    return records
+
+
+def print_stats(records: list[dict]) -> None:
+    tokens = sorted(r["input_tokens_approx"] for r in records)
+    n = len(tokens)
+
+    def percentile(p: float) -> int:
+        idx = int(math.ceil(p / 100.0 * n)) - 1
+        return tokens[max(0, min(idx, n - 1))]
+
+    print(f"Total prompts : {n}")
+    print(f"Token stats   : p50={percentile(50)}  p90={percentile(90)}  p99={percentile(99)}")
+    print(f"Token range   : min={tokens[0]}  max={tokens[-1]}")
+
+    type_counts: dict[str, int] = {}
+    for r in records:
+        type_counts[r["prompt_type"]] = type_counts.get(r["prompt_type"], 0) + 1
+    print("Distribution  :", "  ".join(f"{k}={v}" for k, v in type_counts.items()))
+
+
+def main() -> None:
+    records = build_requests()
+    output_path = OUTPUT_PATH
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        for r in records:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+    print(f"Written: {output_path}")
+    print_stats(records)
+
+
+if __name__ == "__main__":
+    main()

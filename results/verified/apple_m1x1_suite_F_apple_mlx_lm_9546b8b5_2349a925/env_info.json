@@ -1,0 +1,32 @@
+{
+  "collected_at": "2026-04-20T04:41:45.602804+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "Apple M1",
+      "vendor": "Apple",
+      "memory_gb": 16.0,
+      "driver_version": "macOS 14.5 (build 23F79)",
+      "firmware_version": null,
+      "compute_capability": null,
+      "supports_bf16": false
+    }
+  ],
+  "accelerator_topology": "Apple Silicon \u2014 integrated GPU in Apple M1 (unified system memory).\nMachine: arm64\nGPU runtime (spdisplays_mtlgpufamilysupport): spdisplays_metal3",
+  "intra_node_interconnect": "SoC unified memory (no GPU-GPU interconnect)",
+  "cpu": {
+    "model": "Apple M1",
+    "physical_cores": 8,
+    "logical_cores": 8,
+    "numa_nodes": 1
+  },
+  "system_memory_gb": 16.0,
+  "pcie_generation": "SoC integrated (no discrete PCIe GPU)",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": null,
+  "os": "macOS 14.5",
+  "python_version": "3.10.18",
+  "kernel_version": "23.5.0",
+  "runtime_version": "MLX 0.31.1",
+  "pytorch_version": "unknown"
+}

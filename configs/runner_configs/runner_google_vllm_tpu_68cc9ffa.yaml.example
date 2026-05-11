@@ -1,0 +1,34 @@
+# AccelMark runner config — Google TPU vllm-tpu (v5e-1)
+# Copy to configs/runner_configs/runner_google_vllm_tpu_87ea14bd.yaml
+#
+# v5e-1 has 16 GiB HBM per chip. Memory budget:
+#   Qwen3-0.6B   BF16 ~1.5 GB weights  → plenty of KV cache room (Suite F)
+#   Llama-3-8B   BF16 ~16 GB weights   → very tight; needs small max_model_len
+#
+# IMPORTANT: Set VLLM_XLA_CACHE_PATH to a persistent directory to avoid
+# recompiling XLA graphs (~20-30 min) on every Colab session restart.
+#   import os
+#   os.environ["VLLM_XLA_CACHE_PATH"] = "/content/drive/MyDrive/vllm_xla_cache"
+
+# Global defaults — apply to all suites unless overridden below.
+# vLLM's own default for max_num_seqs is 256; set lower here because
+# TPU v5e-1 HBM is constrained for larger models.
+max_num_seqs: 32
+gpu_memory_utilization: 0.90
+
+suites:
+  suite_F:
+    # Qwen3-0.6B (substitute for Qwen2.5-0.5B via models_local.yaml) is tiny —
+    # high concurrency is fine and needed to stress the offline scenario properly.
+    max_num_seqs: 32
+    gpu_memory_utilization: 0.95
+
+  suite_A:
+    # Llama-3-8B fills nearly all 16 GiB in BF16.
+    max_num_seqs: 1
+    gpu_memory_utilization: 0.88
+
+  suite_D:
+    # Long-context suite — very tight on v5e-1; likely to OOM.
+    max_num_seqs: 1
+    gpu_memory_utilization: 0.85

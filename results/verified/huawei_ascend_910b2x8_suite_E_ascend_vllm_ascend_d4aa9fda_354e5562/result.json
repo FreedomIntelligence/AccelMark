@@ -1,0 +1,273 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_E",
+  "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+  "chip": {
+    "name": "Huawei Ascend 910B2",
+    "vendor": "Huawei",
+    "count": 8,
+    "memory_gb": 64.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null,
+    "_count_note": "Maximum chip count used in this suite. See task.chip_counts_run for all counts tested."
+  },
+  "software": {
+    "framework": "vllm-ascend",
+    "framework_version": "0.18.0rc1",
+    "driver_version": "25.0.rc1.2",
+    "runtime_version": "CANN 25.0.rc1.2",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.14"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline"
+    ],
+    "chip_counts_run": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "parallelism_note": "Each chip_count uses tensor_parallel_size=N",
+    "num_runs": 3
+  },
+  "metrics": {
+    "scaling": {
+      "base_chip_count": 1,
+      "base_throughput_tokens_per_sec": 2430.05,
+      "results_by_chip_count": [
+        {
+          "chip_count": 1,
+          "best_throughput_tokens_per_sec": 2430.05,
+          "throughput_tokens_per_sec_per_chip": 2430.05,
+          "scaling_efficiency": 1.0,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 2430.05,
+              "throughput_tokens_per_sec_per_chip": 2430.05,
+              "elapsed_seconds_median": 21.9,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 2413.41,
+              "throughput_tokens_per_sec_per_chip": 2413.41,
+              "elapsed_seconds_median": 22.1,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 2344.7,
+              "throughput_tokens_per_sec_per_chip": 2344.7,
+              "elapsed_seconds_median": 22.7,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "1x"
+        },
+        {
+          "chip_count": 2,
+          "best_throughput_tokens_per_sec": 2844.42,
+          "throughput_tokens_per_sec_per_chip": 1422.21,
+          "scaling_efficiency": 0.585,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 2829.79,
+              "throughput_tokens_per_sec_per_chip": 1414.89,
+              "elapsed_seconds_median": 18.8,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 2844.42,
+              "throughput_tokens_per_sec_per_chip": 1422.21,
+              "elapsed_seconds_median": 18.7,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 2823.41,
+              "throughput_tokens_per_sec_per_chip": 1411.7,
+              "elapsed_seconds_median": 18.9,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "2x"
+        },
+        {
+          "chip_count": 4,
+          "best_throughput_tokens_per_sec": 2930.99,
+          "throughput_tokens_per_sec_per_chip": 732.75,
+          "scaling_efficiency": 0.302,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 2930.99,
+              "throughput_tokens_per_sec_per_chip": 732.75,
+              "elapsed_seconds_median": 18.1,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 2916.29,
+              "throughput_tokens_per_sec_per_chip": 729.07,
+              "elapsed_seconds_median": 18.1,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 2917.65,
+              "throughput_tokens_per_sec_per_chip": 729.41,
+              "elapsed_seconds_median": 18.1,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "4x"
+        },
+        {
+          "chip_count": 8,
+          "best_throughput_tokens_per_sec": 2703.67,
+          "throughput_tokens_per_sec_per_chip": 337.96,
+          "scaling_efficiency": 0.139,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 2696.21,
+              "throughput_tokens_per_sec_per_chip": 337.03,
+              "elapsed_seconds_median": 19.6,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 2682.71,
+              "throughput_tokens_per_sec_per_chip": 335.34,
+              "elapsed_seconds_median": 19.5,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 2703.67,
+              "throughput_tokens_per_sec_per_chip": 337.96,
+              "elapsed_seconds_median": 19.5,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "8x"
+        }
+      ]
+    },
+    "derived": {}
+  },
+  "accuracy": {
+    "subset_score": 0.61,
+    "baseline_delta": 0.01,
+    "valid": true,
+    "framework": "vllm-ascend",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vllm-ascend instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-14",
+    "time": "15:43:03",
+    "run_id": "354e5562",
+    "run_name": "huawei_ascend_910b2x8_suite_E_ascend_vllm_ascend_d4aa9fda_354e5562",
+    "flagged": null,
+    "reproduce_script": "runners/ascend_vllm_ascend_d4aa9fda/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-14T15:38:34.045492+00:00",
+    "benchmark_end_time": "2026-04-14T15:43:03.474783+00:00",
+    "benchmark_elapsed_minutes": 15.8,
+    "model_load_seconds": 76.8,
+    "benchmark_elapsed_minutes_note": "Sum of per-chip-count benchmark_elapsed_minutes (excludes sleep gaps, orchestrator overhead, and skipped counts).",
+    "scenario_dirs": {
+      "offline": "results/verified/huawei_ascend_910b2x8_suite_E_ascend_vllm_ascend_d4aa9fda_354e5562/1x/offline"
+    },
+    "chip_count_dirs": {
+      "1": "1x",
+      "2": "2x",
+      "4": "4x",
+      "8": "8x"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+# AccelMark — Google TPU vllm-tpu runner dependencies
+# Tested on: Google Colab TPU v5e-1 (16 GiB HBM)
+# Tested combination: vllm-tpu (PyPI) + JAX 0.9.2 + libtpu 0.0.39
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+# IMPORTANT: XLA compilation cache
+# ═══════════════════════════════════════════════════════════════════════════════
+# The first inference run compiles XLA graphs for each input shape bucket.
+# This takes 20-30 minutes. Subsequent runs with a warm cache take ~5 minutes.
+#
+# On Colab (ephemeral sessions), persist the cache to Google Drive so you
+# don't recompile on every session restart. Add this to your notebook BEFORE
+# running any AccelMark commands:
+#
+#   from google.colab import drive
+#   drive.mount('/content/drive')
+#   import os
+#   os.environ["VLLM_XLA_CACHE_PATH"] = "/content/drive/MyDrive/vllm_xla_cache"
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+# Installation (Colab or TPU VM)
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Option A — PyPI (recommended, simplest):
+#
+#   pip install vllm-tpu
+#   pip install -r runners/google_vllm_tpu_68cc9ffa/requirements.txt
+#
+#   vllm-tpu is a self-contained package that pulls in the correct vLLM build,
+#   JAX, libtpu, and tpu-inference plugin in one step. Do NOT separately install
+#   torch, torch-xla, or jax — vllm-tpu manages these versions internally.
+#
+# Option B — Docker (TPU VM / GKE):
+#
+#   docker pull vllm/vllm-tpu:latest
+#   docker run --privileged --net=host --shm-size=150gb -it vllm/vllm-tpu:latest
+#
+#   Inside the container, install only the AccelMark-specific extras:
+#   pip install -r runners/google_vllm_tpu_68cc9ffa/requirements.txt
+#
+# Option C — Source (advanced, for debugging vllm-tpu internals):
+#
+#   # Pin to the vLLM commit that tpu-inference was validated against:
+#   VLLM_COMMIT=08bfedc152f064d8e84f85c4f42b810e5a564229
+#   git clone https://github.com/vllm-project/tpu-inference.git
+#   git clone https://github.com/vllm-project/vllm.git
+#   cd vllm && git checkout $VLLM_COMMIT
+#   pip install -r requirements/tpu.txt --torch-backend=cpu
+#   VLLM_TARGET_DEVICE="tpu" pip install -e .
+#   cd ../tpu-inference && pip install -e .
+#   pip install -r runners/google_vllm_tpu_68cc9ffa/requirements.txt
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+# Verify installation
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+#   python -c "
+#   import jax, vllm
+#   from importlib.metadata import version
+#   print('vllm          :', vllm.__version__)
+#   print('tpu_inference :', version('tpu_inference'))
+#   print('jax           :', jax.__version__)
+#   print('jax devices   :', jax.devices())
+#   "
+#   # Expected on Colab v5e-1:
+#   # jax devices: [TpuDevice(id=0, process_index=0, coords=(0,0,0), core_on_chip=0)]
+
+# ── LLM inference ─────────────────────────────────────────────────────────────
+# vllm-tpu bundles the correct vLLM build, JAX, libtpu, and tpu-inference.
+# Installing it here documents the tested version and is a no-op if already
+# installed via Option A above.
+vllm-tpu
+
+# tpu-info: chip detection utility used by runner._get_chip_count()
+# (counts /dev/accel* device files to determine chip count)
+tpu-info==0.7.1
+
+# ── Transformers stack ────────────────────────────────────────────────────────
+# Used for tokenizer loading (AutoTokenizer.from_pretrained).
+# vllm-tpu already pulls in transformers — pin versions here for reproducibility.
+transformers>=4.46.0
+tokenizers>=0.20.0
+huggingface-hub>=0.25.0
+
+# ── AccelMark dependencies ────────────────────────────────────────────────────
+numpy>=1.24.0
+jsonschema>=4.0.0
+psutil>=5.9.0
+tqdm>=4.66.0
+
+# ── Config file parsing ───────────────────────────────────────────────────────
+pyyaml>=6.0

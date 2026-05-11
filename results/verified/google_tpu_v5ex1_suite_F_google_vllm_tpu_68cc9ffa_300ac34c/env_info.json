@@ -1,0 +1,34 @@
+{
+  "collected_at": "2026-04-18T03:32:01.750663+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "Google TPU v5e",
+      "vendor": "Google",
+      "memory_gb": 16.0,
+      "driver_version": "JAX 0.8.1",
+      "firmware_version": null,
+      "tpu_type": "v5e-1",
+      "tpu_node_name": null,
+      "num_cores_per_chip": 1,
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": null,
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "AMD EPYC 7B13",
+    "physical_cores": 12,
+    "logical_cores": 24,
+    "numa_nodes": 1
+  },
+  "system_memory_gb": 47.0,
+  "pcie_generation": "unknown",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": null,
+  "os": "Ubuntu 22.04.5 LTS",
+  "python_version": "3.12.13",
+  "kernel_version": "6.6.113+",
+  "runtime_version": "JAX 0.8.1",
+  "pytorch_version": "2.9.0+cpu"
+}

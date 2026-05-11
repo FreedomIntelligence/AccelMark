@@ -1,0 +1,16 @@
+# AccelMark — Apple Silicon mlx-lm runner
+# Install in a Python 3.10+ venv on macOS with Apple Silicon.
+
+mlx-lm>=0.18.0
+mlx>=0.20.0
+transformers>=4.40.0
+sentencepiece>=0.2.0
+protobuf>=4.0.0
+
+# AccelMark shared
+numpy>=1.26.0
+jsonschema>=4.25.0
+psutil>=5.9.0
+tqdm>=4.67.0
+PyYAML>=6.0.0
+aiohttp>=3.9.0

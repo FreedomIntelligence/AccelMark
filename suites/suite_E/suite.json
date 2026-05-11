@@ -1,0 +1,42 @@
+{
+  "suite_id": "suite_E",
+  "description": "Multi-chip scaling efficiency. Fixed model (Llama-3-8B), varying chip count (1x/2x/4x). Measures interconnect efficiency independent of chip speed.",
+  "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+  "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+  "dataset": "sharegpt_standard_v1",
+  "scenarios": {
+    "default": ["accuracy", "offline"],
+    "extra": []
+  },
+  "precision_required": "BF16",
+  "allowed_precisions": ["BF16", "FP16"],
+  "request_distribution": {
+    "input_tokens_p25": 120,
+    "input_tokens_p50": 280,
+    "input_tokens_p75": 580,
+    "input_tokens_p99": 2100,
+    "output_tokens_p50": 310,
+    "output_tokens_p99": 1200,
+    "source": "shibing624/sharegpt_gpt4"
+  },
+  "max_model_len": 4096,
+  "output_tokens_max": 512,
+  "concurrency_levels": [8, 32, 128],
+  "_concurrency_levels_note": "Client-side concurrency. See suite_A note.",
+  "chip_counts_required": [1, 2],
+  "chip_counts_optional": [4, 8],
+  "chip_counts_all": [1, 2, 4, 8, 16, 32, 64],
+  "_chip_counts_note": "Must submit at least 1x and 2x. 4x and 8x are optional but recommended. Use --max-chips to set the highest chip count to run.",
+  "online_qps_levels": null,
+  "online_sla_ttft_ms": null,
+  "online_sla_ttft_ms_relaxed": null,
+  "num_runs": 3,
+  "warmup_runs": 1,
+  "online_warmup_runs": 0,
+  "interactive_warmup_runs": 0,
+  "accuracy_threshold_delta": 0.1,
+  "request_count": 150,
+  "_request_count_note": "Reduced from 500 to 150: scaling efficiency is a relative metric (speedup vs 1x baseline), so high absolute sample counts are unnecessary. 150 req \u00d7 3 runs is statistically sufficient for stable throughput comparison across chip counts.",
+  "online_request_count": null,
+  "interactive_request_count": null
+}

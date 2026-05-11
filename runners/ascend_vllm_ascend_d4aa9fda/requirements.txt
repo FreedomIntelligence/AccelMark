@@ -1,0 +1,48 @@
+# AccelMark -- Ascend NPU vllm-ascend runner dependencies
+#
+# This runner is designed to run inside the official vllm-ascend Docker image.
+# All heavy dependencies (torch, torch_npu, vllm, vllm-ascend, CANN) are
+# pre-installed in the image -- do NOT reinstall them via pip.
+#
+# Tested image: quay.io/ascend/vllm-ascend:v0.18.0rc1-a3
+# Setup guide:  https://docs.vllm.ai/projects/ascend/en/latest/installation.html#set-up-using-docker
+#
+# Example docker run (update --device flags to match your hardware):
+#   # Atlas A2: /dev/davinci[0-7]   Atlas A3: /dev/davinci[0-15]
+#   export IMAGE=quay.io/ascend/vllm-ascend:v0.18.0rc1-a3
+#   docker run --rm \
+#       --name vllm-ascend-env \
+#       --shm-size=1g \
+#       --net=host \
+#       --device /dev/davinci0 \
+#       --device /dev/davinci1 \
+#       --device /dev/davinci2 \
+#       --device /dev/davinci3 \
+#       --device /dev/davinci4 \
+#       --device /dev/davinci5 \
+#       --device /dev/davinci6 \
+#       --device /dev/davinci7 \
+#       --device /dev/davinci_manager \
+#       --device /dev/devmm_svm \
+#       --device /dev/hisi_hdc \
+#       -v /usr/local/dcmi:/usr/local/dcmi \
+#       -v /usr/local/Ascend/driver/tools/hccn_tool:/usr/local/Ascend/driver/tools/hccn_tool \
+#       -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+#       -v /usr/local/Ascend/driver/lib64/:/usr/local/Ascend/driver/lib64/ \
+#       -v /usr/local/Ascend/driver/version.info:/usr/local/Ascend/driver/version.info \
+#       -v /etc/ascend_install.info:/etc/ascend_install.info \
+#       -v /root/.cache:/root/.cache \
+#       -it $IMAGE bash
+#
+# Inside the container, install only the AccelMark-specific extras:
+#   pip install -r runners/ascend_vllm_ascend_d4aa9fda/requirements.txt
+#
+# Pre-installed in image (versions from v0.18.0rc1-a3):
+#   torch==2.9.0+cpu  torch_npu==2.9.0.post1  vllm==0.18.0  vllm-ascend==0.18.0rc1
+#   transformers==4.57.6  tokenizers==0.22.2  huggingface-hub==0.36.2
+#   safetensors==0.7.0  numpy==1.26.4  aiohttp==3.13.5  PyYAML==6.0.3
+
+# AccelMark dependencies (not bundled in the image)
+jsonschema==4.26.0
+psutil==7.2.2
+tqdm==4.67.3

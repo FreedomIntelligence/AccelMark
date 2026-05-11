@@ -1,0 +1,342 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_vllm_47f5d58e",
+  "chip": {
+    "name": "NVIDIA GeForce RTX 5090",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 31.8,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-16T17:07:29.012705+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "NVIDIA GeForce RTX 5090",
+        "vendor": "NVIDIA",
+        "memory_gb": 31.8,
+        "driver_version": "570.211.01",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tGPU4\tGPU5\tGPU6\tGPU7\tNIC0\tNIC1\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNODE\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tNODE\tNODE\t0-15,64-79\t0\t\tN/A\nGPU1\tNODE\t X \tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tNODE\tNODE\t0-15,64-79\t0\t\tN/A\nGPU2\tSYS\tSYS\t X \tNODE\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t16-31,80-95\t1\t\tN/A\nGPU3\tSYS\tSYS\tNODE\t X \tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t16-31,80-95\t1\t\tN/A\nGPU4\tSYS\tSYS\tSYS\tSYS\t X \tNODE\tSYS\tSYS\tSYS\tSYS\t32-47,96-111\t2\t\tN/A\nGPU5\tSYS\tSYS\tSYS\tSYS\tNODE\t X \tSYS\tSYS\tSYS\tSYS\t32-47,96-111\t2\t\tN/A\nGPU6\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t X \tNODE\tSYS\tSYS\t48-63,112-127\t3\t\tN/A\nGPU7\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tNODE\t X \tSYS\tSYS\t48-63,112-127\t3\t\tN/A\nNIC0\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\t X \tPIX\t\t\t\t\nNIC1\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\tSYS\tSYS\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "INTEL(R) XEON(R) GOLD 6530",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 4
+    },
+    "system_memory_gb": 503.5,
+    "pcie_generation": "PCIe Gen 1",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.12",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.5",
+    "pytorch_version": "2.4.0a0+f70bd71a48.nv24.06"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.19.1rc1.dev339+gedc364896",
+    "driver_version": "570.211.01",
+    "runtime_version": "CUDA 12.5",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.12"
+  },
+  "model": {
+    "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+    "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e",
+    "model_name": null,
+    "model_note": "INT4 weight-only quantization by RedHatAI using AWQ. Weights INT4, activations FP16.",
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "W4A16",
+    "effective_dtype": null,
+    "quantization_method": "gptq",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "sustained",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    },
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "sustained": {
+      "sustained_concurrency": 8,
+      "duration_minutes": 15,
+      "warmup_minutes": 1,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 641.1,
+          "tokens_out": 38480,
+          "tokens_in": 0,
+          "requests_completed": 110,
+          "ttft_ms_p50": 41.8,
+          "ttft_ms_p99": 30431.4
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1449.1,
+          "tokens_out": 86943,
+          "tokens_in": 0,
+          "requests_completed": 251,
+          "ttft_ms_p50": 31.1,
+          "ttft_ms_p99": 44.1
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1415.5,
+          "tokens_out": 84948,
+          "tokens_in": 0,
+          "requests_completed": 242,
+          "ttft_ms_p50": 31.7,
+          "ttft_ms_p99": 43.6
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1411.0,
+          "tokens_out": 84639,
+          "tokens_in": 0,
+          "requests_completed": 245,
+          "ttft_ms_p50": 32.0,
+          "ttft_ms_p99": 44.5
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1429.2,
+          "tokens_out": 85742,
+          "tokens_in": 0,
+          "requests_completed": 244,
+          "ttft_ms_p50": 31.4,
+          "ttft_ms_p99": 45.1
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1424.7,
+          "tokens_out": 85500,
+          "tokens_in": 0,
+          "requests_completed": 248,
+          "ttft_ms_p50": 31.7,
+          "ttft_ms_p99": 44.0
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1453.5,
+          "tokens_out": 87181,
+          "tokens_in": 0,
+          "requests_completed": 248,
+          "ttft_ms_p50": 31.4,
+          "ttft_ms_p99": 43.6
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1454.5,
+          "tokens_out": 87334,
+          "tokens_in": 0,
+          "requests_completed": 251,
+          "ttft_ms_p50": 31.6,
+          "ttft_ms_p99": 39.9
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1422.3,
+          "tokens_out": 85310,
+          "tokens_in": 0,
+          "requests_completed": 243,
+          "ttft_ms_p50": 31.5,
+          "ttft_ms_p99": 43.0
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1435.2,
+          "tokens_out": 86128,
+          "tokens_in": 0,
+          "requests_completed": 247,
+          "ttft_ms_p50": 31.4,
+          "ttft_ms_p99": 44.0
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1456.1,
+          "tokens_out": 87333,
+          "tokens_in": 0,
+          "requests_completed": 250,
+          "ttft_ms_p50": 31.5,
+          "ttft_ms_p99": 43.0
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1440.6,
+          "tokens_out": 86436,
+          "tokens_in": 0,
+          "requests_completed": 247,
+          "ttft_ms_p50": 31.2,
+          "ttft_ms_p99": 45.4
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1447.5,
+          "tokens_out": 86846,
+          "tokens_in": 0,
+          "requests_completed": 248,
+          "ttft_ms_p50": 31.2,
+          "ttft_ms_p99": 42.8
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 1459.6,
+          "tokens_out": 87625,
+          "tokens_in": 0,
+          "requests_completed": 250,
+          "ttft_ms_p50": 31.4,
+          "ttft_ms_p99": 41.6
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 1381.4,
+      "throttle_ratio": 0.439,
+      "throttle_onset_minute": 1.0,
+      "ttft_p99_drift_ms": -30389.8
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-04-16",
+    "time": "18:00:22",
+    "run_id": "1f0041fa",
+    "run_name": "nvidia_geforce_rtx_5090x1_suite_C_nvidia_vllm_47f5d58e_1f0041fa",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-16T17:45:18.542411+00:00",
+    "benchmark_end_time": "2026-04-16T18:00:22.475935+00:00",
+    "benchmark_elapsed_minutes": 15.1,
+    "model_load_seconds": 101.7
+  }
+}
