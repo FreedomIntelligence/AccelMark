@@ -21,4 +21,7 @@ configs/runner_configs/*.yaml
 # Local-only benchmark artifacts (not needed for submission)
 accuracy_outputs.jsonl
 run.log
-samples.jsonl
+samples.jsonl.ipynb_checkpoints/
+*_backup/
+backup/
+.ipynb_checkpoints/
