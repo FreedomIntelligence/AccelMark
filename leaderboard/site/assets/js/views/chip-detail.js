@@ -189,13 +189,24 @@ function bindClicks(el) {
     const dlBtn = t.closest("[data-chart-dl]");
     if (dlBtn) {
       ev.preventDefault();
-      _downloadChipChart(dlBtn, slug);
+      _downloadChipChart(dlBtn);
       return;
     }
   });
 }
 
-async function _downloadChipChart(btn, slug) {
+// Read the active chip slug from the URL hash rather than capturing
+// it in bindClicks's closure — bindClicks attaches once per mounted
+// view container (`__chipDetailClicksAttached` guard), so a captured
+// slug would go stale the first time the user navigates to a
+// different chip without remounting the view.  `#/chip/<slug>(?…)`
+// is the only shape this view ever runs under, so the regex is safe.
+function _activeChipSlug() {
+  const m = (location.hash || "").match(/#\/chip\/([^?]+)/);
+  return m ? decodeURIComponent(m[1]) : "chip";
+}
+
+async function _downloadChipChart(btn) {
   const kind = btn.dataset.chartDl; // "radar" | "scaling"
   const wrap = btn.closest(".chip-fp-canvas, .chip-scl-canvas");
   const canvas = wrap && wrap.querySelector("canvas");
@@ -203,6 +214,7 @@ async function _downloadChipChart(btn, slug) {
     flashButtonLabel(btn, "Failed", { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
     return;
   }
+  const slug = _activeChipSlug();
   const filename = `${slug}-${kind === "radar" ? "fingerprint" : "scaling"}.png`;
   const ok = await downloadCanvasAsPng(canvas, { filename });
   flashButtonLabel(btn, ok ? "Saved" : "Failed", {
