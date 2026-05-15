@@ -567,6 +567,52 @@ export function chipCountsForChip(slug) {
   return Array.from(counts).sort((a, b) => a - b);
 }
 
+// Per-suite "fingerprint" of a chip, normalised against the global best
+// for each suite.  Used by the chip-detail page to render a radar of
+// where the chip lands across the workload spectrum: each suite axis
+// reads as 0–100 (% of the global best primary metric for that suite).
+//
+// `direction === "asc"` (lower-is-better metrics like TTFT) inverts
+// the normalisation so the global winner still shows at 100 % — same
+// convention compare.js uses for its bar widths.  Suites the chip
+// hasn't submitted to come back as `value: null, normalized: 0` so
+// the radar polygon collapses to the centre on those axes (visually
+// signalling "no data" rather than faking a low score).
+export function suiteFingerprint(slug) {
+  const out = new Map();
+  for (const sid of SUITE_ORDER) {
+    const meta = SUITE_META[sid];
+    if (!meta) continue;
+    const board = rowsForSuite(sid);
+    if (!board.length) {
+      out.set(sid, { value: null, normalized: 0, best: null, missing: true });
+      continue;
+    }
+    const key = meta.primary.key;
+    const direction = meta.primary.direction;
+    const bestValue = board[0][key];
+    const myRow = board.find((r) => r._chip_slug === slug);
+    if (!myRow) {
+      out.set(sid, { value: null, normalized: 0, best: bestValue, missing: true });
+      continue;
+    }
+    const v = myRow[key];
+    let normalized = 0;
+    if (typeof v === "number" && typeof bestValue === "number") {
+      if (direction === "asc") {
+        normalized = v > 0 ? bestValue / v : 0;
+      } else {
+        normalized = bestValue > 0 ? v / bestValue : 0;
+      }
+    }
+    // Clamp into [0, 1] just in case the global best is the row itself
+    // (1.0) or a future scoring change inverts something unexpectedly.
+    normalized = Math.max(0, Math.min(1, normalized));
+    out.set(sid, { value: v, normalized, best: bestValue, missing: false });
+  }
+  return out;
+}
+
 // Pick a representative run_id for a given chip slug — used by the
 // chip-cloud "quick add" affordance on Home and Compare so that a single
 // click on a chip seeds the compare basket with the freshest run for

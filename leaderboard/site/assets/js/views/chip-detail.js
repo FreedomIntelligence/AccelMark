@@ -22,6 +22,7 @@ import {
   SUITE_ORDER, SUITE_META,
   rowsForChip, bestPerSuiteForChip, formatPrimary,
   rankChipInSuite, similarChipsTo, chipCountsForChip,
+  suiteFingerprint, vendorColor,
 } from "../data.js";
 import {
   esc, fmtDate, shortVersion, submitterHandle,
@@ -118,10 +119,12 @@ export function render({ el, params }) {
       </div>
     </section>
 
+    ${renderFingerprintSection(slug, sample)}
+
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">02 · Every submission</span>
+          <span class="eyebrow">03 · Every submission</span>
           <h2>${rs.length} run${rs.length === 1 ? "" : "s"} on file</h2>
         </div>
         <p class="section-sub">Sorted newest first. Click a row to open the run detail.</p>
@@ -135,6 +138,10 @@ export function render({ el, params }) {
   `;
 
   bindClicks(el);
+  // Mount the radar after innerHTML lands so Chart.js sees an attached
+  // canvas.  Uses a microtask rather than requestAnimationFrame so the
+  // first paint already includes the chart (no layout flash).
+  setTimeout(() => _mountFingerprintChart(el, slug, sample), 0);
 }
 
 // Click delegation — once-attached on the view container.  The router
@@ -183,7 +190,163 @@ async function _copyChipShareLink(btn) {
   });
 }
 
-// ── 03 · Compare with similar chips ──
+// ── 02 · Performance fingerprint (radar) ──────────────────────
+//
+// Tells the user where this chip is strong and weak across the suite
+// spectrum at a glance.  Each axis = one suite, each tick = % of the
+// global best primary metric for that suite (asc-direction metrics
+// inverted so the leader still reads as 100 %).
+//
+// We render a section + canvas, then mount Chart.js after innerHTML
+// lands.  When the chip has data on fewer than 2 suites the polygon
+// degenerates to a point and the chart adds no signal — the section
+// is skipped.  When Chart.js isn't available (rare: tests, blocked
+// CDN) we render a structured table fallback so the data still
+// reaches keyboard / screen-reader users.
+function renderFingerprintSection(slug, sample) {
+  const fp = suiteFingerprint(slug);
+  const activeSuites = SUITE_ORDER.filter((sid) => {
+    const cell = fp.get(sid);
+    return cell && !cell.missing;
+  });
+  if (activeSuites.length < 2) return "";
+
+  const missing = SUITE_ORDER.filter((sid) => fp.get(sid)?.missing);
+  const cells = SUITE_ORDER.map((sid) => {
+    const meta = SUITE_META[sid];
+    const cell = fp.get(sid);
+    if (!meta || !cell) return "";
+    const pct = cell.missing ? "—" : `${Math.round(cell.normalized * 100)}%`;
+    const value = cell.missing ? "no data" : formatPrimary(cell.value, sid);
+    return `
+      <li class="chip-fp-row" data-suite="${esc(meta.letter)}">
+        <span class="chip-fp-letter" aria-hidden="true">${esc(meta.letter)}</span>
+        <span class="chip-fp-name">${esc(meta.title)}</span>
+        <span class="chip-fp-value tnum">${esc(value)}</span>
+        <span class="chip-fp-pct tnum${cell.missing ? " is-missing" : ""}">${esc(pct)}</span>
+      </li>
+    `;
+  }).join("");
+
+  return `
+    <section class="section chip-fp-section">
+      <div class="section-header section-header--stacked">
+        <div class="section-title">
+          <span class="eyebrow">02 · Performance fingerprint</span>
+          <h2>How this chip sits across the spectrum</h2>
+        </div>
+        <p class="section-sub">
+          Each axis is one suite.  100 % is the global best primary metric
+          for that suite — your chip's normalised score sits inside.
+          ${missing.length
+            ? `Suites without a submission collapse to the centre (${missing.map((sid) => SUITE_META[sid]?.letter).filter(Boolean).join(", ")}).`
+            : ""}
+        </p>
+      </div>
+      <div class="chip-fp-wrap" data-vendor="${esc(sample.vendor)}">
+        <div class="chip-fp-canvas">
+          <canvas data-chip-radar
+                  aria-label="Radar chart of ${esc(sample.chip)} performance across all suites"
+                  role="img"></canvas>
+        </div>
+        <ol class="chip-fp-legend" aria-label="Per-suite normalised scores">
+          ${cells}
+        </ol>
+      </div>
+    </section>
+  `;
+}
+
+let _activeFpChart = null;
+
+function _mountFingerprintChart(el, slug, sample) {
+  const canvas = el.querySelector("[data-chip-radar]");
+  if (!canvas) return;
+  if (typeof window.Chart !== "function") return; // table fallback already shown.
+
+  if (_activeFpChart) {
+    try { _activeFpChart.destroy(); } catch (_) { /* noop */ }
+    _activeFpChart = null;
+  }
+
+  const fp = suiteFingerprint(slug);
+  const labels = SUITE_ORDER
+    .map((sid) => SUITE_META[sid]?.letter || sid)
+    .filter(Boolean);
+  const data = SUITE_ORDER.map((sid) => {
+    const cell = fp.get(sid);
+    return cell && !cell.missing ? Math.round(cell.normalized * 100) : 0;
+  });
+  const reference = SUITE_ORDER.map(() => 100);
+
+  const cs = getComputedStyle(document.documentElement);
+  const textColor   = (cs.getPropertyValue("--fg-muted").trim()    || "#8b949e");
+  const gridColor   = (cs.getPropertyValue("--border-soft").trim() || "rgba(127,127,127,0.18)");
+  const refColor    = (cs.getPropertyValue("--fg-faint").trim()    || "#888780");
+  const accentHex   = vendorColor(sample.vendor);
+
+  _activeFpChart = new window.Chart(canvas, {
+    type: "radar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Global best",
+          data: reference,
+          borderColor: refColor,
+          borderDash: [4, 4],
+          backgroundColor: "transparent",
+          pointRadius: 0,
+          borderWidth: 1,
+        },
+        {
+          label: sample.chip,
+          data,
+          borderColor: accentHex,
+          backgroundColor: accentHex + "33",
+          pointBackgroundColor: accentHex,
+          pointBorderColor: accentHex,
+          pointRadius: 3.5,
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.r}%`,
+          },
+        },
+      },
+      scales: {
+        r: {
+          suggestedMin: 0,
+          suggestedMax: 100,
+          ticks: {
+            color: textColor,
+            backdropColor: "transparent",
+            font: { size: 10 },
+            stepSize: 25,
+            showLabelBackdrop: false,
+            callback: (v) => `${v}%`,
+          },
+          grid: { color: gridColor },
+          angleLines: { color: gridColor },
+          pointLabels: {
+            color: textColor,
+            font: { size: 12, weight: "600" },
+          },
+        },
+      },
+    },
+  });
+}
+
+// ── 04 · Compare with similar chips ──
 //
 // Surfaces chips with the largest suite-coverage overlap so users have
 // a one-click jump-off to peer hardware they'd realistically compare
@@ -226,7 +389,7 @@ function renderSimilarChipsSection(slug, latestRid) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">03 · Peers</span>
+          <span class="eyebrow">04 · Peers</span>
           <h2>Compare with similar chips</h2>
         </div>
         <p class="section-sub">Chips that compete on the same workload suites — sorted by suite overlap, same-vendor first.</p>

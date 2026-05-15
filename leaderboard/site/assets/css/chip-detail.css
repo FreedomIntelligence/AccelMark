@@ -233,7 +233,97 @@ a.chip-suite-card:hover .chip-suite-hint {
   border-top-color: color-mix(in srgb, var(--suite-color) 30%, var(--border-soft));
 }
 
-/* ── 02 · Every submission ────────────────────────────────── */
+/* ── 02 · Performance fingerprint (radar) ─────────────────── */
+.chip-fp-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.9fr);
+  gap: 1.4rem;
+  align-items: center;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 1.2rem 1.3rem;
+  box-shadow: var(--shadow-card);
+}
+@media (max-width: 760px) {
+  .chip-fp-wrap {
+    grid-template-columns: 1fr;
+    padding: 1rem 0.95rem;
+  }
+}
+.chip-fp-canvas {
+  position: relative;
+  width: 100%;
+  /* Square the canvas so the radar polygon stays visually balanced;
+     Chart.js needs the parent to set the height (canvas is responsive). */
+  aspect-ratio: 1 / 1;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.chip-fp-canvas canvas { width: 100% !important; height: 100% !important; }
+
+.chip-fp-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.chip-fp-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto auto;
+  gap: 0.55rem;
+  align-items: baseline;
+  padding: 0.32rem 0.55rem;
+  border-radius: var(--r-md);
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  font-size: 0.82rem;
+}
+.chip-fp-row[data-suite="A"] { --suite-color: var(--suite-A); }
+.chip-fp-row[data-suite="B"] { --suite-color: var(--suite-B); }
+.chip-fp-row[data-suite="C"] { --suite-color: var(--suite-C); }
+.chip-fp-row[data-suite="D"] { --suite-color: var(--suite-D); }
+.chip-fp-row[data-suite="E"] { --suite-color: var(--suite-E); }
+.chip-fp-row[data-suite="F"] { --suite-color: var(--suite-F); }
+.chip-fp-row[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-fp-letter {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--on-accent, #fff);
+  background: var(--suite-color, var(--accent-2));
+}
+.chip-fp-name {
+  color: var(--fg);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip-fp-value {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+.chip-fp-pct {
+  color: var(--fg-strong);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 3.2rem;
+  text-align: right;
+}
+.chip-fp-pct.is-missing {
+  color: var(--fg-faint);
+  font-weight: 400;
+}
+
+/* ── 03 · Every submission ────────────────────────────────── */
 .chip-runs-wrap {
   border: 1px solid var(--border-soft);
   border-radius: var(--r-lg);
