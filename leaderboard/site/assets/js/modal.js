@@ -74,15 +74,15 @@ export function initModal() {
         </div>
         <button class="modal-close" type="button" aria-label="Close">×</button>
       </header>
-      <nav class="modal-tabs" role="tablist">
-        <button class="modal-tab" data-tab="details" type="button" role="tab">Details</button>
-        <button class="modal-tab" data-tab="viz"     type="button" role="tab">Visualize</button>
-        <button class="modal-tab" data-tab="impl"    type="button" role="tab">Implementation</button>
+      <nav class="modal-tabs" role="tablist" aria-label="Run details">
+        <button class="modal-tab" data-tab="details" type="button" role="tab" id="run-modal-tab-details" aria-controls="run-modal-panel-details">Details</button>
+        <button class="modal-tab" data-tab="viz"     type="button" role="tab" id="run-modal-tab-viz"     aria-controls="run-modal-panel-viz">Visualize</button>
+        <button class="modal-tab" data-tab="impl"    type="button" role="tab" id="run-modal-tab-impl"    aria-controls="run-modal-panel-impl">Implementation</button>
       </nav>
       <div class="modal-body">
-        <section class="modal-panel" data-panel="details" role="tabpanel"></section>
-        <section class="modal-panel" data-panel="viz"     role="tabpanel"></section>
-        <section class="modal-panel" data-panel="impl"    role="tabpanel"></section>
+        <section class="modal-panel" data-panel="details" role="tabpanel" id="run-modal-panel-details" aria-labelledby="run-modal-tab-details" tabindex="0"></section>
+        <section class="modal-panel" data-panel="viz"     role="tabpanel" id="run-modal-panel-viz"     aria-labelledby="run-modal-tab-viz"     tabindex="0"></section>
+        <section class="modal-panel" data-panel="impl"    role="tabpanel" id="run-modal-panel-impl"    aria-labelledby="run-modal-tab-impl"    tabindex="0"></section>
       </div>
       <footer class="modal-footer">
         <span class="modal-submission">—</span>
@@ -130,6 +130,27 @@ export function initModal() {
     // Allow modifier-clicks (cmd/ctrl/middle) to behave like normal links
     // when the element is also an anchor with an href.
     if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
+    ev.preventDefault();
+    openModal(t.dataset.openRun);
+  });
+
+  // Keyboard activation for the same `[data-open-run]` triggers.
+  // Mirrors the click handler so non-mouse users can pop the modal
+  // by tabbing onto a row / card and pressing Enter or Space — the
+  // ARIA-recommended activation keys for role="button" surfaces.  We
+  // skip text inputs / contenteditable so typing inside, say, a
+  // future modal search field doesn't accidentally fire it.
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Enter" && ev.key !== " " && ev.key !== "Spacebar") return;
+    const t = ev.target.closest("[data-open-run]");
+    if (!t) return;
+    // If focus is on an inner link/button, let that element's own
+    // activation handler win (matches the click nested-anchor escape).
+    const inner = ev.target.closest("a[href], button, input, textarea, select, [contenteditable=true]");
+    if (inner && inner !== t && t.contains(inner)) return;
+    // Modifiers fall through to the browser's default (e.g. Cmd+Enter
+    // on a focused link still opens in a new tab).
+    if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
     ev.preventDefault();
     openModal(t.dataset.openRun);
   });

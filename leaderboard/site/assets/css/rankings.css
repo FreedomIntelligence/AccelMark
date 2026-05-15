@@ -648,10 +648,11 @@
 }
 .cmp-basket-clear:hover { color: var(--fg-strong); border-color: var(--accent); }
 
-/* Share button mirrors the clear pill's silhouette so the two read as
-   a paired actions group, but uses the accent fill on hover to flag
-   the positive nature of the action.  `is-copied` swaps the chrome to
-   the success palette while the confirmation label is showing. */
+/* Compare basket "Copy share link" pill — mirrors the clear pill's
+   silhouette so the two read as a paired actions group.  Success /
+   failure styling lives on the shared `.copy-btn` class (components.css)
+   so chip-detail and any future share button get the same flash chrome
+   for free. */
 .cmp-basket-share {
   display: inline-flex;
   align-items: center;
@@ -669,21 +670,6 @@
 .cmp-basket-share:hover {
   color: var(--fg-strong);
   border-color: var(--accent);
-}
-.cmp-basket-share-icon {
-  font-size: 0.85rem;
-  line-height: 1;
-  display: inline-block;
-  transform: translateY(-1px);
-}
-.cmp-basket-share.is-copied {
-  color: var(--good, #16a34a);
-  border-color: var(--good, #16a34a);
-  background: color-mix(in srgb, var(--good, #16a34a) 10%, transparent);
-}
-.cmp-basket-share.is-copy-failed {
-  color: var(--bad, #dc2626);
-  border-color: var(--bad, #dc2626);
 }
 
 /* Compare empty state */

@@ -214,6 +214,88 @@ export function buildHash(path, params = {}) {
   return `#${path}${qs ? "?" + qs : ""}`;
 }
 
+// Copy a string to the user's clipboard with progressive fallback.
+//
+// Three paths, tried in order:
+//   1. navigator.clipboard.writeText — modern, requires a secure
+//      context (https / localhost) and a user gesture.
+//   2. <textarea> + execCommand("copy") — works on insecure contexts
+//      (file://, intranet) and older Safari.
+//   3. window.prompt — last-ditch surface so the user can manually
+//      Cmd-C.  Returns false in this case so callers can flag the
+//      "user had to do extra work" outcome differently from a clean
+//      programmatic copy.
+//
+// Returns true when a path completed without user-visible escalation
+// (paths 1 + 2), false on path 3.  Never throws.
+export async function copyToClipboard(text) {
+  const value = text == null ? "" : String(text);
+  try {
+    if (typeof navigator !== "undefined"
+        && navigator.clipboard
+        && typeof navigator.clipboard.writeText === "function") {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch (_) { /* fall through */ }
+  try {
+    if (typeof document !== "undefined" && typeof document.execCommand === "function") {
+      const ta = document.createElement("textarea");
+      ta.value = value;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      if (ok) return true;
+    }
+  } catch (_) { /* fall through */ }
+  try {
+    if (typeof window !== "undefined" && typeof window.prompt === "function") {
+      window.prompt("Copy this link:", value);
+    }
+  } catch (_) { /* noop */ }
+  return false;
+}
+
+// Briefly swap a button's label to a status message after an async
+// action.  Used by the share-link buttons in compare + chip-detail to
+// give a "Copied!" / "Copy failed" beat without pulling in a toast
+// framework.  The label is restored after `holdMs`, or sooner on a
+// follow-up call to the same button.
+//
+// `labelSelector` defaults to ".copy-btn-label" — the convention used
+// by the share buttons in this codebase; pass an explicit selector if
+// the caller's label lives somewhere else inside the button.
+export function flashButtonLabel(btn, message, {
+  holdMs = 1600,
+  className = "is-flashed",
+  labelSelector = ".copy-btn-label",
+} = {}) {
+  if (!btn) return;
+  const labelEl = btn.querySelector(labelSelector) || btn;
+  if (btn.__flashTimer) {
+    clearTimeout(btn.__flashTimer);
+    btn.__flashTimer = null;
+  }
+  if (btn.__flashOriginalLabel == null) {
+    btn.__flashOriginalLabel = labelEl.textContent || "";
+  }
+  if (btn.__flashOriginalClass == null) {
+    btn.__flashOriginalClass = className;
+  }
+  labelEl.textContent = message;
+  if (className) btn.classList.add(className);
+  btn.__flashTimer = setTimeout(() => {
+    labelEl.textContent = btn.__flashOriginalLabel;
+    if (className) btn.classList.remove(className);
+    btn.__flashTimer = null;
+  }, holdMs);
+}
+
 // Empty wrapper to keep view modules consistent.
 export function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);

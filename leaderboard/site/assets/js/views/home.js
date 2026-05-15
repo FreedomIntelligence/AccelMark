@@ -235,8 +235,16 @@ function renderLbRow(row, suiteId, rank) {
   // its native href, so users get two distinct affordances on one row:
   //   • click on chip name        → /chip/<slug> overview page
   //   • click anywhere else in row → run-detail modal
+  // role="button" + tabindex="0" + aria-label make the row keyboard /
+  // screen-reader accessible — modal.js's keydown handler turns Enter
+  // and Space into the same `openModal(rid)` call.
+  const a11yLabel = `Open run details for ${row._chip_label}`;
   return `
-    <div class="lb-row${featured}" data-open-run="${esc(runId)}">
+    <div class="lb-row${featured}"
+         role="button"
+         tabindex="0"
+         aria-label="${esc(a11yLabel)}"
+         data-open-run="${esc(runId)}">
       <span class="lb-row-rank ${medal}">${rank}</span>
       <span class="lb-row-main">
         <a class="lb-row-name" href="${chipHref(row)}">${esc(row._chip_label)}</a>
@@ -340,6 +348,11 @@ function renderRecentRow(row) {
   wrap.className = "lb-row";
   wrap.setAttribute("data-suite", letter);
   wrap.setAttribute("data-open-run", row.run_id || row.submission || "");
+  // a11y: same role + keyboard hooks as renderLbRow so the recent
+  // activity list is fully tab-able and screen-reader-discoverable.
+  wrap.setAttribute("role", "button");
+  wrap.setAttribute("tabindex", "0");
+  wrap.setAttribute("aria-label", `Open run details for ${row._chip_label} on ${suiteLabel}`);
   const bylineBits = [];
   if (handle) bylineBits.push(`@${esc(handle)}`);
   bylineBits.push(esc(fmtDate(row.date)));

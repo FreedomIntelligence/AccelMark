@@ -293,8 +293,20 @@ function renderRow(suiteId, row, cols, sortKey, rank) {
   const inBasket = basketHas(runId);
   const ver = shortVersion(row.framework_version);
   const fw = row.framework || "";
+  // a11y: tabindex on the row makes the run-detail trigger reachable
+  // via keyboard.  We deliberately keep the native `<tr>` role so
+  // assistive tech still announces row context (column → cell mapping
+  // would break under role="button").  modal.js's keydown handler
+  // turns Enter / Space on a focused row into the same openModal call
+  // a click would make.
+  const a11yLabel = `Open run details for ${row._chip_label}${fw ? " on " + fw : ""}`;
   return `
-    <tr data-run-id="${esc(runId)}" data-chip-slug="${esc(slug)}" data-open-run="${esc(runId)}" class="${inBasket ? "in-basket" : ""}">
+    <tr data-run-id="${esc(runId)}"
+        data-chip-slug="${esc(slug)}"
+        data-open-run="${esc(runId)}"
+        tabindex="0"
+        aria-label="${esc(a11yLabel)}"
+        class="${inBasket ? "in-basket" : ""}">
       <td class="col-compare" title="Add to compare basket">
         <label class="compare-cell" aria-label="Add ${esc(row._chip_label)} run to compare basket">
           <input type="checkbox" class="compare-checkbox" tabindex="-1" ${inBasket ? "checked" : ""}>

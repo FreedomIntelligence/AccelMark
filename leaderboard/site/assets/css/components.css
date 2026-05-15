@@ -51,6 +51,30 @@
 .btn.ghost:hover { color: var(--fg); background: var(--bg-elev); border-color: var(--border-soft); }
 .btn.small { padding: 0.3rem 0.6rem; font-size: 0.78rem; }
 
+/* ── Copy / share buttons ─────────────────────────────────────
+   Cross-view affordance for "copy a URL to the clipboard".  Compose
+   with any base button class (`.btn`, `.cmp-basket-share`, etc.) — this
+   class only adds the icon spacing and the success / failure flash
+   chrome that runs after `flashButtonLabel(btn, …, { className: "is-copied"|"is-copy-failed" })`. */
+.copy-btn { display: inline-flex; align-items: center; gap: 0.35rem; }
+.copy-btn-icon {
+  font-size: 0.95em;
+  line-height: 1;
+  display: inline-block;
+  transform: translateY(-1px);
+  opacity: 0.85;
+}
+.copy-btn.is-copied {
+  color: var(--good, #16a34a);
+  border-color: var(--good, #16a34a);
+  background: color-mix(in srgb, var(--good, #16a34a) 10%, transparent);
+}
+.copy-btn.is-copy-failed {
+  color: var(--bad, #dc2626);
+  border-color: var(--bad, #dc2626);
+  background: color-mix(in srgb, var(--bad, #dc2626) 10%, transparent);
+}
+
 /* ── Badges & tags ────────────────────────────────────────── */
 .badge {
   display: inline-flex;

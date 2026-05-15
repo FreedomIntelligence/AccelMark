@@ -164,6 +164,32 @@ button {
   cursor: pointer;
 }
 
+/* Keyboard focus ring.  We rely on `:focus-visible` so mouse users
+   don't see the ring on click; tab navigation gets a 2px accent halo
+   (with offset so it doesn't overlap rounded corners + a translucent
+   ring underneath for high-contrast visibility on busy backgrounds).
+   `[tabindex="-1"]:focus-visible` is suppressed because we use that
+   pattern for programmatic focus targets (modal panel) where the
+   focus is intentional, not a keyboard navigation step. */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+[tabindex="-1"]:focus-visible { outline: none; }
+.btn:focus-visible,
+.copy-btn:focus-visible {
+  outline-offset: 2px;
+}
+/* Pills with their own border and tight radius look better with the
+   ring snugged in tighter — anything with a `*-pill` suffix opts in. */
+.rk-suite-pill:focus-visible,
+.rk-facet-pill:focus-visible,
+.scn-suite-letter:focus-visible {
+  outline-offset: 1px;
+}
+
 ::selection { background: var(--accent-soft); color: var(--fg-strong); }
 
 /* Scrollbar (webkit only) */

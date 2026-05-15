@@ -25,6 +25,7 @@ import {
 } from "../data.js";
 import {
   esc, fmtDate, shortVersion, submitterHandle,
+  copyToClipboard, flashButtonLabel,
 } from "../utils.js";
 
 export function render({ el, params }) {
@@ -94,6 +95,13 @@ export function render({ el, params }) {
           ? `<a class="btn primary" href="#/compare?runs=${encodeURIComponent(latestRid)}">Compare this chip</a>`
           : ""}
         <a class="btn" href="#/rankings?vendor=${encodeURIComponent(sample.vendor)}">Browse ${esc(sample.vendor)} rankings</a>
+        <button class="btn copy-btn chip-share-btn"
+                type="button"
+                data-chip-share="1"
+                title="Copy a link to this chip's overview page.">
+          <span class="copy-btn-icon" aria-hidden="true">↗</span>
+          <span class="copy-btn-label">Copy link</span>
+        </button>
       </div>
     </section>
 
@@ -125,6 +133,54 @@ export function render({ el, params }) {
 
     ${renderSimilarChipsSection(slug, latestRid)}
   `;
+
+  bindClicks(el);
+}
+
+// Click delegation — once-attached on the view container.  The router
+// rebuilds `el.innerHTML` on every visit so handlers must live on the
+// container itself; the guard flag prevents listener stacking on
+// re-renders.  Currently scoped to the hero share button; expand here
+// when other in-view affordances need view-local logic (anything that
+// runs before modal.js's document delegation should land here too).
+function bindClicks(el) {
+  if (el.__chipDetailClicksAttached) return;
+  el.__chipDetailClicksAttached = true;
+
+  el.addEventListener("click", (ev) => {
+    if (!location.hash.startsWith("#/chip/")) return;
+    const t = ev.target;
+
+    // Hero share button — copy a clean URL to this chip's overview
+    // page (no query string, so the recipient lands on the canonical
+    // view rather than a filtered slice).
+    const shareBtn = t.closest("[data-chip-share]");
+    if (shareBtn) {
+      ev.preventDefault();
+      _copyChipShareLink(shareBtn);
+      return;
+    }
+  });
+}
+
+function _chipShareUrl() {
+  // Strip any in-flight query string (`?foo=…` after `#/chip/<slug>`)
+  // so the shared link points at the canonical chip-detail view.
+  // Anything past `#/chip/<slug>` is current-session UI state, not
+  // semantically part of the chip identity.
+  const hash = location.hash || "";
+  const hashPath = hash.split("?")[0];
+  return location.origin + location.pathname + location.search + hashPath;
+}
+
+async function _copyChipShareLink(btn) {
+  const url = _chipShareUrl();
+  const ok = await copyToClipboard(url);
+  flashButtonLabel(btn, ok ? "Copied!" : "Copy failed — select & ⌘C", {
+    holdMs: ok ? 1600 : 3500,
+    className: ok ? "is-copied" : "is-copy-failed",
+    labelSelector: ".copy-btn-label",
+  });
 }
 
 // ── 03 · Compare with similar chips ──
@@ -330,8 +386,16 @@ function renderRunRow(row, showChipCol) {
   const tierClass = row.tier ? ` tier-${esc(row.tier)}` : "";
   const cnt = row.chip_count || 1;
 
+  // a11y: tabindex makes the row keyboard-reachable; modal.js's
+  // keydown delegate fires openModal on Enter/Space.  Native <tr>
+  // semantics stay so screen-reader column headers still pair with
+  // each cell.
+  const a11yLabel = `Open run details: ${meta ? meta.title + " · " : ""}${row.framework || ""} ${display || ""}`.trim();
   return `
-    <tr data-open-run="${esc(rid)}" data-suite="${meta ? esc(meta.letter) : ""}">
+    <tr data-open-run="${esc(rid)}"
+        data-suite="${meta ? esc(meta.letter) : ""}"
+        tabindex="0"
+        aria-label="${esc(a11yLabel)}">
       <td class="col-suite">
         <span class="chip-runs-suite">
           <span class="chip-suite-letter chip-suite-letter--inline">${meta ? esc(meta.letter) : "·"}</span>

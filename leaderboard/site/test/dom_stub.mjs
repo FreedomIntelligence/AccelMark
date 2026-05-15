@@ -46,6 +46,12 @@ class FakeEl {
   setAttribute(k, v) { this._attrs[k] = v; }
   removeAttribute(k) { delete this._attrs[k]; }
   getAttribute(k)  { return this._attrs[k] ?? null; }
+  // Minimal querySelector stub: we only ever need to call this for
+  // helpers like flashButtonLabel that look for ".copy-btn-label"
+  // inside a button.  Returning null lets the helper fall through to
+  // its "label is the button itself" branch, which the tests assert.
+  querySelector() { return null; }
+  querySelectorAll() { return []; }
 
   // Recursively flatten children — handy for assertions that care
   // about how many cards / canvases the renderer produced regardless

@@ -30,6 +30,7 @@ import {
 } from "../data.js";
 import {
   esc, fmtNum, buildHash, chipHref, parseHash, shortVersion,
+  copyToClipboard, flashButtonLabel,
 } from "../utils.js";
 import {
   basketGet, basketHas, basketToggle, basketOnChange,
@@ -152,12 +153,12 @@ export function render({ el, query }) {
       <span class="cmp-basket-label">Comparing</span>
       ${chips.map((c) => renderBasketChip(c)).join("")}
       <div class="cmp-basket-actions">
-        <button class="cmp-basket-share"
+        <button class="copy-btn cmp-basket-share"
                 data-basket-share="1"
                 type="button"
                 title="Copy a URL that pre-loads this comparison.">
-          <span class="cmp-basket-share-icon" aria-hidden="true">↗</span>
-          <span class="cmp-basket-share-label">Copy share link</span>
+          <span class="copy-btn-icon" aria-hidden="true">↗</span>
+          <span class="copy-btn-label">Copy share link</span>
         </button>
         <button class="cmp-basket-clear" data-basket-clear="1" type="button">Clear all</button>
       </div>
@@ -225,12 +226,21 @@ function renderChipCloudBlock({ title, hint, compact }) {
     // basket behaviour; the href is the middle-click / Cmd-click /
     // copy-link fallback and points at the chip's overview page so it
     // matches every other chip-name link on the site.
+    //
+    // a11y: tile doubles as a toggle (left-click) and a navigation link
+    // (modifier-click).  We treat the toggle as the primary action for
+    // assistive tech — `role="button"` + `aria-pressed` mirrors the
+    // visual "in-basket" state.  Modifier-click is documented in the
+    // tooltip so non-mouse users know about the secondary affordance.
+    const a11yTitle = `${c.label}: ${c.submissions} ${subL} across ${c.suites.length} ${suiteL}${variantPart}. Click to ${inBasket ? "remove from" : "add to"} compare basket; Cmd / Ctrl-click to open chip overview.`;
     return `
       <a class="chip-tile size-${esc(c.size)}${inBasket ? " in-basket" : ""}"
          href="#/chip/${esc(c.slug)}"
          data-vendor="${esc(c.vendor)}"
          data-cmp-add-slug="${esc(c.slug)}"
-         title="${esc(c.label)}: ${esc(String(c.submissions))} ${esc(subL)} across ${esc(String(c.suites.length))} ${esc(suiteL)}${esc(variantPart)}">
+         role="button"
+         aria-pressed="${inBasket ? "true" : "false"}"
+         title="${esc(a11yTitle)}">
         <span class="chip-tile-name">${esc(c.label)}</span>
         <span class="chip-tile-count">${fmtNum(c.submissions)}</span>
       </a>
@@ -877,62 +887,14 @@ function _shareUrlForBasket(suiteId) {
   return `${base}#/compare?${params.toString()}`;
 }
 
-// Briefly swap the button label to "Copied!" so the user sees the
-// click did something — toast frameworks would be overkill for this
-// one-off interaction.  Restores the original label after 1.6s, or on
-// the next click that touches the same button (whichever comes first).
-function _flashShareCopied(btn, ok) {
-  const labelEl = btn.querySelector(".cmp-basket-share-label");
-  if (!labelEl) return;
-  if (btn.__shareTimer) {
-    clearTimeout(btn.__shareTimer);
-    btn.__shareTimer = null;
-  }
-  if (btn.__shareOriginalLabel == null) {
-    btn.__shareOriginalLabel = labelEl.textContent || "Copy share link";
-  }
-  labelEl.textContent = ok ? "Copied!" : "Copy failed — select & ⌘C";
-  btn.classList.add(ok ? "is-copied" : "is-copy-failed");
-  btn.__shareTimer = setTimeout(() => {
-    labelEl.textContent = btn.__shareOriginalLabel;
-    btn.classList.remove("is-copied", "is-copy-failed");
-    btn.__shareTimer = null;
-  }, ok ? 1600 : 3500);
-}
-
 async function _copyShareLink(btn, suiteId) {
   const url = _shareUrlForBasket(suiteId);
-  // navigator.clipboard requires a secure context (https or localhost)
-  // and a user gesture — this handler runs inside a click, so the
-  // gesture half is satisfied; the secure-context half is what gets
-  // us into the fallback path on file:// previews and intranet hosts.
-  try {
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
-      await navigator.clipboard.writeText(url);
-      _flashShareCopied(btn, true);
-      return;
-    }
-  } catch (_) { /* fall through to legacy path */ }
-  try {
-    const ta = document.createElement("textarea");
-    ta.value = url;
-    ta.setAttribute("readonly", "");
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
-    ta.style.left = "-9999px";
-    document.body.appendChild(ta);
-    ta.select();
-    const ok = document.execCommand && document.execCommand("copy");
-    document.body.removeChild(ta);
-    if (ok) {
-      _flashShareCopied(btn, true);
-      return;
-    }
-  } catch (_) { /* ignore */ }
-  // Last resort — surface the URL in a prompt so the user can copy it
-  // manually.  Better than failing silently.
-  _flashShareCopied(btn, false);
-  try { window.prompt("Copy this share link:", url); } catch (_) { /* noop */ }
+  const ok = await copyToClipboard(url);
+  flashButtonLabel(btn, ok ? "Copied!" : "Copy failed — select & ⌘C", {
+    holdMs: ok ? 1600 : 3500,
+    className: ok ? "is-copied" : "is-copy-failed",
+    labelSelector: ".copy-btn-label",
+  });
 }
 
 // ── Click delegation ──
