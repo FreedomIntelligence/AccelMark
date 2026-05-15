@@ -189,6 +189,9 @@
   grid-template-columns: 26px minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem;
+  /* Row is a <div> (so the chip-name anchor inside can be a real <a>);
+     keep the link affordance for the row body. */
+  cursor: pointer;
   padding: 0.62rem 0.7rem;
   border-radius: var(--r-md);
   text-decoration: none;
@@ -267,6 +270,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* Renders as an <a> so the chip name navigates to /chip/<slug> while
+     the rest of the row opens the run modal.  Suppress the default
+     underline and surface it only on hover to keep the row visually
+     quiet. */
+  text-decoration: none;
+  display: inline-block;
+  max-width: 100%;
+  transition: color 100ms ease;
+}
+.lb-row-name:hover {
+  color: var(--accent-2);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 .lb-row-sub {
   display: flex;
@@ -406,6 +423,24 @@
 .chip-tile.size-md { font-size: 0.92rem; padding: 0.45rem 0.85rem; }
 .chip-tile.size-lg { font-size: 1.05rem; padding: 0.55rem 1.05rem; }
 .chip-tile.size-xl { font-size: 1.25rem; padding: 0.65rem 1.25rem; }
+
+/* Phone widths: tiles can't keep their popularity-tier size scaling
+   without overflowing the viewport (the longest chip names already
+   eat 200+ px at xl).  Collapse them to a single compact size and
+   allow the inner text to wrap. */
+@media (max-width: 480px) {
+  .chip-cloud { gap: 0.4rem; }
+  .chip-tile,
+  .chip-tile.size-sm,
+  .chip-tile.size-md,
+  .chip-tile.size-lg,
+  .chip-tile.size-xl {
+    font-size: 0.82rem;
+    padding: 0.36rem 0.6rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
 
 .chip-tile[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
 .chip-tile[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }

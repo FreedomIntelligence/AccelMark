@@ -57,6 +57,26 @@ export function fmtDate(s) {
 //   "0.18.0rc1"                     → "0.18.0rc1"
 // Strategy: cut at "+" (drops git hash), then at ".dev" (drops dev
 // build counter). If still long, hard-cap at 12 chars.
+// Title-case a string while preserving common separators (hyphen,
+// slash, parens) so hero copy reads as proper headlines.
+//   "Multi-chip throughput"   -> "Multi-Chip Throughput"
+//   "Edge / consumer hardware"-> "Edge / Consumer Hardware"
+//   "Mixture-of-Experts (MoE)"-> "Mixture-of-Experts (MoE)"
+// Words that already contain *any* uppercase letter are left intact —
+// covers acronyms like MoE / GPU / TPU / FP8 as well as branded camel
+// casing.  Lowercase "stop words" stay lowercase unless they're the
+// first token (matches AP / Chicago house-style minor words).
+export function toTitleCase(s) {
+  if (!s) return "";
+  const STOP = new Set(["a","an","the","and","but","or","nor","for","of","on","in","to","by","at","as","vs"]);
+  return String(s).replace(/[A-Za-z][A-Za-z0-9]*/g, (word, offset, full) => {
+    if (/[A-Z]/.test(word)) return word;
+    const isFirst = offset === 0 || /^[\s]+$/.test(full.slice(0, offset));
+    if (!isFirst && STOP.has(word)) return word;
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+}
+
 export function shortVersion(v) {
   if (!v) return "";
   let s = String(v).split("+")[0];
@@ -111,15 +131,23 @@ export function slugify(s) {
 
 // Build a chip slug that's stable across pages.
 // Includes count to keep H100 ×1 distinct from H100 ×8.
+// `data.js` precomputes `_chip_slug` for every loaded row — we prefer that
+// so the link target stays in lock-step with the grouping key the rest of
+// the app uses (no risk of slug drift if slugify ever changes).
 export function chipSlug(row) {
   if (!row) return "";
+  if (row._chip_slug) return row._chip_slug;
+  if (!row.chip) return "";
   const parts = [row.chip, "x" + (row.chip_count || 1)];
   return slugify(parts.join("-"));
 }
 
-// Build a URL hash for chip detail.
+// Build a URL hash for chip detail.  Falls back to the rankings landing
+// when the row can't produce a slug — better to bounce somewhere useful
+// than to leave a dangling `#/chip/` that 404s into the empty state.
 export function chipHref(row) {
-  return `#/chip/${chipSlug(row)}`;
+  const slug = chipSlug(row);
+  return slug ? `#/chip/${slug}` : "#/rankings";
 }
 
 // Group by helper.

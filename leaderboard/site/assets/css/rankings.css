@@ -1,0 +1,1052 @@
+/* rankings.css — Rankings + Compare views.
+ *
+ * Shared primitives:
+ *   • .rk-suite-pill   — per-suite pill row, used as both the rankings
+ *                        suite filter and the compare suite switcher.
+ *   • .rk-facet-pill   — multi-select facet pills (vendor / precision /
+ *                        framework).
+ *   • .data-table      — sortable, scrollable data table with sticky-ish
+ *                        header (relative to the table container, not the
+ *                        viewport — the toolbar above is already sticky).
+ *
+ * Per-suite color tokens are bound via [data-suite="A"..G"] on the hero,
+ * table, and any pill that needs to render in suite color.
+ */
+
+/* ── Per-suite color binding ───────────────────────────────── */
+.rk-hero[data-suite="A"],        .data-table[data-suite="A"],   .rk-chip-focus[data-suite="A"] { --suite-color: var(--suite-A); }
+.rk-hero[data-suite="B"],        .data-table[data-suite="B"],   .rk-chip-focus[data-suite="B"] { --suite-color: var(--suite-B); }
+.rk-hero[data-suite="C"],        .data-table[data-suite="C"],   .rk-chip-focus[data-suite="C"] { --suite-color: var(--suite-C); }
+.rk-hero[data-suite="D"],        .data-table[data-suite="D"],   .rk-chip-focus[data-suite="D"] { --suite-color: var(--suite-D); }
+.rk-hero[data-suite="E"],        .data-table[data-suite="E"],   .rk-chip-focus[data-suite="E"] { --suite-color: var(--suite-E); }
+.rk-hero[data-suite="F"],        .data-table[data-suite="F"],   .rk-chip-focus[data-suite="F"] { --suite-color: var(--suite-F); }
+.rk-hero[data-suite="G"],        .data-table[data-suite="G"],   .rk-chip-focus[data-suite="G"] { --suite-color: var(--suite-G); }
+
+.rk-suite-pill[data-suite="suite_A"] { --suite-color: var(--suite-A); }
+.rk-suite-pill[data-suite="suite_B"] { --suite-color: var(--suite-B); }
+.rk-suite-pill[data-suite="suite_C"] { --suite-color: var(--suite-C); }
+.rk-suite-pill[data-suite="suite_D"] { --suite-color: var(--suite-D); }
+.rk-suite-pill[data-suite="suite_E"] { --suite-color: var(--suite-E); }
+.rk-suite-pill[data-suite="suite_F"] { --suite-color: var(--suite-F); }
+.rk-suite-pill[data-suite="suite_G"] { --suite-color: var(--suite-G); }
+
+.rk-hero, .data-table, .rk-suite-pill { --suite-color: var(--accent-2); }
+
+/* Generic vendor-dot color binding — base color is owned by parent.
+ * We pre-bind --vendor-color so any .vendor-dot[data-vendor="X"] inside
+ * the rankings / compare scope picks up the right hue. */
+.rk-facet-pill .vendor-dot,
+.data-table .vendor-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vendor-color, var(--fg-faint));
+  flex: 0 0 auto;
+}
+.rk-facet-pill .vendor-dot[data-vendor="NVIDIA"],
+.data-table   .vendor-dot[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.rk-facet-pill .vendor-dot[data-vendor="AMD"],
+.data-table   .vendor-dot[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.rk-facet-pill .vendor-dot[data-vendor="Apple"],
+.data-table   .vendor-dot[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.rk-facet-pill .vendor-dot[data-vendor="Google"],
+.data-table   .vendor-dot[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.rk-facet-pill .vendor-dot[data-vendor="Huawei"],
+.data-table   .vendor-dot[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.rk-facet-pill .vendor-dot[data-vendor="Moore Threads"],
+.data-table   .vendor-dot[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.rk-facet-pill .vendor-dot[data-vendor="Intel"],
+.data-table   .vendor-dot[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+
+/* ── Hero (compact, suite-tinted) ──────────────────────────── */
+.rk-hero {
+  text-align: center;
+  padding: 2.25rem 1rem 1.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.rk-hero::after {
+  content: "";
+  display: block;
+  width: 2.25rem;
+  height: 2px;
+  background: var(--suite-color);
+  margin: 1rem auto 0;
+  border-radius: 2px;
+  opacity: 0.85;
+}
+.rk-hero .eyebrow { justify-content: center; color: var(--suite-color); }
+/* Centered heroes don't need the leading rule that .eyebrow::before draws
+   for left-aligned section labels — it looks like a stray hyphen next to
+   the centered text. */
+.rk-hero .eyebrow::before { display: none; }
+.rk-hero-title {
+  margin: 0.55rem auto 0.4rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+/* Aligns with .hero .hero-sub on Home / Suites so cross-page typography
+   stays consistent — same size, weight, and (strong) foreground. */
+.rk-hero-sub {
+  margin: 0 auto;
+  color: var(--fg-strong);
+  font-weight: 400;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  max-width: 56ch;
+}
+
+/* ── Sticky toolbar ────────────────────────────────────────── */
+.rk-toolbar {
+  position: sticky;
+  top: 3.5rem;             /* clears topnav (~56–58 px) */
+  z-index: 20;
+  background: var(--bg);
+  padding: 0.85rem 0 0.65rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+@supports (backdrop-filter: blur(6px)) {
+  .rk-toolbar {
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: saturate(160%) blur(8px);
+    -webkit-backdrop-filter: saturate(160%) blur(8px);
+  }
+}
+
+.rk-suite-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+.rk-suite-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.85rem 0.32rem 0.4rem;
+  border-radius: 999px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.rk-suite-pill .rk-suite-letter {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--suite-color) 18%, transparent);
+  color: var(--suite-color);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+}
+.rk-suite-pill .rk-suite-name {
+  white-space: nowrap;
+}
+.rk-suite-pill:hover {
+  border-color: color-mix(in srgb, var(--suite-color) 55%, transparent);
+  color: var(--fg-strong);
+}
+.rk-suite-pill.active {
+  background: var(--suite-color);
+  border-color: var(--suite-color);
+  color: var(--on-accent);
+}
+.rk-suite-pill.active .rk-suite-letter {
+  background: rgba(255, 255, 255, 0.25);
+  color: var(--on-accent);
+}
+
+.rk-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 0.55rem;
+}
+.rk-facet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.rk-facet-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.rk-facet-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.rk-facet-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
+}
+.rk-facet-pill:hover {
+  border-color: var(--accent);
+  color: var(--fg-strong);
+}
+.rk-facet-pill.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--fg-strong);
+  font-weight: 600;
+}
+
+.rk-clear-all {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: color 100ms, border-color 100ms;
+}
+.rk-clear-all:hover {
+  color: var(--fg-strong);
+  border-color: var(--accent);
+}
+
+.rk-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+.rk-status strong { color: var(--fg-strong); font-weight: 600; }
+.rk-sort-arrow { color: var(--suite-color, var(--fg-strong)); font-weight: 700; }
+
+/* ── Compare basket banner ─────────────────────────────────── */
+.rk-basket-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+  background: color-mix(in srgb, var(--accent-2) 8%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--accent-2) 35%, var(--border-soft));
+  border-radius: var(--r-md);
+  font-size: 0.85rem;
+  color: var(--fg-strong);
+}
+.rk-basket-bar.show { display: flex; }
+.rk-basket-bar strong { color: var(--accent-2); font-weight: 700; }
+.rk-basket-actions { display: inline-flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* Chip focus banner: shown when rankings was deep-linked from a
+   chip-detail KPI card (`?chip=<slug>`).  Sits above the basket bar
+   so the "soft filter set externally" callout reads before any
+   in-progress compare state. */
+.rk-chip-focus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0.9rem;
+  margin-bottom: 0.75rem;
+  background: color-mix(in srgb, var(--suite-color, var(--accent-2)) 8%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--suite-color, var(--accent-2)) 35%, var(--border-soft));
+  border-radius: var(--r-md);
+  font-size: 0.85rem;
+  color: var(--fg-strong);
+}
+.rk-chip-focus-msg strong {
+  color: var(--suite-color, var(--accent-2));
+  font-weight: 700;
+}
+.rk-chip-focus-actions { display: inline-flex; gap: 0.4rem; flex-wrap: wrap; }
+
+/* ── Data table ────────────────────────────────────────────── */
+.data-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow-card);
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+.data-table thead th {
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 600;
+  padding: 0.7rem 0.75rem 0.6rem;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.data-table thead th.col-compare { width: 2.8rem; padding-right: 0; }
+.data-table thead th.col-rank    { width: 2.5rem; text-align: right; padding-right: 0.5rem; }
+.data-table thead th.col-vendor,
+.data-table thead th.col-precision,
+.data-table thead th.col-fw,
+.data-table thead th.col-tier,
+.data-table thead th.col-date { white-space: nowrap; }
+.data-table thead th.col-metric { text-align: right; }
+.data-table thead th.col-primary {
+  color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-strong));
+}
+.data-table thead th.sortable { cursor: pointer; user-select: none; }
+.data-table thead th.sortable:hover { color: var(--fg-strong); }
+/* Sorted column tint: just enough to lead the eye, not a column wash.
+ * Header gets a hint of suite color; body cells stay neutral so the
+ * column doesn't visually compete with featured-row / in-basket rows. */
+.data-table thead th.is-sort {
+  color: var(--fg-strong);
+  background: color-mix(in srgb, var(--suite-color) 4%, var(--bg-elev));
+}
+.data-table thead th .th-unit {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--fg-faint);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-top: 0.15rem;
+  text-transform: none;
+}
+.data-table thead th .th-sort-icon {
+  display: inline-block;
+  margin-left: 0.25rem;
+  color: var(--fg-faint);
+  font-size: 0.78rem;
+  vertical-align: -1px;
+}
+.data-table thead th.is-sort .th-sort-icon { color: var(--suite-color); }
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: background 100ms ease;
+}
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody tr:hover { background: color-mix(in srgb, var(--fg) 4%, transparent); }
+.data-table tbody tr.in-basket {
+  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
+}
+.data-table tbody tr.in-basket:hover {
+  background: color-mix(in srgb, var(--accent-2) 14%, transparent);
+}
+
+.data-table td {
+  padding: 0.6rem 0.75rem;
+  vertical-align: middle;
+  color: var(--fg);
+}
+.data-table td.col-rank {
+  text-align: right;
+  font-weight: 700;
+  color: var(--fg-muted);
+  padding-right: 0.5rem;
+  width: 2.5rem;
+}
+/* The whole .col-compare cell is the hit-target for toggling a run
+ * into the compare basket — not the tiny checkbox.  This widens the
+ * forgiveness zone so the user doesn't have to land on the input
+ * pixel-perfectly and accidentally activate the row's chip-detail
+ * navigation instead. */
+.data-table td.col-compare {
+  width: 2.8rem;
+  padding-right: 0;
+  cursor: pointer;
+  position: relative;
+}
+.data-table td.col-compare:hover {
+  background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+}
+.data-table tbody tr.in-basket td.col-compare {
+  background: color-mix(in srgb, var(--accent-2) 16%, transparent);
+}
+.data-table .compare-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 1.6rem;
+  padding: 0.5rem 0.4rem;
+  cursor: pointer;
+}
+.data-table .compare-checkbox {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--accent-2);
+  pointer-events: none;
+}
+
+.data-table td.col-chip { min-width: 11rem; }
+/* The whole chip cell (name + memory meta) is a single link so users
+   don't accidentally hit the row's run-modal handler when aiming for
+   the memory affordance.  We render it as a block so the meta line
+   keeps its stacked layout below the name. */
+.data-table td.col-chip .rk-chip-link {
+  display: block;
+  color: var(--fg-strong);
+  text-decoration: none;
+}
+.data-table td.col-chip .rk-chip-name {
+  font-weight: 600;
+  color: var(--fg-strong);
+  transition: color 100ms ease;
+}
+.data-table td.col-chip .rk-chip-link:hover .rk-chip-name {
+  color: var(--suite-color);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.data-table td.col-chip .rk-chip-meta {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.7rem;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table td.col-vendor {
+  white-space: nowrap;
+  display: table-cell;
+}
+.data-table td.col-vendor .vendor-dot {
+  margin-right: 0.45rem;
+  vertical-align: 1px;
+}
+.data-table td.col-vendor .vendor-name { color: var(--fg); }
+
+.data-table td.col-fw .fw-ver {
+  color: var(--fg-faint);
+  font-size: 0.78rem;
+  margin-left: 0.15rem;
+}
+.data-table td.col-precision {
+  color: var(--fg-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table td.col-metric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.data-table td.col-metric .metric-empty { color: var(--fg-faint); }
+.data-table td.col-primary { color: var(--fg-strong); font-weight: 600; }
+.data-table td.col-primary .metric-val {
+  color: color-mix(in srgb, var(--suite-color) 60%, var(--fg-strong));
+  letter-spacing: -0.005em;
+}
+/* Body cells deliberately have no sort-column tint — only the header
+ * carries the cue.  A vertical band of color across every row was too
+ * loud and competed with the in-basket / featured row highlights. */
+.data-table td.col-metric.is-sort { background: transparent; }
+
+.data-table td.col-date {
+  color: var(--fg-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+}
+.data-table td.col-date.is-sort { background: transparent; }
+.data-table td.col-tier { white-space: nowrap; }
+
+/* Empty state */
+.rk-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+.rk-empty .rk-empty-icon {
+  display: block;
+  font-size: 2rem;
+  color: var(--fg-faint);
+  margin-bottom: 0.6rem;
+}
+.rk-empty p { margin: 0.3rem 0 1rem; }
+.rk-empty .rk-empty-sub {
+  font-size: 0.85rem;
+  color: var(--fg-faint);
+  margin-bottom: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* ── Compare view ─────────────────────────────────────────── */
+.cmp-hero {
+  text-align: center;
+  padding: 2.25rem 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.cmp-hero .eyebrow { justify-content: center; }
+/* Mirror .rk-hero: drop the leading rule so the centered eyebrow text
+   isn't preceded by a stray hyphen. */
+.cmp-hero .eyebrow::before { display: none; }
+.cmp-hero-title {
+  margin: 0.55rem auto 0.4rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+/* Matches .hero .hero-sub on Home / Suites — same size, weight, color —
+   so the Compare landing reads like its siblings. */
+.cmp-hero-sub {
+  margin: 0 auto;
+  color: var(--fg-strong);
+  font-weight: 400;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  max-width: 56ch;
+}
+
+/* Selected chips strip */
+.cmp-basket {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0.5rem 0 1.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  align-items: center;
+}
+.cmp-basket-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-right: 0.4rem;
+}
+.cmp-basket-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.7rem;
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  color: var(--fg-strong);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.cmp-basket-name {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  color: var(--fg-strong);
+  text-decoration: none;
+  line-height: 1.15;
+}
+.cmp-basket-name:hover .cmp-basket-chip-name {
+  color: var(--accent-2);
+}
+.cmp-basket-chip-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.cmp-basket-chip-meta {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  letter-spacing: 0.005em;
+}
+.cmp-basket-chip .vendor-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vendor-color, var(--fg-faint));
+}
+.cmp-basket-chip[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.cmp-basket-chip[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.cmp-basket-chip[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.cmp-basket-chip[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.cmp-basket-chip[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.cmp-basket-chip[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.cmp-basket-chip[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+
+.cmp-basket-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--fg-faint);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0;
+}
+.cmp-basket-remove:hover {
+  background: color-mix(in srgb, var(--bad) 20%, transparent);
+  color: var(--bad);
+}
+
+.cmp-basket-clear {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.cmp-basket-clear:hover { color: var(--fg-strong); border-color: var(--accent); }
+
+/* Compare empty state */
+.cmp-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+.cmp-empty .state-icon {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--fg-faint);
+}
+.cmp-empty p { margin: 0.3rem 0 1rem; }
+
+/* Per-suite empty banner: shown when ALL chips in the basket have zero
+   data for the currently active suite — saves users from staring at a
+   table of dashes by surfacing which suites DO have data. */
+.cmp-suite-empty {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+.cmp-suite-empty .state-icon {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--fg-faint);
+}
+.cmp-suite-empty p { margin: 0.3rem 0; }
+.cmp-suite-empty-sub {
+  font-size: 0.85rem;
+  color: var(--fg-faint);
+}
+.cmp-suite-empty-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  font-weight: 600;
+}
+.cmp-suite-empty-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Suite switcher reuses .rk-suite-pill; just align it. */
+.cmp-suite-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.cmp-suite-row .rk-facet-label { margin-right: 0.4rem; }
+
+/* Metric comparison table */
+.cmp-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow-card);
+}
+.cmp-table {
+  --suite-color: var(--accent-2);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+.cmp-table[data-suite="A"] { --suite-color: var(--suite-A); }
+.cmp-table[data-suite="B"] { --suite-color: var(--suite-B); }
+.cmp-table[data-suite="C"] { --suite-color: var(--suite-C); }
+.cmp-table[data-suite="D"] { --suite-color: var(--suite-D); }
+.cmp-table[data-suite="E"] { --suite-color: var(--suite-E); }
+.cmp-table[data-suite="F"] { --suite-color: var(--suite-F); }
+.cmp-table[data-suite="G"] { --suite-color: var(--suite-G); }
+
+.cmp-table thead th {
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 600;
+  padding: 0.7rem 0.75rem 0.55rem;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.66rem;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+.cmp-table thead th.cmp-chip-head {
+  text-transform: none;
+  letter-spacing: -0.005em;
+  font-size: 0.85rem;
+  color: var(--fg-strong);
+  padding-bottom: 0.5rem;
+}
+.cmp-table thead th.cmp-chip-head .cmp-chip-name {
+  display: block;
+  font-weight: 700;
+  color: var(--fg-strong);
+  text-decoration: none;
+  transition: color 100ms ease;
+}
+.cmp-table thead th.cmp-chip-head .cmp-chip-name:hover {
+  color: var(--accent-2);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.cmp-table thead th.cmp-chip-head .cmp-chip-meta {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--fg-muted);
+  font-weight: 500;
+  margin-top: 0.18rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.cmp-table thead th.cmp-chip-head .vendor-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  vertical-align: 1px;
+  background: var(--vendor-color, var(--fg-faint));
+}
+.cmp-table thead th[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.cmp-table thead th[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.cmp-table thead th[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.cmp-table thead th[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.cmp-table thead th[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.cmp-table thead th[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.cmp-table thead th[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+
+.cmp-table tbody tr { border-bottom: 1px solid var(--border-soft); }
+.cmp-table tbody tr:last-child { border-bottom: none; }
+
+.cmp-table td {
+  padding: 0.75rem 0.75rem;
+  vertical-align: middle;
+  color: var(--fg);
+}
+.cmp-table td.cmp-metric-label {
+  font-size: 0.85rem;
+  color: var(--fg-strong);
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 11rem;
+}
+.cmp-table td.cmp-metric-label.is-primary {
+  color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-strong));
+}
+.cmp-table td.cmp-metric-label .cmp-metric-unit {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--fg-muted);
+  font-weight: 500;
+  margin-top: 0.15rem;
+}
+.cmp-table td.cmp-metric-label .cmp-metric-dir {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.cmp-table td.cmp-cell { position: relative; min-width: 9rem; }
+.cmp-bar {
+  position: relative;
+  height: 8px;
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.32rem;
+}
+.cmp-bar .cmp-bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--suite-color) 75%, var(--fg-strong)),
+    var(--suite-color));
+  border-radius: 4px;
+}
+.cmp-bar.is-winner .cmp-bar-fill {
+  background: linear-gradient(90deg,
+    var(--suite-color),
+    color-mix(in srgb, var(--suite-color) 75%, var(--good)));
+}
+.cmp-cell-value {
+  font-size: 0.94rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-strong);
+}
+.cmp-cell-value .cmp-cell-unit {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  margin-left: 0.25rem;
+  letter-spacing: 0.02em;
+}
+.cmp-cell.is-winner .cmp-cell-value::after {
+  content: "★";
+  margin-left: 0.35rem;
+  color: var(--suite-color);
+  font-size: 0.8rem;
+}
+.cmp-cell.is-missing .cmp-cell-value {
+  color: var(--fg-faint);
+  font-weight: 400;
+}
+
+/* ── Compare head-to-head charts ─────────────────────────────── */
+.cmp-charts-wrap:not(:empty) {
+  max-width: var(--page-max, 1100px);
+  margin: 1.8rem auto 0;
+  padding: 0 1rem;
+}
+.cmp-charts-head {
+  margin-bottom: 1rem;
+}
+.cmp-charts-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.005em;
+}
+.cmp-charts-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+}
+.cmp-chart-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 1rem 1.1rem 1.1rem;
+  margin-bottom: 1rem;
+}
+.cmp-chart-card-head { margin-bottom: 0.55rem; }
+.cmp-chart-card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  letter-spacing: 0.005em;
+}
+.cmp-chart-card-sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+.cmp-chart-canvas { width: 100%; }
+.cmp-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 0.65rem;
+  font-size: 0.74rem;
+  color: var(--fg);
+}
+.cmp-chart-legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.cmp-chart-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.cmp-chart-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--fg-faint);
+  font-size: 0.82rem;
+}
+.cmp-charts-missing {
+  font-size: 0.76rem;
+  color: var(--fg-faint);
+  margin: 0.45rem 0 0;
+  padding: 0.45rem 0.7rem;
+  border-left: 2px solid var(--border-soft);
+}
+.cmp-charts-missing strong {
+  color: var(--fg-muted);
+  font-weight: 600;
+}
+
+/* ── Compare chip cloud (quick-add affordance) ──────────────────
+ *
+ * Reuses .chip-cloud / .chip-tile from home.css; only the wrapping
+ * section, headline copy, and selected-chip styling live here.
+ * In the empty state (cmp-cloud without .is-compact) the block is the
+ * page's main content; in the populated state it sits below the table
+ * as a compact "add another chip" footer.
+ */
+.cmp-cloud {
+  max-width: var(--page-max, 1100px);
+  margin: 1.4rem auto 0;
+  padding: 1.4rem 1rem 1.5rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+}
+.cmp-cloud.is-compact {
+  background: transparent;
+  border: 1px dashed var(--border-soft);
+  margin-top: 2rem;
+  padding: 1rem 0.85rem 1.1rem;
+}
+.cmp-cloud-head {
+  text-align: center;
+  margin-bottom: 0.85rem;
+  padding: 0 0.5rem;
+}
+.cmp-cloud-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.005em;
+}
+.cmp-cloud.is-compact .cmp-cloud-title {
+  font-size: 0.92rem;
+  color: var(--fg-muted);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+.cmp-cloud-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+  line-height: 1.45;
+}
+.cmp-cloud.is-compact .cmp-cloud-hint {
+  font-size: 0.74rem;
+  color: var(--fg-faint);
+}
+
+/* "In-basket" affordance on cloud tiles — a filled pill in the chip's
+ * vendor color, with a checkmark prefixed to the name so the state is
+ * obvious without relying on color alone.  Clicking again removes
+ * every basket entry whose chip matches the tile name. */
+.chip-tile.in-basket {
+  background: color-mix(in srgb, var(--vendor-color) 38%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--vendor-color) 60%, var(--border));
+  color: var(--fg-strong);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--vendor-color) 30%, transparent);
+}
+.chip-tile.in-basket::before {
+  content: "✓";
+  display: inline-block;
+  margin-right: 0.35rem;
+  font-size: 0.8em;
+  color: color-mix(in srgb, var(--vendor-color) 75%, var(--fg-strong));
+  font-weight: 700;
+}
+.chip-tile.in-basket .chip-tile-count {
+  color: color-mix(in srgb, var(--vendor-color) 65%, var(--fg-strong));
+  font-weight: 600;
+}
+
+.cmp-hero-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  border-bottom: 1px dashed color-mix(in srgb, var(--accent-2) 50%, transparent);
+}
+.cmp-hero-link:hover {
+  color: color-mix(in srgb, var(--accent-2) 70%, var(--fg-strong));
+  border-bottom-color: var(--accent-2);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 880px) {
+  .rk-hero-title, .cmp-hero-title { font-size: 1.6rem; }
+  .rk-toolbar { top: 3rem; }
+  .data-table, .cmp-table { font-size: 0.8rem; }
+  .data-table td, .data-table thead th { padding: 0.5rem 0.55rem; }
+  .data-table td.col-rank { width: 2rem; }
+}
+@media (max-width: 640px) {
+  .rk-hero, .cmp-hero { padding: 1.25rem 0.5rem 0.85rem; }
+  .rk-hero-title, .cmp-hero-title { font-size: 1.35rem; }
+  .rk-hero-sub, .cmp-hero-sub { font-size: 0.9rem; }
+  .rk-toolbar { top: 2.85rem; padding-top: 0.55rem; }
+  .rk-suite-pill { font-size: 0.76rem; padding: 0.28rem 0.6rem 0.28rem 0.3rem; }
+  .rk-suite-pill .rk-suite-letter { width: 18px; height: 18px; font-size: 0.66rem; }
+}

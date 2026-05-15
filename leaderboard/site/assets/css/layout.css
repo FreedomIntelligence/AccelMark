@@ -53,25 +53,6 @@
   gap: 0.5rem;
 }
 
-.topnav .compare-pill {
-  display: none;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.65rem;
-  background: var(--accent-2);
-  color: var(--on-accent);
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-.topnav .compare-pill.show { display: inline-flex; }
-.topnav .compare-pill .count {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 999px;
-  padding: 0 0.4rem;
-  font-size: 0.72rem;
-}
-
 .topnav .gh-link {
   color: var(--fg-muted);
   font-size: 0.85rem;
@@ -163,4 +144,16 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); text-decorati
   .topnav .nav-link { padding: 0.35rem 0.55rem; font-size: 0.82rem; }
   main { padding: 1rem; }
   .hide-mobile { display: none !important; }
+}
+/* Phone-sized viewports — once we drop below ~480px the brand wordmark
+   and the 4-link nav can't share a single row.  Hide the wordmark and
+   GitHub link so the four primary destinations still fit on one line,
+   and let the link strip shrink-to-fit. */
+@media (max-width: 480px) {
+  .topnav { padding: 0.55rem 0.65rem; gap: 0.35rem; flex-wrap: nowrap; }
+  .topnav .brand span { display: none; }
+  .topnav .nav-links { flex: 1 1 auto; min-width: 0; justify-content: flex-end; }
+  .topnav .nav-link { padding: 0.3rem 0.45rem; font-size: 0.78rem; }
+  .topnav .nav-right { display: none; }
+  main { padding: 0.85rem 0.75rem 2rem; }
 }

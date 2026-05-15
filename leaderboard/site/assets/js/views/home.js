@@ -183,7 +183,9 @@ function renderSuiteMeta(suiteId, facts) {
   return items.join("");
 }
 
-// Single ranked row used by suite cards.  Anchor → chip detail page.
+// Single ranked row used by suite cards.  Plain click → run modal.
+// Anchor href stays pointed at the chip detail page so Cmd-click still
+// opens the chip-level overview in a new tab.
 function renderLbRow(row, suiteId, rank) {
   const meta = SUITE_META[suiteId];
   const value = row[meta.primary.key];
@@ -191,18 +193,24 @@ function renderLbRow(row, suiteId, rank) {
   const { num, unit } = splitNumUnit(display);
   const medal = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
   const featured = rank === 1 ? " lb-row--featured" : "";
+  const runId = row.run_id || row.submission || "";
+  // Row anatomy: the surrounding <div> is the run-modal trigger; the
+  // chip name is a nested <a> that the modal listener lets through to
+  // its native href, so users get two distinct affordances on one row:
+  //   • click on chip name        → /chip/<slug> overview page
+  //   • click anywhere else in row → run-detail modal
   return `
-    <a class="lb-row${featured}" href="${chipHref(row)}">
+    <div class="lb-row${featured}" data-open-run="${esc(runId)}">
       <span class="lb-row-rank ${medal}">${rank}</span>
       <span class="lb-row-main">
-        <span class="lb-row-name">${esc(row._chip_label)}</span>
+        <a class="lb-row-name" href="${chipHref(row)}">${esc(row._chip_label)}</a>
         ${renderFwSub(row)}
       </span>
       <span class="lb-row-score">
         <span class="score-val">${esc(num)}</span>
         ${unit ? `<span class="score-unit">${esc(unit)}</span>` : ""}
       </span>
-    </a>
+    </div>
   `;
 }
 
@@ -236,6 +244,11 @@ function renderChipCloud(container, legendEl) {
   for (const c of chips) {
     const a = document.createElement("a");
     a.className = `chip-tile size-${c.size}`;
+    // Each tile is a navigational link to the chip's overview page.
+    // From there users can drill into any specific run or jump to
+    // Compare with this chip pre-selected, but the home landing stays
+    // a "browse chips" experience rather than a "start comparing"
+    // funnel — matches user expectations for a clickable chip name.
     a.href = `#/chip/${c.slug}`;
     a.setAttribute("data-vendor", c.vendor);
     const subL = c.submissions === 1 ? "submission" : "submissions";
@@ -285,18 +298,20 @@ function renderRecentRow(row) {
   const ver = shortVersion(row.framework_version);
   const fwVer = ver ? `${esc(row.framework)} <span class="fw-ver">${esc(ver)}</span>` : esc(row.framework);
 
-  const a = document.createElement("a");
-  a.className = "lb-row";
-  a.href = chipHref(row);
-  a.setAttribute("data-suite", letter);
+  // Mirrors renderLbRow: outer <div> = run-modal trigger, inner chip-name
+  // <a> escapes via modal.js nested-anchor rule to navigate to /chip/<slug>.
+  const wrap = document.createElement("div");
+  wrap.className = "lb-row";
+  wrap.setAttribute("data-suite", letter);
+  wrap.setAttribute("data-open-run", row.run_id || row.submission || "");
   const bylineBits = [];
   if (handle) bylineBits.push(`@${esc(handle)}`);
   bylineBits.push(esc(fmtDate(row.date)));
   const byline = `<span class="lb-row-byline">${bylineBits.join(" · ")}</span>`;
-  a.innerHTML = `
+  wrap.innerHTML = `
     <span class="lb-row-rank suite-tag-rank" aria-hidden="true">${esc(letter)}</span>
     <span class="lb-row-main">
-      <span class="lb-row-name">${esc(row._chip_label)}</span>
+      <a class="lb-row-name" href="${chipHref(row)}">${esc(row._chip_label)}</a>
       <span class="lb-row-sub">
         <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
         <span class="vendor-name">${esc(row.vendor)}</span>
@@ -312,7 +327,7 @@ function renderRecentRow(row) {
       ${unit ? `<span class="score-unit">${esc(unit)}</span>` : ""}
     </span>
   `;
-  return a;
+  return wrap;
 }
 
 // "5,731 tok/s" → { num: "5,731", unit: "tok/s" }

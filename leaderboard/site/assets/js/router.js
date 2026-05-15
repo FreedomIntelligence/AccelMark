@@ -83,14 +83,19 @@ export function dispatch() {
 
 function syncNav(path) {
   const links = document.querySelectorAll(".topnav .nav-link");
+  // Map the route to the nav entry that should appear active.
+  //   • /chip/:slug    → no nav entry highlighted; it's a drill-in page
+  //                      reached from chip-cloud / lb-row, not part of
+  //                      the rankings hub.
+  //   • everything else falls through to its obvious top-level link.
   let active = "/";
-  if (path.startsWith("/rankings")) active = "/rankings";
-  else if (path.startsWith("/chip"))     active = "/rankings";
+  if (path.startsWith("/rankings"))      active = "/rankings";
   else if (path.startsWith("/compare"))  active = "/compare";
   else if (path.startsWith("/suites"))   active = "/suites";
+  else if (path.startsWith("/chip"))     active = null;
   for (const a of links) {
     const href = a.getAttribute("href") || "";
-    a.classList.toggle("active", href === `#${active}`);
+    a.classList.toggle("active", active !== null && href === `#${active}`);
   }
 }
 

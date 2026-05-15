@@ -7,7 +7,7 @@
 // All views consume LeaderboardData from this module.  Do not access
 // window.LEADERBOARD_DATA directly anywhere else.
 
-import { groupBy, maxBy, chipSlug } from "./utils.js";
+import { groupBy, maxBy, chipSlug, toTitleCase } from "./utils.js";
 
 // Each suite has a "primary metric" most relevant to a buyer's question.
 // This drives default sort on the rankings page and the top-3 podium on home.
@@ -236,6 +236,16 @@ export const SUITE_META = {
   },
 };
 
+// House style: headline-style Title Case for all suite titles so they
+// look correct everywhere they surface (home cards, rankings hero,
+// rankings suite pills, compare hero, compare suite pills, modal
+// header, suites explainer).  The source strings above stay in
+// natural sentence case for readability; we transform once at module
+// load so consumers don't have to remember to call toTitleCase().
+for (const meta of Object.values(SUITE_META)) {
+  meta.title = toTitleCase(meta.title);
+}
+
 // Single source of truth for "render the primary metric for this suite".
 // Used by home, rankings, chip-detail, compare — keeps unit / scale rules
 // in one place.  Returns "—" for null / missing values.
@@ -260,8 +270,67 @@ export const SUITE_ORDER = ["suite_A", "suite_B", "suite_C", "suite_D", "suite_E
 // Vendor display order — controls filter pill order on rankings.
 export const VENDOR_ORDER = ["NVIDIA", "AMD", "Apple", "Google", "Huawei", "Moore Threads", "Intel"];
 
+// Per-suite column / metric specs used by the rankings table and the
+// compare view.  Decoupled from SUITE_META.scenarios because the UI
+// columns are a curated subset (some scenarios are extras, some have
+// no numeric metric at all), and the column ordering matters.
+//
+// First entry is the primary metric (default sort + featured row).
+// `scale` multiplies the raw value at display (e.g. 0.945 -> 94.5 %).
+// `direction` selects asc / desc default sort and informs compare bars.
+// `textual` marks string-valued columns (e.g. quant_best_precision).
+export const SUITE_COLUMNS = {
+  suite_A: [
+    { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
+    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+    { key: "interactive_ttft_p99", label: "TTFT p99",       unit: "ms",    direction: "asc", decimals: 0 },
+  ],
+  suite_B: [
+    { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
+    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+  ],
+  suite_C: [
+    { key: "quant_quality_eff",    label: "Quality eff.",   unit: "",      direction: "desc", primary: true, decimals: 2 },
+    { key: "quant_best_throughput", label: "Best tok/s",    unit: "tok/s", direction: "desc" },
+    { key: "quant_best_precision", label: "Best format",    unit: "",      direction: "desc", textual: true },
+  ],
+  suite_D: [
+    { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
+    { key: "interactive_ttft_p99", label: "TTFT p99",       unit: "ms",    direction: "asc", decimals: 0 },
+  ],
+  suite_E: [
+    { key: "scaling_efficiency_2x", label: "2× eff.",       unit: "%",     direction: "desc", primary: true, scale: 100, decimals: 1 },
+    { key: "scaling_efficiency_4x", label: "4× eff.",       unit: "%",     direction: "desc", scale: 100, decimals: 1 },
+  ],
+  suite_F: [
+    { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
+    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+    { key: "interactive_ttft_p99", label: "TTFT p99",       unit: "ms",    direction: "asc", decimals: 0 },
+  ],
+  suite_G: [
+    { key: "sustained_throughput", label: "Sustained",      unit: "tok/s", direction: "desc", primary: true },
+    { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc" },
+  ],
+};
+
+// Format a numeric value against a column spec.  Returns null for
+// missing values so callers can render the "-" themselves.
+export function formatMetric(value, col) {
+  if (value === null || value === undefined || Number.isNaN(value)) return null;
+  if (col.textual) return String(value);
+  const scaled = Number(value) * (col.scale || 1);
+  const decimals = col.decimals !== undefined
+    ? col.decimals
+    : (Math.abs(scaled) >= 100 ? 0 : Math.abs(scaled) >= 10 ? 1 : 2);
+  return scaled.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
 let _rows = null;
 let _byChip = null;
+let _byRunId = null;
 let _bySuite = null;
 let _ready = false;
 
@@ -274,6 +343,8 @@ export function rows() {
 
 export function init() {
   if (_ready) return;
+  mergeSuiteSpecs();
+
   const data = (typeof window !== "undefined" && Array.isArray(window.LEADERBOARD_DATA))
     ? window.LEADERBOARD_DATA
     : [];
@@ -286,8 +357,78 @@ export function init() {
   }
   _rows = data;
   _bySuite = groupBy(data, (r) => r.suite);
-  _byChip = groupBy(data, (r) => r._chip_slug);
+  _byChip  = groupBy(data, (r) => r._chip_slug);
+  _byRunId = new Map(data.filter((r) => r.run_id).map((r) => [r.run_id, r]));
   _ready = true;
+}
+
+// Merge canonical suite spec from suites/suite_X/suite.json (baked into
+// the generated leaderboard.js as window.SUITE_SPECS) into SUITE_META.
+//
+// Only factual fields (model, dataset, precision baseline, prompt-token
+// p50, default/extra scenario split) are merged in; editorial fields
+// (title, tagline, description, primary metric label, chip-count copy)
+// stay hardcoded since they aren't part of the suite contract.
+//
+// The merge is conservative: a spec value only overrides the existing
+// editorial value when the existing value looks like a simple token
+// (no comma, no semicolon).  This preserves intentionally composite
+// strings — e.g. suite_C's "BF16, FP8, W8A8, W8A16, W4A16" and
+// suite_D's "BF16; max_model_len 30,208".  If maintainers want those
+// suites to auto-track suite.json too, they should split the composite
+// into separate fields in SUITE_META.
+function mergeSuiteSpecs() {
+  const specs = (typeof window !== "undefined" && window.SUITE_SPECS) || {};
+  for (const [sid, spec] of Object.entries(specs)) {
+    const meta = SUITE_META[sid];
+    if (!meta) continue;
+    const wl = meta.workload || (meta.workload = {});
+
+    if (spec.model_id) wl.model = spec.model_id;
+    if (spec.dataset)  wl.dataset = spec.dataset;
+    if (spec.precision_required && _isSimpleToken(wl.precision)) {
+      wl.precision = spec.precision_required;
+    }
+
+    const inT  = _fmtTokenCount(spec.input_tokens_p50);
+    const outT = _fmtTokenCount(spec.output_tokens_p50);
+    if (inT  && _isTokenCountToken(wl.inputTokens))  wl.inputTokens  = inT;
+    if (outT && _isTokenCountToken(wl.outputTokens)) wl.outputTokens = outT;
+
+    // Scenario name in SUITE_META may be qualified ("offline (×5 formats)",
+    // "offline (1× / 2×)"); match by leading bare word.
+    const extras   = new Set(spec.scenarios_extra   || []);
+    const defaults = new Set(spec.scenarios_default || []);
+    for (const s of meta.scenarios) {
+      const base = s.name.split(" ")[0].trim();
+      if (extras.has(base))   s.isExtra = true;
+      if (defaults.has(base)) s.isExtra = false;
+    }
+  }
+}
+
+function _isSimpleToken(v) {
+  // True for "BF16", "FP16", "FP8", etc.; false for "BF16, FP8, ..."
+  // (composite list) and "BF16; max_model_len 30,208" (composite line).
+  if (!v) return true;
+  const s = String(v);
+  return !s.includes(",") && !s.includes(";");
+}
+
+function _isTokenCountToken(v) {
+  // Auto-format only when the existing value is a plain "~280" / "~28K"
+  // style.  Preserves anything more elaborate the editorial layer set.
+  if (!v) return true;
+  return /^~[\d.]+[KM]?$/.test(String(v));
+}
+
+function _fmtTokenCount(n) {
+  if (n === null || n === undefined) return null;
+  const v = Number(n);
+  if (!Number.isFinite(v)) return null;
+  if (v >= 10000) return `~${Math.round(v / 1000)}K`;
+  if (v >= 1000)  return `~${(v / 1000).toFixed(1)}K`;
+  return `~${Math.round(v)}`;
 }
 
 // Returns rows in a given suite, sorted by suite primary metric.
@@ -328,6 +469,92 @@ export function bestPerChipForSuite(suiteId) {
 export function rowsForChip(slug) {
   if (!_ready) init();
   return _byChip.get(slug) || [];
+}
+
+// Pick a representative run_id for a given chip slug — used by the
+// chip-cloud "quick add" affordance on Home and Compare so that a single
+// click on a chip seeds the compare basket with the freshest run for
+// that chip-count variant.  Returns null when no rows exist (e.g. the
+// chip was removed from the dataset since a shared link was created).
+export function representativeRunForChip(slug) {
+  const rs = rowsForChip(slug);
+  if (!rs.length) return null;
+  const best = rs.reduce((a, b) => (String(b.date) > String(a.date) ? b : a));
+  return best.run_id || best.submission || null;
+}
+
+// Find a row by its run_id (the compare-basket primary key).
+// Returns null if the run no longer exists in the dataset (e.g. the
+// user reloaded a shared URL after the submission was withdrawn).
+export function rowByRunId(runId) {
+  if (!_ready) init();
+  return _byRunId.get(runId) || null;
+}
+
+// Resolve a basket run_id to the most appropriate row to display for a
+// given suite:
+//   • exact run in the same suite     → return it
+//   • same chip + count + framework + version → best by suite primary
+//   • same chip + count + framework             → best by suite primary
+//   • otherwise                                  → null (no data in suite)
+//
+// This is what makes the compare page meaningful across suites: the
+// user picks a specific run from Rankings, and when they switch suite
+// we resurface that same hardware/software configuration's best run
+// in the new suite rather than dropping the chip from the basket.
+// Resolve a basket entry to its "matching" row in another suite.  The
+// match cascades through ever-laxer constraints so suites that fix
+// chip_count (e.g. suite_B / suite_G are ×8) still surface a relevant
+// row when the user originally picked a single-chip variant:
+//
+//   1. exact run_id in the target suite (rare; same submission ran the
+//      whole suite family)
+//   2. chip + chip_count + framework + framework_version
+//   3. chip + chip_count + framework (looser framework_version)
+//   4. chip + framework (loosen chip_count; this is how an H200×1 pick
+//      maps onto suite_B's H200×8 row, which is the *only* H200 row in
+//      that suite anyway)
+//   5. chip (loosen framework — last-resort cross-framework fallback)
+//
+// Within whichever pool wins we pick the row with the best value on
+// the target suite's primary metric.
+export function bestRowForRunInSuite(runId, suiteId) {
+  const seed = rowByRunId(runId);
+  if (!seed) return null;
+  if (seed.suite === suiteId) return seed;
+  const inSuite = _rows.filter((r) => r.suite === suiteId);
+  if (inSuite.length === 0) return null;
+
+  const cascade = [
+    (r) => r.chip === seed.chip
+        && (r.chip_count || 1) === (seed.chip_count || 1)
+        && r.framework === seed.framework
+        && r.framework_version === seed.framework_version,
+    (r) => r.chip === seed.chip
+        && (r.chip_count || 1) === (seed.chip_count || 1)
+        && r.framework === seed.framework,
+    (r) => r.chip === seed.chip
+        && r.framework === seed.framework,
+    (r) => r.chip === seed.chip,
+  ];
+
+  let pool = null;
+  for (const pred of cascade) {
+    const candidates = inSuite.filter(pred);
+    if (candidates.length > 0) { pool = candidates; break; }
+  }
+  if (!pool) return null;
+
+  const meta = SUITE_META[suiteId];
+  if (!meta) return pool[0];
+  const pk = meta.primary.key;
+  const valid = pool.filter((r) =>
+    r[pk] !== null && r[pk] !== undefined && !Number.isNaN(r[pk])
+  );
+  if (valid.length === 0) return pool[0];
+  return meta.primary.direction === "asc"
+    ? valid.reduce((a, b) => (a[pk] <= b[pk] ? a : b))
+    : valid.reduce((a, b) => (a[pk] >= b[pk] ? a : b));
 }
 
 // Best per suite for a chip.  Returns Map<suite_id, best_row>.
@@ -383,6 +610,61 @@ export function recent(limit = 6) {
     .filter((r) => r.date)
     .sort((a, b) => String(b.date).localeCompare(String(a.date)))
     .slice(0, limit);
+}
+
+// Rank a *chip* within a suite leaderboard (one entry per chip slug,
+// scored by each chip's best primary metric).  Used by chip-detail to
+// surface "ranked #N of M" badges per suite — far more useful than the
+// raw row rank, which would penalise chips that submit many variants.
+export function rankChipInSuite(slug, suiteId) {
+  const board = bestPerChipForSuite(suiteId);
+  if (!board.length) return null;
+  const idx = board.findIndex((r) => r._chip_slug === slug);
+  if (idx < 0) return null;
+  return { rank: idx + 1, total: board.length };
+}
+
+// Find chips with the most overlapping suite coverage with `slug`.
+// Returns a small array sorted by (shared suite count desc, same-vendor
+// preferred, total run count desc) — i.e. "you might also care about
+// these because they compete on the same workloads".  Chips with no
+// shared suite are excluded; the source chip itself is excluded.
+export function similarChipsTo(slug, { limit = 5 } = {}) {
+  if (!_ready) init();
+  const myRows = rowsForChip(slug);
+  if (!myRows.length) return [];
+  const mySuites = new Set(myRows.map((r) => r.suite));
+  const myVendor = myRows[0].vendor;
+
+  const candidates = [];
+  for (const [otherSlug, rows] of _byChip.entries()) {
+    if (otherSlug === slug || !rows.length) continue;
+    const shared = rows.filter((r) => mySuites.has(r.suite));
+    if (shared.length === 0) continue;
+    const otherSuites = new Set(shared.map((r) => r.suite));
+    candidates.push({
+      slug: otherSlug,
+      sample: rows[0],
+      label: rows[0]._chip_label,
+      vendor: rows[0].vendor,
+      sharedSuites: Array.from(otherSuites),
+      sameVendor: rows[0].vendor === myVendor,
+      totalRuns: rows.length,
+    });
+  }
+
+  candidates.sort((a, b) => {
+    if (b.sharedSuites.length !== a.sharedSuites.length) {
+      return b.sharedSuites.length - a.sharedSuites.length;
+    }
+    // Same-vendor first when overlap is tied — keeps recommendations
+    // intra-vendor for vendor lock-in shoppers without hard-filtering
+    // cross-vendor matches off the strip.
+    if (a.sameVendor !== b.sameVendor) return a.sameVendor ? -1 : 1;
+    return b.totalRuns - a.totalRuns;
+  });
+
+  return candidates.slice(0, limit);
 }
 
 // Rank of a row within its suite (1-indexed).

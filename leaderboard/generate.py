@@ -6,6 +6,7 @@ Usage:
     python leaderboard/generate.py
 """
 
+import hashlib
 import json
 import re
 import statistics
@@ -46,6 +47,65 @@ def _get_suite_precision_required(suite_id: str) -> str:
             return json.load(f).get("precision_required", "BF16")
     except Exception:
         return "BF16"
+
+
+def _collect_suite_specs() -> dict:
+    """Collect UI-relevant per-suite spec from suites/suite_*/suite.json.
+
+    Baked into the generated leaderboard.js as ``window.SUITE_SPECS`` so
+    the static leaderboard UI auto-syncs whenever a maintainer edits a
+    suite contract — model id, dataset, prompt distribution, scenarios
+    default/extra split, online SLA, etc.  Editorial UI content (titles,
+    taglines, descriptions) stays in assets/js/data.js since it isn't a
+    property of the suite contract.
+
+    Returns a ``{ suite_id: spec }`` mapping with only the fields the UI
+    consumes.  Missing fields are omitted (the JS-side merge keeps the
+    hardcoded fallback when a key is absent).
+    """
+    out: dict = {}
+    suites_dir = Path("suites")
+    if not suites_dir.exists():
+        return out
+    for sd in sorted(suites_dir.iterdir()):
+        if not sd.is_dir():
+            continue
+        sf = sd / "suite.json"
+        if not sf.exists():
+            continue
+        try:
+            with open(sf) as f:
+                data = json.load(f)
+        except Exception:
+            continue
+        sid = data.get("suite_id") or sd.name
+        rd = data.get("request_distribution") or {}
+        scn = data.get("scenarios") or {}
+        spec: dict = {}
+        # Fields the UI displays in suite cards / specs / compare headers.
+        for k in (
+            "model_id",
+            "model_revision",
+            "dataset",
+            "precision_required",
+            "allowed_precisions",
+            "max_model_len",
+            "concurrency_levels",
+            "online_qps_levels",
+            "online_sla_ttft_ms",
+        ):
+            if k in data and data[k] is not None:
+                spec[k] = data[k]
+        if rd.get("input_tokens_p50") is not None:
+            spec["input_tokens_p50"] = rd["input_tokens_p50"]
+        if rd.get("output_tokens_p50") is not None:
+            spec["output_tokens_p50"] = rd["output_tokens_p50"]
+        if scn.get("default"):
+            spec["scenarios_default"] = list(scn["default"])
+        if scn.get("extra"):
+            spec["scenarios_extra"] = list(scn["extra"])
+        out[sid] = spec
+    return out
 
 
 # ── Data loading ──────────────────────────────────────────────────────────────
@@ -1080,6 +1140,8 @@ def main():
 
     rows = _deduped
 
+    suite_specs = _collect_suite_specs()
+
     SITE_DIR.mkdir(parents=True, exist_ok=True)
     out_path = SITE_DIR / "leaderboard.js"
     with open(out_path, "w") as f:
@@ -1088,9 +1150,44 @@ def main():
         # Also exposed as bare LEADERBOARD_DATA for any legacy classic-script consumers.
         f.write(f"const LEADERBOARD_DATA = {json.dumps(rows, indent=2)};\n")
         f.write("window.LEADERBOARD_DATA = LEADERBOARD_DATA;\n")
+        # window.SUITE_SPECS — canonical per-suite spec from suites/suite_*/suite.json.
+        # data.js merges these into SUITE_META at init() so UI facts auto-sync
+        # with a suite contract edit (no JS to keep in step manually).
+        f.write(f"const SUITE_SPECS = {json.dumps(suite_specs, indent=2)};\n")
+        f.write("window.SUITE_SPECS = SUITE_SPECS;\n")
 
-    print(f"Leaderboard data written to {out_path} ({len(rows)} rows).")
+    print(f"Leaderboard data written to {out_path} "
+          f"({len(rows)} rows, {len(suite_specs)} suite specs).")
+
+    # Cache-bust leaderboard.js in index.html so a stale CDN / browser
+    # cached copy never out-survives the data refresh.  GitHub Pages
+    # serves the static files with a 10-minute Cache-Control by default
+    # and *no* ETag-aware revalidation on cross-domain `<script src>`
+    # loads, so without a versioned query users routinely see "old"
+    # submissions for hours after a merge.  We hash the bytes we just
+    # wrote and rewrite the existing `?v=…` (or insert one) in place.
+    _bust_index_cache(out_path, SITE_DIR / "index.html")
+
     generate_api(results, SITE_DIR)
+
+
+def _bust_index_cache(data_path: Path, index_path: Path) -> None:
+    """Rewrite ``<script src="leaderboard.js?v=<sha8>">`` to match the
+    short SHA-256 of the file we just wrote.  No-op if the index file
+    is missing (e.g. someone is running the generator outside the
+    repo)."""
+    if not index_path.exists():
+        return
+    sha8 = hashlib.sha256(data_path.read_bytes()).hexdigest()[:8]
+    html = index_path.read_text()
+    pattern = re.compile(
+        r'(<script\s+src="leaderboard\.js)(?:\?v=[0-9a-f]+)?(")',
+        re.IGNORECASE,
+    )
+    new_html, n = pattern.subn(rf'\1?v={sha8}\2', html)
+    if n and new_html != html:
+        index_path.write_text(new_html)
+        print(f"  cache-busted leaderboard.js → ?v={sha8}")
 
 
 if __name__ == "__main__":

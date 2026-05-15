@@ -257,6 +257,21 @@
   .kpi .kpi-value { font-size: 1.4rem; }
   .kpi .kpi-label { font-size: 0.65rem; letter-spacing: 0.08em; }
 }
+/* Very narrow viewports (≤420 — older phones, app drawer split-screen):
+   long titles like "AccelMark Leaderboard" or "NVIDIA H100 80GB HBM3"
+   overflow even at 1.85rem.  Drop another notch, force wrapping, and
+   stack the CTA row so the buttons are full-bleed and tappable. */
+@media (max-width: 420px) {
+  .hero { padding: 1.4rem 0.4rem 1.6rem; }
+  .hero h1 {
+    font-size: 1.5rem;
+    line-height: 1.1;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .hero-cta { flex-direction: column; align-items: stretch; }
+  .hero-cta .btn { width: 100%; text-align: center; }
+}
 
 /* Rank medals */
 .rank {

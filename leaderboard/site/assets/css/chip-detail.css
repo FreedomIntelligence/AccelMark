@@ -1,0 +1,376 @@
+/* chip-detail.css — Chip-level overview page.
+ *
+ * Layout primitives (.hero, .section, .grid, .card, .data-table) come
+ * from the global stylesheets; this file only adds the per-page bits:
+ *   • chip-hero      : center-aligned hero matched to Home / Suites
+ *   • chip-suite-grid: per-suite KPI cards with suite-color accent
+ *   • chip-runs      : the all-submissions table styling
+ */
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.chip-hero {
+  text-align: center;
+  padding: 2.5rem 1rem 1.75rem;
+}
+.chip-hero .eyebrow { justify-content: center; }
+/* Centered hero — drop the leading rule so the vendor label doesn't
+   read like "— APPLE", matching the rk-hero / cmp-hero treatment. */
+.chip-hero .eyebrow::before { display: none; }
+.chip-hero-eyebrow .vendor-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vendor-color, var(--fg-muted));
+}
+
+/* ── 01 · Best per suite ──────────────────────────────────── */
+.chip-suite-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.chip-suite-card {
+  --suite-color: var(--accent-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1rem 1.05rem 1.05rem;
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid color-mix(in srgb, var(--suite-color) 65%, transparent);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 120ms ease, transform 120ms ease,
+              box-shadow 120ms ease, background 120ms ease;
+}
+.chip-suite-card[data-suite="A"] { --suite-color: var(--suite-A); }
+.chip-suite-card[data-suite="B"] { --suite-color: var(--suite-B); }
+.chip-suite-card[data-suite="C"] { --suite-color: var(--suite-C); }
+.chip-suite-card[data-suite="D"] { --suite-color: var(--suite-D); }
+.chip-suite-card[data-suite="E"] { --suite-color: var(--suite-E); }
+.chip-suite-card[data-suite="F"] { --suite-color: var(--suite-F); }
+.chip-suite-card[data-suite="G"] { --suite-color: var(--suite-G); }
+
+a.chip-suite-card { cursor: pointer; }
+a.chip-suite-card:hover {
+  border-color: var(--suite-color);
+  border-left-color: var(--suite-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px -10px color-mix(in srgb, var(--suite-color) 45%, transparent);
+  background: color-mix(in srgb, var(--suite-color) 3%, var(--bg-elev));
+  text-decoration: none;
+}
+
+.chip-suite-card--empty {
+  opacity: 0.55;
+  border-left-color: var(--border-soft);
+}
+
+.chip-suite-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.chip-suite-letter {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: color-mix(in srgb, var(--suite-color) 18%, transparent);
+  color: color-mix(in srgb, var(--suite-color) 75%, var(--fg-strong));
+  flex: 0 0 auto;
+}
+.chip-suite-letter--inline {
+  width: 22px;
+  height: 22px;
+  font-size: 0.7rem;
+}
+.chip-suite-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  line-height: 1.2;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* "Ranked #N of M" badge in the KPI card head.  Rank is computed
+   across unique chips (not raw rows), so a chip with many vLLM
+   versions doesn't double-count its own ranking slot.  Top-3 borrow
+   the same medal palette as Home / Rankings; everyone else stays
+   muted so the badge doesn't compete with the primary metric. */
+.chip-suite-rank {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fg-muted);
+  background: color-mix(in srgb, var(--fg-muted) 10%, transparent);
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.chip-suite-rank .chip-suite-rank-total {
+  color: var(--fg-faint);
+  font-weight: 500;
+}
+.chip-suite-rank.is-gold {
+  color: #b8860b;
+  background: color-mix(in srgb, #f1c40f 22%, transparent);
+}
+.chip-suite-rank.is-silver {
+  color: #7d7d7d;
+  background: color-mix(in srgb, #b0b0b0 25%, transparent);
+}
+.chip-suite-rank.is-bronze {
+  color: #8b4513;
+  background: color-mix(in srgb, #cd7f32 22%, transparent);
+}
+
+.chip-suite-metric {
+  margin-top: 0.2rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.chip-suite-val {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--fg-strong);
+  font-variant-numeric: tabular-nums;
+}
+.chip-suite-unit {
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  letter-spacing: 0.01em;
+}
+.chip-suite-meta {
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  line-height: 1.4;
+}
+.chip-suite-meta .fw-ver { color: var(--fg-faint); margin-left: 0.25rem; }
+.chip-suite-empty {
+  font-size: 0.85rem;
+  color: var(--fg-faint);
+  font-style: italic;
+}
+
+/* ── 02 · Every submission ────────────────────────────────── */
+.chip-runs-wrap {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.chip-runs {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+.chip-runs thead th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding: 0.7rem 0.85rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border-soft);
+  white-space: nowrap;
+}
+.chip-runs tbody td {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--fg);
+  vertical-align: middle;
+}
+.chip-runs tbody tr:last-child td { border-bottom: 0; }
+.chip-runs tbody tr {
+  cursor: pointer;
+  transition: background 80ms ease;
+}
+.chip-runs tbody tr:hover td {
+  background: color-mix(in srgb, var(--suite-color, var(--fg-muted)) 7%, transparent);
+}
+
+.chip-runs tbody tr[data-suite="A"] { --suite-color: var(--suite-A); }
+.chip-runs tbody tr[data-suite="B"] { --suite-color: var(--suite-B); }
+.chip-runs tbody tr[data-suite="C"] { --suite-color: var(--suite-C); }
+.chip-runs tbody tr[data-suite="D"] { --suite-color: var(--suite-D); }
+.chip-runs tbody tr[data-suite="E"] { --suite-color: var(--suite-E); }
+.chip-runs tbody tr[data-suite="F"] { --suite-color: var(--suite-F); }
+.chip-runs tbody tr[data-suite="G"] { --suite-color: var(--suite-G); }
+
+.chip-runs-suite {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.chip-runs-suite-title {
+  font-weight: 600;
+  color: var(--fg-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip-runs-metric {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-strong);
+}
+.chip-runs .fw-ver { color: var(--fg-faint); margin-left: 0.25rem; }
+.chip-runs .col-tier .badge { text-transform: capitalize; }
+
+/* ── Empty / not-found state ──────────────────────────────────
+ * Visually rhymes with .rk-empty / .cmp-empty so a stale
+ * `#/chip/<slug>` link reads as the same "no data here" surface
+ * as an over-filtered rankings view, not a hard 404. */
+.chip-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+.chip-empty .state-icon {
+  display: block;
+  font-size: 2rem;
+  color: var(--fg-faint);
+  margin-bottom: 0.6rem;
+}
+.chip-empty p { margin: 0.3rem 0; }
+.chip-empty .chip-empty-sub {
+  font-size: 0.85rem;
+  color: var(--fg-faint);
+}
+.chip-empty code {
+  font-family: var(--font-mono);
+  background: var(--bg);
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  color: var(--fg-strong);
+}
+
+/* ── 03 · Compare with similar chips ─────────────────────────
+ * Horizontal-flowing grid of peer tiles.  Each tile links to that
+ * chip's own detail page so the section is a pure navigation
+ * surface; we deliberately do NOT mutate the compare basket from
+ * here (that would be a hidden side effect on a click that visually
+ * reads as "open this chip"). */
+.chip-peer-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.chip-peer-card {
+  --vendor-color: var(--fg-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem 0.95rem;
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid color-mix(in srgb, var(--vendor-color) 60%, transparent);
+  border-radius: var(--r-md);
+  background: var(--bg-elev);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 120ms ease, transform 120ms ease,
+              box-shadow 120ms ease, background 120ms ease;
+}
+.chip-peer-card[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.chip-peer-card[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.chip-peer-card[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.chip-peer-card[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.chip-peer-card[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.chip-peer-card[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.chip-peer-card[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+
+.chip-peer-card:hover {
+  border-color: var(--vendor-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px -10px color-mix(in srgb, var(--vendor-color) 45%, transparent);
+  background: color-mix(in srgb, var(--vendor-color) 3%, var(--bg-elev));
+  text-decoration: none;
+}
+.chip-peer-vendor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+}
+.chip-peer-name {
+  font-weight: 600;
+  color: var(--fg-strong);
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+.chip-peer-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  color: var(--fg-muted);
+}
+.chip-peer-suites { display: inline-flex; gap: 0.25rem; flex-wrap: wrap; }
+.chip-peer-suite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--suite-color, var(--fg-muted)) 18%, transparent);
+  color: color-mix(in srgb, var(--suite-color, var(--fg-muted)) 75%, var(--fg-strong));
+}
+.chip-peer-suite[data-suite="A"] { --suite-color: var(--suite-A); }
+.chip-peer-suite[data-suite="B"] { --suite-color: var(--suite-B); }
+.chip-peer-suite[data-suite="C"] { --suite-color: var(--suite-C); }
+.chip-peer-suite[data-suite="D"] { --suite-color: var(--suite-D); }
+.chip-peer-suite[data-suite="E"] { --suite-color: var(--suite-E); }
+.chip-peer-suite[data-suite="F"] { --suite-color: var(--suite-F); }
+.chip-peer-suite[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-peer-runs { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 880px) {
+  .chip-hero { padding: 1.75rem 0.5rem 1.4rem; }
+  .chip-suite-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .chip-suite-val { font-size: 1.5rem; }
+  .chip-runs { font-size: 0.8rem; }
+  .chip-runs thead th,
+  .chip-runs tbody td { padding: 0.55rem 0.6rem; }
+  /* Submitter column carries the least info on mobile — hide it first. */
+  .chip-runs .col-submitter { display: none; }
+  .chip-peer-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+@media (max-width: 640px) {
+  .chip-runs .col-precision { display: none; }
+  .chip-suite-grid { grid-template-columns: 1fr; }
+  .chip-peer-grid { grid-template-columns: 1fr; }
+}
