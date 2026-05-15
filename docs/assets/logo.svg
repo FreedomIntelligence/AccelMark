@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="AccelMark">
+  <title>AccelMark</title>
+  <desc>Lightning bolt over a speedometer arc - the AccelMark mark for accelerator benchmarking.</desc>
+  <defs>
+    <linearGradient id="amBolt" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="amGauge" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#60A5FA"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <path d="M 10 50 A 26 26 0 1 1 62 50" fill="none" stroke="url(#amGauge)" stroke-width="5.5" stroke-linecap="round"/>
+  <circle cx="10" cy="50" r="3" fill="url(#amGauge)"/>
+  <circle cx="62" cy="50" r="3" fill="url(#amGauge)"/>
+  <path d="M 40 14 L 24 42 L 33 42 L 28 58 L 50 30 L 41 30 Z" fill="url(#amBolt)" stroke="#92400E" stroke-width="0.7" stroke-linejoin="round"/>
+</svg>

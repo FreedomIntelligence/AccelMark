@@ -11,9 +11,10 @@ in the leaderboard and submitting your results.
 **Got a GPU? Here's the shortest path to getting on the leaderboard:**
 
 ```bash
-# 1. Clone and install
-git clone https://github.com/JuhaoLiang1997/AccelMark.git
+# 1. Fork the repo on GitHub, then clone your fork
+git clone https://github.com/<you>/AccelMark.git
 cd AccelMark
+pip install -e .
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 
 # 2. Set your name (one-time setup)
@@ -23,14 +24,19 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 # 3. Run the benchmark (~11 min on A100 for default scenarios)
 #    Accuracy gate runs automatically before the benchmark starts.
 #    Output directory is auto-named using run_name, e.g.:
-    #    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557
-    python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
+#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
-# 4. Submit — open a GitHub Issue and paste your result.json
-# https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
+# 4. Open a pull request with your result
+git checkout -b submit/<your-hardware>
+git add results/ && git commit -m "results: <hardware> on suite_A"
+git push origin submit/<your-hardware>
+gh pr create   # or open the PR via the GitHub web UI
 ```
 
-That's it. The CI bot handles the rest.
+That's it. CI validates the result automatically; merging the PR publishes it to the leaderboard.
+
+> _Prefer not to use git?_ Open a [Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md), paste your `result.json`, and the CI bot will draft the PR on your behalf.
 
 ---
 
@@ -86,6 +92,22 @@ models:
 
 `configs/models_local.yaml` is gitignored. Once configured, you don't
 need `--model-path` on the command line.
+
+### Per-runner config overrides (optional)
+
+If you want to permanently change a runner's defaults (e.g. raise
+`max_num_seqs`, enable `enforce_eager`, set `tensor_parallel_size`) without
+adding flags to every invocation, drop a yaml at
+`configs/runner_configs/runner_<runner_id>.yaml`. The file is
+**gitignored** — only `*.yaml.example` companions are checked into the
+repo. That makes the override strictly local to your machine and keeps
+the canonical defaults intact for everyone else.
+
+```bash
+cp configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml.example \
+   configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml
+# edit freely — your benchmarks now pick up the overrides automatically
+```
 
 ---
 
@@ -238,7 +260,7 @@ Add **speculative** (~3 min extra on Suite A, ~24 min extra on Suite D) or **bur
 
 ---
 
-## Submitting your results
+## Submitting a result
 
 ### Accuracy gate (automatic)
 
@@ -271,28 +293,42 @@ framework, same precision, same inference stack.
 **Resuming an interrupted run:** Re-running the same command resumes from
 where it stopped. Completed steps are skipped automatically.
 
-### Step 1: Open a GitHub Issue
+### Recommended: open a pull request
 
-Go to [Issues → New → Community Submission](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
+After a successful run, validate locally and open a PR:
 
-Paste the full contents of your `result.json` into the code block and submit.
+```bash
+# Validate the produced files against the schemas (the same check CI runs).
+python runners/validate_submission.py \
+    results/community/<run_name>/result.json
 
-> **The CI bot validates your result automatically** — recommend to run
-> `validate_submission.py` locally first. If validation fails, the bot
-> comments on your issue explaining what to fix.
+# Stage just the new result and env file.
+git checkout -b submit/<your-hardware>
+git add results/community/<run_name>/
+git commit -m "results: <hardware> on suite_A"
+git push origin submit/<your-hardware>
 
-> **Why paste instead of attach?** The CI bot reads `result.json` directly
-> from the issue body. File attachments are not accessible to GitHub Actions.
+# Open the PR — either via the GitHub web UI or:
+gh pr create --fill
+```
 
-### Step 2: Done
+What gets committed is *only* the new files under `results/community/<run_name>/`:
+your `result.json`, `env_info.json`, and (optionally) `samples.jsonl`. Nothing
+else in the repo should change.
 
-The CI bot will:
-1. Validate your `result.json` against the schema
-2. Open a PR with your result files
-3. Comment on your issue with a link to the PR
+CI then re-runs the schema validator and the runner-folder integrity check.
+When both pass and a contributor reviews the diff, the PR is merged and your
+result shows up on the leaderboard on the next site build.
 
-Your result appears on the **Community** tab after the maintainer reviews
-and merges the PR — usually within a day or two.
+### Alternative: open a submission issue (no git required)
+
+If you'd rather not use git, paste your `result.json` into a
+[Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
+A bot will validate the JSON, draft a PR with the files in the right place,
+and link it back to your issue. You don't need to touch git or fork the repo.
+
+> **Why paste instead of attach?** The bot reads `result.json` directly from
+> the issue body. File attachments are not accessible to GitHub Actions.
 
 ---
 
@@ -300,10 +336,13 @@ and merges the PR — usually within a day or two.
 
 | Tier | How to get it | Leaderboard placement |
 |------|--------------|----------------------|
-| **community** | Submit via GitHub Issue, passes CI validation | Community tab |
-| **verified** | Maintainer reproduced your result within 5% | Main leaderboard |
+| **community** | Submit a PR (or issue → bot-drafted PR) and pass CI validation | Community tab |
+| **verified** | Independently reproduced on the same hardware/runner within 5% | Main leaderboard |
 
-To request verification, comment on your submission issue.
+To promote a community result to **verified**, anyone with the same hardware
+and runner can run the same suite and open a follow-up PR that lands the
+reproduction in `results/verified/`. Maintainers do not gate this — every
+verified result is itself reproducible by definition.
 
 ---
 
@@ -445,9 +484,10 @@ If a result looks wrong:
 2. Include: the submission name, what looks wrong, and ideally your own
    run on the same hardware as evidence
 
-Maintainers will investigate. If confirmed suspicious, the result's `meta.flagged`
-field will be set to a reason string and it will appear with a ⚠️ badge on the
-leaderboard.
+The community discusses the report in the issue. If the consensus is that
+the result is suspicious, a PR sets `meta.flagged` on that result to a
+reason string and the entry shows up with a ⚠️ badge on the leaderboard.
+Anyone can open that follow-up PR.
 
 ---
 

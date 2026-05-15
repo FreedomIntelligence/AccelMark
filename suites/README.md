@@ -714,7 +714,7 @@ submissions.
 
 1. Open a GitHub Issue using the "Request new suite" template
 2. Specify: model, chip count, scenarios, and rationale
-3. Maintainers review and add to the roadmap
+3. Discuss the proposal in the issue thread — interested contributors weigh in
 4. Create `suites/suite_X/suite.json` referencing a shared dataset
    (or add a new dataset to `datasets/`)
 5. If custom orchestration is needed, add `suites/suite_X/suite.py`

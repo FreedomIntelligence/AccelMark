@@ -1,12 +1,23 @@
-# ⚡ AccelMark
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-wordmark-dark.svg">
+    <img src="docs/assets/logo-wordmark.svg" alt="AccelMark — cross-platform LLM inference benchmark" width="420">
+  </picture>
+</p>
 
-**Open benchmark leaderboard for AI accelerators on LLM workloads.**
+<p align="center">
+  <a href="https://juhaoliang1997.github.io/AccelMark"><img src="https://img.shields.io/badge/leaderboard-live-brightgreen" alt="Live Leaderboard"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributions-welcome-orange.svg" alt="Contributions welcome"></a>
+</p>
 
-[![Live Leaderboard](https://img.shields.io/badge/leaderboard-live-brightgreen)](https://juhaoliang1997.github.io/AccelMark)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)](CONTRIBUTING.md)
-
-[**→ Live Leaderboard**](https://juhaoliang1997.github.io/AccelMark) · [Contributing](CONTRIBUTING.md) · [Suites](suites/README.md) · [Development](DEVELOPMENT.md)
+<p align="center">
+  <a href="https://juhaoliang1997.github.io/AccelMark"><strong>→ Live Leaderboard</strong></a> ·
+  <a href="CONTRIBUTING.md">Contributing</a> ·
+  <a href="suites/README.md">Suites</a> ·
+  <a href="https://github.com/JuhaoLiang1997/AccelMark/discussions">Discussions</a> ·
+  <a href="DEVELOPMENT.md">Development</a>
+</p>
 
 ---
 
@@ -36,11 +47,14 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 # 3. Run the benchmark (~11 min on A100)
 python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
-# 4. Submit — open a GitHub Issue and paste your result.json
-# https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
+# 4. Submit your result — open a pull request:
+#    git checkout -b submit/<your-hardware>
+#    cp results/your-result.json results/community/<runner_id>/result.json
+#    git add results/ env_info.json && git commit -m "results: <hardware>"
+#    gh pr create   # or open via the GitHub web UI
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. If you'd rather skip the PR workflow, [open a submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md) instead and a bot will draft the PR for you.
 
 ---
 
@@ -91,53 +105,10 @@ Adding a new runner? See [CONTRIBUTING.md#adding-a-new-runner](CONTRIBUTING.md#a
 
 | Tier | How | Where |
 |------|-----|-------|
-| **community** | Submit via GitHub Issue, passes CI validation | Community tab |
-| **verified** | Independently reproduced by maintainer within 5% | Main leaderboard |
+| **community** | Submitted by anyone via PR (or issue → bot-drafted PR) and passes CI validation | Community tab |
+| **verified** | Independently reproduced on the same hardware/runner and matches the original within 5% | Main leaderboard |
 
-Community results are fully visible and comparable — they just haven't been independently reproduced yet.
-
----
-
-## Repository structure
-
-```
-AccelMark/
-├── suites/              # Suite definitions — see suites/README.md
-├── runners/             # Platform benchmark runners
-│   ├── benchmark_runner.py   # Shared base class — all orchestration logic
-│   ├── collect_env.py        # Hardware/software detection → env_info.json
-│   ├── validate_submission.py
-│   ├── validate_runners.py
-│   ├── protocol.py           # RunnerProtocol interface (serve layer)
-│   ├── template/             # Annotated starter template for new runners
-│   └── nvidia_vllm_{hash8}/  # Example: NVIDIA vLLM runner
-│       ├── runner.py
-│       ├── meta.json
-│       └── requirements.txt
-├── loadgen/             # Shared request sending and timing logic
-│   ├── loadgen.py       # Core timing engine — do not modify per-platform
-│   └── types.py         # InferenceResult, SampleRecord
-├── serve/               # OpenAI-compatible inference server
-│   ├── server.py        # FastAPI app — wraps any runner as an HTTP API
-│   └── adapter.py       # OpenAI request/response models
-├── schema/              # JSON schemas, accuracy subset, cloud pricing
-│   ├── result.schema.json
-│   ├── accuracy_subset.jsonl    # immutable
-│   └── cloud_pricing.json
-├── results/             # Benchmark results
-│   ├── verified/        # Maintainer-reproduced results
-│   └── community/       # Community-submitted results
-├── leaderboard/         # Static leaderboard site (GitHub Pages)
-│   ├── generate.py      # Reads results/, writes leaderboard.js + api/
-│   └── site/
-│       ├── index.html
-│       └── leaderboard.js   # Auto-generated — do not edit manually
-├── run.py               # Unified entry point — benchmark and serve
-├── CONTRIBUTING.md
-├── DEVELOPMENT.md
-└── configs/             # Local config — gitignored
-    └── submitter.yaml.example
-```
+Community results are fully visible and comparable — they just haven't been independently reproduced yet. Anyone with the listed hardware can promote a community result to verified by submitting a reproduction PR.
 
 ---
 
@@ -145,11 +116,14 @@ AccelMark/
 
 The most valuable contribution is running the benchmark on hardware not yet in the leaderboard.
 
-- **Submit a result** → [Community Submission guide](CONTRIBUTING.md)
-- **Report a bug** → [Open an issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=bug_report.md)
-- **Add a new runner** → [Runner guide](CONTRIBUTING.md#adding-a-new-runner)
+- **Submit a result** → [Submitting a result](CONTRIBUTING.md#submitting-a-result)
+- **Add a new runner** → [Adding a new runner](CONTRIBUTING.md#adding-a-new-runner)
 - **Add a new accelerator family** → [Platform plug-in guide](runners/README.md#adding-a-new-accelerator-family)
+- **Report a bug** → [Open an issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=bug_report.md)
+- **Ask a question / share results** → [Discussions](https://github.com/JuhaoLiang1997/AccelMark/discussions)
 - **Extend the leaderboard** → [Development guide](DEVELOPMENT.md)
+
+> _Optional:_ AccelMark also ships a small voice-driven launcher for the [OpenClaw](https://clawhub.ai) ecosystem — see [`openclaw_skill/`](openclaw_skill/README.md). It's not required to run, contribute, or submit results.
 
 ---
 
@@ -160,7 +134,7 @@ If you use AccelMark results in research, please cite:
 ```bibtex
 @misc{accelmark2026,
   title  = {AccelMark: Open Benchmark Leaderboard for AI Accelerators on LLM Workloads},
-  author = {Liang, Juhao},
+  author = {Liang, Juhao and {The AccelMark Contributors}},
   year   = {2026},
   url    = {https://github.com/JuhaoLiang1997/AccelMark}
 }

@@ -897,7 +897,7 @@ Key constraints:
 | `meta.run_id` | string\|null | 8-char hex hash of hardware+software+suite+submitter. Deterministic — same config always produces same `run_id`. Used for duplicate detection. |
 | `meta.run_name` | string\|null | Full directory name: `{chip}x{count}_{suite}_{runner}_{run_id}`. Used as the output directory name. |
 | `meta.time` | string\|null | Benchmark start time HH:MM:SS. |
-| `meta.flagged` | string\|null | Null for normal results. Maintainer sets to a reason string if result is suspicious — triggers ⚠️ badge on leaderboard. |
+| `meta.flagged` | string\|null | Null for normal results. Set to a reason string if community review concludes the result is suspicious (via a follow-up PR) — triggers ⚠️ badge on leaderboard. |
 
 These fields are optional in the schema for backward compatibility with older results.
 New benchmark runs populate all four automatically.
