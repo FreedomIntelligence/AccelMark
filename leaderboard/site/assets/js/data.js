@@ -267,8 +267,86 @@ export function formatPrimary(value, suiteId) {
 
 export const SUITE_ORDER = ["suite_A", "suite_B", "suite_C", "suite_D", "suite_E", "suite_F", "suite_G"];
 
-// Vendor display order — controls filter pill order on rankings.
-export const VENDOR_ORDER = ["NVIDIA", "AMD", "Apple", "Google", "Huawei", "Moore Threads", "Intel"];
+// ── Vendor metadata (single source of truth) ────────────────────────
+//
+// Adding a new vendor used to require touching ~70 lines across 6 CSS
+// files (one `[data-vendor="X"] { --vendor-color: var(--v-x); }` per
+// scoped selector).  Now everything lives here:
+//
+//   • VENDOR_COLORS — known brand colour per vendor name (1 entry per
+//                     vendor; key matches the `vendor` field on rows).
+//   • vendorColor(name) — returns the brand colour, or a deterministic
+//                         fallback from FALLBACK_PALETTE when the
+//                         vendor isn't in the table yet.
+//   • injectVendorStyles() — reads every vendor seen in the loaded
+//                            dataset and writes one `[data-vendor="X"]
+//                            { --vendor-color: ... }` rule into a
+//                            singleton `<style>` tag.  Components keep
+//                            consuming `var(--vendor-color)` like before.
+//
+// Net result: a brand-new vendor gets a stable colour out of the box.
+// To pin its actual brand colour, add one entry below — that's it.
+export const VENDOR_COLORS = {
+  "NVIDIA":        "#76b900",
+  "AMD":           "#ed1c24",
+  "Apple":         "#a1a1aa",
+  "Google":        "#4285f4",
+  "Huawei":        "#ff4d4d",
+  "Moore Threads": "#c084fc",
+  "Intel":         "#0071c5",
+};
+
+// Spread across the colour wheel so two unknown vendors picked up in
+// the same dataset are unlikely to collide.  Tuned for legibility on
+// both light and dark backgrounds.
+const FALLBACK_PALETTE = [
+  "#5e9bff", "#ffa94d", "#56d364", "#f87171",
+  "#a78bfa", "#2dd4bf", "#fbbf24", "#fb7185", "#22d3ee",
+];
+
+export function vendorColor(name) {
+  if (!name) return "#888780";
+  if (VENDOR_COLORS[name]) return VENDOR_COLORS[name];
+  // Deterministic per-name pick: same vendor name always lands on the
+  // same fallback so the colour doesn't shuffle between page loads.
+  let h = 0;
+  const s = String(name);
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return FALLBACK_PALETTE[Math.abs(h) % FALLBACK_PALETTE.length];
+}
+
+// Display order for vendor filter pills, derived from VENDOR_COLORS in
+// declaration order so adding a vendor to the colour table is the only
+// step needed to give it a stable rank in the UI.  Vendors that show
+// up in the data without a colour entry are appended in alphabetical
+// order at the end.
+export const VENDOR_ORDER = Object.keys(VENDOR_COLORS);
+
+function _cssEscapeAttr(v) {
+  // CSS attribute selectors use double-quoted strings; double quotes
+  // and backslashes need escaping.  Vendor names in the wild are very
+  // unlikely to contain either, but better to be robust than to write
+  // unparseable CSS the moment a vendor like `Foo "Bar"` shows up.
+  return String(v).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+function injectVendorStyles(vendors) {
+  // Quietly no-op when the DOM isn't available — node tests import
+  // data.js without standing up the full document/window globals and
+  // we don't want them to blow up.
+  if (typeof document === "undefined" || !document.head) return;
+  const css = Array.from(vendors)
+    .filter(Boolean)
+    .map((v) => `[data-vendor="${_cssEscapeAttr(v)}"]{--vendor-color:${vendorColor(v)};}`)
+    .join("\n");
+  let style = document.getElementById("__vendor-color-styles");
+  if (!style) {
+    style = document.createElement("style");
+    style.id = "__vendor-color-styles";
+    document.head.appendChild(style);
+  }
+  style.textContent = css;
+}
 
 // Per-suite column / metric specs used by the rankings table and the
 // compare view.  Decoupled from SUITE_META.scenarios because the UI
@@ -359,6 +437,13 @@ export function init() {
   _bySuite = groupBy(data, (r) => r.suite);
   _byChip  = groupBy(data, (r) => r._chip_slug);
   _byRunId = new Map(data.filter((r) => r.run_id).map((r) => [r.run_id, r]));
+
+  // Resolve vendor colours for every vendor seen in the loaded data
+  // and inject them as CSS custom properties.  Components consume
+  // `var(--vendor-color)` and stay agnostic to the colour table.
+  const vendors = new Set(data.map((r) => r.vendor).filter(Boolean));
+  injectVendorStyles(vendors);
+
   _ready = true;
 }
 
@@ -469,6 +554,17 @@ export function bestPerChipForSuite(suiteId) {
 export function rowsForChip(slug) {
   if (!_ready) init();
   return _byChip.get(slug) || [];
+}
+
+// Chip-count variants this chip has been deployed at, sorted asc.
+// Returns e.g. [1, 4, 8] for a chip with single-card, 4-card, and
+// 8-card submissions.  chip-detail uses this in the hero facts row
+// and the suite-card "won at ×N" badge.
+export function chipCountsForChip(slug) {
+  const rs = rowsForChip(slug);
+  const counts = new Set();
+  for (const r of rs) counts.add(r.chip_count || 1);
+  return Array.from(counts).sort((a, b) => a - b);
 }
 
 // Pick a representative run_id for a given chip slug — used by the
@@ -645,7 +741,12 @@ export function similarChipsTo(slug, { limit = 5 } = {}) {
     candidates.push({
       slug: otherSlug,
       sample: rows[0],
-      label: rows[0]._chip_label,
+      // Peer cards link to a chip-detail page (which is now per-model,
+      // not per-fan-out) so the displayed label is the bare chip name
+      // — `_chip_label` would arbitrarily pick whichever variant came
+      // first in `rows`, which would read as "RTX 4090D ×4" sometimes
+      // and "RTX 4090D" other times depending on insertion order.
+      label: rows[0].chip,
       vendor: rows[0].vendor,
       sharedSuites: Array.from(otherSuites),
       sameVendor: rows[0].vendor === myVendor,

@@ -130,16 +130,32 @@ export function slugify(s) {
 }
 
 // Build a chip slug that's stable across pages.
-// Includes count to keep H100 ×1 distinct from H100 ×8.
-// `data.js` precomputes `_chip_slug` for every loaded row — we prefer that
-// so the link target stays in lock-step with the grouping key the rest of
-// the app uses (no risk of slug drift if slugify ever changes).
+//
+// Slug is the chip *model* only — chip_count is intentionally NOT
+// encoded.  4090D, 4090D ×4, 4090D ×8 are the same hardware deployed in
+// different fan-out configurations; they belong on the same chip-detail
+// page where the page itself can break them out by chip-count.  Ranking
+// tables and compare baskets continue to disambiguate per-row via
+// `_chip_label` (which still carries "×N") and `run_id` respectively.
+//
+// `data.js` precomputes `_chip_slug` for every loaded row — we prefer
+// that so the link target stays in lock-step with the grouping key the
+// rest of the app uses (no risk of slug drift if slugify ever changes).
 export function chipSlug(row) {
   if (!row) return "";
   if (row._chip_slug) return row._chip_slug;
   if (!row.chip) return "";
-  const parts = [row.chip, "x" + (row.chip_count || 1)];
-  return slugify(parts.join("-"));
+  return slugify(row.chip);
+}
+
+// Detect a stale "<chip>-x<N>" slug from the pre-2026-05 era and return
+// the bare-model slug it should now be normalised to.  Returns null
+// when `slug` is already in the new shape.  Used by the router to
+// redirect old shared links instead of 404-ing them.
+export function normalizeChipSlug(slug) {
+  if (!slug) return null;
+  const m = String(slug).match(/^(.+)-x\d+$/);
+  return m ? m[1] : null;
 }
 
 // Build a URL hash for chip detail.  Falls back to the rankings landing

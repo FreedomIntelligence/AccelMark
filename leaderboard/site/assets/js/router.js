@@ -10,7 +10,7 @@
 // Each handler receives ({ params, query, el }) and is responsible for
 // rendering into `el` (the main view container).
 
-import { parseHash } from "./utils.js";
+import { parseHash, normalizeChipSlug } from "./utils.js";
 
 const routes = [];
 let mountEl = null;
@@ -46,6 +46,29 @@ function matchRoute(path) {
 export function dispatch() {
   if (!mountEl) return;
   const { path, params: query } = parseHash(location.hash);
+
+  // Backward-compat for the pre-2026-05 chip slug shape (`<chip>-x<N>`)
+  // — chip-detail pages are now per-model, with chip-count variants
+  // surfaced inside the page.  Old shared links / bookmarks like
+  // `#/chip/nvidia-rtx-4090d-x4` would otherwise hit the empty state;
+  // rewrite to the new bare-model slug and let the dispatch continue.
+  // We use replaceState so a back-button click goes to wherever the
+  // user came from rather than the legacy URL itself.
+  const chipMatch = path.match(/^\/chip\/(.+)$/);
+  if (chipMatch) {
+    const normalised = normalizeChipSlug(chipMatch[1]);
+    if (normalised) {
+      const qs = location.hash.includes("?")
+        ? "?" + location.hash.split("?").slice(1).join("?")
+        : "";
+      const next = `#/chip/${encodeURIComponent(normalised)}${qs}`;
+      history.replaceState(null, "", location.pathname + location.search + next);
+      // Re-dispatch with the corrected hash so this turn renders the
+      // right view immediately rather than waiting for a hashchange.
+      return dispatch();
+    }
+  }
+
   const match = matchRoute(path);
   // Reset scroll on route change.
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });

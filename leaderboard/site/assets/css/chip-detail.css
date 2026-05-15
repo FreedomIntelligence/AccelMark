@@ -155,6 +155,24 @@ a.chip-suite-card:hover {
   color: var(--fg-muted);
   letter-spacing: 0.01em;
 }
+
+/* "×N" badge that appears next to the metric on chips with multiple
+ * fan-out variants (×1 / ×4 / ×8).  Tells users the headline number
+ * came from a multi-card deployment so they don't read it as a
+ * single-card score.  Suite-tinted to match the card accent. */
+.chip-suite-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--suite-color) 15%, transparent);
+  color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-strong));
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
 .chip-suite-meta {
   font-size: 0.78rem;
   color: var(--fg-muted);
@@ -165,6 +183,54 @@ a.chip-suite-card:hover {
   font-size: 0.85rem;
   color: var(--fg-faint);
   font-style: italic;
+}
+
+/* Affordance hint pinned to the bottom of every active KPI card.
+ *   • Plain click   → primary action ("Open run") — emphasized.
+ *   • Modifier click → secondary path ("⌘+click for all in suite") —
+ *     muted and only fully revealed on hover so it doesn't compete
+ *     with the metric.  The full sentence is also exposed via the
+ *     card's `title` attribute for keyboard / screen-reader access. */
+.chip-suite-hint {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--fg-faint);
+  border-top: 1px dashed color-mix(in srgb, var(--border-soft) 80%, transparent);
+}
+.chip-suite-hint-primary {
+  color: var(--fg-muted);
+  font-weight: 600;
+}
+.chip-suite-hint-sep { opacity: 0.5; }
+.chip-suite-hint-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  opacity: 0.55;
+  transition: opacity 120ms ease;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip-suite-hint kbd {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  padding: 0.02rem 0.28rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg-muted);
+  line-height: 1.2;
+}
+a.chip-suite-card:hover .chip-suite-hint-secondary { opacity: 1; }
+a.chip-suite-card:hover .chip-suite-hint {
+  border-top-color: color-mix(in srgb, var(--suite-color) 30%, var(--border-soft));
 }
 
 /* ── 02 · Every submission ────────────────────────────────── */
@@ -237,6 +303,16 @@ a.chip-suite-card:hover {
 }
 .chip-runs .fw-ver { color: var(--fg-faint); margin-left: 0.25rem; }
 .chip-runs .col-tier .badge { text-transform: capitalize; }
+.chip-runs .col-chips { width: 1%; white-space: nowrap; }
+.chip-runs-count {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-strong);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--fg-muted) 10%, transparent);
+}
 
 /* ── Empty / not-found state ──────────────────────────────────
  * Visually rhymes with .rk-empty / .cmp-empty so a stale
@@ -295,13 +371,7 @@ a.chip-suite-card:hover {
   transition: border-color 120ms ease, transform 120ms ease,
               box-shadow 120ms ease, background 120ms ease;
 }
-.chip-peer-card[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.chip-peer-card[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.chip-peer-card[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.chip-peer-card[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.chip-peer-card[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.chip-peer-card[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.chip-peer-card[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
 
 .chip-peer-card:hover {
   border-color: var(--vendor-color);
@@ -373,4 +443,9 @@ a.chip-suite-card:hover {
   .chip-runs .col-precision { display: none; }
   .chip-suite-grid { grid-template-columns: 1fr; }
   .chip-peer-grid { grid-template-columns: 1fr; }
+  /* Modifier-click is moot on touch — keep the primary hint, drop
+     the secondary one (the title attribute still carries the full
+     sentence for assistive tech). */
+  .chip-suite-hint-sep,
+  .chip-suite-hint-secondary { display: none; }
 }

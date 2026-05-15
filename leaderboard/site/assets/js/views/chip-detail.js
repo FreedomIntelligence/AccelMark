@@ -21,7 +21,7 @@
 import {
   SUITE_ORDER, SUITE_META,
   rowsForChip, bestPerSuiteForChip, formatPrimary,
-  rankChipInSuite, similarChipsTo,
+  rankChipInSuite, similarChipsTo, chipCountsForChip,
 } from "../data.js";
 import {
   esc, fmtDate, shortVersion, submitterHandle,
@@ -49,9 +49,11 @@ export function render({ el, params }) {
     return;
   }
 
-  // Pick a sample row for hero attribution (vendor / memory / label) and
-  // a separate "latest run" for the Compare CTA so users land on the
-  // freshest configuration when they jump to compare.
+  // Pick a sample row for hero attribution (vendor / memory / model
+  // name) and a separate "latest run" for the Compare CTA so users land
+  // on the freshest configuration when they jump to compare.  We use
+  // `sample.chip` (not `_chip_label`) for the hero h1 because the page
+  // is now a chip-model page; ×1/×4/×8 variants live inside.
   const sample = rs[0];
   const latestRun = rs.reduce(
     (a, b) => (String(b.date || "") > String(a.date || "") ? b : a)
@@ -62,6 +64,7 @@ export function render({ el, params }) {
   const activeSuites = SUITE_ORDER.filter((sid) => bestPerSuite.has(sid));
   const frameworks   = new Set(rs.map((r) => r.framework).filter(Boolean));
   const precisions   = new Set(rs.map((r) => r.precision).filter(Boolean));
+  const chipCounts   = chipCountsForChip(slug);
 
   const memoryStr = sample.memory_gb ? `${sample.memory_gb} GB` : "";
   const factPills = [
@@ -70,6 +73,13 @@ export function render({ el, params }) {
     `${frameworks.size} framework${frameworks.size === 1 ? "" : "s"}`,
     `${precisions.size} precision${precisions.size === 1 ? "" : "s"}`,
   ];
+  // Chip-count fact only adds noise for single-variant chips; only
+  // surface it when the chip has been deployed at >1 fan-out.
+  if (chipCounts.length > 1) {
+    factPills.push(`${chipCounts.length} chip-count variants (${chipCounts.map((c) => `×${c}`).join(", ")})`);
+  } else if (chipCounts.length === 1 && chipCounts[0] > 1) {
+    factPills.push(`deployed at ×${chipCounts[0]}`);
+  }
 
   el.innerHTML = `
     <section class="hero chip-hero" data-vendor="${esc(sample.vendor)}">
@@ -77,7 +87,7 @@ export function render({ el, params }) {
         <span class="vendor-dot" data-vendor="${esc(sample.vendor)}"></span>
         ${esc(sample.vendor)}${memoryStr ? " · " + esc(memoryStr) : ""}
       </span>
-      <h1>${esc(sample._chip_label)}</h1>
+      <h1>${esc(sample.chip)}</h1>
       <p class="hero-sub">${factPills.map(esc).join(" · ")}</p>
       <div class="hero-cta">
         ${latestRid
@@ -178,6 +188,11 @@ function renderSimilarChipsSection(slug, latestRid) {
 // middle-click) lands the user on the rankings view already filtered to
 // this exact chip variant — saves a few clicks compared to dumping them
 // at the unfiltered suite page.
+//
+// The dual-affordance (plain click → run modal, modified click → filtered
+// rankings) isn't visually obvious, so each active card carries both a
+// `title` tooltip and a small bottom-row hint so the cmd-click path is
+// discoverable without bloating the layout.
 function renderSuiteCard(sid, row, chipSlug) {
   const meta = SUITE_META[sid];
   if (!meta) return "";
@@ -217,11 +232,27 @@ function renderSuiteCard(sid, row, chipSlug) {
        : rank.rank === 3 ? " is-bronze" : "")
     : "";
 
+  // Two affordances on one element. Spell them out in the tooltip and
+  // (more visibly) in a tiny hint footer so the modifier-click path is
+  // findable without a separate help layer.
+  const chipLabel = row._chip_label || "this chip";
+  const cardTitle = `Click to open this run · Cmd/Ctrl-click to see all ${chipLabel} runs in Suite ${meta.letter}`;
+
+  // Now that chip_count variants share a chip-detail page, the "best
+  // per suite" run can land on any fan-out (×1 vs ×4 vs ×8).  Surface
+  // that explicitly so users don't read the metric as "single-card
+  // throughput".  Only render the badge when the chip has multiple
+  // variants — otherwise it's noise.
+  const allCounts = chipSlug ? chipCountsForChip(chipSlug) : [];
+  const bestCount = row.chip_count || 1;
+  const showCountBadge = allCounts.length > 1;
+
   return `
     <a class="chip-suite-card"
        data-suite="${esc(meta.letter)}"
        data-open-run="${esc(rid)}"
-       href="${esc(rankingsHref)}">
+       href="${esc(rankingsHref)}"
+       title="${esc(cardTitle)}">
       <div class="chip-suite-head">
         <span class="chip-suite-letter">${esc(meta.letter)}</span>
         <span class="chip-suite-title">${esc(meta.title)}</span>
@@ -235,23 +266,42 @@ function renderSuiteCard(sid, row, chipSlug) {
       <div class="chip-suite-metric">
         <span class="chip-suite-val">${esc(num)}</span>
         ${unit ? `<span class="chip-suite-unit">${esc(unit)}</span>` : ""}
+        ${showCountBadge
+          ? `<span class="chip-suite-count" title="Best score in this suite came from a ×${bestCount} deployment">×${bestCount}</span>`
+          : ""}
       </div>
       <div class="chip-suite-meta">
         ${fwLine}${row.precision ? ` · ${esc(row.precision)}` : ""}${row.date ? ` · ${esc(fmtDate(row.date))}` : ""}
+      </div>
+      <div class="chip-suite-hint" aria-hidden="true">
+        <span class="chip-suite-hint-primary">Open run</span>
+        <span class="chip-suite-hint-sep">·</span>
+        <span class="chip-suite-hint-secondary"><kbd>⌘</kbd>+click for all in suite</span>
       </div>
     </a>
   `;
 }
 
 function renderRunsTable(rs) {
-  const sorted = rs.slice().sort((a, b) =>
-    String(b.date || "").localeCompare(String(a.date || ""))
-  );
+  // Group by chip_count then date desc; runs at the same fan-out land
+  // next to each other so users can scan "what does ×1 look like vs ×8"
+  // without flipping rows.  Within a fan-out, newest first.
+  const sorted = rs.slice().sort((a, b) => {
+    const ca = a.chip_count || 1;
+    const cb = b.chip_count || 1;
+    if (ca !== cb) return ca - cb;
+    return String(b.date || "").localeCompare(String(a.date || ""));
+  });
+  // Show the Chips column only when this chip actually has variants —
+  // adding a column that only ever reads "×1" is just visual debt.
+  const counts = new Set(rs.map((r) => r.chip_count || 1));
+  const showChipCol = counts.size > 1;
   return `
     <table class="data-table chip-runs">
       <thead>
         <tr>
           <th class="col-suite">Suite</th>
+          ${showChipCol ? `<th class="col-chips">Chips</th>` : ""}
           <th class="col-framework">Framework</th>
           <th class="col-precision">Precision</th>
           <th class="col-primary">Primary metric</th>
@@ -261,13 +311,13 @@ function renderRunsTable(rs) {
         </tr>
       </thead>
       <tbody>
-        ${sorted.map(renderRunRow).join("")}
+        ${sorted.map((r) => renderRunRow(r, showChipCol)).join("")}
       </tbody>
     </table>
   `;
 }
 
-function renderRunRow(row) {
+function renderRunRow(row, showChipCol) {
   const meta = SUITE_META[row.suite];
   const rid = row.run_id || row.submission || "";
   const ver = shortVersion(row.framework_version);
@@ -278,6 +328,7 @@ function renderRunRow(row) {
   const display = meta ? formatPrimary(v, row.suite) : (v != null ? String(v) : "");
   const handle = submitterHandle(row.submitted_by);
   const tierClass = row.tier ? ` tier-${esc(row.tier)}` : "";
+  const cnt = row.chip_count || 1;
 
   return `
     <tr data-open-run="${esc(rid)}" data-suite="${meta ? esc(meta.letter) : ""}">
@@ -287,6 +338,7 @@ function renderRunRow(row) {
           <span class="chip-runs-suite-title">${meta ? esc(meta.title) : esc(row.suite || "")}</span>
         </span>
       </td>
+      ${showChipCol ? `<td class="col-chips tnum"><span class="chip-runs-count">×${cnt}</span></td>` : ""}
       <td class="col-framework">${fwLine}</td>
       <td class="col-precision">${esc(row.precision || "—")}</td>
       <td class="col-primary"><span class="chip-runs-metric">${esc(display || "—")}</span></td>

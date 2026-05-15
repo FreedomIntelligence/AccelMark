@@ -512,8 +512,12 @@ function _renderImpl(row, panel) {
 
 // ── Visualize panel ──
 
-function _renderViz(row) {
-  const panel = _modalEl.querySelector('[data-panel="viz"]');
+// _renderViz lazily fills the Visualize tab with the right chart bundle
+// for `row.viz.type`.  `panel` defaults to the modal's viz panel for the
+// production code path; tests pass a fake element to drive the dispatch
+// + per-suite renderer fallbacks without standing up the full modal DOM.
+function _renderViz(row, panel) {
+  if (!panel) panel = _modalEl.querySelector('[data-panel="viz"]');
   panel.innerHTML = "";
 
   if (typeof window.Chart !== "function") {
@@ -1169,3 +1173,17 @@ function _ms(v, decimals = 1) {
   if (v == null) return null;
   return Number(v).toFixed(decimals) + " ms";
 }
+
+// Test-only escape hatch.  Kept namespaced under an underscore so it
+// reads as "internals — don't depend on this from app code"; node tests
+// import it to drive _renderViz against fake panels + a stubbed Chart
+// constructor without booting the full modal shell.
+export const _test = {
+  vizHasAnyData: _vizHasAnyData,
+  renderViz: (panel, row) => _renderViz(row, panel),
+  destroyCharts: _destroyCharts,
+  // Lets a test reset the cached chartColors() result between cases —
+  // the cache reads CSS custom-properties on first access and would
+  // otherwise pin to whatever the first test happened to expose.
+  resetColorCache: () => { _C = null; },
+};

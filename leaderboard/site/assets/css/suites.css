@@ -719,13 +719,7 @@
   background: var(--vendor-color);
   flex: 0 0 auto;
 }
-.leader-vendor[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.leader-vendor[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.leader-vendor[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.leader-vendor[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.leader-vendor[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.leader-vendor[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.leader-vendor[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
 .leader-val {
   color: color-mix(in srgb, var(--suite-color) 80%, var(--fg-strong));
   font-weight: 700;

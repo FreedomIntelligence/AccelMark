@@ -318,13 +318,7 @@
   background: var(--vendor-color, var(--fg-faint));
   flex: 0 0 auto;
 }
-.lb-row-sub .vendor-dot[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.lb-row-sub .vendor-dot[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.lb-row-sub .vendor-dot[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.lb-row-sub .vendor-dot[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.lb-row-sub .vendor-dot[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.lb-row-sub .vendor-dot[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.lb-row-sub .vendor-dot[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
 
 .lb-row-sub .sub-sep { color: var(--fg-faint); flex: 0 0 auto; }
 .lb-row-sub .vendor-name { color: var(--fg-muted); flex: 0 0 auto; }
@@ -442,13 +436,7 @@
   }
 }
 
-.chip-tile[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.chip-tile[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.chip-tile[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.chip-tile[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.chip-tile[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.chip-tile[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.chip-tile[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
 
 .chip-tile-count {
   font-size: 0.7em;
@@ -477,13 +465,7 @@
   align-items: center;
   gap: 0.4rem;
 }
-.cloud-legend-item[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.cloud-legend-item[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.cloud-legend-item[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.cloud-legend-item[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.cloud-legend-item[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.cloud-legend-item[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.cloud-legend-item[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
 .cloud-legend-item .dot {
   width: 9px;
   height: 9px;

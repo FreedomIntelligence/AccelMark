@@ -47,14 +47,10 @@
   --suite-F: #db2777;   /* rose — Edge / low-power */
   --suite-G: #6366f1;   /* indigo — Sustained load */
 
-  /* Vendor palette (kept) */
-  --v-nvidia:   #76b900;
-  --v-amd:      #ed1c24;
-  --v-apple:    #a1a1aa;
-  --v-google:   #4285f4;
-  --v-huawei:   #ff4d4d;
-  --v-moore:    #c084fc;
-  --v-intel:    #0071c5;
+  /* Vendor colour table now lives in data.js (`VENDOR_COLORS`) and is
+   * injected at runtime as `[data-vendor="<name>"] { --vendor-color: ... }`
+   * — adding a new vendor is one line in JS instead of 70 lines spread
+   * across 6 CSS files.  Components keep consuming `var(--vendor-color)`. */
 
   /* Card shadow (soft on dark) */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5);

@@ -32,9 +32,8 @@
 
 .rk-hero, .data-table, .rk-suite-pill { --suite-color: var(--accent-2); }
 
-/* Generic vendor-dot color binding — base color is owned by parent.
- * We pre-bind --vendor-color so any .vendor-dot[data-vendor="X"] inside
- * the rankings / compare scope picks up the right hue. */
+/* Vendor dots inside rankings / compare scopes inherit the global
+ * `--vendor-color` set on `[data-vendor="<name>"]` by data.js. */
 .rk-facet-pill .vendor-dot,
 .data-table .vendor-dot {
   display: inline-block;
@@ -44,20 +43,6 @@
   background: var(--vendor-color, var(--fg-faint));
   flex: 0 0 auto;
 }
-.rk-facet-pill .vendor-dot[data-vendor="NVIDIA"],
-.data-table   .vendor-dot[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.rk-facet-pill .vendor-dot[data-vendor="AMD"],
-.data-table   .vendor-dot[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.rk-facet-pill .vendor-dot[data-vendor="Apple"],
-.data-table   .vendor-dot[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.rk-facet-pill .vendor-dot[data-vendor="Google"],
-.data-table   .vendor-dot[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.rk-facet-pill .vendor-dot[data-vendor="Huawei"],
-.data-table   .vendor-dot[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.rk-facet-pill .vendor-dot[data-vendor="Moore Threads"],
-.data-table   .vendor-dot[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.rk-facet-pill .vendor-dot[data-vendor="Intel"],
-.data-table   .vendor-dot[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
 
 /* ── Hero (compact, suite-tinted) ──────────────────────────── */
 .rk-hero {
@@ -207,10 +192,12 @@
   font-size: 0.76rem;
   cursor: pointer;
   transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
+  text-decoration: none;
 }
 .rk-facet-pill:hover {
   border-color: var(--accent);
   color: var(--fg-strong);
+  text-decoration: none;
 }
 .rk-facet-pill.active {
   background: var(--accent-soft);
@@ -229,10 +216,14 @@
   font-size: 0.75rem;
   cursor: pointer;
   transition: color 100ms, border-color 100ms;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 .rk-clear-all:hover {
   color: var(--fg-strong);
   border-color: var(--accent);
+  text-decoration: none;
 }
 
 .rk-status {
@@ -286,6 +277,11 @@
 .rk-chip-focus-msg strong {
   color: var(--suite-color, var(--accent-2));
   font-weight: 700;
+}
+.rk-chip-focus-variants {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  margin-left: 0.15rem;
 }
 .rk-chip-focus-actions { display: inline-flex; gap: 0.4rem; flex-wrap: wrap; }
 
@@ -612,13 +608,7 @@
   border-radius: 50%;
   background: var(--vendor-color, var(--fg-faint));
 }
-.cmp-basket-chip[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.cmp-basket-chip[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.cmp-basket-chip[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.cmp-basket-chip[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.cmp-basket-chip[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.cmp-basket-chip[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.cmp-basket-chip[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
 
 .cmp-basket-remove {
   display: inline-flex;
@@ -784,13 +774,7 @@
   vertical-align: 1px;
   background: var(--vendor-color, var(--fg-faint));
 }
-.cmp-table thead th[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.cmp-table thead th[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.cmp-table thead th[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.cmp-table thead th[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.cmp-table thead th[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.cmp-table thead th[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.cmp-table thead th[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
 
 .cmp-table tbody tr { border-bottom: 1px solid var(--border-soft); }
 .cmp-table tbody tr:last-child { border-bottom: none; }

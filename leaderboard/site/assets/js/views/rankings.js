@@ -79,12 +79,19 @@ export function render({ el, query }) {
 
   const filtersActive = !!(query.vendor || query.precision || query.framework || chipFilter);
 
-  // Pretty label for the chip-focus banner: prefer the actual chip
-  // label of any matched row, falling back to the slug so the banner
-  // is never blank when a slug is stale.
+  // Banner label for the chip-focus mode: now that `?chip=<slug>`
+  // matches every chip_count variant of a single chip model (×1 / ×4 /
+  // ×8 share a slug), use the bare chip name rather than `_chip_label`
+  // — the latter carries "×N" which would mislabel the banner as
+  // scoped to a specific fan-out.  We also surface how many distinct
+  // chip-count variants the filter is showing so the count isn't
+  // surprising.
   const chipFocusLabel = chipFilter
-    ? (filtered[0]?._chip_label || allRows.find((r) => r._chip_slug === chipFilter)?._chip_label || chipFilter)
+    ? (filtered[0]?.chip || allRows.find((r) => r._chip_slug === chipFilter)?.chip || chipFilter)
     : "";
+  const chipFocusVariants = chipFilter
+    ? new Set(filtered.map((r) => r.chip_count || 1)).size
+    : 0;
 
   el.innerHTML = `
     <section class="rk-hero" data-suite="${esc(meta.letter)}">
@@ -99,11 +106,11 @@ export function render({ el, query }) {
       </div>
 
       <div class="rk-filter-row">
-        ${renderFacetGroup("vendor",    "Vendor",    facets.vendor,    vendorFilter)}
-        ${renderFacetGroup("precision", "Precision", facets.precision, precisionFilter)}
-        ${renderFacetGroup("framework", "Framework", facets.framework, frameworkFilter)}
+        ${renderFacetGroup("vendor",    "Vendor",    facets.vendor,    vendorFilter,    suiteId, query)}
+        ${renderFacetGroup("precision", "Precision", facets.precision, precisionFilter, suiteId, query)}
+        ${renderFacetGroup("framework", "Framework", facets.framework, frameworkFilter, suiteId, query)}
         ${filtersActive
-          ? `<button class="rk-clear-all" data-clear-all="1" type="button">Clear filters</button>`
+          ? `<a class="rk-clear-all" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(suiteId)))}">Clear filters</a>`
           : ""}
       </div>
 
@@ -123,7 +130,7 @@ export function render({ el, query }) {
     ${chipFilter ? `
       <div class="rk-chip-focus" data-suite="${esc(meta.letter)}">
         <span class="rk-chip-focus-msg">
-          Showing only <strong>${esc(chipFocusLabel)}</strong> in Suite ${esc(meta.letter)}.
+          Showing only <strong>${esc(chipFocusLabel)}</strong>${chipFocusVariants > 1 ? ` <span class="rk-chip-focus-variants">(across ${chipFocusVariants} chip-count variants)</span>` : ""} in Suite ${esc(meta.letter)}.
         </span>
         <span class="rk-chip-focus-actions">
           <a class="btn ghost small" href="#/chip/${esc(chipFilter)}">View chip overview</a>
@@ -201,25 +208,36 @@ function renderSuitePill(sid, active) {
   `;
 }
 
-function renderFacetGroup(facetKey, label, options, selected) {
+function renderFacetGroup(facetKey, label, options, selected, suiteId, query) {
   if (options.length === 0) return "";
   const sel = new Set(selected);
+  // Each pill is an anchor whose `href` is the URL the click would
+  // navigate to (toggling this value into the comma-separated facet
+  // CSV).  That gives middle-click and Cmd/Ctrl-click native open-in-
+  // new-tab semantics for free; the listener still preventDefaults on
+  // plain left-clicks and routes through the SPA in-place.
   return `
     <div class="rk-facet" data-facet-group="${esc(facetKey)}">
       <span class="rk-facet-label">${esc(label)}</span>
       <div class="rk-facet-pills">
-        ${options.map((opt) => `
-          <button class="rk-facet-pill ${sel.has(opt) ? "active" : ""}"
-                  data-facet="${esc(facetKey)}"
-                  data-value="${esc(opt)}"
-                  type="button"
-                  aria-pressed="${sel.has(opt) ? "true" : "false"}">
-            ${facetKey === "vendor"
-              ? `<span class="vendor-dot" data-vendor="${esc(opt)}"></span>`
-              : ""}
-            <span>${esc(opt)}</span>
-          </button>
-        `).join("")}
+        ${options.map((opt) => {
+          const next = toggleInCsv(query[facetKey], opt);
+          const href = rebuildHash(suiteId, query, { [facetKey]: next || undefined });
+          const active = sel.has(opt);
+          return `
+            <a class="rk-facet-pill ${active ? "active" : ""}"
+               href="${esc(href)}"
+               data-toggle-facet="${esc(facetKey)}"
+               data-value="${esc(opt)}"
+               role="button"
+               aria-pressed="${active ? "true" : "false"}">
+              ${facetKey === "vendor"
+                ? `<span class="vendor-dot" data-vendor="${esc(opt)}"></span>`
+                : ""}
+              <span>${esc(opt)}</span>
+            </a>
+          `;
+        }).join("")}
       </div>
     </div>
   `;
@@ -328,11 +346,15 @@ function renderEmpty(meta, filtersActive) {
       </div>
     `;
   }
+  // Resolve the active suite from the URL so the "Clear filters" href
+  // strips facets while keeping the user on this same suite.
+  const { params: q } = parseHash(location.hash);
+  const sid = SUITE_ORDER.includes(q.suite) ? q.suite : SUITE_ORDER[0];
   return `
     <div class="rk-empty">
       <span class="rk-empty-icon" aria-hidden="true">∅</span>
       <p>No submissions match the current filters in Suite ${esc(meta.letter)}.</p>
-      <button class="btn" data-clear-all="1" type="button">Clear filters</button>
+      <a class="btn" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(sid)))}">Clear filters</a>
     </div>
   `;
 }
@@ -368,30 +390,42 @@ function bindClicks(el) {
       return;
     }
 
-    // Clear all filters button.
+    // Anchor-driven actions (clear filters, facet pills) are real <a>
+    // tags so middle-click / Cmd-click / Ctrl-click / Shift-click can
+    // open the toggled URL in a new tab.  The plain-click case still
+    // preventDefaults and routes through the SPA in-place.
+    const isModifiedNav = ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0;
+
+    // Clear all filters anchor.
     if (t.closest("[data-clear-all]")) {
+      if (isModifiedNav) return;
       ev.preventDefault();
       location.hash = buildHash("/rankings", suiteUrlParam(suiteId));
       return;
     }
 
-    // Suite pill.
+    // Suite pill (still a button — switching suite resets sort/filters
+    // so opening "the same suite with different filters" in a new tab
+    // doesn't make sense).
     const suitePill = t.closest(".rk-suite-pill");
     if (suitePill) {
       ev.preventDefault();
       const sid = suitePill.dataset.suite;
       if (sid && sid !== suiteId) {
-        // Filters and sort are suite-specific, so a suite switch clears them.
         location.hash = buildHash("/rankings", suiteUrlParam(sid));
       }
       return;
     }
 
-    // Facet pill.
-    const facetPill = t.closest(".rk-facet-pill");
+    // Facet pill anchor.  Toggle the facet value in the CSV and update
+    // the URL — but only on plain left-click; modified clicks fall
+    // through to the browser so they open the precomputed href in a
+    // new tab.
+    const facetPill = t.closest("[data-toggle-facet]");
     if (facetPill) {
+      if (isModifiedNav) return;
       ev.preventDefault();
-      const facet = facetPill.dataset.facet;
+      const facet = facetPill.dataset.toggleFacet;
       const value = facetPill.dataset.value;
       const next = toggleInCsv(query[facet], value);
       location.hash = rebuildHash(suiteId, query, { [facet]: next || undefined });
