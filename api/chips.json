@@ -49,9 +49,9 @@
   },
   {
     "name": "NVIDIA A100-SXM4-40GB",
-    "submission_count": 8,
+    "submission_count": 9,
     "best_throughput_tokens_per_sec": 10805.85,
-    "median_throughput_tokens_per_sec": 2708.3
+    "median_throughput_tokens_per_sec": 2416.0
   },
   {
     "name": "NVIDIA RTX A6000",

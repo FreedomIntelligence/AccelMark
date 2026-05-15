@@ -129,8 +129,8 @@
         "throttle_ratio": 0.966
       },
       "suite_C": {
-        "best_quality_efficiency": 1891.3,
-        "best_quality_efficiency_format": "W8A8"
+        "best_quality_efficiency": 1970.2,
+        "best_quality_efficiency_format": "W8A16"
       },
       "suite_D": {
         "best_throughput_tokens_per_sec": 56.8,
