@@ -214,7 +214,7 @@
   font-weight: 400;
   letter-spacing: -0.005em;
   line-height: 1.35;
-  max-width: 40ch;
+  white-space: nowrap;
 }
 .hero .tagline {
   color: var(--fg-muted);
@@ -242,10 +242,15 @@
   justify-content: center;
 }
 
+@media (max-width: 880px) {
+  .hero .hero-sub { font-size: 1rem; }
+}
+@media (max-width: 720px) {
+  .hero .hero-sub { font-size: 0.92rem; white-space: normal; max-width: 36ch; }
+}
 @media (max-width: 640px) {
   .hero { padding: 1.75rem 0.5rem 2rem; }
   .hero h1 { font-size: 1.85rem; }
-  .hero .hero-sub { font-size: 1rem; max-width: 32ch; }
   .hero .tagline { font-size: 0.92rem; }
   .hero-stats { padding: 0.9rem 0; }
   .kpi { padding: 0 0.85rem; min-width: 4rem; }

@@ -189,7 +189,7 @@
   grid-template-columns: 26px minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem;
-  padding: 0.5rem 0.65rem;
+  padding: 0.62rem 0.7rem;
   border-radius: var(--r-md);
   text-decoration: none;
   color: inherit;
@@ -215,8 +215,8 @@
 /* Featured #1 row — soft suite-color tint background */
 .lb-row.lb-row--featured {
   background: color-mix(in srgb, var(--suite-color) 8%, transparent);
-  padding-top: 0.62rem;
-  padding-bottom: 0.62rem;
+  padding-top: 0.78rem;
+  padding-bottom: 0.78rem;
   border-left: 2px solid var(--suite-color);
   border-radius: 0 var(--r-md) var(--r-md) 0;
   margin-left: -2px;
@@ -269,13 +269,30 @@
   white-space: nowrap;
 }
 .lb-row-sub {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 0.74rem;
   color: var(--fg-muted);
   line-height: 1.25;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.lb-row-sub .fw-line {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-row-byline {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--fg-faint);
+  line-height: 1.25;
+  margin-top: 0.05rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .lb-row-sub .vendor-dot {
   width: 7px;
@@ -292,15 +309,14 @@
 .lb-row-sub .vendor-dot[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
 .lb-row-sub .vendor-dot[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
 
-.lb-row-sub .sub-sep { color: var(--fg-faint); }
-.lb-row-sub .vendor-name { color: var(--fg-muted); }
+.lb-row-sub .sub-sep { color: var(--fg-faint); flex: 0 0 auto; }
+.lb-row-sub .vendor-name { color: var(--fg-muted); flex: 0 0 auto; }
 .lb-row-sub .fw-ver {
   color: var(--fg-faint);
   font-size: 0.7rem;
   margin-left: 0.15rem;
   font-variant-numeric: tabular-nums;
 }
-.lb-row-sub .submitter { color: var(--fg-muted); }
 .lb-row-sub .suite-tag {
   display: inline-flex;
   align-items: center;
@@ -311,8 +327,8 @@
   background: color-mix(in srgb, var(--suite-color) 12%, transparent);
   color: color-mix(in srgb, var(--suite-color) 80%, var(--fg-strong));
   border-radius: 999px;
+  flex: 0 0 auto;
 }
-.lb-row-sub .date { color: var(--fg-faint); font-size: 0.72rem; }
 
 .lb-row-score {
   text-align: right;
@@ -353,112 +369,151 @@
   box-shadow: var(--shadow-card);
 }
 
-/* ── Coverage by vendor section ─────────────────────────── */
-.vendor-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: 1.25rem;
-}
-
-.vendor-card {
-  padding: 1.1rem 1.2rem 1rem;
+/* ── Chip cloud (02 · Coverage) ──────────────────────────── */
+.chip-cloud {
   display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  position: relative;
-  --vendor-color: var(--fg-faint);
-}
-.vendor-card[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
-.vendor-card[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
-.vendor-card[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
-.vendor-card[data-vendor="Google"]        { --vendor-color: var(--v-google); }
-.vendor-card[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
-.vendor-card[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
-.vendor-card[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
-.vendor-card::before {
-  content: "";
-  position: absolute;
-  top: 0; bottom: 0; left: 0;
-  width: 3px;
-  background: var(--vendor-color);
-  border-radius: var(--r-lg) 0 0 var(--r-lg);
-}
-
-.vendor-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-}
-.vendor-name-main {
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 0.55rem;
-  font-weight: 700;
-  font-size: 1.02rem;
-  color: var(--fg-strong);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem 0.5rem;
 }
-.vendor-name-main::before {
-  content: "";
+
+.chip-tile {
+  --vendor-color: var(--fg-faint);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vendor-color) 14%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--vendor-color) 32%, transparent);
+  color: var(--fg-strong);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  white-space: nowrap;
+}
+.chip-tile:hover {
+  background: color-mix(in srgb, var(--vendor-color) 26%, var(--bg-elev));
+  border-color: var(--vendor-color);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.chip-tile.size-sm { font-size: 0.8rem;  padding: 0.38rem 0.7rem;  }
+.chip-tile.size-md { font-size: 0.92rem; padding: 0.45rem 0.85rem; }
+.chip-tile.size-lg { font-size: 1.05rem; padding: 0.55rem 1.05rem; }
+.chip-tile.size-xl { font-size: 1.25rem; padding: 0.65rem 1.25rem; }
+
+.chip-tile[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.chip-tile[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.chip-tile[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.chip-tile[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.chip-tile[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.chip-tile[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.chip-tile[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+
+.chip-tile-count {
+  font-size: 0.7em;
+  font-weight: 500;
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+  padding-left: 0.4rem;
+  border-left: 1px solid color-mix(in srgb, var(--vendor-color) 30%, transparent);
+}
+
+.cloud-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.5rem;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+}
+.cloud-legend-item {
+  --vendor-color: var(--fg-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.cloud-legend-item[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.cloud-legend-item[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.cloud-legend-item[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.cloud-legend-item[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.cloud-legend-item[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.cloud-legend-item[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.cloud-legend-item[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+.cloud-legend-item .dot {
   width: 9px;
   height: 9px;
   border-radius: 50%;
   background: var(--vendor-color);
+  flex: 0 0 auto;
 }
-
-.vendor-stats {
-  display: flex;
-  gap: 1.25rem;
-  font-size: 0.78rem;
-  color: var(--fg-muted);
-}
-.vendor-stats .stat strong {
-  display: block;
-  font-size: 1.2rem;
-  font-weight: 700;
+.cloud-legend-item .name {
   color: var(--fg-strong);
+  font-weight: 600;
+}
+.cloud-legend-item .meta {
+  color: var(--fg-muted);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  margin-bottom: 0.15rem;
 }
 
-.vendor-best {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  font-size: 0.78rem;
-  color: var(--fg-muted);
+/* ── Submit your result (04 · Contribute) ───────────────── */
+/* Borderless, blends into the page with a soft radial wash that
+   fades to the page background — visually quieter than a card. */
+.submit-section { margin: 4rem 0 1rem; }
+.submit-card {
+  position: relative;
+  padding: 3rem 1rem 2.5rem;
+  text-align: center;
+  border: none;
+  background: transparent;
 }
-.vendor-best-label {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.66rem;
-  font-weight: 600;
+.submit-card::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -4rem;
+  z-index: -1;
+  background:
+    radial-gradient(42% 80% at 26% 50%, color-mix(in srgb, var(--suite-A) 11%, transparent), transparent 65%),
+    radial-gradient(42% 80% at 74% 50%, color-mix(in srgb, var(--suite-D) 11%, transparent), transparent 65%);
+  -webkit-mask-image: radial-gradient(80% 95% at 50% 50%, #000 55%, transparent 100%);
+          mask-image: radial-gradient(80% 95% at 50% 50%, #000 55%, transparent 100%);
+  pointer-events: none;
 }
-.vendor-best-chip {
-  font-size: 0.92rem;
-  font-weight: 600;
+.submit-card .eyebrow { justify-content: center; }
+.submit-card .eyebrow::before { display: none; }
+.submit-title {
+  font-size: 2.85rem;
+  font-weight: 700;
+  margin: 0.6rem 0 0.95rem;
   color: var(--fg-strong);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
-
-.vendor-suites {
+.submit-body {
+  margin: 0 auto 1.75rem;
+  color: var(--fg-muted);
+  font-size: 1.08rem;
+  line-height: 1.65;
+  max-width: 58ch;
+}
+@media (max-width: 720px) {
+  .submit-title { font-size: 2.2rem; }
+  .submit-body { font-size: 1rem; }
+}
+.submit-cta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
-}
-.vendor-suite-pill {
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  background: color-mix(in srgb, var(--suite-color) 14%, transparent);
-  color: var(--suite-color);
-  border: 1px solid color-mix(in srgb, var(--suite-color) 30%, transparent);
+  gap: 0.6rem;
 }
 
 /* Stats row inside suite card body (used by /suites listing). */

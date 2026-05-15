@@ -4,7 +4,7 @@ export function render({ el }) {
   el.innerHTML = `
     <section class="hero">
       <h1>Compare chips</h1>
-      <p class="tagline">Side-by-side comparisons across suites — coming in commit 2.</p>
+      <p class="tagline">Side-by-side comparisons across suites. Coming in commit 2.</p>
     </section>
     <section class="state">
       <span class="state-icon">⚙</span>

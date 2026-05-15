@@ -14,7 +14,7 @@ export function esc(s) {
 // Format big numbers compactly: 12453 -> "12,453"; 1234567 -> "1.23M"
 // Integers (e.g. counts) render with no decimals automatically.
 export function fmtNum(v, opts = {}) {
-  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  if (v === null || v === undefined || Number.isNaN(v)) return "-";
   const n = Number(v);
   const { compact = false, decimals } = opts;
   if (compact && Math.abs(n) >= 1000) {
@@ -36,17 +36,17 @@ export function fmtNum(v, opts = {}) {
 }
 
 export function fmtPct(v, decimals = 1) {
-  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  if (v === null || v === undefined || Number.isNaN(v)) return "-";
   return `${Number(v).toFixed(decimals)}%`;
 }
 
 export function fmtMs(v, decimals = 0) {
-  if (v === null || v === undefined || Number.isNaN(v)) return "—";
+  if (v === null || v === undefined || Number.isNaN(v)) return "-";
   return `${Number(v).toFixed(decimals)} ms`;
 }
 
 export function fmtDate(s) {
-  if (!s) return "—";
+  if (!s) return "-";
   // Accept YYYY-MM-DD or ISO timestamp; return short YYYY-MM-DD.
   return String(s).slice(0, 10);
 }

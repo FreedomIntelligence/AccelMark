@@ -126,8 +126,9 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); text-decorati
 .section-header .section-sub {
   color: var(--fg-muted);
   font-size: 0.92rem;
-  max-width: 52ch;
   line-height: 1.45;
+  text-align: right;
+  flex: 0 1 auto;
 }
 
 /* Loading + empty states */

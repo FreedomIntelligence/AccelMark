@@ -51,3 +51,6 @@ backup/
 
 # ── Local-only handoff notes (across-session continuity) ────────────────────
 .handoff-*.md
+
+# ── Local-only design QA screenshots ────────────────────────────────────────
+.screenshots/

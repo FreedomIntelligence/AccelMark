@@ -13,7 +13,7 @@
 
 import {
   SUITE_ORDER, SUITE_META,
-  bestPerChipForSuite, suiteFacts, vendorBreakdown,
+  bestPerChipForSuite, suiteFacts, chipCloudData,
   summary, recent, formatPrimary,
 } from "../data.js";
 import {
@@ -21,7 +21,7 @@ import {
   shortVersion, shortModel, submitterHandle,
 } from "../utils.js";
 
-const TOP_N = 6;
+const TOP_N = 8;
 
 export function render({ el }) {
   const s = summary();
@@ -43,7 +43,7 @@ export function render({ el }) {
       <div class="hero-cta">
         <a class="btn primary" href="#/rankings">Browse rankings →</a>
         <a class="btn" href="#/compare">Compare chips</a>
-        <a class="btn ghost" href="#/suites">What are the suites?</a>
+        <a class="btn" href="#/suites">What are the suites?</a>
       </div>
     </section>
 
@@ -53,7 +53,7 @@ export function render({ el }) {
           <span class="eyebrow">01 · Workloads</span>
           <h2>Rankings by workload</h2>
         </div>
-        <span class="section-sub">Seven workloads, each on a fixed model and protocol. Pick one to dive in.</span>
+        <span class="section-sub">Each suite is a fixed model + protocol. Pick one to dive in.</span>
       </div>
       <div class="suite-grid" id="suite-grid"></div>
     </section>
@@ -62,11 +62,12 @@ export function render({ el }) {
       <div class="section-header">
         <div class="section-title">
           <span class="eyebrow">02 · Coverage</span>
-          <h2>Submissions by vendor</h2>
+          <h2>Chips on the leaderboard</h2>
         </div>
-        <span class="section-sub">Who shows up, how many chips, and where they compete.</span>
+        <span class="section-sub">Tile size = submission count. Color = vendor.</span>
       </div>
-      <div class="vendor-grid" id="vendor-grid"></div>
+      <div class="chip-cloud" id="chip-cloud"></div>
+      <div class="cloud-legend" id="cloud-legend"></div>
     </section>
 
     <section class="section">
@@ -75,9 +76,29 @@ export function render({ el }) {
           <span class="eyebrow">03 · Latest activity</span>
           <h2>Recent submissions</h2>
         </div>
-        <a class="btn ghost small" href="#/rankings">See all →</a>
+        <a class="btn small" href="#/rankings">See all →</a>
       </div>
       <div class="recent-list" id="recent-list"></div>
+    </section>
+
+    <section class="section submit-section">
+      <div class="submit-card">
+        <span class="eyebrow">04 · Contribute</span>
+        <h2 class="submit-title">Submit your result</h2>
+        <p class="submit-body">
+          Benchmark your hardware with a runner script, open a pull request,
+          and CI re-runs the validation suite before a maintainer reviews. Once
+          merged, your result lands in the leaderboard within minutes.
+        </p>
+        <div class="submit-cta">
+          <a class="btn primary"
+             href="https://github.com/JuhaoLiang1997/AccelMark/blob/main/CONTRIBUTING.md"
+             target="_blank" rel="noopener">Contributor guide →</a>
+          <a class="btn"
+             href="https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=submission.md"
+             target="_blank" rel="noopener">Open a submission</a>
+        </div>
+      </div>
     </section>
   `;
 
@@ -86,10 +107,9 @@ export function render({ el }) {
     grid.appendChild(renderSuiteCard(suiteId));
   }
 
-  const vendorGrid = el.querySelector("#vendor-grid");
-  for (const v of vendorBreakdown()) {
-    vendorGrid.appendChild(renderVendorCard(v));
-  }
+  const cloud = el.querySelector("#chip-cloud");
+  const legend = el.querySelector("#cloud-legend");
+  renderChipCloud(cloud, legend);
 
   const recentEl = el.querySelector("#recent-list");
   for (const row of recent(8)) {
@@ -109,7 +129,7 @@ function renderSuiteCard(suiteId) {
 
   const rankingsHref = buildHash("/rankings", { suite: suiteId });
 
-  const metaLine = renderSuiteMeta(facts);
+  const metaLine = renderSuiteMeta(suiteId, facts);
   const header = `
     <div class="suite-card-head">
       <div class="suite-head-row1">
@@ -142,13 +162,17 @@ function renderSuiteCard(suiteId) {
   return card;
 }
 
-function renderSuiteMeta(facts) {
+function renderSuiteMeta(suiteId, facts) {
+  const wl = SUITE_META[suiteId] && SUITE_META[suiteId].workload;
   const items = [];
   if (facts.model) {
     items.push(`<span class="meta-item"><strong>${esc(shortModel(facts.model))}</strong></span>`);
   }
   if (facts.precision) {
     items.push(`<span class="meta-item">${esc(facts.precision)} baseline</span>`);
+  }
+  if (wl && wl.inputTokens && wl.outputTokens) {
+    items.push(`<span class="meta-item">${esc(wl.inputTokens)} → ${esc(wl.outputTokens)} tok</span>`);
   }
   if (facts.submissions) {
     items.push(`<span class="meta-item"><strong>${fmtNum(facts.submissions)}</strong> results</span>`);
@@ -182,59 +206,72 @@ function renderLbRow(row, suiteId, rank) {
   `;
 }
 
-// Sub line under chip name: vendor + framework@version + precision + submitter.
+// Sub block under chip name — two predictable lines so every row in
+// a suite card lines up the same way regardless of framework / version
+// string length:
+//   line 1: vendor · framework version · precision
+//   line 2: @submitter (omitted if absent)
 function renderFwSub(row) {
   const fw = row.framework || "";
   const ver = shortVersion(row.framework_version);
   const fwVer = ver ? `${esc(fw)} <span class="fw-ver">${esc(ver)}</span>` : esc(fw);
   const precision = row.precision ? ` · ${esc(row.precision)}` : "";
   const handle = submitterHandle(row.submitted_by);
-  const submitter = handle
-    ? `<span class="sub-sep">·</span><span class="submitter">@${esc(handle)}</span>`
+  const byline = handle
+    ? `<span class="lb-row-byline">@${esc(handle)}</span>`
     : "";
   return `
     <span class="lb-row-sub">
       <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
       <span class="vendor-name">${esc(row.vendor)}</span>
       <span class="sub-sep">·</span>
-      <span>${fwVer}${precision}</span>
-      ${submitter}
+      <span class="fw-line">${fwVer}${precision}</span>
     </span>
+    ${byline}
   `;
 }
 
-function renderVendorCard(v) {
-  const div = document.createElement("article");
-  div.className = "card vendor-card";
-  div.setAttribute("data-vendor", v.vendor);
+function renderChipCloud(container, legendEl) {
+  const chips = chipCloudData();
+  for (const c of chips) {
+    const a = document.createElement("a");
+    a.className = `chip-tile size-${c.size}`;
+    a.href = `#/chip/${c.slug}`;
+    a.setAttribute("data-vendor", c.vendor);
+    const subL = c.submissions === 1 ? "submission" : "submissions";
+    const suiteL = c.suites.length === 1 ? "suite" : "suites";
+    const variantPart = c.variants > 1 ? ` · ${c.variants} chip-count variants` : "";
+    a.setAttribute("title",
+      `${c.label}: ${c.submissions} ${subL} across ` +
+      `${c.suites.length} ${suiteL}${variantPart}`);
+    a.innerHTML = `
+      <span class="chip-tile-name">${esc(c.label)}</span>
+      <span class="chip-tile-count">${fmtNum(c.submissions)}</span>
+    `;
+    container.appendChild(a);
+  }
 
-  const topMeta = v.topRow && v.topSuite ? SUITE_META[v.topSuite] : null;
-  const topScore = topMeta && v.topRow
-    ? formatPrimary(v.topRow[topMeta.primary.key], v.topSuite)
-    : null;
-  const topLine = v.topRow
-    ? `${esc(v.topRow._chip_label)}${topScore ? `<span class="muted"> · ${esc(topScore)}</span>` : ""}`
-    : `<span class="muted">No submissions yet</span>`;
-
-  const pills = v.suites.map((l) => `
-    <span class="vendor-suite-pill" data-suite="${esc(l)}" title="Suite ${esc(l)}">${esc(l)}</span>
-  `).join("");
-
-  div.innerHTML = `
-    <div class="vendor-head">
-      <span class="vendor-name-main">${esc(v.vendor)}</span>
-    </div>
-    <div class="vendor-stats">
-      <div class="stat"><strong>${fmtNum(v.chips)}</strong>chips</div>
-      <div class="stat"><strong>${fmtNum(v.submissions)}</strong>submissions</div>
-    </div>
-    <div class="vendor-best">
-      <span class="vendor-best-label">Top entry</span>
-      <span class="vendor-best-chip">${topLine}</span>
-    </div>
-    <div class="vendor-suites" aria-label="Suites this vendor appears in">${pills}</div>
-  `;
-  return div;
+  // Vendor legend below the cloud
+  if (!legendEl) return;
+  const byVendor = new Map();
+  for (const c of chips) {
+    const v = byVendor.get(c.vendor) || { vendor: c.vendor, chips: 0, submissions: 0 };
+    v.chips += 1;
+    v.submissions += c.submissions;
+    byVendor.set(c.vendor, v);
+  }
+  const vendors = Array.from(byVendor.values()).sort((a, b) => b.submissions - a.submissions);
+  legendEl.innerHTML = vendors.map((v) => {
+    const chipsLbl = v.chips === 1 ? "chip" : "chips";
+    const subsLbl  = v.submissions === 1 ? "result" : "results";
+    return `
+      <span class="cloud-legend-item" data-vendor="${esc(v.vendor)}">
+        <span class="dot"></span>
+        <span class="name">${esc(v.vendor)}</span>
+        <span class="meta">${fmtNum(v.chips)} ${chipsLbl} · ${fmtNum(v.submissions)} ${subsLbl}</span>
+      </span>
+    `;
+  }).join("");
 }
 
 function renderRecentRow(row) {
@@ -252,6 +289,10 @@ function renderRecentRow(row) {
   a.className = "lb-row";
   a.href = chipHref(row);
   a.setAttribute("data-suite", letter);
+  const bylineBits = [];
+  if (handle) bylineBits.push(`@${esc(handle)}`);
+  bylineBits.push(esc(fmtDate(row.date)));
+  const byline = `<span class="lb-row-byline">${bylineBits.join(" · ")}</span>`;
   a.innerHTML = `
     <span class="lb-row-rank suite-tag-rank" aria-hidden="true">${esc(letter)}</span>
     <span class="lb-row-main">
@@ -260,13 +301,11 @@ function renderRecentRow(row) {
         <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
         <span class="vendor-name">${esc(row.vendor)}</span>
         <span class="sub-sep">·</span>
-        <span>${fwVer}${row.precision ? " · " + esc(row.precision) : ""}</span>
+        <span class="fw-line">${fwVer}${row.precision ? " · " + esc(row.precision) : ""}</span>
         <span class="sub-sep">·</span>
         <span class="suite-tag">${esc(suiteLabel)}</span>
-        ${handle ? `<span class="sub-sep">·</span><span class="submitter">@${esc(handle)}</span>` : ""}
-        <span class="sub-sep">·</span>
-        <span class="date">${esc(fmtDate(row.date))}</span>
       </span>
+      ${byline}
     </span>
     <span class="lb-row-score">
       <span class="score-val">${esc(num)}</span>
@@ -278,7 +317,7 @@ function renderRecentRow(row) {
 
 // "5,731 tok/s" → { num: "5,731", unit: "tok/s" }
 function splitNumUnit(s) {
-  if (!s) return { num: "—", unit: "" };
+  if (!s) return { num: "-", unit: "" };
   const idx = s.search(/\s[A-Za-z%]/);
   if (idx === -1) return { num: s, unit: "" };
   return { num: s.slice(0, idx), unit: s.slice(idx + 1) };

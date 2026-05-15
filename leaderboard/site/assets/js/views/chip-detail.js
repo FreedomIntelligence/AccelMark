@@ -42,7 +42,7 @@ export function render({ el, params }) {
       <h1>${esc(sample._chip_label)}</h1>
       <p class="tagline">
         ${esc(sample.vendor)} ·
-        ${esc(sample.memory_gb || "—")}GB memory ·
+        ${esc(sample.memory_gb || "-")}GB memory ·
         ${rs.length} ${rs.length === 1 ? "run" : "runs"} across ${bestPerSuite.size} suite${bestPerSuite.size === 1 ? "" : "s"}
       </p>
     </section>
