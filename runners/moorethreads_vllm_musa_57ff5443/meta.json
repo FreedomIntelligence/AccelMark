@@ -1,0 +1,21 @@
+{
+  "id": "moorethreads_vllm_musa_57ff5443",
+  "platform": "moorethreads",
+  "name": "vllm-musa on Moore Threads MUSA GPU",
+  "framework": "vllm-musa",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "AccelMark runner for Moore Threads MTT S4000 / S5000 MUSA GPUs via the vllm-musa platform plugin (vLLM 0.10.x / 0.13.x + torchada CUDA→MUSA compatibility + pymtml). API-compatible with standard vLLM; MCCL-based tensor parallelism. FP8 excluded — not supported on current MUSA hardware. Quantization limited to compressed-tensors (W8A8/W8A16) pending real-hardware validation of AWQ / GPTQ / FP8 paths.",
+  "supersedes_chain": [],
+  "notes": "Initial Moore Threads runner. Written from the public vllm-musa documentation and the structural template of ascend_vllm_ascend_d4aa9fda; capability flags, dtype mapping and teardown sequence are placeholders awaiting smoke-testing on real S4000 / S5000 silicon.",
+  "created": "2026-05-15",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "pending",
+    "G": "unsupported"
+  }
+}
