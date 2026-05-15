@@ -613,6 +613,79 @@ export function suiteFingerprint(slug) {
   return out;
 }
 
+// Per-suite scaling profile across this chip's chip-count variants.
+// Returns { chipCounts: [1, 4, 8], suites: [{ sid, letter, title, perCount }] }
+// where `perCount` is a Map<chip_count, { value, normalized, run_id }>.
+//
+// `normalized` is `value / max(values across chip_counts for this
+// suite)`, clamped to [0, 1].  asc-direction primary metrics (TTFT,
+// latency) get inverted so the lowest latency reads as 1.0 — matches
+// the radar's convention so users don't have to retrain their eye
+// when switching between sections.
+//
+// Cells where the chip didn't submit at a given chip-count for a
+// suite come back as `{ value: null, normalized: 0, run_id: null }`
+// so the chart renderer can render a zero-height placeholder rather
+// than skipping the cluster (skipping would silently re-align the
+// remaining bars under the wrong x-axis tick).
+//
+// Suites the chip never submitted to at *any* chip-count are omitted
+// from `suites` entirely — the scaling story for those is "no data"
+// and the fingerprint section already telegraphs that.
+export function chipCountScaling(slug) {
+  const counts = chipCountsForChip(slug);
+  const out = { chipCounts: counts, suites: [] };
+  if (counts.length < 2) return out;
+
+  for (const sid of SUITE_ORDER) {
+    const meta = SUITE_META[sid];
+    if (!meta) continue;
+    const key = meta.primary.key;
+    const direction = meta.primary.direction;
+    const board = rowsForSuite(sid);
+    const myRows = board.filter((r) => r._chip_slug === slug);
+    if (!myRows.length) continue;
+
+    // Best row per chip_count for this chip on this suite.
+    const perCount = new Map();
+    for (const r of myRows) {
+      const c = r.chip_count || 1;
+      const cur = perCount.get(c);
+      const better = !cur || (direction === "asc"
+        ? r[key] < cur.value
+        : r[key] > cur.value);
+      if (better && r[key] != null) {
+        perCount.set(c, { value: r[key], run_id: r.run_id || r.submission || null });
+      }
+    }
+    if (!perCount.size) continue;
+
+    // Normalise within this suite's per-count column so the chart
+    // reads as "% of this chip's best on this suite" rather than raw
+    // throughput (which would drown the smaller chip_counts).
+    const values = Array.from(perCount.values()).map((v) => v.value);
+    const refValue = direction === "asc" ? Math.min(...values) : Math.max(...values);
+    const filled = new Map();
+    for (const c of counts) {
+      const cell = perCount.get(c);
+      if (!cell) {
+        filled.set(c, { value: null, normalized: 0, run_id: null });
+        continue;
+      }
+      let normalized = 0;
+      if (typeof cell.value === "number" && typeof refValue === "number" && refValue !== 0) {
+        normalized = direction === "asc" ? refValue / cell.value : cell.value / refValue;
+      }
+      normalized = Math.max(0, Math.min(1, normalized));
+      filled.set(c, { value: cell.value, normalized, run_id: cell.run_id });
+    }
+
+    out.suites.push({ sid, letter: meta.letter, title: meta.title, perCount: filled });
+  }
+
+  return out;
+}
+
 // Pick a representative run_id for a given chip slug — used by the
 // chip-cloud "quick add" affordance on Home and Compare so that a single
 // click on a chip seeds the compare basket with the freshest run for

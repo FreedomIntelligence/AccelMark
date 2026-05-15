@@ -323,7 +323,137 @@ a.chip-suite-card:hover .chip-suite-hint {
   font-weight: 400;
 }
 
-/* ── 03 · Every submission ────────────────────────────────── */
+/* ── 03 · Scaling across chip-counts (grouped bar) ────────── */
+.chip-scl-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem 1.4rem;
+  align-items: center;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 1.2rem 1.3rem 0.6rem;
+  box-shadow: var(--shadow-card);
+}
+@media (max-width: 760px) {
+  .chip-scl-wrap {
+    grid-template-columns: 1fr;
+    padding: 1rem 0.95rem 0.4rem;
+  }
+}
+.chip-scl-canvas {
+  position: relative;
+  width: 100%;
+  /* Aspect ratio that gives 6–7 suite clusters of bars adequate width
+     without stretching tall on mobile.  Chart.js owns the height. */
+  aspect-ratio: 16 / 7;
+  min-height: 220px;
+  max-height: 320px;
+}
+.chip-scl-canvas canvas { width: 100% !important; height: 100% !important; }
+
+.chip-scl-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-self: start;
+  padding-top: 0.5rem;
+}
+.chip-scl-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--fg);
+}
+.chip-scl-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--border-soft);
+  background: var(--accent-2);
+}
+.chip-scl-legend-label {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.chip-scl-breakdown {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.4rem;
+}
+.chip-scl-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1.2fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--r-md);
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  font-size: 0.8rem;
+}
+.chip-scl-row[data-suite="A"] { --suite-color: var(--suite-A); }
+.chip-scl-row[data-suite="B"] { --suite-color: var(--suite-B); }
+.chip-scl-row[data-suite="C"] { --suite-color: var(--suite-C); }
+.chip-scl-row[data-suite="D"] { --suite-color: var(--suite-D); }
+.chip-scl-row[data-suite="E"] { --suite-color: var(--suite-E); }
+.chip-scl-row[data-suite="F"] { --suite-color: var(--suite-F); }
+.chip-scl-row[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-scl-row-letter {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.74rem;
+  color: var(--on-accent, #fff);
+  background: var(--suite-color, var(--accent-2));
+}
+.chip-scl-row-title {
+  color: var(--fg);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chip-scl-row-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.4rem;
+  align-items: center;
+}
+.chip-scl-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.chip-scl-cell-pct {
+  color: var(--fg-strong);
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+.chip-scl-cell-val {
+  color: var(--fg-muted);
+  font-size: 0.7rem;
+}
+.chip-scl-cell-empty {
+  color: var(--fg-faint);
+  font-weight: 400;
+  text-align: right;
+  display: inline-block;
+}
+
+/* ── 04 · Every submission ────────────────────────────────── */
 .chip-runs-wrap {
   border: 1px solid var(--border-soft);
   border-radius: var(--r-lg);

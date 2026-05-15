@@ -22,7 +22,7 @@ import {
   SUITE_ORDER, SUITE_META,
   rowsForChip, bestPerSuiteForChip, formatPrimary,
   rankChipInSuite, similarChipsTo, chipCountsForChip,
-  suiteFingerprint, vendorColor,
+  suiteFingerprint, chipCountScaling, vendorColor,
 } from "../data.js";
 import {
   esc, fmtDate, shortVersion, submitterHandle,
@@ -67,6 +67,15 @@ export function render({ el, params }) {
   const frameworks   = new Set(rs.map((r) => r.framework).filter(Boolean));
   const precisions   = new Set(rs.map((r) => r.precision).filter(Boolean));
   const chipCounts   = chipCountsForChip(slug);
+
+  // Section numbering — scaling section (03) is conditional on the
+  // chip having ≥2 chip_count variants with data on at least one
+  // shared suite.  Precompute once so we can renumber every
+  // downstream eyebrow consistently and we only call the data helper
+  // once per render.
+  const scalingHtml = renderScalingSection(slug, sample);
+  const runsNum  = scalingHtml ? "04" : "03";
+  const peersNum = scalingHtml ? "05" : "04";
 
   const memoryStr = sample.memory_gb ? `${sample.memory_gb} GB` : "";
   const factPills = [
@@ -121,10 +130,12 @@ export function render({ el, params }) {
 
     ${renderFingerprintSection(slug, sample)}
 
+    ${scalingHtml}
+
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">03 · Every submission</span>
+          <span class="eyebrow">${runsNum} · Every submission</span>
           <h2>${rs.length} run${rs.length === 1 ? "" : "s"} on file</h2>
         </div>
         <p class="section-sub">Sorted newest first. Click a row to open the run detail.</p>
@@ -134,14 +145,17 @@ export function render({ el, params }) {
       </div>
     </section>
 
-    ${renderSimilarChipsSection(slug, latestRid)}
+    ${renderSimilarChipsSection(slug, latestRid, peersNum)}
   `;
 
   bindClicks(el);
-  // Mount the radar after innerHTML lands so Chart.js sees an attached
-  // canvas.  Uses a microtask rather than requestAnimationFrame so the
-  // first paint already includes the chart (no layout flash).
-  setTimeout(() => _mountFingerprintChart(el, slug, sample), 0);
+  // Mount Chart.js instances after innerHTML lands so the canvases
+  // are attached.  setTimeout(0) instead of rAF so the first paint
+  // already includes the charts (no layout flash).
+  setTimeout(() => {
+    _mountFingerprintChart(el, slug, sample);
+    _mountScalingChart(el, slug, sample);
+  }, 0);
 }
 
 // Click delegation — once-attached on the view container.  The router
@@ -346,6 +360,185 @@ function _mountFingerprintChart(el, slug, sample) {
   });
 }
 
+// ── 03 · Scaling across chip-counts (grouped bar) ─────────────
+//
+// Only meaningful when the chip has been deployed at >1 fan-out
+// (e.g. ×1 + ×8 for an A100, ×1 + ×4 for a 4090D); otherwise this
+// section returns "" and the rest of the page renumbers downward.
+// The chart answers: "is this chip linearly faster at ×8 than at
+// ×1?  On which suites does going wide actually help?"
+//
+// Y-axis is "% of this chip's best on this suite" — within a single
+// suite cluster, the bars are normalised to the highest-throughput
+// chip-count for that suite (asc-direction primary metrics inverted
+// so the lowest-latency variant still reads as 100 %).  Cross-suite
+// comparison would mix tok/s with ms with %, which is exactly what
+// the fingerprint radar is for; here we want intra-suite scaling
+// behaviour to read at a glance instead.
+function renderScalingSection(slug, sample) {
+  const data = chipCountScaling(slug);
+  if (data.suites.length === 0) return "";
+
+  const chipCounts = data.chipCounts;
+  // Build a compact legend list — also serves as the keyboard /
+  // screen-reader fallback when Chart.js can't load.
+  const legendItems = chipCounts.map((c, i) => `
+    <li class="chip-scl-legend-item" data-count-idx="${i}">
+      <span class="chip-scl-legend-swatch" data-count-idx="${i}" aria-hidden="true"></span>
+      <span class="chip-scl-legend-label">×${c}</span>
+    </li>
+  `).join("");
+
+  // Per-suite breakdown row underneath the chart — visible on every
+  // viewport and the only surface for the absolute primary-metric
+  // value (chart bars are normalised %).
+  const breakdownRows = data.suites.map((s) => {
+    const bestPerCount = chipCounts.map((c) => {
+      const cell = s.perCount.get(c);
+      if (!cell || cell.value == null) return `<span class="chip-scl-cell-empty" title="No submission at ×${c}">—</span>`;
+      const pct = Math.round(cell.normalized * 100);
+      const display = formatPrimary(cell.value, s.sid);
+      return `
+        <span class="chip-scl-cell" title="${esc(`×${c}: ${display} (${pct}% of this chip's best in Suite ${s.letter})`)}">
+          <span class="chip-scl-cell-pct tnum">${pct}%</span>
+          <span class="chip-scl-cell-val tnum">${esc(display || "—")}</span>
+        </span>
+      `;
+    }).join("");
+    return `
+      <div class="chip-scl-row" data-suite="${esc(s.letter)}">
+        <span class="chip-scl-row-letter" aria-hidden="true">${esc(s.letter)}</span>
+        <span class="chip-scl-row-title">${esc(s.title)}</span>
+        <span class="chip-scl-row-cells">${bestPerCount}</span>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <section class="section chip-scl-section">
+      <div class="section-header section-header--stacked">
+        <div class="section-title">
+          <span class="eyebrow">03 · Scaling across chip-counts</span>
+          <h2>Does going wide actually pay off?</h2>
+        </div>
+        <p class="section-sub">
+          Bars are normalised to this chip's best result on each suite —
+          ×N at 100 % means that fan-out wins the suite among this chip's
+          variants.  Chip-counts without a submission for a suite show as
+          gaps; zoom out via Compare to put another chip on the same axes.
+        </p>
+      </div>
+      <div class="chip-scl-wrap" data-vendor="${esc(sample.vendor)}">
+        <div class="chip-scl-canvas">
+          <canvas data-chip-scaling
+                  aria-label="Grouped bar chart of ${esc(sample.chip)} scaling across chip-counts ${chipCounts.map((c) => `×${c}`).join(", ")}"
+                  role="img"></canvas>
+        </div>
+        <ol class="chip-scl-legend" aria-label="Chip-count series">
+          ${legendItems}
+        </ol>
+      </div>
+      <div class="chip-scl-breakdown" role="table" aria-label="Per-suite scaling breakdown">
+        ${breakdownRows}
+      </div>
+    </section>
+  `;
+}
+
+let _activeSclChart = null;
+
+function _mountScalingChart(el, slug, sample) {
+  const canvas = el.querySelector("[data-chip-scaling]");
+  if (!canvas) return;
+  if (typeof window.Chart !== "function") return; // breakdown table is the fallback.
+
+  if (_activeSclChart) {
+    try { _activeSclChart.destroy(); } catch (_) { /* noop */ }
+    _activeSclChart = null;
+  }
+
+  const data = chipCountScaling(slug);
+  if (!data.suites.length) return;
+
+  const chipCounts = data.chipCounts;
+  const labels = data.suites.map((s) => `Suite ${s.letter}`);
+  const accentHex = vendorColor(sample.vendor);
+
+  // Per-chip-count colour: tint the vendor accent by lightening it
+  // for higher counts, so the bars within a cluster read as a
+  // gradient ("more chips = brighter" matches scaling intuition)
+  // instead of needing a separate palette per chip family.
+  const datasets = chipCounts.map((c, i) => {
+    const tint = chipCounts.length === 1 ? 0 : i / (chipCounts.length - 1);
+    // Mix from accent (i=0) → vendor accent at 50% (i=last).  We use
+    // explicit hex for opacity so old browsers without color-mix in
+    // canvas still get a reasonable colour.
+    const alphaHex = (200 - Math.round(tint * 90)).toString(16).padStart(2, "0");
+    return {
+      label: `×${c}`,
+      data: data.suites.map((s) => {
+        const cell = s.perCount.get(c);
+        return cell && cell.value != null ? Math.round(cell.normalized * 100) : null;
+      }),
+      backgroundColor: accentHex + alphaHex,
+      borderColor: accentHex,
+      borderWidth: 1,
+      borderRadius: 3,
+    };
+  });
+
+  // Push the same per-chip-count palette into the legend swatches so
+  // the canvas + DOM legend stay visually in sync without a runtime
+  // observer.
+  const legendItems = el.querySelectorAll(".chip-scl-legend-swatch");
+  legendItems.forEach((sw, i) => {
+    sw.style.background = datasets[i]?.backgroundColor || accentHex;
+    sw.style.borderColor = datasets[i]?.borderColor || accentHex;
+  });
+
+  const cs = getComputedStyle(document.documentElement);
+  const textColor = (cs.getPropertyValue("--fg-muted").trim()    || "#8b949e");
+  const gridColor = (cs.getPropertyValue("--border-soft").trim() || "rgba(127,127,127,0.18)");
+
+  _activeSclChart = new window.Chart(canvas, {
+    type: "bar",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const sIdx = ctx.dataIndex;
+              const cIdx = ctx.datasetIndex;
+              const suite = data.suites[sIdx];
+              const cnt = chipCounts[cIdx];
+              const cell = suite?.perCount.get(cnt);
+              if (!cell || cell.value == null) return `×${cnt}: no submission`;
+              const display = formatPrimary(cell.value, suite.sid);
+              return `×${cnt}: ${display} (${ctx.parsed.y}% of best)`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: textColor, font: { size: 11, weight: "600" } },
+          grid:  { color: gridColor, display: false },
+        },
+        y: {
+          beginAtZero: true,
+          suggestedMax: 100,
+          ticks: { color: textColor, callback: (v) => `${v}%` },
+          grid:  { color: gridColor },
+        },
+      },
+    },
+  });
+}
+
 // ── 04 · Compare with similar chips ──
 //
 // Surfaces chips with the largest suite-coverage overlap so users have
@@ -353,7 +546,7 @@ function _mountFingerprintChart(el, slug, sample) {
 // against.  Each tile links to that chip's detail page; the section as
 // a whole is skipped when the dataset is too sparse for a meaningful
 // recommendation (e.g. the chip is the only entry in its suites).
-function renderSimilarChipsSection(slug, latestRid) {
+function renderSimilarChipsSection(slug, latestRid, sectionNum = "04") {
   const peers = similarChipsTo(slug, { limit: 6 });
   if (!peers.length) return "";
 
@@ -389,7 +582,7 @@ function renderSimilarChipsSection(slug, latestRid) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">04 · Peers</span>
+          <span class="eyebrow">${sectionNum} · Peers</span>
           <h2>Compare with similar chips</h2>
         </div>
         <p class="section-sub">Chips that compete on the same workload suites — sorted by suite overlap, same-vendor first.</p>
