@@ -1,0 +1,851 @@
+/* suites.css — Suites explainer page.
+   Reuses shared tokens (--suite-A..G, --vendor-*) defined in base.css. */
+
+/* Per-suite color binding (mirrors the home selectors). */
+.suite-spec[data-suite="A"],
+.inversion-card[data-suite="A"],
+.scn-card .scn-suite-letter[data-suite="A"],
+.rfl-dot[data-suite="A"] { --suite-color: var(--suite-A); }
+.suite-spec[data-suite="B"],
+.inversion-card[data-suite="B"],
+.scn-card .scn-suite-letter[data-suite="B"],
+.rfl-dot[data-suite="B"] { --suite-color: var(--suite-B); }
+.suite-spec[data-suite="C"],
+.inversion-card[data-suite="C"],
+.scn-card .scn-suite-letter[data-suite="C"],
+.rfl-dot[data-suite="C"] { --suite-color: var(--suite-C); }
+.suite-spec[data-suite="D"],
+.inversion-card[data-suite="D"],
+.scn-card .scn-suite-letter[data-suite="D"],
+.rfl-dot[data-suite="D"] { --suite-color: var(--suite-D); }
+.suite-spec[data-suite="E"],
+.inversion-card[data-suite="E"],
+.scn-card .scn-suite-letter[data-suite="E"],
+.rfl-dot[data-suite="E"] { --suite-color: var(--suite-E); }
+.suite-spec[data-suite="F"],
+.inversion-card[data-suite="F"],
+.scn-card .scn-suite-letter[data-suite="F"],
+.rfl-dot[data-suite="F"] { --suite-color: var(--suite-F); }
+.suite-spec[data-suite="G"],
+.inversion-card[data-suite="G"],
+.scn-card .scn-suite-letter[data-suite="G"],
+.rfl-dot[data-suite="G"] { --suite-color: var(--suite-G); }
+.suite-spec,
+.inversion-card,
+.scn-card .scn-suite-letter,
+.rfl-dot { --suite-color: var(--accent-2); }
+
+/* ── Hero ──────────────────────────────────────────────── */
+.suites-hero {
+  padding: 3rem 1rem 2.25rem;
+  margin-bottom: 0.5rem;
+}
+.suites-hero h1 {
+  font-size: 3rem;
+  max-width: none;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+@media (max-width: 760px) {
+  .suites-hero h1 { font-size: 2.2rem; }
+}
+.suites-hero .hero-sub {
+  margin-bottom: 1.4rem;
+  white-space: nowrap;
+  max-width: none;
+}
+@media (max-width: 980px) {
+  .suites-hero .hero-sub { white-space: normal; max-width: 60ch; }
+}
+
+/* Section header overrides for suites page — stack title with a separate
+   lede paragraph below it instead of pushing a subtitle to the right
+   edge (which leaves an unsightly gap when titles are short). */
+.section-header--stacked {
+  display: block;
+}
+/* Lede paragraph: full page width, single column, comfortable for prose. */
+.section-lede {
+  max-width: none;
+  margin: 0.1rem 0 1.5rem;
+  font-size: 0.96rem;
+  line-height: 1.65;
+  color: var(--fg-muted);
+}
+.section-lede strong { color: var(--fg-strong); font-weight: 600; }
+.section-lede code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-elev-2);
+  padding: 0.05rem 0.35rem;
+  border-radius: 5px;
+  color: var(--fg);
+  border: 1px solid var(--border-soft);
+}
+
+/* ── 01 · Methodology / Why per-suite ───────────────────── */
+.why-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(260px, 30%, 360px);
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 2rem;
+}
+@media (max-width: 980px) {
+  .why-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+.why-prose {
+  max-width: none;
+}
+.why-prose p {
+  color: var(--fg);
+  font-size: 1.02rem;
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+.why-prose p:last-child { margin-bottom: 0; }
+.why-prose strong { color: var(--fg-strong); font-weight: 600; }
+.why-prose em { color: var(--fg-strong); font-style: italic; }
+
+/* ── Roofline mini-diagram (sidebar of the methodology section) ── */
+.roofline-diagram {
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  padding: 0.85rem 0.95rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-self: stretch;
+}
+.roofline-eyebrow { color: var(--fg-muted); }
+.roofline-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.rfl-axis {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+.rfl-roof {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent-2) 50%, var(--fg-faint));
+  stroke-width: 1.6;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rfl-knee {
+  stroke: var(--border-soft);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+.rfl-region {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--fg-faint);
+}
+.rfl-region--bw { fill: color-mix(in srgb, var(--accent-2) 60%, var(--fg-muted)); }
+.rfl-region--cp { fill: color-mix(in srgb, var(--suite-D) 60%, var(--fg-muted)); }
+.rfl-knee-label {
+  font-size: 7.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--fg-faint);
+}
+.rfl-dot circle {
+  fill: var(--suite-color);
+  stroke: var(--bg-elev);
+  stroke-width: 1.6;
+}
+.rfl-letter {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  fill: var(--fg-strong);
+}
+.rfl-axis-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  fill: var(--fg-muted);
+  text-transform: uppercase;
+}
+.roofline-caption {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+/* Inversion cards row — the "evidence" */
+.inversion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin-top: 0.5rem;
+}
+.inversion-card {
+  position: relative;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 1.2rem 1.25rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+.inversion-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--suite-color);
+}
+.inversion-card h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.inversion-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+@media (max-width: 980px) {
+  .inversion-grid { grid-template-columns: 1fr; }
+}
+
+/* ── 02 · Scenarios catalog ─────────────────────────────── */
+.scn-catalog {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.05rem;
+}
+@media (max-width: 1080px) {
+  .scn-catalog { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .scn-catalog { grid-template-columns: 1fr; }
+}
+
+.scn-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  padding: 1.1rem 1.2rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.scn-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.scn-icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-2) 9%, var(--bg-elev-2));
+  color: color-mix(in srgb, var(--accent-2) 75%, var(--fg-strong));
+  border: 1px solid color-mix(in srgb, var(--accent-2) 18%, var(--border-soft));
+}
+.scn-icon svg { width: 24px; height: 24px; }
+.scn-card-id {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+/* Scenario name is the card title — promoted from a small pill to a
+   proper headline so each card has a clear focal point. */
+.scn-card-name {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--fg-strong);
+  line-height: 1.1;
+}
+.scn-card-role {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fg-muted);
+}
+.scn-card-desc {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--fg);
+  /* Let the description absorb extra height so the spec block lands at
+     the same vertical position across every card in a row. */
+  flex: 1 0 auto;
+}
+
+/* Mini-spec rows (Metric / Direction / Setting / ...) */
+.scn-card-spec {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  background: var(--bg-elev-2);
+  border-radius: var(--r-sm, 8px);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.scn-spec-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 32%) minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: baseline;
+}
+.scn-spec-row dt {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--fg-muted);
+}
+.scn-spec-row dd {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--fg-strong);
+  font-weight: 500;
+}
+
+.scn-card-applies {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.05rem;
+  flex-wrap: wrap;
+}
+.scn-applies-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+}
+.scn-applies-letters {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.scn-applies-sep {
+  color: var(--fg-faint);
+  font-weight: 500;
+  margin: 0 0.05rem;
+}
+.scn-applies-note {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--fg-faint);
+}
+.scn-suite-letter {
+  --letter-bg: color-mix(in srgb, var(--suite-color) 18%, transparent);
+  --letter-border: color-mix(in srgb, var(--suite-color) 35%, transparent);
+  --letter-fg: color-mix(in srgb, var(--suite-color) 75%, var(--fg-strong));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--letter-bg);
+  border: 1px solid var(--letter-border);
+  color: var(--letter-fg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-feature-settings: "tnum" on;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  transition: transform 80ms ease, background 120ms ease;
+}
+.scn-suite-letter:hover {
+  background: color-mix(in srgb, var(--suite-color) 30%, transparent);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.scn-suite-letter--extra {
+  --letter-bg: transparent;
+  --letter-border: color-mix(in srgb, var(--suite-color) 40%, transparent);
+  --letter-fg: color-mix(in srgb, var(--suite-color) 65%, var(--fg-muted));
+  border-style: dashed;
+}
+
+/* ── 03 · Suite specifications ─────────────────────────── */
+.suite-spec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+.suite-spec {
+  position: relative;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  /* Clear the sticky top nav (~58 px) plus a little breathing room so
+     anchor jumps from the scenarios catalog don't tuck the suite card's
+     top edge underneath the nav bar. */
+  scroll-margin-top: 4.75rem;
+}
+.suite-spec::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 4px;
+  background: var(--suite-color);
+}
+
+/* Brief flash when scrolling to a suite via a "Used by" letter chip. */
+@keyframes suite-spec-flash {
+  0%   { box-shadow: 0 0 0 0   color-mix(in srgb, var(--suite-color) 55%, transparent); }
+  60%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--suite-color) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0   color-mix(in srgb, var(--suite-color) 0%, transparent); }
+}
+.suite-spec--flash {
+  animation: suite-spec-flash 1.2s ease-out 1;
+}
+
+.suite-spec-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.4rem 1.5rem 1.2rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--suite-color) 5%, transparent);
+}
+.suite-spec-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--suite-color);
+  color: var(--on-accent, #fff);
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex: 0 0 auto;
+}
+.suite-spec-title { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.suite-spec-title .eyebrow { color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-muted)); }
+.suite-spec-title .eyebrow::before { background: var(--suite-color); }
+.suite-spec-title h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--fg-strong);
+  line-height: 1.15;
+}
+.suite-spec-tagline {
+  margin: 0.1rem 0 0;
+  color: var(--fg-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.suite-spec-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  flex: 0 0 auto;
+}
+.suite-spec-metric .metric-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--suite-color) 80%, var(--fg-strong));
+}
+.suite-spec-metric .metric-direction {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .suite-spec-head {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+  }
+  .suite-spec-metric {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .suite-spec-letter { width: 44px; height: 44px; font-size: 1.4rem; }
+  .suite-spec-title h3 { font-size: 1.25rem; }
+}
+
+.suite-spec-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  padding: 1.3rem 1.5rem 1.5rem;
+}
+
+/* Per-suite intro paragraph — sits in the left column of the suite-intro-row
+   alongside the Current Leaders sidebar.  No max-width so it fills the
+   available column comfortably. */
+.suite-spec-intro {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--fg);
+}
+
+/* ── Horizontal spec strip ─────────────────────────────── */
+.spec-strip {
+  list-style: none;
+  margin: 0;
+  padding: 0.95rem 1.1rem;
+  background: var(--bg-elev-2);
+  border-radius: var(--r-md);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.95rem 1.25rem;
+  border: 1px solid var(--border-soft);
+}
+@media (max-width: 980px) {
+  .spec-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .spec-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.spec-strip li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.spec-strip .strip-v { overflow-wrap: anywhere; }
+.spec-strip .strip-v code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--bg-elev);
+  padding: 0.08rem 0.4rem;
+  border-radius: 6px;
+  color: var(--fg);
+  border: 1px solid var(--border-soft);
+  word-break: keep-all;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.spec-strip .strip-k {
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+}
+.spec-strip .strip-v {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--fg-strong);
+  line-height: 1.3;
+}
+
+/* ── Suite scenarios (compact pills row) ───────────────── */
+.suite-scns {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+.suite-scns-label,
+.suite-leaders-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+  flex: 0 0 auto;
+}
+.suite-scns-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* Scenario pills — shared between catalog and per-suite contexts. */
+.scn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.scn-default {
+  background: color-mix(in srgb, var(--suite-color) 16%, transparent);
+  color: color-mix(in srgb, var(--suite-color) 75%, var(--fg-strong));
+  border: 1px solid color-mix(in srgb, var(--suite-color) 28%, transparent);
+}
+.scn-extra {
+  background: var(--bg-elev-2);
+  color: var(--fg-muted);
+  border: 1px dashed var(--border);
+}
+.scn-extra-tag {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+/* ── Suite intro row: description (left) + concrete finding (right) ─── */
+.suite-intro-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 36%, 400px);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+@media (max-width: 880px) {
+  .suite-intro-row { grid-template-columns: 1fr; gap: 1.1rem; }
+}
+
+/* ── Current leaders — horizontal mini-card grid ───────── */
+.suite-leaders {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.suite-leaders-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fg-muted);
+}
+.leader-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* Flex with capped card width so a lone leader keeps a sensible size
+     instead of stretching to full row width, and a full row of four
+     leaders still divides the space evenly. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.leader-row {
+  flex: 1 1 220px;
+  min-width: 220px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.7rem 0.85rem 0.75rem;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  border-top: 3px solid color-mix(in srgb, var(--suite-color) 38%, var(--border-soft));
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.leader-row:hover {
+  border-top-color: var(--suite-color);
+  background: color-mix(in srgb, var(--suite-color) 4%, var(--bg-elev-2));
+}
+.leader-row .scn-pill {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  padding: 0.12rem 0.55rem;
+}
+.leader-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  min-width: 0;
+  margin-top: 0.05rem;
+}
+.leader-chip:hover { text-decoration: none; }
+.leader-chip:hover .leader-chip-name { color: var(--accent-2); }
+.leader-chip-name {
+  font-weight: 600;
+  color: var(--fg-strong);
+  font-size: 0.9rem;
+  line-height: 1.25;
+  transition: color 120ms ease;
+  /* Long chip names wrap to a second line inside their mini-card. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.leader-vendor {
+  --vendor-color: var(--fg-faint);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vendor-color);
+  flex: 0 0 auto;
+}
+.leader-vendor[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.leader-vendor[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.leader-vendor[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.leader-vendor[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.leader-vendor[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.leader-vendor[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.leader-vendor[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+.leader-val {
+  color: color-mix(in srgb, var(--suite-color) 80%, var(--fg-strong));
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.005em;
+  margin-top: 0.15rem;
+}
+.leader-empty {
+  color: var(--fg-faint);
+  font-style: italic;
+  font-size: 0.82rem;
+  margin-top: 0.15rem;
+}
+
+/* ── Concrete finding card ───────────────────────────────── */
+.suite-finding {
+  padding: 1rem 1.1rem 1.05rem;
+  background: color-mix(in srgb, var(--suite-color) 6%, var(--bg-elev-2));
+  border-radius: var(--r-md);
+  border: 1px solid color-mix(in srgb, var(--suite-color) 18%, transparent);
+}
+/* Side variant — sits alongside the description paragraph in the
+   suite-intro-row.  Stretches to match the description's height for
+   a clean two-column block. */
+.suite-finding--side {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.suite-finding--side .finding-body {
+  font-size: 0.88rem;
+}
+.finding-eyebrow {
+  display: inline-block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-muted));
+  margin-bottom: 0.4rem;
+}
+.finding-headline {
+  margin: 0 0 0.4rem;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+.finding-body {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+/* ── CTAs ─────────────────────────────────────────────────── */
+.suite-spec-cta {
+  margin-top: 0.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border-soft);
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── 04 · Datasets table ───────────────────────────────── */
+.dataset-table {
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+.dataset-row {
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 1.4fr)
+    minmax(120px, 1fr)
+    minmax(70px, 0.6fr)
+    minmax(110px, 0.9fr)
+    minmax(110px, 0.9fr)
+    minmax(220px, 2fr);
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.92rem;
+}
+.dataset-row:last-child { border-bottom: none; }
+.dataset-row--head {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--fg-muted);
+  background: var(--bg-elev-2);
+}
+.dataset-row .dt-name code {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  background: var(--bg-elev-2);
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  color: var(--fg-strong);
+}
+.dataset-row .dt-notes {
+  color: var(--fg-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 880px) {
+  .dataset-row {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 0.35rem;
+  }
+  .dataset-row--head { display: none; }
+  .dataset-row .dt-name { grid-column: 1 / -1; font-weight: 600; }
+  .dataset-row .dt-notes { grid-column: 1 / -1; }
+}
