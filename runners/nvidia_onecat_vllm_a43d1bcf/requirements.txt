@@ -1,0 +1,58 @@
+# AccelMark -- 1Cat-vLLM (SM70 / V100) runner dependencies
+#
+# 1Cat-vLLM is a community fork of vLLM tuned for Tesla V100. It ships two
+# wheels that must be installed together:
+#   - flash_attn_v100  (Volta-optimised FlashAttention kernels)
+#   - vllm             (patched fork, exposes the FLASH_ATTN_V100 backend
+#                       and AWQ 4-bit kernels for SM70)
+#
+# Both wheels are published as GitHub release assets at:
+#   https://github.com/1CatAI/1Cat-vLLM/releases
+#
+# Reference validated stack (1Cat-vLLM 1.0.0):
+#   OS:       Ubuntu 24.04
+#   Python:   3.12
+#   CUDA:     12.8
+#   PyTorch:  2.9.1+cu128
+#   Driver:   570.211.01
+#   GPU:      4 x Tesla V100 32 GB
+#
+# Installation:
+#   # 1. Install CUDA 12.8 toolkit and matching driver
+#   # 2. Create a fresh Python 3.12 environment
+#   # 3. Install the two 1Cat-vLLM wheels from the release page:
+#   pip install --prefer-binary --no-cache-dir \
+#     --extra-index-url https://download.pytorch.org/whl/cu128 \
+#     "https://github.com/1CatAI/1Cat-vLLM/releases/download/v1.0.0/flash_attn_v100-1.0.0-cp312-cp312-linux_x86_64.whl" \
+#     "https://github.com/1CatAI/1Cat-vLLM/releases/download/v1.0.0/vllm-1.0.0-cp312-cp312-linux_x86_64.whl"
+#
+#   # 4. Then install the AccelMark extras below:
+#   pip install -r runners/nvidia_onecat_vllm_a43d1bcf/requirements.txt
+#
+# Note: do NOT add `torch==2.x` here — the matching torch wheel is pulled in
+# by the 1Cat-vLLM wheel install command above. Listing torch here would
+# fight with the cu128 extra-index-url.
+
+# Transformers stack — compatible with 1Cat-vLLM 1.0.0 (vllm fork 1.0.0,
+# based on upstream vLLM 0.7.x line). Versions match the upstream
+# nvidia_vllm_47f5d58e runner so we know they're consistent.
+transformers==4.57.6
+tokenizers==0.22.2
+huggingface-hub==0.35.0
+accelerate==1.10.1
+safetensors==0.6.2
+
+# AccelMark dependencies
+numpy==1.26.4
+jsonschema==4.25.1
+psutil==7.1.0
+tqdm==4.67.1
+
+# NVIDIA monitoring (for power and GPU stats — same as upstream NVIDIA runner)
+nvidia-ml-py==13.580.82
+
+# Async support
+aiohttp==3.12.15
+
+# Config file parsing
+PyYAML==6.0.2
