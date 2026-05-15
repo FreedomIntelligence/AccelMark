@@ -48,3 +48,6 @@ mini_result/
 *_backup/
 backup/
 /tmp/
+
+# ── Local-only handoff notes (across-session continuity) ────────────────────
+.handoff-*.md
