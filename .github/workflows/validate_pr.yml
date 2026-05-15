@@ -1,12 +1,16 @@
 name: Validate Submission
 
-# Triggers only when results/ directory is touched in a PR.
-# Schema changes, script changes, and doc changes do not trigger this.
+# Triggers when results/, runner metadata, the platforms catalogue, the
+# README (which contains the auto-generated matrix), or the matrix
+# generator itself are touched in a PR.
 on:
   pull_request:
     paths:
       - 'results/**'
       - 'runners/**'
+      - 'schema/platforms.json'
+      - 'tools/generate_platforms_matrix.py'
+      - 'README.md'
 
 jobs:
   validate-runners:
@@ -65,6 +69,24 @@ jobs:
       - name: No runner folders changed
         if: steps.changed.outputs.folders == ''
         run: echo "No runner folders changed in this PR — skipping."
+
+      # Always validate every runner folder (not just the ones touched in
+      # this PR). This catches drift introduced by shared changes — e.g.
+      # a meta.schema.json edit that breaks an unrelated existing runner.
+      - name: Validate all runner folders (drift check)
+        run: |
+          echo "::group::Validating every runner folder in the repo"
+          python runners/validate_runners.py
+          echo "::endgroup::"
+
+      # README "Supported platforms" matrix is generated from each runner's
+      # meta.json. If a PR changes a runner's suite_support / hardware_label
+      # or adds a new runner without regenerating the table, fail.
+      - name: README platforms matrix is in sync
+        run: |
+          echo "::group::tools/generate_platforms_matrix.py --check"
+          python tools/generate_platforms_matrix.py --check
+          echo "::endgroup::"
 
   validate:
     name: Validate result submissions
