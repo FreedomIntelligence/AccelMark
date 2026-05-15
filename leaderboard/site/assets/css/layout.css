@@ -117,9 +117,8 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); text-decorati
 }
 .section-header h2 {
   margin: 0;
-  font-family: var(--font-serif);
-  font-size: 1.6rem;
-  font-weight: 500;
+  font-size: 1.4rem;
+  font-weight: 700;
   color: var(--fg-strong);
   letter-spacing: -0.015em;
   line-height: 1.15;

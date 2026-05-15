@@ -70,9 +70,10 @@
   --gap:    1rem;
   --gap-lg: 1.5rem;
 
-  /* Type */
+  /* Type — single sans family used everywhere; mono is kept only for
+     the `.mono` utility class and for the optional `font-variant-numeric`
+     tabular figures.  Serif token removed (was inconsistent feedback). */
   --font-sans:  -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-  --font-serif: ui-serif, "Iowan Old Style", "Source Serif Pro", "Charter", Georgia, serif;
   --font-mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
   color-scheme: dark;
@@ -135,6 +136,28 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  position: relative;
+  isolation: isolate;
+}
+/* Ambient page-top wash — soft multi-stop radial that fades into the
+   page background.  Pinned to the top of the document (absolute, not
+   fixed) so it scrolls away with the hero; no rounded clip, no hard
+   edge. */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 720px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 80% at 12% 0%, color-mix(in srgb, var(--suite-A) 13%, transparent), transparent 70%),
+    radial-gradient(55% 70% at 90% -4%, color-mix(in srgb, var(--suite-D) 11%, transparent), transparent 65%),
+    radial-gradient(70% 55% at 50% 0%,  color-mix(in srgb, var(--suite-B) 6%,  transparent), transparent 75%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 100%);
 }
 
 a { color: var(--accent); text-decoration: none; }
@@ -157,7 +180,7 @@ button {
 .muted     { color: var(--fg-muted); }
 .faint     { color: var(--fg-faint); }
 .mono      { font-family: var(--font-mono); }
-.serif     { font-family: var(--font-serif); }
+.tnum      { font-variant-numeric: tabular-nums; }
 .text-xs   { font-size: 0.75rem; }
 .text-sm   { font-size: 0.85rem; }
 .text-lg   { font-size: 1.1rem; }

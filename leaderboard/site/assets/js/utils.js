@@ -65,6 +65,26 @@ export function shortVersion(v) {
   return s;
 }
 
+// Abbreviate verbose HF-style model names for tight UI slots.
+//   "Meta-Llama-3-8B-Instruct"        → "Llama 3 · 8B"
+//   "Meta-Llama-3-70B-Instruct"       → "Llama 3 · 70B"
+//   "Llama-3.1-8B-Instruct"           → "Llama 3.1 · 8B"
+//   "Qwen2.5-0.5B-Instruct"           → "Qwen 2.5 · 0.5B"
+//   "Mixtral-8x7B-Instruct-v0.1"      → "Mixtral 8×7B"
+//   anything-else                     → unchanged
+export function shortModel(name) {
+  if (!name) return "";
+  let s = String(name);
+  s = s.replace(/^Meta-/, "");                  // Meta-Llama-3 → Llama-3
+  s = s.replace(/-Instruct(?:-v[\d.]+)?$/, ""); // drop trailing variant
+  // Llama / Qwen with a "-<size>" suffix → split family · size
+  const m = s.match(/^(Llama|Qwen)[-]?(\d+(?:\.\d+)?)-([\d.]+B)$/i);
+  if (m) return `${m[1]} ${m[2]} · ${m[3]}`;
+  // Mixtral 8x7B style → keep
+  s = s.replace(/(\d+)x(\d+B)/i, "$1×$2");
+  return s;
+}
+
 // Normalize a submitter field to a bare handle (no leading @).
 // Accepts GitHub login, email, or "Name <email>" — falls back to the
 // part before the first @ for emails.

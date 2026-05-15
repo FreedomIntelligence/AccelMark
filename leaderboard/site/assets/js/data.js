@@ -214,3 +214,81 @@ export function rankWithinSuite(row) {
   const idx = list.findIndex((r) => r.submission === row.submission);
   return idx >= 0 ? { rank: idx + 1, total: list.length } : null;
 }
+
+// Suite-level facts derived from current data — model used,
+// baseline precision, total submissions, distinct chips.  Used in
+// the home suite-card header to give buyers immediate context
+// without having to dive in.
+export function suiteFacts(suiteId) {
+  if (!_ready) init();
+  const rows = _bySuite.get(suiteId) || [];
+  if (rows.length === 0) {
+    return { model: null, precision: null, submissions: 0, chips: 0 };
+  }
+  const model = mode(rows.map((r) => r.model).filter(Boolean));
+  const precision = mode(rows.map((r) => r.precision).filter(Boolean));
+  const chips = new Set(rows.map((r) => r._chip_slug)).size;
+  return { model, precision, submissions: rows.length, chips };
+}
+
+// Per-vendor breakdown for the "Coverage by vendor" home section.
+// Returns an array sorted by submission count desc, each entry
+// containing the vendor name, chip count, submission count, the
+// vendor's best chip in its most-populated suite, and the set of
+// suite letters the vendor appears in.
+export function vendorBreakdown() {
+  if (!_ready) init();
+  const byVendor = groupBy(_rows, (r) => r.vendor);
+  const out = [];
+  for (const [vendor, rows] of byVendor.entries()) {
+    if (!vendor) continue;
+    const chips = new Set(rows.map((r) => r._chip_slug));
+    const suiteCounts = new Map();
+    for (const r of rows) {
+      suiteCounts.set(r.suite, (suiteCounts.get(r.suite) || 0) + 1);
+    }
+    // Most-populated suite the vendor appears in — pick the vendor's
+    // best chip there as the headline "flagship" entry.
+    let topSuite = null;
+    let topCount = -1;
+    for (const [sid, c] of suiteCounts.entries()) {
+      if (c > topCount) { topCount = c; topSuite = sid; }
+    }
+    const bestRow = topSuite ? bestChipForVendorInSuite(vendor, topSuite) : null;
+    out.push({
+      vendor,
+      chips: chips.size,
+      submissions: rows.length,
+      suites: Array.from(suiteCounts.keys())
+        .sort((a, b) => a.localeCompare(b))
+        .map((sid) => (SUITE_META[sid] && SUITE_META[sid].letter) || null)
+        .filter(Boolean),
+      topSuite,
+      topRow: bestRow,
+    });
+  }
+  out.sort((a, b) => b.submissions - a.submissions);
+  return out;
+}
+
+function bestChipForVendorInSuite(vendor, suiteId) {
+  const meta = SUITE_META[suiteId];
+  if (!meta) return null;
+  const key = meta.primary.key;
+  const dir = meta.primary.direction;
+  const rows = (_bySuite.get(suiteId) || [])
+    .filter((r) => r.vendor === vendor && r[key] !== null && r[key] !== undefined);
+  if (rows.length === 0) return null;
+  return dir === "asc"
+    ? rows.reduce((a, b) => (a[key] <= b[key] ? a : b))
+    : rows.reduce((a, b) => (a[key] >= b[key] ? a : b));
+}
+
+function mode(arr) {
+  if (!arr || arr.length === 0) return null;
+  const c = new Map();
+  for (const x of arr) c.set(x, (c.get(x) || 0) + 1);
+  let best = null, bestC = -1;
+  for (const [k, n] of c.entries()) if (n > bestC) { best = k; bestC = n; }
+  return best;
+}

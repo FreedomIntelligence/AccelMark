@@ -1,87 +1,44 @@
-/* home.css — Home page (suite overview grid + recent additions)
+/* home.css — Home page (suite overview grid + recent additions + vendor coverage)
  *
  * Each suite card declares its `data-suite="A".."G"` which scopes
  *   --suite-color   (full saturation, used for header bar + accents)
  *   --suite-tint    (~10% alpha, used for #1 row + letter chip bg)
- * so the rest of the file can reference them theme-agnostically.
  */
 
 /* ── Per-suite color tokens via data attribute ──────────── */
-.suite-card[data-suite="A"] { --suite-color: var(--suite-A); }
-.suite-card[data-suite="B"] { --suite-color: var(--suite-B); }
-.suite-card[data-suite="C"] { --suite-color: var(--suite-C); }
-.suite-card[data-suite="D"] { --suite-color: var(--suite-D); }
-.suite-card[data-suite="E"] { --suite-color: var(--suite-E); }
-.suite-card[data-suite="F"] { --suite-color: var(--suite-F); }
-.suite-card[data-suite="G"] { --suite-color: var(--suite-G); }
+.suite-card[data-suite="A"], .lb-row[data-suite="A"], .vendor-suite-pill[data-suite="A"] { --suite-color: var(--suite-A); }
+.suite-card[data-suite="B"], .lb-row[data-suite="B"], .vendor-suite-pill[data-suite="B"] { --suite-color: var(--suite-B); }
+.suite-card[data-suite="C"], .lb-row[data-suite="C"], .vendor-suite-pill[data-suite="C"] { --suite-color: var(--suite-C); }
+.suite-card[data-suite="D"], .lb-row[data-suite="D"], .vendor-suite-pill[data-suite="D"] { --suite-color: var(--suite-D); }
+.suite-card[data-suite="E"], .lb-row[data-suite="E"], .vendor-suite-pill[data-suite="E"] { --suite-color: var(--suite-E); }
+.suite-card[data-suite="F"], .lb-row[data-suite="F"], .vendor-suite-pill[data-suite="F"] { --suite-color: var(--suite-F); }
+.suite-card[data-suite="G"], .lb-row[data-suite="G"], .vendor-suite-pill[data-suite="G"] { --suite-color: var(--suite-G); }
 
-/* Default fallback color (also used by .lb-row outside a card) */
+/* Default fallback color */
 .suite-card,
-.lb-row {
-  --suite-color: var(--accent-2);
-}
+.lb-row,
+.vendor-suite-pill { --suite-color: var(--accent-2); }
 
-/* ── 4+3 suite grid ─────────────────────────────────────────
-   Row 1: 4 compact cards, span 3 cols of a 12-col grid.
-   Row 2: 3 wider cards, span 4 cols. Cards keep the same
-   internal structure; row-1 just gets a tighter head layout. */
+/* ── Uniform 3-col suite grid ──────────────────────────── */
 .suite-grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
 }
-.suite-grid > .suite-card { grid-column: span 4; }
-.suite-grid > .suite-card.is-compact { grid-column: span 3; }
-
-@media (max-width: 1100px) {
-  .suite-grid > .suite-card,
-  .suite-grid > .suite-card.is-compact { grid-column: span 6; }
+@media (max-width: 980px) {
+  .suite-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
-  .suite-grid > .suite-card,
-  .suite-grid > .suite-card.is-compact { grid-column: span 12; }
+  .suite-grid { grid-template-columns: 1fr; }
 }
-
-/* Compact variant — row 1 cards need a stacked head so the title
-   gets the full card width (otherwise "Single-chip throughput"
-   truncates next to the metric pill at 25% width). */
-.suite-card.is-compact .suite-card-head {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.55rem;
-  padding: 0.75rem 0.95rem 0.7rem;
-}
-.suite-card.is-compact .suite-card-head .suite-head-left {
-  width: 100%;
-}
-.suite-card.is-compact .suite-card-head .suite-title {
-  font-size: 0.95rem;
-}
-.suite-card.is-compact .suite-card-head .suite-metric-tag {
-  align-self: flex-end;
-  font-size: 0.66rem;
-  padding: 0.18rem 0.55rem;
-}
-.suite-card.is-compact .suite-card-tag {
-  padding: 0.6rem 0.95rem 0.15rem;
-  font-size: 0.8rem;
-}
-.suite-card.is-compact .suite-card-body {
-  padding: 0.35rem 0.4rem 0.3rem;
-}
-.suite-card.is-compact .suite-card-foot {
-  padding: 0.55rem 0.95rem 0.95rem;
-}
-.suite-card.is-compact .lb-row { padding: 0.45rem 0.55rem; gap: 0.55rem; }
-.suite-card.is-compact .lb-row-name { font-size: 0.9rem; }
-.suite-card.is-compact .lb-row-sub  { font-size: 0.72rem; }
-.suite-card.is-compact .lb-row-score .score-val { font-size: 0.95rem; }
-.suite-card.is-compact .lb-row.lb-row--featured .lb-row-name { font-size: 0.95rem; }
-.suite-card.is-compact .lb-row.lb-row--featured .lb-row-score .score-val { font-size: 1.02rem; }
 
 /* ── Suite card ────────────────────────────────────────────
-   Filled accent header (per-suite color) → tagline → top-5 row
-   list (with #1 visually featured) → centered "View full →" CTA. */
+   Header (filled in suite color) contains:
+     · letter + bigger title + right metric pill
+     · tagline (short description, moved out of the body)
+     · meta line (model · precision · N rows · M chips)
+   Body is the lb-row leaderboard only (top 6).
+   Footer is the centered "View full ranking →" CTA. */
 
 .suite-card {
   padding: 0;
@@ -101,57 +58,63 @@
 
 .suite-card-head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.9rem 1.1rem;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.15rem 1.05rem;
   background: var(--suite-color);
   color: var(--on-accent);
   position: relative;
   overflow: hidden;
 }
-/* Subtle highlight sheen on the colored bar */
 .suite-card-head::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 60%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 65%);
   pointer-events: none;
 }
-.suite-card-head .suite-head-left {
+.suite-card-head > * { position: relative; z-index: 1; }
+
+.suite-head-row1 {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  justify-content: space-between;
+  gap: 0.75rem;
   min-width: 0;
-  position: relative;
-  z-index: 1;
 }
-.suite-card-head .suite-letter {
+.suite-head-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.suite-letter {
   flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.22);
   color: var(--on-accent);
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.suite-card-head .suite-title {
-  font-size: 1.02rem;
-  font-weight: 600;
+.suite-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: var(--on-accent);
-  letter-spacing: -0.005em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  overflow-wrap: break-word;
 }
-.suite-card-head .suite-metric-tag {
+.suite-metric-tag {
   flex: 0 0 auto;
-  font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 600;
   padding: 0.22rem 0.6rem;
@@ -160,15 +123,33 @@
   color: var(--on-accent);
   letter-spacing: 0.02em;
   white-space: nowrap;
-  position: relative;
-  z-index: 1;
 }
 
-.suite-card-tag {
-  padding: 0.75rem 1.1rem 0.25rem;
-  font-size: 0.85rem;
-  color: var(--fg-muted);
-  line-height: 1.45;
+.suite-head-tagline {
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.86);
+  margin: 0;
+}
+
+.suite-head-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.01em;
+  padding-top: 0.15rem;
+}
+.suite-head-meta .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.suite-head-meta .meta-item strong {
+  color: var(--on-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .suite-card-body {
@@ -178,24 +159,21 @@
 }
 
 .suite-card-foot {
-  padding: 0.6rem 1.1rem 1.1rem;
+  padding: 0.55rem 1.15rem 1rem;
   text-align: center;
   border-top: 1px solid var(--border-soft);
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
 }
 .suite-card-foot a,
 .suite-card-foot .cta {
   font-size: 0.82rem;
-  color: color-mix(in srgb, var(--suite-color) 80%, var(--fg-strong));
+  color: color-mix(in srgb, var(--suite-color) 78%, var(--fg-strong));
   font-weight: 600;
   letter-spacing: 0.01em;
   text-decoration: none;
 }
-.suite-card:hover .suite-card-foot .cta {
-  color: var(--suite-color);
-}
+.suite-card:hover .suite-card-foot .cta { color: var(--suite-color); }
 
-/* Empty suite (no submissions yet) */
 .suite-card.empty .suite-card-body {
   padding: 1.5rem 1.1rem 1.25rem;
   color: var(--fg-faint);
@@ -208,10 +186,10 @@
 .lb-row {
   position: relative;
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.7rem;
-  padding: 0.55rem 0.7rem;
+  padding: 0.5rem 0.65rem;
   border-radius: var(--r-md);
   text-decoration: none;
   color: inherit;
@@ -225,8 +203,8 @@
   content: "";
   position: absolute;
   top: 0;
-  left: 0.7rem;
-  right: 0.7rem;
+  left: 0.65rem;
+  right: 0.65rem;
   height: 1px;
   background: var(--border-soft);
   pointer-events: none;
@@ -237,8 +215,8 @@
 /* Featured #1 row — soft suite-color tint background */
 .lb-row.lb-row--featured {
   background: color-mix(in srgb, var(--suite-color) 8%, transparent);
-  padding-top: 0.7rem;
-  padding-bottom: 0.7rem;
+  padding-top: 0.62rem;
+  padding-bottom: 0.62rem;
   border-left: 2px solid var(--suite-color);
   border-radius: 0 var(--r-md) var(--r-md) 0;
   margin-left: -2px;
@@ -247,36 +225,30 @@
 .lb-row.lb-row--featured:hover {
   background: color-mix(in srgb, var(--suite-color) 14%, transparent);
 }
-.lb-row.lb-row--featured .lb-row-name {
-  font-size: 1rem;
-}
-.lb-row.lb-row--featured .lb-row-score .score-val {
-  font-size: 1.1rem;
-}
+.lb-row.lb-row--featured .lb-row-name { font-size: 1rem; }
+.lb-row.lb-row--featured .lb-row-score .score-val { font-size: 1.08rem; }
 
 .lb-row-rank {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   background: var(--bg-elev-2);
   color: var(--fg-muted);
   border: 1px solid var(--border-soft);
+  font-variant-numeric: tabular-nums;
 }
 .lb-row-rank.gold   { background: var(--gold);   color: #1a1206; border-color: transparent; }
 .lb-row-rank.silver { background: var(--silver); color: #15171c; border-color: transparent; }
 .lb-row-rank.bronze { background: var(--bronze); color: #1e0e02; border-color: transparent; }
-/* Suite-letter circle on recent rows uses the suite color */
 .lb-row-rank.suite-tag-rank {
   background: color-mix(in srgb, var(--suite-color) 18%, transparent);
   color: var(--suite-color);
   border-color: color-mix(in srgb, var(--suite-color) 35%, transparent);
-  font-family: inherit;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -302,7 +274,7 @@
   gap: 0.4rem;
   font-size: 0.74rem;
   color: var(--fg-muted);
-  line-height: 1.2;
+  line-height: 1.25;
   flex-wrap: wrap;
 }
 .lb-row-sub .vendor-dot {
@@ -323,21 +295,18 @@
 .lb-row-sub .sub-sep { color: var(--fg-faint); }
 .lb-row-sub .vendor-name { color: var(--fg-muted); }
 .lb-row-sub .fw-ver {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
   color: var(--fg-faint);
+  font-size: 0.7rem;
   margin-left: 0.15rem;
+  font-variant-numeric: tabular-nums;
 }
-.lb-row-sub .submitter {
-  color: var(--fg-muted);
-  font-feature-settings: "tnum";
-}
+.lb-row-sub .submitter { color: var(--fg-muted); }
 .lb-row-sub .suite-tag {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-family: var(--font-mono);
   font-size: 0.7rem;
+  font-weight: 600;
   padding: 0.05rem 0.45rem;
   background: color-mix(in srgb, var(--suite-color) 12%, transparent);
   color: color-mix(in srgb, var(--suite-color) 80%, var(--fg-strong));
@@ -360,14 +329,12 @@
   font-variant-numeric: tabular-nums;
 }
 .lb-row-score .score-unit {
-  font-family: var(--font-mono);
   font-size: 0.68rem;
   color: var(--fg-muted);
   letter-spacing: 0.02em;
   margin-top: 0.1rem;
 }
 
-/* Empty placeholder row inside a suite with no entries */
 .lb-row.placeholder {
   color: var(--fg-faint);
   font-style: italic;
@@ -385,16 +352,114 @@
   padding: 0.5rem 0.55rem;
   box-shadow: var(--shadow-card);
 }
-.recent-list .lb-row {
-  /* Recent rows scope --suite-color per-row via inline data-suite */
+
+/* ── Coverage by vendor section ─────────────────────────── */
+.vendor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
 }
-.recent-list .lb-row[data-suite="A"] { --suite-color: var(--suite-A); }
-.recent-list .lb-row[data-suite="B"] { --suite-color: var(--suite-B); }
-.recent-list .lb-row[data-suite="C"] { --suite-color: var(--suite-C); }
-.recent-list .lb-row[data-suite="D"] { --suite-color: var(--suite-D); }
-.recent-list .lb-row[data-suite="E"] { --suite-color: var(--suite-E); }
-.recent-list .lb-row[data-suite="F"] { --suite-color: var(--suite-F); }
-.recent-list .lb-row[data-suite="G"] { --suite-color: var(--suite-G); }
+
+.vendor-card {
+  padding: 1.1rem 1.2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: relative;
+  --vendor-color: var(--fg-faint);
+}
+.vendor-card[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.vendor-card[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.vendor-card[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.vendor-card[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.vendor-card[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.vendor-card[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.vendor-card[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+.vendor-card::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 3px;
+  background: var(--vendor-color);
+  border-radius: var(--r-lg) 0 0 var(--r-lg);
+}
+
+.vendor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.vendor-name-main {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--fg-strong);
+}
+.vendor-name-main::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--vendor-color);
+}
+
+.vendor-stats {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+}
+.vendor-stats .stat strong {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  margin-bottom: 0.15rem;
+}
+
+.vendor-best {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+}
+.vendor-best-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+.vendor-best-chip {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+}
+
+.vendor-suites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.vendor-suite-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--suite-color) 14%, transparent);
+  color: var(--suite-color);
+  border: 1px solid color-mix(in srgb, var(--suite-color) 30%, transparent);
+}
 
 /* Stats row inside suite card body (used by /suites listing). */
 .suite-stats {
@@ -412,17 +477,16 @@
   margin-right: 0.2rem;
 }
 
-/* When the whole card is a link, kill underline + inherit color. */
 a.suite-card { text-decoration: none; color: inherit; }
 a.suite-card:hover { text-decoration: none; }
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 700px) {
-  .suite-card-head { padding: 0.75rem 0.9rem; }
-  .suite-card-tag  { padding: 0.6rem 0.9rem 0.1rem; font-size: 0.82rem; }
+  .suite-card-head { padding: 0.85rem 0.95rem; }
+  .suite-title { font-size: 1.05rem; }
   .suite-card-body { padding: 0.3rem 0.4rem 0.25rem; }
-  .suite-card-foot { padding: 0.55rem 0.9rem 0.85rem; }
+  .suite-card-foot { padding: 0.5rem 0.95rem 0.9rem; }
   .lb-row { padding: 0.45rem 0.55rem; gap: 0.55rem; }
   .lb-row-name { font-size: 0.92rem; }
-  .lb-row-score .score-val { font-size: 1.05rem; }
+  .lb-row-score .score-val { font-size: 0.95rem; }
 }

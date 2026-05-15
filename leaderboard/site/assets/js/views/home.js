@@ -1,31 +1,34 @@
 // views/home.js — Home page (multi-suite overview).
 //
-// Layout (editorial, per-suite color):
-//   • Hero is centered (eyebrow + serif h1 + tagline + KPI strip + CTAs).
-//   • Suite grid: 4 compact cards on row 1 (A B C D, span 3 of 12),
-//     3 wider cards on row 2 (E F G, span 4 of 12).
-//   • Each suite card declares data-suite="A".."G" so CSS scopes
-//     --suite-color for the header bar, featured #1 row tint, and CTA.
-//   • Recent submissions: same .lb-row, suite letter circle tinted in
-//     that submission's suite color.
+// Layout:
+//   • Hero  : centered, two-line title (h1 + sub), tagline, KPI strip, CTAs.
+//             Background gradient lives on body::before (no hard edges).
+//   • 01    : Suite grid — uniform 3-col, 7 cards, each with a colored
+//             header (letter + title + metric tag + tagline + meta line:
+//             model · precision · N results · M chips) and top-6 entries
+//             in the body. CTA at the bottom.
+//   • 02    : Coverage by vendor — auto-fit cards, one per vendor.
+//   • 03    : Recent submissions — same .lb-row primitive, suite-tinted
+//             letter circle in the rank slot.
 
 import {
   SUITE_ORDER, SUITE_META,
-  rowsForSuite, bestPerChipForSuite,
+  bestPerChipForSuite, suiteFacts, vendorBreakdown,
   summary, recent, formatPrimary,
 } from "../data.js";
-import { esc, fmtNum, fmtDate, chipHref, buildHash, shortVersion, submitterHandle } from "../utils.js";
+import {
+  esc, fmtNum, fmtDate, chipHref, buildHash,
+  shortVersion, shortModel, submitterHandle,
+} from "../utils.js";
 
-// Row-1 (compact) suites — narrower 25%-ish cards. Anything not here
-// goes into row 2 (wider 33% cards).
-const COMPACT_SUITES = new Set(["suite_A", "suite_B", "suite_C", "suite_D"]);
+const TOP_N = 6;
 
 export function render({ el }) {
   const s = summary();
   el.innerHTML = `
     <section class="hero">
-      <span class="eyebrow hero-eyebrow">AccelMark · Benchmark suite</span>
-      <h1>AI accelerator benchmark — <em>open and reproducible</em></h1>
+      <h1>AccelMark Leaderboard</h1>
+      <p class="hero-sub">A Reproducible Multi-Regime AI Accelerator Benchmark</p>
       <p class="tagline">
         Independent measurements of inference performance across vendors.
         Every result links back to the runner code that produced it.
@@ -50,7 +53,7 @@ export function render({ el }) {
           <span class="eyebrow">01 · Workloads</span>
           <h2>Rankings by workload</h2>
         </div>
-        <span class="section-sub">Each suite measures a different real-world workload. Pick one to dive in.</span>
+        <span class="section-sub">Seven workloads, each on a fixed model and protocol. Pick one to dive in.</span>
       </div>
       <div class="suite-grid" id="suite-grid"></div>
     </section>
@@ -58,7 +61,18 @@ export function render({ el }) {
     <section class="section">
       <div class="section-header">
         <div class="section-title">
-          <span class="eyebrow">02 · Latest activity</span>
+          <span class="eyebrow">02 · Coverage</span>
+          <h2>Submissions by vendor</h2>
+        </div>
+        <span class="section-sub">Who shows up, how many chips, and where they compete.</span>
+      </div>
+      <div class="vendor-grid" id="vendor-grid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="eyebrow">03 · Latest activity</span>
           <h2>Recent submissions</h2>
         </div>
         <a class="btn ghost small" href="#/rankings">See all →</a>
@@ -72,6 +86,11 @@ export function render({ el }) {
     grid.appendChild(renderSuiteCard(suiteId));
   }
 
+  const vendorGrid = el.querySelector("#vendor-grid");
+  for (const v of vendorBreakdown()) {
+    vendorGrid.appendChild(renderVendorCard(v));
+  }
+
   const recentEl = el.querySelector("#recent-list");
   for (const row of recent(8)) {
     recentEl.appendChild(renderRecentRow(row));
@@ -80,26 +99,29 @@ export function render({ el }) {
 
 function renderSuiteCard(suiteId) {
   const meta = SUITE_META[suiteId];
-  const compact = COMPACT_SUITES.has(suiteId);
-  const limit = compact ? 4 : 5;
-  const top = bestPerChipForSuite(suiteId).slice(0, limit);
+  const facts = suiteFacts(suiteId);
+  const top = bestPerChipForSuite(suiteId).slice(0, TOP_N);
   const empty = top.length === 0;
 
   const card = document.createElement("article");
-  card.className = "card suite-card" + (compact ? " is-compact" : "") + (empty ? " empty" : "");
+  card.className = "card suite-card" + (empty ? " empty" : "");
   card.setAttribute("data-suite", meta.letter);
 
   const rankingsHref = buildHash("/rankings", { suite: suiteId });
 
+  const metaLine = renderSuiteMeta(facts);
   const header = `
     <div class="suite-card-head">
-      <div class="suite-head-left">
-        <span class="suite-letter">${esc(meta.letter)}</span>
-        <span class="suite-title">${esc(meta.title)}</span>
+      <div class="suite-head-row1">
+        <div class="suite-head-left">
+          <span class="suite-letter">${esc(meta.letter)}</span>
+          <span class="suite-title">${esc(meta.title)}</span>
+        </div>
+        <span class="suite-metric-tag">${esc(meta.primary.label)}</span>
       </div>
-      <span class="suite-metric-tag">${esc(meta.primary.label)}</span>
+      <p class="suite-head-tagline">${esc(meta.tagline)}</p>
+      <div class="suite-head-meta">${metaLine}</div>
     </div>
-    <div class="suite-card-tag">${esc(meta.tagline)}</div>
   `;
 
   if (empty) {
@@ -111,7 +133,7 @@ function renderSuiteCard(suiteId) {
     return card;
   }
 
-  const body = top.map((r, i) => renderLbRow(r, suiteId, i + 1, compact)).join("");
+  const body = top.map((r, i) => renderLbRow(r, suiteId, i + 1)).join("");
   card.innerHTML = `
     ${header}
     <div class="suite-card-body">${body}</div>
@@ -120,23 +142,37 @@ function renderSuiteCard(suiteId) {
   return card;
 }
 
+function renderSuiteMeta(facts) {
+  const items = [];
+  if (facts.model) {
+    items.push(`<span class="meta-item"><strong>${esc(shortModel(facts.model))}</strong></span>`);
+  }
+  if (facts.precision) {
+    items.push(`<span class="meta-item">${esc(facts.precision)} baseline</span>`);
+  }
+  if (facts.submissions) {
+    items.push(`<span class="meta-item"><strong>${fmtNum(facts.submissions)}</strong> results</span>`);
+  }
+  if (facts.chips) {
+    items.push(`<span class="meta-item"><strong>${fmtNum(facts.chips)}</strong> chips</span>`);
+  }
+  return items.join("");
+}
+
 // Single ranked row used by suite cards.  Anchor → chip detail page.
-// `compact` flag hides the submitter line so narrow row-1 cards stay
-// readable; row-2 (wider) cards show it.
-function renderLbRow(row, suiteId, rank, compact = false) {
+function renderLbRow(row, suiteId, rank) {
   const meta = SUITE_META[suiteId];
   const value = row[meta.primary.key];
   const display = formatPrimary(value, suiteId);
   const { num, unit } = splitNumUnit(display);
   const medal = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
   const featured = rank === 1 ? " lb-row--featured" : "";
-  const fwLine = renderFwSub(row, compact);
   return `
     <a class="lb-row${featured}" href="${chipHref(row)}">
       <span class="lb-row-rank ${medal}">${rank}</span>
       <span class="lb-row-main">
         <span class="lb-row-name">${esc(row._chip_label)}</span>
-        ${fwLine}
+        ${renderFwSub(row)}
       </span>
       <span class="lb-row-score">
         <span class="score-val">${esc(num)}</span>
@@ -146,16 +182,14 @@ function renderLbRow(row, suiteId, rank, compact = false) {
   `;
 }
 
-// Sub line under chip name. Always shows vendor + framework@version +
-// precision. Submitter is shown on wider rows only (recent list +
-// row-2 suite cards) to keep compact rows tight.
-function renderFwSub(row, compact = false) {
+// Sub line under chip name: vendor + framework@version + precision + submitter.
+function renderFwSub(row) {
   const fw = row.framework || "";
   const ver = shortVersion(row.framework_version);
   const fwVer = ver ? `${esc(fw)} <span class="fw-ver">${esc(ver)}</span>` : esc(fw);
   const precision = row.precision ? ` · ${esc(row.precision)}` : "";
   const handle = submitterHandle(row.submitted_by);
-  const submitter = (!compact && handle)
+  const submitter = handle
     ? `<span class="sub-sep">·</span><span class="submitter">@${esc(handle)}</span>`
     : "";
   return `
@@ -167,6 +201,40 @@ function renderFwSub(row, compact = false) {
       ${submitter}
     </span>
   `;
+}
+
+function renderVendorCard(v) {
+  const div = document.createElement("article");
+  div.className = "card vendor-card";
+  div.setAttribute("data-vendor", v.vendor);
+
+  const topMeta = v.topRow && v.topSuite ? SUITE_META[v.topSuite] : null;
+  const topScore = topMeta && v.topRow
+    ? formatPrimary(v.topRow[topMeta.primary.key], v.topSuite)
+    : null;
+  const topLine = v.topRow
+    ? `${esc(v.topRow._chip_label)}${topScore ? `<span class="muted"> · ${esc(topScore)}</span>` : ""}`
+    : `<span class="muted">No submissions yet</span>`;
+
+  const pills = v.suites.map((l) => `
+    <span class="vendor-suite-pill" data-suite="${esc(l)}" title="Suite ${esc(l)}">${esc(l)}</span>
+  `).join("");
+
+  div.innerHTML = `
+    <div class="vendor-head">
+      <span class="vendor-name-main">${esc(v.vendor)}</span>
+    </div>
+    <div class="vendor-stats">
+      <div class="stat"><strong>${fmtNum(v.chips)}</strong>chips</div>
+      <div class="stat"><strong>${fmtNum(v.submissions)}</strong>submissions</div>
+    </div>
+    <div class="vendor-best">
+      <span class="vendor-best-label">Top entry</span>
+      <span class="vendor-best-chip">${topLine}</span>
+    </div>
+    <div class="vendor-suites" aria-label="Suites this vendor appears in">${pills}</div>
+  `;
+  return div;
 }
 
 function renderRecentRow(row) {
@@ -209,8 +277,6 @@ function renderRecentRow(row) {
 }
 
 // "5,731 tok/s" → { num: "5,731", unit: "tok/s" }
-// "94.5 %"     → { num: "94.5",  unit: "%" }
-// "—"          → { num: "—",     unit: "" }
 function splitNumUnit(s) {
   if (!s) return { num: "—", unit: "" };
   const idx = s.search(/\s[A-Za-z%]/);

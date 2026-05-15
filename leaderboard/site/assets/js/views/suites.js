@@ -1,30 +1,30 @@
 // views/suites.js — Suites explorer.  In commit 1 this is already informative
 // (lightweight static reference page); commit 4 will add per-suite stats.
 
-import { SUITE_ORDER, SUITE_META, rowsForSuite } from "../data.js";
-import { esc, buildHash } from "../utils.js";
+import { SUITE_ORDER, SUITE_META, suiteFacts } from "../data.js";
+import { esc, buildHash, shortModel, fmtNum } from "../utils.js";
 
 export function render({ el }) {
   const cards = SUITE_ORDER.map((id) => {
     const meta = SUITE_META[id];
-    const rows = rowsForSuite(id);
-    const submissions = rows.length;
-    const chips = new Set(rows.map((r) => r._chip_slug)).size;
+    const facts = suiteFacts(id);
     return `
       <a class="card suite-card" data-suite="${esc(meta.letter)}"
          href="${buildHash("/rankings", { suite: id })}">
         <div class="suite-card-head">
-          <div class="suite-head-left">
-            <span class="suite-letter">${esc(meta.letter)}</span>
-            <span class="suite-title">${esc(meta.title)}</span>
+          <div class="suite-head-row1">
+            <div class="suite-head-left">
+              <span class="suite-letter">${esc(meta.letter)}</span>
+              <span class="suite-title">${esc(meta.title)}</span>
+            </div>
+            <span class="suite-metric-tag">${esc(meta.primary.label)}</span>
           </div>
-          <span class="suite-metric-tag">${esc(meta.primary.label)}</span>
-        </div>
-        <div class="suite-card-tag">${esc(meta.tagline)}</div>
-        <div class="suite-card-body" style="padding:0.5rem 1.1rem 1rem">
-          <div class="suite-stats">
-            <span><strong>${submissions}</strong> submission${submissions === 1 ? "" : "s"}</span>
-            <span><strong>${chips}</strong> chip${chips === 1 ? "" : "s"}</span>
+          <p class="suite-head-tagline">${esc(meta.tagline)}</p>
+          <div class="suite-head-meta">
+            ${facts.model    ? `<span class="meta-item"><strong>${esc(shortModel(facts.model))}</strong></span>` : ""}
+            ${facts.precision ? `<span class="meta-item">${esc(facts.precision)} baseline</span>` : ""}
+            <span class="meta-item"><strong>${fmtNum(facts.submissions)}</strong> results</span>
+            <span class="meta-item"><strong>${fmtNum(facts.chips)}</strong> chips</span>
           </div>
         </div>
       </a>
@@ -33,15 +33,15 @@ export function render({ el }) {
 
   el.innerHTML = `
     <section class="hero">
-      <span class="eyebrow hero-eyebrow">Reference · Suites</span>
-      <h1>Benchmark <em>suites</em></h1>
+      <h1>Benchmark Suites</h1>
+      <p class="hero-sub">Seven workloads, each on a fixed model and protocol</p>
       <p class="tagline">
-        Each suite targets a distinct deployment workload. Click into one to
-        view its full ranking.
+        Each suite targets a distinct deployment regime. Click into one to view
+        its full ranking.
       </p>
     </section>
     <section class="section">
-      <div class="grid grid-2">${cards}</div>
+      <div class="suite-grid">${cards}</div>
     </section>
     <section class="section">
       <div class="section-header">
@@ -51,9 +51,9 @@ export function render({ el }) {
         </div>
       </div>
       <p class="muted" style="max-width:62ch;line-height:1.7;margin:0;font-size:1rem">
-        AI workloads vary widely — a chip optimized for batched offline throughput
-        may rank poorly on interactive latency.  Combining all dimensions into a
-        single number hides those trade-offs.  AccelMark keeps every suite raw and
+        AI workloads vary widely. A chip optimized for batched offline throughput
+        may rank poorly on interactive latency. Combining every dimension into a
+        single number hides those trade-offs. AccelMark keeps every suite raw and
         lets you pick the one that matches your deployment.
       </p>
     </section>
