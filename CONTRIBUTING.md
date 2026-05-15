@@ -346,6 +346,69 @@ verified result is itself reproducible by definition.
 
 ---
 
+## How your result appears on the leaderboard
+
+The frontend treats every submission as data — there's nothing per-vendor or per-chip hand-coded on the UI side. A few conventions are worth knowing if you want your result to look its best:
+
+### Chip identity vs. chip count
+
+The chip-detail page (`#/chip/<slug>`) is keyed on the **chip model** alone, not on `chip_count`. That means a single chip page aggregates every fan-out you've ever submitted (×1, ×4, ×8, ×16) into one overview, with the runs table sorted by `chip_count` ascending and the per-suite KPI card flagging the deployment behind the best score (e.g. `×8` badge next to the metric).
+
+Implication: if your runner emits one `result.json` per chip-count, you don't need to invent fake chip names to keep them apart — submit them with the same `chip` field and they'll merge cleanly. Old `…-x<N>` URLs from before this change auto-redirect to the bare-model slug, so existing shared links keep working.
+
+### Vendor colours
+
+Vendor accents (chip dot, vendor pill, peer card border) are driven entirely by `assets/js/data.js`'s `VENDOR_COLORS` map. New vendors get a deterministic fallback colour from a 9-entry palette the first time they appear in the dataset — no frontend change required to ship the result.
+
+If you want a brand-accurate accent for a new vendor (e.g. your accelerator's official colour), open a one-line PR to `VENDOR_COLORS`:
+
+```js
+export const VENDOR_COLORS = {
+  // …
+  Cerebras: "#ff6f3c",   // ← add yours
+};
+```
+
+`VENDOR_ORDER` (used to lay out the rankings facet pill row) is derived from `Object.keys(VENDOR_COLORS)`, so the same edit also pins your vendor's position in the brand list. Vendors not in the map are appended alphabetically after the brand-named ones.
+
+### Optional: viz fields for richer modal charts
+
+The run-detail modal's **Visualize** tab is hidden when `result.viz` is absent. Populate it to surface scenario-specific charts:
+
+```jsonc
+{
+  "viz": {
+    "type": "decode",            // bandwidth-bound suite (A/F/G default)
+    "offline": {
+      "labels":     [1, 2, 4, 8, 16, 32],
+      "throughput": [120, 230, 410, 760, 1100, 1380]
+    },
+    "interactive": {             // optional, suite_D-style
+      "ttft_p50": 78,  "ttft_p90": 110, "ttft_p99": 135,
+      "tpot_p50":  9,  "tpot_p90":  11, "tpot_p99":  14
+    }
+  }
+}
+```
+
+Suite-specific shapes the frontend understands today:
+
+| `viz.type` | Suites | Required keys |
+|---|---|---|
+| `decode`    | A · F · G  | `offline.labels[]`, `offline.throughput[]` |
+| `multichip` | B          | `offline.labels[]`, `offline.throughput[]`, `offline.throughput_per_chip[]` |
+| `quant`     | C          | `precisions[]`, `throughput[]`, optional `accuracy[]` |
+| `longctx`   | D          | `offline.labels[]`, `offline.throughput[]`, `interactive.{ttft_p50,…,tpot_p99}` |
+| `scaling`   | E          | `chip_counts[]`, `throughput[]`, `efficiency_pct[]` |
+
+`viz` is **fully optional** — runners that don't emit it still get a clean Details / Implementation modal. When present, the same fields drive the per-suite head-to-head charts on the Compare page (so two basket runs render directly comparable visualisations instead of falling back to a metric-table-only view).
+
+### Submitter handle
+
+The leaderboard surfaces the value of `meta.submitted_by` as `@<handle>` next to your result on every list (home recent, suite cards, chip-detail submissions table). Anything that looks like a GitHub login, an email, or a `Name <email>` form is reduced to the local-part — see `submitterHandle` in `assets/js/utils.js`.
+
+---
+
 ## Using local or air-gapped models
 
 AccelMark separates the **model identifier** (used for leaderboard comparisons)
