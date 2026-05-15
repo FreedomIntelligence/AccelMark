@@ -1,15 +1,22 @@
 name: Generate Leaderboard
 
-# Triggers only when results/ changes land on main.
-# This covers both direct merges and squash merges.
+# Triggers when anything that can change the rendered leaderboard lands on
+# main: new community/verified results, generator code, the static site, or
+# the auto-generated README platforms matrix (so a runner/platform metadata
+# change also redeploys). This covers both direct merges and squash merges.
 on:
   push:
     branches:
       - main
     paths:
       - 'results/**'
+      - 'leaderboard/**'
+      - 'tools/generate_platforms_matrix.py'
+      - 'schema/platforms.json'
+      - 'runners/*/meta.json'
 
-  # Allow manual trigger from Actions tab (useful for first deploy)
+  # Allow manual trigger from Actions tab (useful for first deploy or to
+  # force a redeploy when nothing in the watched paths changed).
   workflow_dispatch:
 
 jobs:
