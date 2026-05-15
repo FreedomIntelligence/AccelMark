@@ -69,7 +69,6 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). The t
 <!-- platforms-matrix:start -->
 | Hardware | Runner folder | Framework | A | B | C | D | E | F | G |
 |---|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| NVIDIA GPU | `nvidia_sglang_6da83845` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | NVIDIA GPU | `nvidia_sglang_c43a8309` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | AMD GPU | `amd_vllm_rocm_6c18cd8f` | vLLM-ROCm | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
