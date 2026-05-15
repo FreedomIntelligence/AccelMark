@@ -83,7 +83,7 @@ _Legend: ✓ validated · ⋯ author-declared (not smoke-tested in this repo yet
 
 Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 
-Adding a new platform? See [CONTRIBUTING.md#adding-support-for-a-new-platform](CONTRIBUTING.md#adding-support-for-a-new-platform).
+Adding a new runner? See [CONTRIBUTING.md#adding-a-new-runner](CONTRIBUTING.md#adding-a-new-runner). Adding a new accelerator family? See [`runners/README.md`](runners/README.md#adding-a-new-accelerator-family).
 
 ---
 
@@ -147,7 +147,8 @@ The most valuable contribution is running the benchmark on hardware not yet in t
 
 - **Submit a result** → [Community Submission guide](CONTRIBUTING.md)
 - **Report a bug** → [Open an issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=bug_report.md)
-- **Add platform support** → [Platform guide](CONTRIBUTING.md#adding-support-for-a-new-platform)
+- **Add a new runner** → [Runner guide](CONTRIBUTING.md#adding-a-new-runner)
+- **Add a new accelerator family** → [Platform plug-in guide](runners/README.md#adding-a-new-accelerator-family)
 - **Extend the leaderboard** → [Development guide](DEVELOPMENT.md)
 
 ---

@@ -329,11 +329,29 @@ If your local copy was downloaded at a different revision, add a note in
 
 ---
 
-## Adding support for a new platform
+## Adding a new runner
 
-Create a new runner folder under `runners/` by subclassing `BenchmarkRunner`.
-See [DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation guide including
-how to compute your runner's hash ID.
+A "runner" here is a Python class that wraps an inference framework (vLLM,
+SGLang, mlx-lm, …) and exposes the AccelMark standard interface. Adding
+one for an **existing** platform (NVIDIA, AMD, Ascend, Apple, Google TPU,
+Moore Threads, …) does not require touching any shared file. The full
+walk-through lives in [`runners/README.md`](runners/README.md); the short
+version is:
+
+1. Copy `runners/template/runner.py` into a temporary folder and fill in
+   the three required methods (`load_model`, `inference_fn_offline`,
+   `release_resources`) plus `inference_fn_streaming` if your framework
+   has a streaming API.
+2. Compute the hash and rename the folder:
+   `python runners/hash_runner.py runners/tmp/`
+   produces e.g. `nvidia_myframework_3f8a2c1d`.
+3. Write `meta.json` next to it, including `suite_support` — that field
+   is **how the top-level `README.md` table picks up your runner**. You
+   never edit `README.md` yourself.
+4. Add a `requirements.txt`.
+5. Validate: `python runners/validate_runners.py --dir runners/<your_folder>`.
+6. Regenerate the README matrix locally:
+   `python tools/generate_platforms_matrix.py`.
 
 ```python
 # runners/your_platform_{hash8}/runner.py
@@ -347,7 +365,7 @@ class MyFrameworkRunner(BenchmarkRunner):
     SUPPORTS_ONLINE     = True
     SUPPORTS_MULTI_CHIP = True    # set False if no tensor parallelism
 
-    def load_model(self, model_path: str, suite: dict, parallelism: dict) -> None:
+    def load_model(self, model_path: str, parallelism: dict) -> None:
         tp_size = parallelism["tensor_parallel_size"]
         self.model = MyFramework.load(model_path, tp=tp_size)
 
@@ -383,14 +401,37 @@ if __name__ == "__main__":
 All orchestration (result building, accuracy reuse, Suite E, etc.) is
 inherited from `BenchmarkRunner` automatically.
 
-**Checklist for a new platform PR:**
+**Checklist for a new-runner PR (existing platform):**
 - [ ] Runner folder named `{platform}_{name}_{hash8}` with correct hash
 - [ ] `runner.py` subclasses `BenchmarkRunner` and passes `runners/validate_runners.py`
-- [ ] `meta.json` present and valid (see `runners/meta.schema.json`)
+- [ ] `meta.json` present and valid (see `runners/meta.schema.json`), with
+      `suite_support` declared for every suite your runner can or cannot run
 - [ ] `requirements.txt` included
-- [ ] At least one reference result in `results/community/`
-- [ ] `runners/collect_env.py` updated to detect your hardware (see [DEVELOPMENT.md](DEVELOPMENT.md))
-- [ ] `README.md` supported platforms table updated
+- [ ] `tools/generate_platforms_matrix.py --check` passes locally (CI also
+      enforces this)
+- [ ] At least one reference result in `results/community/` (validated by CI)
+
+### Adding a new accelerator family
+
+If you are bringing up a **new platform** (e.g. a vendor not yet in
+`schema/platforms.json`), the only additional file you need to ship is
+
+```
+runners/platforms/<your_platform>.py
+```
+
+which exports module-level `collect()`, `detect_runtime_version()` and a
+few optional helpers. The collector at `runners/collect_env.py`
+auto-discovers it; no change to that file is required. See
+[`runners/README.md`](runners/README.md#adding-a-new-accelerator-family)
+for the full protocol and a worked example.
+
+Optional polish steps when the new platform stabilises:
+
+- Add an entry to `schema/platforms.json` so the README matrix renders a
+  pretty hardware label and stable sort order. Until then, the matrix
+  renders the bare identifier and `validate_runners.py` emits a
+  non-fatal warning prompting this follow-up.
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation reference.
 

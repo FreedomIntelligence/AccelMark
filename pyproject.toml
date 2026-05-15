@@ -1,16 +1,59 @@
 [project]
 name = "accelmark"
 version = "0.1.0"
-description = "LLM inference benchmarking framework for multiple hardware platforms"
+description = "Open benchmark leaderboard for AI accelerators on LLM workloads"
 readme = "README.md"
 license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
+authors = [
+    { name = "Juhao Liang", email = "juhaoliang1997@gmail.com" },
+]
+maintainers = [
+    { name = "Juhao Liang", email = "juhaoliang1997@gmail.com" },
+]
+keywords = [
+    "benchmark",
+    "llm",
+    "inference",
+    "accelerator",
+    "gpu",
+    "tpu",
+    "npu",
+    "vllm",
+    "sglang",
+    "mlx",
+    "leaderboard",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Benchmark",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Environment :: GPU",
+]
 
 dependencies = [
     "jsonschema>=4.0.0",
     "numpy>=1.24",
     "pyyaml>=6.0",
 ]
+
+[project.urls]
+Homepage      = "https://github.com/JuhaoLiang1997/AccelMark"
+Leaderboard   = "https://juhaoliang1997.github.io/AccelMark"
+Documentation = "https://github.com/JuhaoLiang1997/AccelMark/blob/main/README.md"
+Repository    = "https://github.com/JuhaoLiang1997/AccelMark"
+Issues        = "https://github.com/JuhaoLiang1997/AccelMark/issues"
+Changelog     = "https://github.com/JuhaoLiang1997/AccelMark/releases"
 
 [build-system]
 requires = ["setuptools>=68"]
