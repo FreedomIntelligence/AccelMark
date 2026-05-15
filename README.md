@@ -1,8 +1,12 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-wordmark-dark.svg">
-    <img src="docs/assets/logo-wordmark.svg" alt="AccelMark — cross-platform LLM inference benchmark" width="420">
+    <img src="docs/assets/logo-wordmark.svg" alt="AccelMark" width="360">
   </picture>
+</p>
+
+<p align="center">
+  <strong>Open benchmark leaderboard for AI accelerators on LLM workloads.</strong>
 </p>
 
 <p align="center">

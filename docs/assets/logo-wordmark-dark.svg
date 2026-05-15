@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 96" role="img" aria-label="AccelMark - cross-platform LLM inference benchmark">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 72" role="img" aria-label="AccelMark">
   <title>AccelMark</title>
-  <desc>AccelMark wordmark (dark theme): a lightning bolt over a speedometer arc, followed by the project name and tagline.</desc>
+  <desc>AccelMark wordmark (dark theme): a lightning bolt over a speedometer arc, next to the project name.</desc>
   <defs>
     <linearGradient id="amBoltD" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#FCD34D"/>
@@ -12,13 +12,12 @@
     </linearGradient>
   </defs>
 
-  <g transform="translate(12, 12)">
+  <g transform="translate(8, 0)">
     <path d="M 10 50 A 26 26 0 1 1 62 50" fill="none" stroke="url(#amGaugeD)" stroke-width="5.5" stroke-linecap="round"/>
     <circle cx="10" cy="50" r="3" fill="url(#amGaugeD)"/>
     <circle cx="62" cy="50" r="3" fill="url(#amGaugeD)"/>
     <path d="M 40 14 L 24 42 L 33 42 L 28 58 L 50 30 L 41 30 Z" fill="url(#amBoltD)" stroke="#78350F" stroke-width="0.7" stroke-linejoin="round"/>
   </g>
 
-  <text x="100" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="-1" fill="#F9FAFB">AccelMark</text>
-  <text x="102" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif" font-size="14" font-weight="500" fill="#9CA3AF">Cross-platform LLM inference benchmark</text>
+  <text x="84" y="50" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="-1.2" fill="#F9FAFB">AccelMark</text>
 </svg>
