@@ -1,141 +1,265 @@
 /* home.css — Home page (suite overview grid + recent additions) */
 
+/* ── Suite card ────────────────────────────────────────────
+   OpenCompass-style:
+     ┌─ filled accent header ─────────────┐
+     │ A · Single-chip throughput  tok/s │
+     └────────────────────────────────────┘
+     · row · row · row · row · row
+     centered CTA
+*/
+
 .suite-card {
+  /* override .card padding so header fills edge-to-edge */
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 1.1rem 1.2rem 1rem;
   text-decoration: none;
   color: inherit;
+  box-shadow: var(--shadow-card);
+}
+.suite-card.is-link:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
 }
 
-.suite-card-header {
+.suite-card-head {
   display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--accent-3);
+  color: var(--on-accent);
 }
-.suite-card-header .suite-letter-big {
+.suite-card-head .suite-head-left {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+.suite-card-head .suite-letter {
   flex: 0 0 auto;
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  background: var(--accent-soft);
-  color: var(--accent);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--on-accent);
+  font-weight: 800;
+  font-size: 0.85rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
-  font-weight: 800;
   letter-spacing: 0.02em;
 }
-.suite-card-header .suite-title {
+.suite-card-head .suite-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--fg-strong);
-  line-height: 1.25;
-}
-.suite-card-header .suite-tagline {
-  font-size: 0.78rem;
-  color: var(--fg-muted);
-  margin-top: 0.1rem;
-}
-
-.suite-card-meta {
-  display: flex;
-  gap: 0.85rem;
-  flex-wrap: wrap;
-  font-size: 0.72rem;
-  color: var(--fg-muted);
-}
-.suite-card-meta .meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.podium {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.podium-row {
-  display: grid;
-  grid-template-columns: 1.4rem 1fr auto;
-  gap: 0.6rem;
-  align-items: center;
-  font-size: 0.85rem;
-}
-.podium-row .podium-name {
-  color: var(--fg);
+  color: var(--on-accent);
+  letter-spacing: -0.005em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.podium-row .podium-value {
+.suite-card-head .suite-metric-tag {
+  flex: 0 0 auto;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--fg-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--on-accent);
+  letter-spacing: 0.02em;
   white-space: nowrap;
 }
-.podium-bars {
+
+.suite-card-tag {
+  padding: 0.65rem 1.1rem 0.1rem;
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+  line-height: 1.4;
+}
+
+.suite-card-body {
+  padding: 0.5rem 0.55rem 0.4rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
 }
-.podium-row .rel-bar { height: 4px; }
 
-.suite-card-cta {
-  margin-top: 0.25rem;
+.suite-card-foot {
+  padding: 0.5rem 1.1rem 1rem;
+  text-align: center;
+}
+.suite-card-foot a,
+.suite-card-foot .cta {
   font-size: 0.82rem;
   color: var(--accent);
   font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
+  text-decoration: none;
 }
-.suite-card.is-link:hover .suite-card-cta { color: var(--fg-strong); }
+.suite-card.is-link:hover .suite-card-foot .cta { color: var(--fg-strong); }
 
 /* Empty suite (no submissions yet) */
-.suite-card.empty .podium {
+.suite-card.empty .suite-card-body {
+  padding: 1.25rem 1.1rem 1rem;
   color: var(--fg-faint);
   font-style: italic;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  text-align: center;
 }
 
-/* Recent additions */
+/* ── Leaderboard row (used in suite cards + recent list) ── */
+.lb-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--r-md);
+  text-decoration: none;
+  color: inherit;
+  transition: background 100ms ease;
+}
+.lb-row:hover {
+  background: var(--bg-elev-2);
+  text-decoration: none;
+}
+.lb-row + .lb-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0.6rem;
+  right: 0.6rem;
+  height: 1px;
+  background: var(--border-soft);
+  pointer-events: none;
+}
+.lb-row:hover::before,
+.lb-row:hover + .lb-row::before { background: transparent; }
+
+.lb-row-rank {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--bg-elev-2);
+  color: var(--fg-muted);
+  border: 1px solid var(--border-soft);
+}
+.lb-row-rank.gold   { background: var(--gold);   color: #1a1206; border-color: transparent; }
+.lb-row-rank.silver { background: var(--silver); color: #15171c; border-color: transparent; }
+.lb-row-rank.bronze { background: var(--bronze); color: #1e0e02; border-color: transparent; }
+
+.lb-row-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.lb-row-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-row-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  color: var(--fg-muted);
+  line-height: 1.2;
+}
+.lb-row-sub .vendor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vendor-color, var(--fg-faint));
+  flex: 0 0 auto;
+}
+.lb-row-sub .vendor-dot[data-vendor="NVIDIA"]        { --vendor-color: var(--v-nvidia); }
+.lb-row-sub .vendor-dot[data-vendor="AMD"]           { --vendor-color: var(--v-amd); }
+.lb-row-sub .vendor-dot[data-vendor="Apple"]         { --vendor-color: var(--v-apple); }
+.lb-row-sub .vendor-dot[data-vendor="Google"]        { --vendor-color: var(--v-google); }
+.lb-row-sub .vendor-dot[data-vendor="Huawei"]        { --vendor-color: var(--v-huawei); }
+.lb-row-sub .vendor-dot[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.lb-row-sub .vendor-dot[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
+
+.lb-row-sub .sub-sep { color: var(--fg-faint); }
+
+.lb-row-score {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+.lb-row-score .score-val {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.01em;
+}
+.lb-row-score .score-unit {
+  font-size: 0.68rem;
+  color: var(--fg-muted);
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+
+/* Empty placeholder row inside a suite with no entries */
+.lb-row.placeholder {
+  color: var(--fg-faint);
+  font-style: italic;
+  justify-content: center;
+  grid-template-columns: auto;
+}
+
+/* ── Recent submissions list ─────────────────────────────── */
 .recent-list {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-}
-.recent-row {
-  display: grid;
-  grid-template-columns: minmax(140px, 1.6fr) 60px 80px 1fr auto;
-  gap: 0.85rem;
-  align-items: center;
-  padding: 0.55rem 0.85rem;
   background: var(--bg-elev);
   border: 1px solid var(--border-soft);
-  border-radius: var(--r-md);
-  font-size: 0.85rem;
-  color: var(--fg);
-  text-decoration: none;
+  border-radius: var(--r-lg);
+  padding: 0.4rem 0.5rem;
+  box-shadow: var(--shadow-card);
 }
-.recent-row:hover {
-  border-color: var(--accent);
-  text-decoration: none;
+.recent-list .lb-row .lb-row-sub .suite-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.05rem 0.4rem;
+  background: var(--bg-elev-2);
+  color: var(--fg-muted);
+  border-radius: 999px;
 }
-.recent-row .recent-suite { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
-.recent-row .recent-metric { font-family: var(--font-mono); font-weight: 600; color: var(--fg-strong); }
-.recent-row .recent-date { color: var(--fg-muted); font-size: 0.78rem; }
+.recent-list .lb-row .lb-row-sub .date {
+  color: var(--fg-faint);
+  font-size: 0.72rem;
+}
 
+/* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 700px) {
-  .recent-row {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
-  }
-  .recent-row .recent-date,
-  .recent-row .recent-metric { font-size: 0.78rem; }
+  .suite-card-head { padding: 0.7rem 0.85rem; }
+  .suite-card-tag  { padding: 0.5rem 0.85rem 0; font-size: 0.78rem; }
+  .suite-card-body { padding: 0.35rem 0.4rem 0.3rem; }
+  .suite-card-foot { padding: 0.5rem 0.85rem 0.85rem; }
+  .lb-row { padding: 0.4rem 0.5rem; gap: 0.55rem; }
+  .lb-row-name { font-size: 0.9rem; }
+  .lb-row-score .score-val { font-size: 0.95rem; }
 }

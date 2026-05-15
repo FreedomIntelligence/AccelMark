@@ -7,11 +7,16 @@
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  padding: 0.75rem 1.5rem;
-  background: rgba(13, 17, 23, 0.92);
-  backdrop-filter: saturate(140%) blur(6px);
-  -webkit-backdrop-filter: saturate(140%) blur(6px);
+  padding: 0.85rem 1.75rem;
+  background: var(--bg);
   border-bottom: 1px solid var(--border-soft);
+}
+@supports (backdrop-filter: blur(6px)) {
+  .topnav {
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: saturate(160%) blur(8px);
+    -webkit-backdrop-filter: saturate(160%) blur(8px);
+  }
 }
 
 .topnav .brand {
@@ -54,14 +59,14 @@
   gap: 0.4rem;
   padding: 0.3rem 0.65rem;
   background: var(--accent-2);
-  color: white;
+  color: var(--on-accent);
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 600;
 }
 .topnav .compare-pill.show { display: inline-flex; }
 .topnav .compare-pill .count {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 999px;
   padding: 0 0.4rem;
   font-size: 0.72rem;
@@ -77,7 +82,7 @@
 main {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 2rem 1.75rem 3rem;
 }
 
 footer {
@@ -92,25 +97,26 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); text-decorati
 
 /* Page section spacing */
 .section {
-  margin-bottom: 2.25rem;
+  margin-bottom: 3rem;
 }
 .section-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   gap: 1rem;
   flex-wrap: wrap;
 }
 .section-header h2 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--fg-strong);
+  letter-spacing: -0.01em;
 }
 .section-header .section-sub {
   color: var(--fg-muted);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 /* Loading + empty states */
@@ -130,7 +136,7 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); text-decorati
 /* Generic grid helpers */
 .grid {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }

@@ -37,9 +37,12 @@
 .btn.primary {
   background: var(--accent-2);
   border-color: var(--accent-2);
-  color: white;
+  color: var(--on-accent);
 }
-.btn.primary:hover { background: #2876f9; border-color: #2876f9; }
+.btn.primary:hover {
+  background: color-mix(in srgb, var(--accent-2) 88%, var(--fg-strong));
+  border-color: color-mix(in srgb, var(--accent-2) 88%, var(--fg-strong));
+}
 .btn.ghost {
   background: transparent;
   border-color: transparent;
@@ -62,9 +65,21 @@
   border: 1px solid var(--border-soft);
   white-space: nowrap;
 }
-.badge.tier-verified  { color: var(--good); border-color: rgba(63,185,80,0.35); background: rgba(63,185,80,0.08); }
-.badge.tier-community { color: var(--accent); border-color: rgba(88,166,255,0.35); background: var(--accent-soft); }
-.badge.flagged        { color: var(--bad); border-color: rgba(248,81,73,0.4); background: rgba(248,81,73,0.08); }
+.badge.tier-verified  {
+  color: var(--good);
+  border-color: color-mix(in srgb, var(--good) 40%, transparent);
+  background: color-mix(in srgb, var(--good) 10%, transparent);
+}
+.badge.tier-community {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: var(--accent-soft);
+}
+.badge.flagged {
+  color: var(--bad);
+  border-color: color-mix(in srgb, var(--bad) 40%, transparent);
+  background: color-mix(in srgb, var(--bad) 10%, transparent);
+}
 
 /* Vendor pill */
 .vendor-pill {
@@ -145,50 +160,62 @@
 .kpi {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
 }
 .kpi .kpi-value {
   font-family: var(--font-mono);
-  font-size: 1.4rem;
+  font-size: 1.7rem;
   font-weight: 700;
   color: var(--fg-strong);
   letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 .kpi .kpi-label {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--fg-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
 /* Hero strip (used by home + chip detail) */
 .hero {
-  padding: 1.5rem 0 0.75rem;
+  padding: 1rem 0 2rem;
 }
 .hero h1 {
-  margin: 0 0 0.4rem;
-  font-size: 1.8rem;
+  margin: 0 0 0.6rem;
+  font-size: 2.1rem;
   font-weight: 700;
   color: var(--fg-strong);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  max-width: 44ch;
 }
 .hero .tagline {
   color: var(--fg-muted);
-  margin: 0 0 1rem;
-  font-size: 0.98rem;
+  margin: 0 0 1.4rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  max-width: 64ch;
 }
 
 .hero-stats {
   display: flex;
-  gap: 2rem;
+  gap: 2.5rem;
   flex-wrap: wrap;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.4rem;
+}
+.hero-cta {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 640px) {
-  .hero h1 { font-size: 1.45rem; }
-  .hero-stats { gap: 1.25rem; }
-  .kpi .kpi-value { font-size: 1.2rem; }
+  .hero { padding: 0.5rem 0 1.5rem; }
+  .hero h1 { font-size: 1.55rem; }
+  .hero .tagline { font-size: 0.95rem; }
+  .hero-stats { gap: 1.5rem; }
+  .kpi .kpi-value { font-size: 1.4rem; }
 }
 
 /* Rank medals */

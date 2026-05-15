@@ -1,23 +1,23 @@
 /* base.css — design tokens, reset, typography */
 
 :root {
-  /* Surfaces */
+  /* ── Dark theme (default) ─────────────────────────────── */
   --bg:          #0d1117;
   --bg-elev:     #161b22;
   --bg-elev-2:   #1c2128;
   --border:      #30363d;
   --border-soft: #21262d;
 
-  /* Text */
   --fg:          #e6edf3;
   --fg-strong:   #f0f6fc;
   --fg-muted:    #8b949e;
   --fg-faint:    #6e7681;
 
-  /* Accents */
   --accent:      #58a6ff;
   --accent-2:    #1f6feb;
+  --accent-3:    #2f4dc0;            /* deeper, for card headers */
   --accent-soft: rgba(88, 166, 255, 0.12);
+  --on-accent:   #ffffff;            /* text color over accent fills */
 
   --good:        #3fb950;
   --warn:        #d29922;
@@ -26,7 +26,7 @@
   --silver:      #adb5bd;
   --bronze:      #cd7f32;
 
-  /* Vendor palette (used for chips/badges) */
+  /* Vendor palette */
   --v-nvidia:   #76b900;
   --v-amd:      #ed1c24;
   --v-apple:    #a1a1aa;
@@ -35,21 +35,53 @@
   --v-moore:    #c084fc;
   --v-intel:    #0071c5;
 
-  /* Radii / shadows */
+  /* Card shadow */
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.4);
+
+  /* Radii */
   --r-sm: 4px;
   --r-md: 6px;
-  --r-lg: 10px;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --r-lg: 12px;
 
   /* Layout */
-  --max-w: 1400px;
+  --max-w: 1200px;
   --gap:   1rem;
   --gap-lg: 1.5rem;
 
   /* Type */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ── Light theme (auto, follows OS) ───────────────────── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:          #f7f8fb;
+    --bg-elev:     #ffffff;
+    --bg-elev-2:   #f1f3f6;
+    --border:      #d8dde5;
+    --border-soft: #e8ecf2;
+
+    --fg:          #1f2937;
+    --fg-strong:   #0f172a;
+    --fg-muted:    #5b6577;
+    --fg-faint:    #94a3b8;
+
+    --accent:      #1d4ed8;
+    --accent-2:    #2563eb;
+    --accent-3:    #1e40af;
+    --accent-soft: rgba(37, 99, 235, 0.10);
+    --on-accent:   #ffffff;
+
+    --good:        #15803d;
+    --warn:        #b45309;
+    --bad:         #b91c1c;
+    --gold:        #b8860b;
+    --silver:      #6b7280;
+    --bronze:      #b45a30;
+
+    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }

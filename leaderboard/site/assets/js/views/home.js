@@ -1,4 +1,16 @@
 // views/home.js — Home page (multi-suite overview).
+//
+// Layout (per OpenCompass / user feedback):
+//   • Hero: title + tagline + KPI strip + CTAs
+//   • Suite grid: 7 cards, each a small standalone leaderboard (top 5)
+//     ┌─ accent header: A · Title          [tok/s] ─┐
+//     │ tagline                                      │
+//     │ ① NVIDIA H200 ×1     5,731 tok/s             │
+//     │ ② AMD MI300X ×1      5,128 tok/s             │
+//     │ …                                            │
+//     │            View full ranking →               │
+//     └──────────────────────────────────────────────┘
+//   • Recent submissions: same row style in one list card
 
 import {
   SUITE_ORDER, SUITE_META,
@@ -23,7 +35,7 @@ export function render({ el }) {
         <div class="kpi"><span class="kpi-value">${fmtNum(s.suites)}</span><span class="kpi-label">suites</span></div>
         <div class="kpi"><span class="kpi-value">${fmtNum(s.verified)}</span><span class="kpi-label">verified</span></div>
       </div>
-      <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.5rem;">
+      <div class="hero-cta">
         <a class="btn primary" href="#/rankings">Browse rankings →</a>
         <a class="btn" href="#/compare">Compare chips</a>
         <a class="btn ghost" href="#/suites">What are the suites?</a>
@@ -60,93 +72,108 @@ export function render({ el }) {
 
 function renderSuiteCard(suiteId) {
   const meta = SUITE_META[suiteId];
-  const all = rowsForSuite(suiteId);
-  const podiumRows = bestPerChipForSuite(suiteId).slice(0, 3);
-  const direction = meta.primary.direction;
-  const submissions = all.length;
-  const chipsCovered = new Set(all.map((r) => r._chip_slug)).size;
+  const top = bestPerChipForSuite(suiteId).slice(0, 5);
+  const empty = top.length === 0;
 
-  const article = document.createElement("a");
-  article.href = buildHash("/rankings", { suite: suiteId });
-  article.className = "card is-link suite-card" + (podiumRows.length === 0 ? " empty" : "");
+  const card = document.createElement("article");
+  card.className = "card suite-card" + (empty ? " empty" : "");
 
-  if (podiumRows.length === 0) {
-    article.innerHTML = `
-      <div class="suite-card-header">
-        <div class="suite-letter-big">${meta.letter}</div>
-        <div>
-          <div class="suite-title">${esc(meta.title)}</div>
-          <div class="suite-tagline">${esc(meta.tagline)}</div>
-        </div>
+  const rankingsHref = buildHash("/rankings", { suite: suiteId });
+
+  const header = `
+    <div class="suite-card-head">
+      <div class="suite-head-left">
+        <span class="suite-letter">${esc(meta.letter)}</span>
+        <span class="suite-title">${esc(meta.title)}</span>
       </div>
-      <div class="suite-card-meta">
-        <span class="meta-item">No submissions yet</span>
-      </div>
-      <div class="podium">Awaiting first submission.</div>
-      <span class="suite-card-cta">View suite →</span>
+      <span class="suite-metric-tag">${esc(meta.primary.label)}</span>
+    </div>
+    <div class="suite-card-tag">${esc(meta.tagline)}</div>
+  `;
+
+  if (empty) {
+    card.innerHTML = `
+      ${header}
+      <div class="suite-card-body">Awaiting first submission.</div>
+      <div class="suite-card-foot"><a class="cta" href="${rankingsHref}">View suite →</a></div>
     `;
-    return article;
+    return card;
   }
 
-  const best = podiumRows[0];
-  const bestVal = best[meta.primary.key];
-  // Range for relative bars: pick min/max across podium.
-  const vals = podiumRows.map((r) => r[meta.primary.key]);
-  const max = Math.max(...vals);
-  const min = Math.min(...vals);
-
-  const podiumHtml = podiumRows.map((r, i) => {
-    const v = r[meta.primary.key];
-    const fillPct = direction === "asc"
-      // For "lower is better" (e.g. latency), best gets full bar.
-      ? (max === min ? 100 : ((max - v) / (max - min)) * 100)
-      : (max === 0 ? 0 : (v / max) * 100);
-    const medal = ["gold", "silver", "bronze"][i] || "";
-    return `
-      <li>
-        <div class="podium-row">
-          <span class="rank ${medal}">#${i + 1}</span>
-          <span class="podium-name">${esc(r._chip_label)}</span>
-          <span class="podium-value">${esc(formatPrimary(v, suiteId))}</span>
-        </div>
-        <div class="rel-bar"><div class="fill" style="width:${Math.max(4, Math.min(100, fillPct))}%"></div></div>
-      </li>
-    `;
-  }).join("");
-
-  article.innerHTML = `
-    <div class="suite-card-header">
-      <div class="suite-letter-big">${meta.letter}</div>
-      <div>
-        <div class="suite-title">${esc(meta.title)}</div>
-        <div class="suite-tagline">${esc(meta.tagline)}</div>
-      </div>
-    </div>
-    <div class="suite-card-meta">
-      <span class="meta-item">${submissions} ${submissions === 1 ? "submission" : "submissions"}</span>
-      <span class="meta-item">${chipsCovered} ${chipsCovered === 1 ? "chip" : "chips"}</span>
-      <span class="meta-item">primary: <span class="mono">${esc(meta.primary.label)}</span></span>
-    </div>
-    <ul class="podium">${podiumHtml}</ul>
-    <span class="suite-card-cta">View full ranking →</span>
+  const body = top.map((r, i) => renderLbRow(r, suiteId, i + 1)).join("");
+  card.innerHTML = `
+    ${header}
+    <div class="suite-card-body">${body}</div>
+    <div class="suite-card-foot"><a class="cta" href="${rankingsHref}">View full ranking →</a></div>
   `;
-  // Suppress underline on hover for the whole card.
-  article.style.color = "inherit";
-  return article;
+  return card;
+}
+
+// Single ranked row used by suite cards.  Anchor → chip detail page.
+function renderLbRow(row, suiteId, rank) {
+  const meta = SUITE_META[suiteId];
+  const value = row[meta.primary.key];
+  const display = formatPrimary(value, suiteId);
+  // Split formatted value from trailing unit so we can render unit muted.
+  const { num, unit } = splitNumUnit(display);
+  const medal = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
+  return `
+    <a class="lb-row" href="${chipHref(row)}">
+      <span class="lb-row-rank ${medal}">${rank}</span>
+      <span class="lb-row-main">
+        <span class="lb-row-name">${esc(row._chip_label)}</span>
+        <span class="lb-row-sub">
+          <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
+          <span>${esc(row.vendor)}</span>
+          <span class="sub-sep">·</span>
+          <span>${esc(row.framework)}${row.precision ? " · " + esc(row.precision) : ""}</span>
+        </span>
+      </span>
+      <span class="lb-row-score">
+        <span class="score-val">${esc(num)}</span>
+        ${unit ? `<span class="score-unit">${esc(unit)}</span>` : ""}
+      </span>
+    </a>
+  `;
 }
 
 function renderRecentRow(row) {
   const meta = SUITE_META[row.suite];
-  const a = document.createElement("a");
-  a.href = chipHref(row);
-  a.className = "recent-row";
   const metricVal = meta ? row[meta.primary.key] : row.primary_metric;
+  const display = formatPrimary(metricVal, row.suite);
+  const { num, unit } = splitNumUnit(display);
+  const suiteLabel = row.suite.replace("suite_", "Suite ");
+
+  const a = document.createElement("a");
+  a.className = "lb-row";
+  a.href = chipHref(row);
   a.innerHTML = `
-    <span><strong>${esc(row._chip_label)}</strong></span>
-    <span class="recent-suite">${esc(row.suite.replace("suite_", "Suite "))}</span>
-    <span class="recent-metric">${esc(formatPrimary(metricVal, row.suite))}</span>
-    <span class="muted">${esc(row.framework)} ${esc(row.framework_version || "")} · ${esc(row.precision)}</span>
-    <span class="recent-date">${fmtDate(row.date)}</span>
+    <span class="lb-row-rank" aria-hidden="true">${esc(meta ? meta.letter : "·")}</span>
+    <span class="lb-row-main">
+      <span class="lb-row-name">${esc(row._chip_label)}</span>
+      <span class="lb-row-sub">
+        <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
+        <span>${esc(row.vendor)}</span>
+        <span class="sub-sep">·</span>
+        <span class="suite-tag">${esc(suiteLabel)}</span>
+        <span class="sub-sep">·</span>
+        <span class="date">${esc(fmtDate(row.date))}</span>
+      </span>
+    </span>
+    <span class="lb-row-score">
+      <span class="score-val">${esc(num)}</span>
+      ${unit ? `<span class="score-unit">${esc(unit)}</span>` : ""}
+    </span>
   `;
   return a;
+}
+
+// "5,731 tok/s" → { num: "5,731", unit: "tok/s" }
+// "94.5 %"     → { num: "94.5",  unit: "%" }
+// "—"          → { num: "—",     unit: "" }
+function splitNumUnit(s) {
+  if (!s) return { num: "—", unit: "" };
+  const idx = s.search(/\s[A-Za-z%]/);
+  if (idx === -1) return { num: s, unit: "" };
+  return { num: s.slice(0, idx), unit: s.slice(idx + 1) };
 }

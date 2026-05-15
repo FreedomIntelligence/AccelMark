@@ -12,6 +12,7 @@ export function esc(s) {
 }
 
 // Format big numbers compactly: 12453 -> "12,453"; 1234567 -> "1.23M"
+// Integers (e.g. counts) render with no decimals automatically.
 export function fmtNum(v, opts = {}) {
   if (v === null || v === undefined || Number.isNaN(v)) return "—";
   const n = Number(v);
@@ -20,6 +21,10 @@ export function fmtNum(v, opts = {}) {
     if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(2) + "B";
     if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(2) + "M";
     if (Math.abs(n) >= 1e3) return (n / 1e3).toFixed(2) + "K";
+  }
+  // Integer fast-path: counts like 97 / 32 / 4 must not render as "97.0".
+  if (decimals === undefined && Number.isInteger(n)) {
+    return n.toLocaleString();
   }
   const d = decimals === undefined
     ? (Math.abs(n) >= 100 ? 0 : Math.abs(n) >= 10 ? 1 : 2)
