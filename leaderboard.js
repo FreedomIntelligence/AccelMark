@@ -47960,3 +47960,228 @@ const LEADERBOARD_DATA = [
     "implementation_id": "nvidia_sglang_c43a8309"
   }
 ];
+window.LEADERBOARD_DATA = LEADERBOARD_DATA;
+const SUITE_SPECS = {
+  "suite_A": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "dataset": "sharegpt_standard_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "BF16",
+      "FP16"
+    ],
+    "max_model_len": 4096,
+    "concurrency_levels": [
+      8,
+      32,
+      128
+    ],
+    "online_qps_levels": [
+      5,
+      25,
+      100
+    ],
+    "online_sla_ttft_ms": 500,
+    "input_tokens_p50": 280,
+    "output_tokens_p50": 310,
+    "scenarios_default": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "scenarios_extra": [
+      "interactive",
+      "sustained",
+      "speculative",
+      "burst"
+    ]
+  },
+  "suite_B": {
+    "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "dataset": "sharegpt_standard_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "BF16",
+      "FP16"
+    ],
+    "max_model_len": 4096,
+    "concurrency_levels": [
+      8,
+      32,
+      128
+    ],
+    "online_qps_levels": [
+      2,
+      5,
+      10,
+      25
+    ],
+    "online_sla_ttft_ms": 1000,
+    "input_tokens_p50": 280,
+    "output_tokens_p50": 310,
+    "scenarios_default": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "scenarios_extra": [
+      "sustained",
+      "interactive",
+      "burst"
+    ]
+  },
+  "suite_C": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "dataset": "sharegpt_standard_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "BF16",
+      "FP16"
+    ],
+    "max_model_len": 4096,
+    "concurrency_levels": [
+      1,
+      4,
+      16,
+      64
+    ],
+    "online_qps_levels": [
+      5,
+      10,
+      25,
+      50
+    ],
+    "online_sla_ttft_ms": 500,
+    "scenarios_default": [
+      "accuracy",
+      "offline"
+    ],
+    "scenarios_extra": [
+      "online",
+      "sustained"
+    ]
+  },
+  "suite_D": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "dataset": "sharegpt_longctx_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "BF16",
+      "FP16"
+    ],
+    "max_model_len": 30208,
+    "concurrency_levels": [
+      1,
+      4
+    ],
+    "online_qps_levels": [
+      0.5,
+      1,
+      2
+    ],
+    "online_sla_ttft_ms": 5000,
+    "input_tokens_p50": 28650,
+    "output_tokens_p50": 256,
+    "scenarios_default": [
+      "accuracy",
+      "offline"
+    ],
+    "scenarios_extra": [
+      "interactive",
+      "sustained",
+      "online"
+    ]
+  },
+  "suite_E": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "dataset": "sharegpt_standard_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "BF16",
+      "FP16"
+    ],
+    "max_model_len": 4096,
+    "concurrency_levels": [
+      8,
+      32,
+      128
+    ],
+    "input_tokens_p50": 280,
+    "output_tokens_p50": 310,
+    "scenarios_default": [
+      "accuracy",
+      "offline"
+    ]
+  },
+  "suite_F": {
+    "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "dataset": "sharegpt_edge_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "FP16",
+      "BF16"
+    ],
+    "max_model_len": 2048,
+    "concurrency_levels": [
+      4,
+      16,
+      64
+    ],
+    "online_qps_levels": [
+      10,
+      40
+    ],
+    "online_sla_ttft_ms": 500,
+    "input_tokens_p50": 95,
+    "output_tokens_p50": 150,
+    "scenarios_default": [
+      "accuracy",
+      "offline",
+      "online",
+      "interactive"
+    ],
+    "scenarios_extra": [
+      "sustained"
+    ]
+  },
+  "suite_G": {
+    "model_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "model_revision": "eba92302a2861cdc0098cc54bc9f17cb2c47eb61",
+    "dataset": "sharegpt_standard_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "BF16",
+      "FP16"
+    ],
+    "max_model_len": 4096,
+    "concurrency_levels": [
+      4,
+      16,
+      64
+    ],
+    "online_qps_levels": [
+      2,
+      10,
+      40
+    ],
+    "online_sla_ttft_ms": 500,
+    "input_tokens_p50": 280,
+    "output_tokens_p50": 310,
+    "scenarios_default": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "scenarios_extra": [
+      "interactive",
+      "sustained"
+    ]
+  }
+};
+window.SUITE_SPECS = SUITE_SPECS;

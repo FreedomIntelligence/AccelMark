@@ -1,0 +1,423 @@
+/* modal.css — Single-run detail overlay.
+ *
+ * Composition:
+ *   .modal-overlay  → fixed backdrop, fades in when .open
+ *   .modal-shell    → centered card (max-w 760px, max-h 88vh, scrollable)
+ *     ↳ header (title + subtitle + close)
+ *     ↳ tab bar (Details / Visualize / Implementation)
+ *     ↳ body (one .modal-panel per tab, only .active is shown)
+ *     ↳ footer (submission id + reproduce link)
+ *
+ * Suite accent on the shell uses [data-suite="A"..G"] → --suite-color
+ * (same scheme as rankings.css), so the modal picks up the same hue as
+ * the suite the run belongs to.
+ */
+
+/* ── Per-suite color binding ───────────────────────────────── */
+.modal-shell[data-suite="A"] { --suite-color: var(--suite-A); }
+.modal-shell[data-suite="B"] { --suite-color: var(--suite-B); }
+.modal-shell[data-suite="C"] { --suite-color: var(--suite-C); }
+.modal-shell[data-suite="D"] { --suite-color: var(--suite-D); }
+.modal-shell[data-suite="E"] { --suite-color: var(--suite-E); }
+.modal-shell[data-suite="F"] { --suite-color: var(--suite-F); }
+.modal-shell[data-suite="G"] { --suite-color: var(--suite-G); }
+.modal-shell                  { --suite-color: var(--accent-2); }
+
+/* ── Backdrop ──────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg) 35%, rgba(0, 0, 0, 0.55));
+  backdrop-filter: blur(2px);
+  z-index: 90;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4rem 1.25rem 2rem;
+  overflow-y: auto;
+}
+.modal-overlay.open {
+  display: flex;
+  animation: modal-fade 140ms ease;
+}
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Shell ─────────────────────────────────────────────────── */
+.modal-shell {
+  width: 100%;
+  max-width: 760px;
+  max-height: 88vh;
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  border-top: 3px solid var(--suite-color);
+  border-radius: var(--r-lg);
+  box-shadow:
+    0 24px 80px color-mix(in srgb, #000 28%, transparent),
+    0 2px 6px color-mix(in srgb, #000 18%, transparent);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-rise 180ms cubic-bezier(0.2, 0.8, 0.3, 1.05);
+}
+@keyframes modal-rise {
+  from { transform: translateY(12px); opacity: 0.4; }
+  to   { transform: translateY(0);    opacity: 1;   }
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem 0.85rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.modal-titles { min-width: 0; }
+.modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+}
+/* Small drill-in link under the chip name → /chip/<slug>.  Sits between
+   the title and the run-specific subtitle so the relationship between
+   "this run" and "this chip" reads as a natural hierarchy. */
+.modal-chip-link {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--accent-2);
+  text-decoration: none;
+  border-bottom: 1px dashed color-mix(in srgb, var(--accent-2) 45%, transparent);
+}
+.modal-chip-link:hover {
+  color: color-mix(in srgb, var(--accent-2) 65%, var(--fg-strong));
+  border-bottom-color: var(--accent-2);
+}
+.modal-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+  line-height: 1.45;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.35rem;
+}
+.modal-subtitle .sep { color: var(--fg-faint); }
+.modal-subtitle .modal-warn { color: var(--warn, #d29922); font-size: 0.75rem; }
+.modal-suite-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--suite-color) 14%, transparent);
+  color: color-mix(in srgb, var(--suite-color) 75%, var(--fg-strong));
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-right: 0.3rem;
+}
+
+.modal-close {
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1.05rem;
+  color: var(--fg-faint);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  flex: 0 0 auto;
+  transition: background 100ms, color 100ms, border-color 100ms;
+}
+.modal-close:hover {
+  color: var(--fg-strong);
+  border-color: var(--border);
+  background: var(--bg-elev);
+}
+
+/* ── Tabs ──────────────────────────────────────────────────── */
+.modal-tabs {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem 0;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg);
+}
+.modal-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.55rem 0.85rem 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  cursor: pointer;
+  letter-spacing: 0.005em;
+  border-radius: 4px 4px 0 0;
+  transition: color 100ms, border-color 100ms, background 100ms;
+}
+.modal-tab:hover { color: var(--fg-strong); }
+.modal-tab.active {
+  color: var(--suite-color);
+  border-bottom-color: var(--suite-color);
+}
+
+/* ── Body / panels ─────────────────────────────────────────── */
+.modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1.1rem 1.4rem 1.3rem;
+}
+.modal-panel { display: none; }
+.modal-panel.active { display: block; }
+
+/* ── Details / Impl shared sections ────────────────────────── */
+.detail-section { margin-bottom: 1.1rem; }
+.detail-section:last-child { margin-bottom: 0; }
+.detail-section-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--border-soft) 70%, transparent);
+  font-size: 0.83rem;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-label {
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  flex: 0 0 auto;
+}
+.detail-value {
+  color: var(--fg-strong);
+  text-align: right;
+  word-break: break-word;
+}
+.detail-value.null  { color: var(--fg-faint); font-style: italic; }
+.detail-value.mono  { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.78rem; }
+.detail-value.good  { color: var(--good, #56d364); }
+.detail-value.warn  { color: var(--warn, #d29922); }
+.detail-value.bad   { color: var(--bad,  #f85149); }
+.detail-value .muted-note { color: var(--fg-faint); font-size: 0.78em; }
+.detail-link {
+  color: var(--accent-2);
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+.detail-link:hover { text-decoration: underline; }
+.detail-link.mono  { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+/* ── Impl panel extras ─────────────────────────────────────── */
+.impl-deprecation {
+  background: color-mix(in srgb, var(--warn, #d29922) 12%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--warn, #d29922) 40%, var(--border-soft));
+  color: var(--warn, #d29922);
+  border-radius: var(--r-md, 8px);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+.impl-deprecation .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; }
+.impl-prose {
+  font-size: 0.83rem;
+  color: var(--fg);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  padding: 0.45rem 0 0.65rem;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.7rem 1.4rem;
+  border-top: 1px solid var(--border-soft);
+  background: var(--bg-elev);
+  font-size: 0.74rem;
+  color: var(--fg-faint);
+}
+.modal-submission {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 auto;
+}
+.modal-script-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  flex: 0 0 auto;
+}
+.modal-script-link:hover { text-decoration: underline; }
+
+/* ── Viz panel primitives ──────────────────────────────────── */
+.viz-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--fg-muted);
+  font-size: 0.85rem;
+}
+.viz-section-title {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--fg-muted);
+  font-weight: 600;
+  margin: 1.2rem 0 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.viz-section-title:first-child { margin-top: 0.2rem; }
+.viz-chart-wrap {
+  position: relative;
+  width: 100%;
+  margin: 0.4rem 0 0.7rem;
+}
+.viz-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-size: 0.72rem;
+  color: var(--fg-muted);
+  margin: 0.4rem 0 0.8rem;
+}
+.viz-legend-item { display: inline-flex; align-items: center; gap: 0.3rem; }
+.viz-legend-swatch {
+  width: 12px;
+  height: 2px;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.viz-note {
+  margin: 0.4rem 0 0.8rem;
+  font-size: 0.72rem;
+  color: var(--fg-faint);
+}
+
+/* Stat chips — at-a-glance numeric callouts that head most viz sections. */
+.viz-stat-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+.viz-stat-chip {
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md, 8px);
+  padding: 0.45rem 0.6rem;
+}
+.viz-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  margin-bottom: 0.15rem;
+}
+.viz-stat-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  font-variant-numeric: tabular-nums;
+}
+.viz-stat-chip.accent .viz-stat-value { color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-strong)); }
+.viz-stat-chip.good   .viz-stat-value { color: var(--good, #2da44e); }
+.viz-stat-chip.warn   .viz-stat-value { color: var(--warn, #d29922); }
+.viz-stat-chip.bad    .viz-stat-value { color: var(--bad,  #d1242f); }
+
+/* SLA inline row used by suite A/B/F/G online sections. */
+.viz-sla-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-size: 0.74rem;
+  color: var(--fg-muted);
+  margin-bottom: 0.4rem;
+}
+.viz-sla-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.viz-sla-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.viz-sla-dot.pass { background: var(--good, #56d364); }
+.viz-sla-dot.fail { background: var(--bad,  #f85149); }
+.viz-sla-item .qps { color: var(--fg); }
+.viz-sla-item .pass { color: var(--good, #56d364); }
+.viz-sla-item .fail { color: var(--bad,  #f85149); }
+
+/* Suite C quant table */
+.viz-quant-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  margin: 0.4rem 0 0.7rem;
+}
+.viz-quant-table thead th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--fg-muted);
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0.4rem 0.55rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.viz-quant-table thead th:not(:first-child) { text-align: right; }
+.viz-quant-table tbody td {
+  padding: 0.4rem 0.55rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-soft) 60%, transparent);
+  color: var(--fg);
+}
+.viz-quant-table tbody td.tnum { text-align: right; font-variant-numeric: tabular-nums; }
+.viz-quant-table tbody tr:last-child td { border-bottom: none; }
+.viz-quant-table .good  { color: var(--good, #2da44e); }
+.viz-quant-table .warn  { color: var(--warn, #d29922); }
+.viz-quant-table .bad   { color: var(--bad,  #d1242f); }
+.viz-quant-table .muted { color: var(--fg-muted); }
+
+/* ── Small screens ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .modal-overlay { padding: 2rem 0.6rem; }
+  .modal-shell   { max-height: 92vh; }
+  .modal-header,
+  .modal-body,
+  .modal-footer { padding-left: 1rem; padding-right: 1rem; }
+  .modal-title  { font-size: 1.05rem; }
+}
