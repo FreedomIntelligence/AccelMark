@@ -152,13 +152,22 @@
     "percentile": 100.0,
     "primary_metric": 7848.84
   },
+  "nvidia_a100_sxm4_40gbx1_suite_A_nvidia_sglang_c43a8309_958afbbd": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 3146.66
+  },
   "nvidia_a100_sxm4_40gbx1_suite_A_nvidia_vllm_47f5d58e_b4a92b30": {
     "chip_name": "NVIDIA A100-SXM4-40GB",
     "suite_id": "suite_A",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 2415.99
   },
   "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_47f5d58e_57cc3fdf": {
