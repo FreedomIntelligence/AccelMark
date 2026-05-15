@@ -961,7 +961,7 @@
   font-size: 0.75rem;
   color: var(--fg-muted);
 }
-.cmp-chart-canvas { width: 100%; }
+.cmp-chart-canvas { width: 100%; position: relative; }
 .cmp-chart-legend {
   display: flex;
   flex-wrap: wrap;

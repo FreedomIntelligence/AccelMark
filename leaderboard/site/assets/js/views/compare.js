@@ -30,7 +30,7 @@ import {
 } from "../data.js";
 import {
   esc, fmtNum, buildHash, chipHref, parseHash, shortVersion,
-  copyToClipboard, flashButtonLabel,
+  copyToClipboard, flashButtonLabel, downloadCanvasAsPng,
 } from "../utils.js";
 import {
   basketGet, basketHas, basketToggle, basketOnChange,
@@ -341,6 +341,21 @@ function renderCmpCharts(wrap, suiteId, chips) {
     canvasWrap.style.height = (spec.height || 220) + "px";
     const canvas = document.createElement("canvas");
     canvasWrap.appendChild(canvas);
+    // Download-as-PNG button — anchors against the canvas wrapper
+    // (which is `position: relative` in rankings.css).  data-chart-dl
+    // value is the chart spec's title slug so the saved file reads
+    // as e.g. "compare-suite-a-throughput-by-concurrency.png".
+    const dlBtn = document.createElement("button");
+    dlBtn.className = "chart-dl-btn";
+    dlBtn.type = "button";
+    dlBtn.dataset.chartDl = (spec.title || "chart").toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+    dlBtn.title = "Download this chart as a PNG image";
+    dlBtn.innerHTML = `
+      <span class="chart-dl-btn-icon" aria-hidden="true">↓</span>
+      <span class="chart-dl-btn-label">PNG</span>
+    `;
+    canvasWrap.appendChild(dlBtn);
     body.appendChild(canvasWrap);
     body.appendChild(_cmpLegend(spec.legend || []));
     wrap.appendChild(card);
@@ -977,6 +992,33 @@ function bindClicks(el) {
       }
       return;
     }
+
+    // Chart download — sits inside any .cmp-chart-canvas wrapper
+    // built by renderCmpCharts.  Resolve the canvas via DOM proximity.
+    const dlBtn = t.closest("[data-chart-dl]");
+    if (dlBtn) {
+      ev.preventDefault();
+      _downloadCmpChart(dlBtn, suiteId);
+      return;
+    }
+  });
+}
+
+async function _downloadCmpChart(btn, suiteId) {
+  const wrap = btn.closest(".cmp-chart-canvas");
+  const canvas = wrap && wrap.querySelector("canvas");
+  if (!canvas) {
+    flashButtonLabel(btn, "Failed", { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
+    return;
+  }
+  const sectionSlug = btn.dataset.chartDl || "chart";
+  const ok = await downloadCanvasAsPng(canvas, {
+    filename: `compare-${suiteId.replace(/^suite_/, "suite-")}-${sectionSlug}.png`,
+  });
+  flashButtonLabel(btn, ok ? "Saved" : "Failed", {
+    holdMs: ok ? 1400 : 2200,
+    className: ok ? "is-saved" : "is-failed",
+    labelSelector: ".chart-dl-btn-label",
   });
 }
 

@@ -18,7 +18,10 @@
 // itself never crashes the app.
 
 import { rowByRunId, SUITE_META } from "./data.js";
-import { esc, shortVersion, fmtDate, submitterHandle, chipSlug } from "./utils.js";
+import {
+  esc, shortVersion, fmtDate, submitterHandle, chipSlug,
+  downloadCanvasAsPng, flashButtonLabel,
+} from "./utils.js";
 
 // ── Module state ──
 let _modalEl = null;
@@ -102,6 +105,15 @@ export function initModal() {
     if (ev.target.closest(".modal-close")) { closeModal(); return; }
     const tab = ev.target.closest(".modal-tab");
     if (tab) { _setTab(tab.dataset.tab); return; }
+    // Chart download button — sits inside any .viz-chart-wrap built
+    // by _mkCanvas.  Resolve the canvas via DOM proximity so we don't
+    // need a separate registry of (button → chart) mappings.
+    const dlBtn = ev.target.closest("[data-chart-dl]");
+    if (dlBtn && _modalEl.contains(dlBtn)) {
+      ev.preventDefault();
+      _downloadVizChart(dlBtn);
+      return;
+    }
   });
 
   // Esc closes from anywhere.
@@ -571,6 +583,43 @@ function _renderViz(row, panel) {
   }
 }
 
+async function _downloadVizChart(btn) {
+  const wrap = btn.closest(".viz-chart-wrap");
+  const canvas = wrap && wrap.querySelector("canvas");
+  if (!canvas) {
+    flashButtonLabel(btn, "Failed", { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
+    return;
+  }
+  // Filename anatomy: <run_id>-<section-slug>.png
+  // We scan backwards through the wrap's preceding siblings for the
+  // nearest .viz-section-title — that's the heading immediately above
+  // the chart in the DOM (e.g. "Online — TTFT & TPOT by QPS"), which
+  // gives the user a self-describing filename without each _mkCanvas
+  // caller having to pass a name.
+  let sectionSlug = btn.dataset.chartDl || "chart";
+  let prev = wrap.previousElementSibling;
+  while (prev) {
+    if (prev.classList && prev.classList.contains("viz-section-title")) {
+      const text = (prev.textContent || "").trim();
+      if (text) {
+        sectionSlug = text.toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 60);
+      }
+      break;
+    }
+    prev = prev.previousElementSibling;
+  }
+  const ridSlug = (_currentRow?.run_id || "run").replace(/[^a-zA-Z0-9_-]+/g, "_");
+  const ok = await downloadCanvasAsPng(canvas, { filename: `${ridSlug}-${sectionSlug}.png` });
+  flashButtonLabel(btn, ok ? "Saved" : "Failed", {
+    holdMs: ok ? 1400 : 2200,
+    className: ok ? "is-saved" : "is-failed",
+    labelSelector: ".chart-dl-btn-label",
+  });
+}
+
 function _destroyCharts() {
   for (const c of _activeCharts) {
     try { c.destroy(); } catch (e) { /* ignore */ }
@@ -602,12 +651,27 @@ function _statChips(items) {
   return grid;
 }
 
-function _mkCanvas(height) {
+// `name` is a stable slug used as the PNG filename hint when the user
+// clicks the download button — defaults to "chart" so callers that
+// don't bother still get a sensible download.  Wrap is `position:
+// relative` (modal.css) so the absolutely-positioned download button
+// anchors against the canvas area.
+function _mkCanvas(height, name = "chart") {
   const wrap = document.createElement("div");
   wrap.className = "viz-chart-wrap";
   wrap.style.height = height + "px";
   const canvas = document.createElement("canvas");
   wrap.appendChild(canvas);
+  const dl = document.createElement("button");
+  dl.className = "chart-dl-btn";
+  dl.type = "button";
+  dl.dataset.chartDl = name;
+  dl.title = "Download this chart as a PNG image";
+  dl.innerHTML = `
+    <span class="chart-dl-btn-icon" aria-hidden="true">↓</span>
+    <span class="chart-dl-btn-label">PNG</span>
+  `;
+  wrap.appendChild(dl);
   return { wrap, canvas };
 }
 

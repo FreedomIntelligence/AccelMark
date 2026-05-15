@@ -43,9 +43,18 @@ class FakeEl {
   set textContent(v) { this._textContent = String(v); }
   get textContent() { return this._textContent; }
   appendChild(c) { this.children.push(c); return c; }
+  removeChild(c) {
+    const i = this.children.indexOf(c);
+    if (i >= 0) this.children.splice(i, 1);
+    return c;
+  }
   setAttribute(k, v) { this._attrs[k] = v; }
   removeAttribute(k) { delete this._attrs[k]; }
   getAttribute(k)  { return this._attrs[k] ?? null; }
+  // Synthetic `<a download>.click()` fired by downloadCanvasAsPng to
+  // trigger a browser download.  Tests only need it to not throw —
+  // the actual download has no real-DOM observable side effect.
+  click() {}
   // Minimal querySelector stub: we only ever need to call this for
   // helpers like flashButtonLabel that look for ".copy-btn-label"
   // inside a button.  Returning null lets the helper fall through to

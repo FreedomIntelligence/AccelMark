@@ -296,6 +296,84 @@ export function flashButtonLabel(btn, message, {
   }, holdMs);
 }
 
+// Export a `<canvas>` (typically a Chart.js render target) as a PNG
+// download.  Two non-obvious things this helper does:
+//
+//   1. Composites the source canvas onto an opaque background before
+//      export — Chart.js renders with a transparent fill, so a naive
+//      `canvas.toDataURL("image/png")` from a dark-mode page produces
+//      a PNG with white text on a transparent background, invisible
+//      when the user pastes it into a white surface (Slack, X, GitHub
+//      Discussions).  We resolve `--bg-elev` from the document so the
+//      exported image looks like the on-page card it came from.
+//   2. Falls back from Blob → dataURL when `canvas.toBlob` isn't
+//      available (older Safari, jsdom in tests), so the helper never
+//      throws on environments lacking the modern API.
+//
+// Returns a Promise<boolean> — `true` on success, `false` if every
+// path failed (caller can flash an error label).  Never throws.
+export async function downloadCanvasAsPng(sourceCanvas, opts = {}) {
+  if (!sourceCanvas || typeof sourceCanvas.getContext !== "function") return false;
+  const { filename = "chart.png", backgroundColor } = opts;
+
+  let composite;
+  try {
+    composite = document.createElement("canvas");
+    composite.width = sourceCanvas.width;
+    composite.height = sourceCanvas.height;
+    const ctx = composite.getContext("2d");
+    if (!ctx) return false;
+    // Background fill — explicit override > on-page card surface > white.
+    let bg = backgroundColor;
+    if (!bg && typeof getComputedStyle === "function") {
+      try {
+        const v = getComputedStyle(document.documentElement).getPropertyValue("--bg-elev").trim();
+        if (v) bg = v;
+      } catch (_) { /* noop */ }
+    }
+    ctx.fillStyle = bg || "#ffffff";
+    ctx.fillRect(0, 0, composite.width, composite.height);
+    ctx.drawImage(sourceCanvas, 0, 0);
+  } catch (_) {
+    return false;
+  }
+
+  // Try Blob → object URL → <a download>.
+  try {
+    const blob = await new Promise((resolve) => {
+      if (typeof composite.toBlob !== "function") return resolve(null);
+      composite.toBlob((b) => resolve(b), "image/png");
+    });
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // Revoke after a tick so click can resolve before the URL dies.
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return true;
+    }
+  } catch (_) { /* fall through to dataURL */ }
+
+  // dataURL fallback — works everywhere `<canvas>` does.
+  try {
+    const dataUrl = composite.toDataURL("image/png");
+    if (typeof dataUrl !== "string" || !dataUrl.startsWith("data:image/png")) return false;
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 // Empty wrapper to keep view modules consistent.
 export function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);

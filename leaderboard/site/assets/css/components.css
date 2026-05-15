@@ -75,6 +75,57 @@
   background: color-mix(in srgb, var(--bad, #dc2626) 10%, transparent);
 }
 
+/* ── Chart download button ────────────────────────────────────
+   Tiny icon button placed at the top-right corner of any chart
+   wrapper.  Position the wrapper `position: relative` and drop a
+   `<button class="chart-dl-btn">` inside; the helper in utils.js
+   (downloadCanvasAsPng) wires the click target to the canvas. */
+.chart-dl-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: auto;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-elev);
+  color: var(--fg-muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, opacity 120ms ease;
+  z-index: 2;
+}
+.chart-dl-btn:hover,
+.chart-dl-btn:focus-visible {
+  opacity: 1;
+  color: var(--fg-strong);
+  border-color: var(--accent);
+  background: var(--bg-elev-2);
+}
+.chart-dl-btn-icon {
+  font-size: 0.85em;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+.chart-dl-btn.is-saved {
+  color: var(--good, #16a34a);
+  border-color: var(--good, #16a34a);
+  opacity: 1;
+}
+.chart-dl-btn.is-failed {
+  color: var(--bad, #dc2626);
+  border-color: var(--bad, #dc2626);
+  opacity: 1;
+}
+
 /* ── Badges & tags ────────────────────────────────────────── */
 .badge {
   display: inline-flex;

@@ -19,7 +19,7 @@ import { installDom } from "./dom_stub.mjs";
 
 installDom();
 
-const { copyToClipboard, flashButtonLabel } = await import("../assets/js/utils.js");
+const { copyToClipboard, flashButtonLabel, downloadCanvasAsPng } = await import("../assets/js/utils.js");
 
 test("copyToClipboard: returns false (and never throws) when no clipboard path is available", async () => {
   // The DOM stub doesn't provide navigator.clipboard or execCommand,
@@ -81,3 +81,104 @@ test("flashButtonLabel: does nothing (and doesn't throw) for a null button", () 
   assert.doesNotThrow(() => flashButtonLabel(null, "x"));
   assert.doesNotThrow(() => flashButtonLabel(undefined, "x"));
 });
+
+// ── downloadCanvasAsPng — never-throws contract + happy path ──
+
+test("downloadCanvasAsPng: returns false (and never throws) on null / non-canvas inputs", async () => {
+  assert.equal(await downloadCanvasAsPng(null), false);
+  assert.equal(await downloadCanvasAsPng(undefined), false);
+  assert.equal(await downloadCanvasAsPng({}), false); // no getContext
+  assert.equal(await downloadCanvasAsPng({ getContext: 42 }), false); // not a function
+});
+
+test("downloadCanvasAsPng: returns false when a 2d context is unavailable", async () => {
+  const canvas = { getContext: () => null, width: 100, height: 50 };
+  // The helper still has to *create* a composite canvas via
+  // document.createElement — dom_stub returns a FakeEl whose getContext
+  // is also missing, so this exercises the early-return branch in
+  // the composite block too.
+  assert.equal(await downloadCanvasAsPng(canvas), false);
+});
+
+test("downloadCanvasAsPng: succeeds via toBlob path with a full canvas mock", async () => {
+  // Stand up a minimal canvas implementation: getContext returns a
+  // ctx that records draws (so we can assert background fill happened
+  // before drawImage), and toBlob yields a fake Blob.
+  const composite = makeFakeCanvas({ withToBlob: true });
+  // Override createElement just for this test so the helper picks up
+  // our instrumented composite canvas.
+  const origCreate = document.createElement;
+  document.createElement = (tag) => {
+    if (tag === "canvas") return composite;
+    return origCreate.call(document, tag);
+  };
+  try {
+    const sourceCanvas = makeFakeCanvas({ withToBlob: true });
+    const ok = await downloadCanvasAsPng(sourceCanvas, { filename: "test.png", backgroundColor: "#000" });
+    assert.equal(ok, true);
+    // Background fill happened before drawImage (otherwise the source
+    // canvas would overwrite the bg, defeating the whole point).
+    assert.deepEqual(composite._ops, ["fillRect", "drawImage"]);
+    assert.equal(composite._fillStyle, "#000");
+  } finally {
+    document.createElement = origCreate;
+  }
+});
+
+test("downloadCanvasAsPng: falls back to toDataURL when toBlob is unavailable", async () => {
+  const composite = makeFakeCanvas({ withToBlob: false }); // toBlob undefined
+  const origCreate = document.createElement;
+  document.createElement = (tag) => {
+    if (tag === "canvas") return composite;
+    return origCreate.call(document, tag);
+  };
+  try {
+    const sourceCanvas = makeFakeCanvas({ withToBlob: false });
+    const ok = await downloadCanvasAsPng(sourceCanvas, { filename: "fallback.png" });
+    assert.equal(ok, true);
+    assert.equal(composite._toDataURLCalled, true);
+  } finally {
+    document.createElement = origCreate;
+  }
+});
+
+// Tiny canvas factory the tests above share.  Records fillRect /
+// drawImage call order so we can assert ordering, and surfaces the
+// filename via the synthetic <a> click that the helper performs.
+function makeFakeCanvas({ withToBlob }) {
+  const ops = [];
+  const ctx = {
+    set fillStyle(v) { canvas._fillStyle = v; },
+    get fillStyle() { return canvas._fillStyle; },
+    fillRect:  () => ops.push("fillRect"),
+    drawImage: () => ops.push("drawImage"),
+  };
+  const canvas = {
+    width: 200,
+    height: 100,
+    _ops: ops,
+    _fillStyle: null,
+    _toDataURLCalled: false,
+    getContext: (type) => (type === "2d" ? ctx : null),
+    toDataURL: () => { canvas._toDataURLCalled = true; return "data:image/png;base64,AAAA"; },
+  };
+  if (withToBlob) {
+    canvas.toBlob = (cb) => cb(new FakeBlob());
+  }
+  return canvas;
+}
+
+class FakeBlob {
+  constructor() { this.size = 4; this.type = "image/png"; }
+}
+
+// URL.createObjectURL is required by the toBlob path.  Stub on first
+// test setup; harmless if jsdom or another stub adds the real one
+// later because we only set it when missing.
+if (typeof globalThis.URL === "undefined") globalThis.URL = {};
+if (typeof globalThis.URL.createObjectURL !== "function") {
+  globalThis.URL.createObjectURL = () => "blob:fake";
+}
+if (typeof globalThis.URL.revokeObjectURL !== "function") {
+  globalThis.URL.revokeObjectURL = () => {};
+}

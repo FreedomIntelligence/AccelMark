@@ -299,6 +299,7 @@
 }
 .viz-section-title:first-child { margin-top: 0.2rem; }
 .viz-chart-wrap {
+  position: relative;
   width: 100%;
   margin: 0.4rem 0 0.7rem;
 }

@@ -26,7 +26,7 @@ import {
 } from "../data.js";
 import {
   esc, fmtDate, shortVersion, submitterHandle,
-  copyToClipboard, flashButtonLabel,
+  copyToClipboard, flashButtonLabel, downloadCanvasAsPng,
 } from "../utils.js";
 
 export function render({ el, params }) {
@@ -181,6 +181,34 @@ function bindClicks(el) {
       _copyChipShareLink(shareBtn);
       return;
     }
+
+    // Download chart as PNG.  Each download button sits inside the
+    // chart's canvas wrapper; we resolve the canvas via the data
+    // attribute the wrapper template owns, so adding a new chart
+    // just needs the wrapper + the matching button — no rebinding.
+    const dlBtn = t.closest("[data-chart-dl]");
+    if (dlBtn) {
+      ev.preventDefault();
+      _downloadChipChart(dlBtn, slug);
+      return;
+    }
+  });
+}
+
+async function _downloadChipChart(btn, slug) {
+  const kind = btn.dataset.chartDl; // "radar" | "scaling"
+  const wrap = btn.closest(".chip-fp-canvas, .chip-scl-canvas");
+  const canvas = wrap && wrap.querySelector("canvas");
+  if (!canvas) {
+    flashButtonLabel(btn, "Failed", { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
+    return;
+  }
+  const filename = `${slug}-${kind === "radar" ? "fingerprint" : "scaling"}.png`;
+  const ok = await downloadCanvasAsPng(canvas, { filename });
+  flashButtonLabel(btn, ok ? "Saved" : "Failed", {
+    holdMs: ok ? 1400 : 2200,
+    className: ok ? "is-saved" : "is-failed",
+    labelSelector: ".chart-dl-btn-label",
   });
 }
 
@@ -262,6 +290,13 @@ function renderFingerprintSection(slug, sample) {
           <canvas data-chip-radar
                   aria-label="Radar chart of ${esc(sample.chip)} performance across all suites"
                   role="img"></canvas>
+          <button class="chart-dl-btn"
+                  type="button"
+                  data-chart-dl="radar"
+                  title="Download this radar as a PNG image">
+            <span class="chart-dl-btn-icon" aria-hidden="true">↓</span>
+            <span class="chart-dl-btn-label">PNG</span>
+          </button>
         </div>
         <ol class="chip-fp-legend" aria-label="Per-suite normalised scores">
           ${cells}
@@ -433,6 +468,13 @@ function renderScalingSection(slug, sample) {
           <canvas data-chip-scaling
                   aria-label="Grouped bar chart of ${esc(sample.chip)} scaling across chip-counts ${chipCounts.map((c) => `×${c}`).join(", ")}"
                   role="img"></canvas>
+          <button class="chart-dl-btn"
+                  type="button"
+                  data-chart-dl="scaling"
+                  title="Download this scaling chart as a PNG image">
+            <span class="chart-dl-btn-icon" aria-hidden="true">↓</span>
+            <span class="chart-dl-btn-label">PNG</span>
+          </button>
         </div>
         <ol class="chip-scl-legend" aria-label="Chip-count series">
           ${legendItems}
