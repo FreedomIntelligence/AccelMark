@@ -53,10 +53,13 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
     without blocking. Missing baselines (placeholders) are allowed.
 
     Format selection:
-    - Always includes BF16 (baseline)
-    - Other formats: intersection of suite["precision_levels"] and
-      runner.SUPPORTED_QUANTIZATIONS
-    - Formats the runner doesn't declare are skipped with a warning
+    - Always includes the hardware-supported full-precision baseline
+      (BF16 on Ampere+, FP16 on V100/T4); the *other* full-precision
+      baseline is recorded under "skipped".
+    - All quantized formats listed in suite["precision_levels"] are
+      dispatched. Hardware/engine compatibility is left to the inference
+      subprocess — if the engine cannot run a format, its own error is
+      captured in the per-format summary.
     """
     base_dir     = Path(args.output_dir)
     base_dir.mkdir(parents=True, exist_ok=True)
@@ -218,7 +221,7 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
         print(f"  [{icon}] {precision:6s} — {status}")
     if skipped:
         for p in skipped:
-            print(f"  [—] {p:6s} — skipped (backend not in SUPPORTED_QUANTIZATION_BACKENDS)")
+            print(f"  [—] {p:6s} — skipped (other full-precision baseline)")
     print()
 
     successful = [p for p, status, _ in results_summary if status == "SUCCESS"]
