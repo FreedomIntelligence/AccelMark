@@ -165,30 +165,44 @@ button {
 }
 
 /* Keyboard focus ring.  We rely on `:focus-visible` so mouse users
-   don't see the ring on click; tab navigation gets a 2px accent halo
-   (with offset so it doesn't overlap rounded corners + a translucent
-   ring underneath for high-contrast visibility on busy backgrounds).
-   `[tabindex="-1"]:focus-visible` is suppressed because we use that
-   pattern for programmatic focus targets (modal panel) where the
-   focus is intentional, not a keyboard navigation step. */
+   don't see the ring on click; tab navigation gets a two-layer halo:
+   a 2px solid accent outline (the crisp boundary) plus a 4px
+   translucent box-shadow ring underneath (the "halo" that survives
+   busy backgrounds — hero radial gradients, suite-color-tinted rows,
+   in-basket banners — where a single 2px line gets lost).
+   `outline-offset: 2px` keeps the line clear of rounded corners,
+   while the halo uses `0 0 0 4px` so it traces the element's own
+   shape (including any border-radius) without needing per-element
+   tuning.  `[tabindex="-1"]:focus-visible` is suppressed because we
+   use that pattern for programmatic focus targets (modal panel) where
+   the focus is intentional, not a keyboard navigation step. */
 :focus { outline: none; }
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: inherit;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
 }
-[tabindex="-1"]:focus-visible { outline: none; }
+[tabindex="-1"]:focus-visible { outline: none; box-shadow: none; }
 .btn:focus-visible,
 .copy-btn:focus-visible {
   outline-offset: 2px;
 }
 /* Pills with their own border and tight radius look better with the
-   ring snugged in tighter — anything with a `*-pill` suffix opts in. */
+   ring snugged in tighter — anything with a `*-pill` suffix opts in.
+   Halo width also dialled down so it doesn't dwarf the pill itself. */
 .rk-suite-pill:focus-visible,
 .rk-facet-pill:focus-visible,
 .scn-suite-letter:focus-visible {
   outline-offset: 1px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
 }
+/* Table rows: `<tr>` doesn't render a box-shadow reliably across the
+   td borders, and the halo would clip mid-row when the table is in
+   `border-collapse: collapse` mode (which the data-table is).  Drop
+   the halo for rows so users still get the crisp 2px outline without
+   a chopped-off ghost ring. */
+tr:focus-visible { box-shadow: none; }
 
 ::selection { background: var(--accent-soft); color: var(--fg-strong); }
 

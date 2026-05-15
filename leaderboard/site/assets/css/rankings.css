@@ -238,6 +238,39 @@
 .rk-status strong { color: var(--fg-strong); font-weight: 600; }
 .rk-sort-arrow { color: var(--suite-color, var(--fg-strong)); font-weight: 700; }
 
+/* Hidden-columns toggle.  Visually paired with the sort-by line — same
+   font scale, same muted base colour — but readable as an action via
+   the chevron + accent-on-hover treatment.  Anchor (not button) so
+   middle/Cmd-click open the alternate ?cols= state in a new tab. */
+.rk-cols-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-elev);
+  color: var(--fg-muted);
+  font-size: 0.74rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-left: auto;
+  white-space: nowrap;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.rk-cols-toggle:hover {
+  border-color: var(--accent);
+  color: var(--fg-strong);
+  background: var(--bg-elev-2);
+  text-decoration: none;
+}
+.rk-cols-toggle-icon {
+  font-size: 0.85em;
+  line-height: 1;
+  display: inline-block;
+  color: var(--accent);
+}
+
 /* ── Compare basket banner ─────────────────────────────────── */
 .rk-basket-bar {
   display: none;

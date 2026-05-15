@@ -63,6 +63,14 @@ export function render({ el, query }) {
     }
   }
 
+  // Column-visibility mode: ?cols=auto (default) hides metric columns
+  // that are empty for every visible row — suite_C's quant_quality
+  // and suite_E's scaling_efficiency end up null on most chips, and
+  // a wall of "—" reads as a regression.  ?cols=all forces every
+  // declared column to render so power users can inspect what's
+  // sparse vs. what's genuinely zero.
+  const colsMode = query.cols === "all" ? "all" : "auto";
+
   // Facet sets are derived from the suite's rows (not the post-filter
   // subset) so toggling one filter doesn't erase the others.
   const allRows = rowsForSuite(suiteId);
@@ -76,6 +84,22 @@ export function render({ el, query }) {
   );
 
   const sorted = [...filtered].sort((a, b) => safeCompare(a[sortKey], b[sortKey], sortDir));
+
+  // Compute which metric columns are entirely empty in the current
+  // post-filter slice.  Always keep the primary metric and the active
+  // sort column visible — hiding either would make the table read as
+  // broken (primary is the headline number; sort would dangle a sort
+  // indicator on a missing column).  In ?cols=all mode we still
+  // *track* the empty list so the toggle label can advertise the
+  // count even when nothing is hidden.
+  const emptyMetricKeys = cols
+    .filter((c) => !c.primary && c.key !== sortKey)
+    .filter((c) => sorted.length > 0 && sorted.every((r) => r[c.key] == null))
+    .map((c) => c.key);
+  const colsAreHideable = emptyMetricKeys.length > 0;
+  const displayCols = colsMode === "auto" && colsAreHideable
+    ? cols.filter((c) => !emptyMetricKeys.includes(c.key))
+    : cols;
 
   const filtersActive = !!(query.vendor || query.precision || query.framework || chipFilter);
 
@@ -124,6 +148,7 @@ export function render({ el, query }) {
           <strong>${esc(colLabel(cols, sortKey))}</strong>
           <span class="rk-sort-arrow">${sortDir === "asc" ? "↑" : "↓"}</span>
         </span>
+        ${colsAreHideable ? renderColsToggle(suiteId, query, colsMode, emptyMetricKeys.length) : ""}
       </div>
     </section>
 
@@ -153,7 +178,7 @@ export function render({ el, query }) {
     <section class="rk-table-section">
       ${sorted.length === 0
         ? renderEmpty(meta, filtersActive)
-        : renderTable(suiteId, sorted, cols, sortKey, sortDir)}
+        : renderTable(suiteId, sorted, displayCols, sortKey, sortDir)}
     </section>
   `;
 
@@ -192,6 +217,29 @@ export function render({ el, query }) {
 }
 
 // ── Toolbar bits ──
+
+// "N empty columns hidden" pill in the status row.  Anchor (not button)
+// so middle-click / Cmd-click open the alternate view in a new tab —
+// same affordance every other rankings filter uses.  We rebuild the
+// hash via rebuildHash so the suite + every other filter survive the
+// toggle.
+function renderColsToggle(suiteId, query, colsMode, hiddenCount) {
+  const isHiding = colsMode === "auto";
+  const next = isHiding ? "all" : undefined; // undefined drops the param
+  const href = rebuildHash(suiteId, query, { cols: next });
+  const label = isHiding
+    ? `${hiddenCount} ${hiddenCount === 1 ? "column" : "columns"} hidden — show all`
+    : "Hide empty columns";
+  return `
+    <a class="rk-cols-toggle"
+       data-cols-toggle="${esc(isHiding ? "all" : "auto")}"
+       href="${esc(href)}"
+       title="${esc(isHiding ? "Show every metric column declared by this suite" : "Hide metric columns that are empty for every visible row")}">
+      <span class="rk-cols-toggle-icon" aria-hidden="true">${isHiding ? "▸" : "▾"}</span>
+      ${esc(label)}
+    </a>
+  `;
+}
 
 function renderSuitePill(sid, active) {
   const m = SUITE_META[sid];
