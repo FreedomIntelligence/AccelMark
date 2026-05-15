@@ -30,13 +30,17 @@ test("copyToClipboard: returns false (and never throws) when no clipboard path i
 });
 
 test("copyToClipboard: succeeds via navigator.clipboard.writeText when the API is present", async () => {
-  // Node's `navigator` is a non-configurable getter on globalThis, so
-  // we monkey-patch the `clipboard` property on the existing object
-  // (which IS configurable) for the duration of the assertion.
+  // Cross-Node-version setup: Node ≤20 leaves `globalThis.navigator`
+  // undefined entirely, while Node ≥21 exposes it as a configurable
+  // getter.  We replace the whole `navigator` slot via defineProperty
+  // (configurable on every supported version) and restore the original
+  // descriptor — or delete the slot if there wasn't one — on the way
+  // out.  This keeps the test green on both runtimes (CI pins Node 20
+  // today, local devs typically run a newer version).
   const captured = [];
-  const desc = Object.getOwnPropertyDescriptor(globalThis.navigator, "clipboard");
-  Object.defineProperty(globalThis.navigator, "clipboard", {
-    value: { writeText: async (s) => { captured.push(s); } },
+  const origDesc = Object.getOwnPropertyDescriptor(globalThis, "navigator");
+  Object.defineProperty(globalThis, "navigator", {
+    value: { clipboard: { writeText: async (s) => { captured.push(s); } } },
     configurable: true,
     writable: true,
   });
@@ -45,8 +49,8 @@ test("copyToClipboard: succeeds via navigator.clipboard.writeText when the API i
     assert.equal(ok, true);
     assert.deepEqual(captured, ["hello"]);
   } finally {
-    if (desc) Object.defineProperty(globalThis.navigator, "clipboard", desc);
-    else delete globalThis.navigator.clipboard;
+    if (origDesc) Object.defineProperty(globalThis, "navigator", origDesc);
+    else delete globalThis.navigator;
   }
 });
 
