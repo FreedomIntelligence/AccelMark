@@ -41,6 +41,7 @@ except ImportError:
 
 RUNNERS_DIR = Path(__file__).parent
 SCHEMA_PATH = RUNNERS_DIR / "meta.schema.json"
+PLATFORMS_CATALOG_PATH = RUNNERS_DIR.parent / "schema" / "platforms.json"
 
 # Files that live flat in runners/ — not runner folders
 BASE_FILES = {
@@ -49,9 +50,11 @@ BASE_FILES = {
     "validate_submission.py",
     "validate_runners.py",
     "hash_runner.py",
+    "gen_pr_summary.py",
     "meta.schema.json",
     "protocol.py",
     "template",
+    "platforms",
     "__pycache__",
     "__init__.py",
 }
@@ -59,6 +62,18 @@ BASE_FILES = {
 schema = None
 if HAS_JSONSCHEMA and SCHEMA_PATH.exists():
     schema = json.loads(SCHEMA_PATH.read_text())
+
+known_platforms: set[str] = set()
+if PLATFORMS_CATALOG_PATH.exists():
+    try:
+        _catalog = json.loads(PLATFORMS_CATALOG_PATH.read_text())
+        known_platforms = {
+            p["id"]
+            for p in (_catalog.get("platforms") or [])
+            if isinstance(p, dict) and p.get("id")
+        }
+    except Exception:
+        known_platforms = set()
 
 
 def compute_hash(runner_py: Path) -> str:
@@ -327,6 +342,16 @@ for folder in runner_folders:
         for field in ("id", "platform", "name", "framework", "submitted_by", "description"):
             if not meta.get(field):
                 err(f"meta.json missing required field: {field}")
+
+    # ── Platform catalogue check (warning only) ──────────────────────────────
+    platform_id = meta.get("platform") or ""
+    if known_platforms and platform_id and platform_id not in known_platforms:
+        warn(
+            f"Platform '{platform_id}' is not catalogued in schema/platforms.json. "
+            f"The runner still validates (the schema accepts any lowercase identifier), "
+            f"but please consider adding an entry so the README matrix can render a "
+            f"human-readable label and stable sort order for this platform."
+        )
 
     # ── meta.id must match folder name ────────────────────────────────────────
     if meta.get("id") != folder.name:

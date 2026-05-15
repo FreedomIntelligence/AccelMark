@@ -7,5 +7,15 @@
   "description": "AccelMark runner for NVIDIA GPUs using SGLang. Supports all suites (A–F). Enables direct throughput and latency comparison between SGLang and vLLM on the same hardware.",
   "supersedes_chain": [],
   "notes": "Decouple runners from suite and scenario knowledge — load_model() uses use_async from parallelism dict instead of checking scenario name.",
-  "created": "2026-04-03"
+  "created": "2026-04-03",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "validated",
+    "B": "validated",
+    "C": "validated",
+    "D": "validated",
+    "E": "validated",
+    "F": "validated",
+    "G": "validated"
+  }
 }

@@ -7,5 +7,15 @@
   "description": "Official AccelMark reference runner for NVIDIA GPUs using vLLM. Supports all suites (A–F). Standard vLLM configuration, no custom patches.",
   "supersedes_chain": [],
   "notes": "Decouple runners from suite and scenario knowledge — load_model() uses use_async from parallelism dict instead of checking scenario name.",
-  "created": "2026-04-03"
+  "created": "2026-04-03",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "validated",
+    "B": "validated",
+    "C": "validated",
+    "D": "validated",
+    "E": "validated",
+    "F": "validated",
+    "G": "validated"
+  }
 }

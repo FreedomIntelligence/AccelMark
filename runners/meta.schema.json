@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "AccelMark runner meta.json",
+  "$comment": "Schema for runners/*/meta.json. Note that `platform` is validated by a regex pattern rather than an enum — adding a runner for a new accelerator family does NOT require modifying this schema. See schema/platforms.json for the curated presentation catalog (display name, sort order) that the README matrix generator consults.",
   "type": "object",
   "required": ["id", "platform", "name", "framework", "submitted_by", "description"],
   "additionalProperties": true,
@@ -12,8 +13,8 @@
     },
     "platform": {
       "type": "string",
-      "enum": ["nvidia", "amd", "ascend", "apple", "google", "other"],
-      "description": "Hardware platform this runner targets"
+      "pattern": "^[a-z][a-z0-9]*$",
+      "description": "Hardware platform identifier (lowercase, no underscores). Should match the prefix of the runner folder name. Known platforms (nvidia, amd, ascend, apple, google, moorethreads, other) are catalogued in schema/platforms.json — using a new identifier is allowed and only triggers a non-fatal warning from validate_runners.py prompting an optional follow-up PR."
     },
     "name": {
       "type": "string",
@@ -53,6 +54,32 @@
       "type": ["string", "null"],
       "description": "ID of the runner that supersedes this one. Set by maintainer after a newer runner is merged.",
       "pattern": "^[a-z][a-z0-9]*_[a-z][a-z0-9_]*_[0-9a-f]{8}$"
+    },
+    "hardware_label": {
+      "type": ["string", "null"],
+      "description": "Optional override for the 'Hardware' column in the README matrix. When null/missing, the generator falls back to the display_name of this platform from schema/platforms.json. Use this when a runner targets a more specific scope than the platform (e.g. 'NVIDIA V100 (SM70)' for a V100-only fork).",
+      "maxLength": 80
+    },
+    "suite_support": {
+      "type": ["object", "null"],
+      "description": "Self-declared support level for each AccelMark suite. Keys are suite letters (A, B, C, D, E, F, G); values describe support status. The README platforms matrix is generated from these fields — runners do not have to manually edit README.md.",
+      "additionalProperties": false,
+      "properties": {
+        "A": { "$ref": "#/definitions/suiteStatus" },
+        "B": { "$ref": "#/definitions/suiteStatus" },
+        "C": { "$ref": "#/definitions/suiteStatus" },
+        "D": { "$ref": "#/definitions/suiteStatus" },
+        "E": { "$ref": "#/definitions/suiteStatus" },
+        "F": { "$ref": "#/definitions/suiteStatus" },
+        "G": { "$ref": "#/definitions/suiteStatus" }
+      }
+    }
+  },
+  "definitions": {
+    "suiteStatus": {
+      "type": "string",
+      "enum": ["validated", "pending", "unsupported"],
+      "description": "validated → suite has been smoke-tested on this runner and produces results (rendered as ✓). pending → runner author believes it should work but has not validated end-to-end yet (rendered as ⋯). unsupported → suite cannot run on this runner due to hardware/framework limitations (rendered as —)."
     }
   }
 }

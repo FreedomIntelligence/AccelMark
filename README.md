@@ -64,15 +64,23 @@ See [suites/README.md](suites/README.md) for full specs, time budgets, SLA defin
 
 ## Supported platforms
 
-Reference runners live under `runners/` (see each folder’s `meta.json`). Checkmarks mark suites **implemented and runnable** with that runner in this repository.
+Reference runners live under `runners/` (see each folder’s `meta.json`). The table below is **auto-generated** from each runner's `meta.json` — never hand-edited. Add a runner, declare its `suite_support` in `meta.json`, and the matrix updates on its own.
 
+<!-- platforms-matrix:start -->
 | Hardware | Runner folder | Framework | A | B | C | D | E | F | G |
-|----------|---------------|-----------|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+|---|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | NVIDIA GPU | `nvidia_sglang_6da83845` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| AMD GPU | `amd_vllm_rocm_5355c2c6` | vLLM (ROCm) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Huawei Ascend NPU | `ascend_vllm_ascend_605db33a` | vLLM-Ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
-| Google TPU | `google_vllm_tpu_68cc9ffa` | vllm-tpu (JAX/XLA) | ✓ | — | — | ✓ | — | ✓ | — |
+| NVIDIA GPU | `nvidia_sglang_c43a8309` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| AMD GPU | `amd_vllm_rocm_6c18cd8f` | vLLM-ROCm | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Huawei Ascend NPU | `ascend_vllm_ascend_d4aa9fda` | vllm-ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
+| Apple Silicon | `apple_mlx_lm_9546b8b5` | mlx-lm | ⋯ | — | — | ⋯ | — | ⋯ | — |
+| Google TPU | `google_vllm_tpu_68cc9ffa` | vllm-tpu | ✓ | — | — | ✓ | — | ✓ | — |
+
+_Legend: ✓ validated · ⋯ author-declared (not smoke-tested in this repo yet) · — unsupported._
+<!-- platforms-matrix:end -->
+
+> Regenerate locally with `python tools/generate_platforms_matrix.py`. CI runs `--check` and fails the PR if the README and runner metadata disagree.
 
 Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 

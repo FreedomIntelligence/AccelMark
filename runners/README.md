@@ -24,11 +24,20 @@ You write ~50 lines. AccelMark handles the rest.
 runners/
 ├── benchmark_runner.py     ← Base class — inherit from this
 ├── protocol.py             ← RunnerProtocol — the serve layer interface
-├── collect_env.py          ← Hardware/software detection
+├── collect_env.py          ← Top-level environment collector (orchestrator only)
 ├── validate_submission.py  ← Result validator
 ├── validate_runners.py     ← Runner folder validator
 ├── hash_runner.py          ← Compute runner ID before submitting
 ├── meta.schema.json        ← JSON schema for meta.json
+│
+├── platforms/              ← One file per accelerator family (plug-ins)
+│   ├── __init__.py         ← Auto-discovery loader
+│   ├── nvidia.py
+│   ├── amd.py
+│   ├── ascend.py
+│   ├── apple.py
+│   ├── google.py
+│   └── moorethreads.py
 │
 ├── template/               ← starter template for new runners
 │   └── runner.py
@@ -178,11 +187,36 @@ is **immutable** — updates require a new folder with a new hash.
   "submitted_by": "your_github_username",
   "description":  "One sentence describing what makes this runner distinct.",
   "notes":        null,
-  "created":      "2026-03-22"
+  "created":      "2026-03-22",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "validated",
+    "B": "validated",
+    "C": "pending",
+    "D": "validated",
+    "E": "pending",
+    "F": "validated",
+    "G": "unsupported"
+  }
 }
 ```
 
 `id` must exactly match the folder name.
+
+`suite_support` is **how your runner declares what works**. The top-level
+`README.md` platforms matrix is generated from this field — you never
+edit the README yourself. Allowed values:
+
+| Value | Meaning | Rendered |
+|---|---|---|
+| `"validated"` | Smoke-tested end-to-end and produces a `result.json` | ✓ |
+| `"pending"` | You believe it works but have not run it through yet | ⋯ |
+| `"unsupported"` | Hardware or framework cannot run this suite | — |
+
+`hardware_label` is optional. When `null`, the README falls back to the
+`display_name` from `schema/platforms.json` for your platform. Set it
+explicitly if your runner targets a narrower hardware scope than the
+platform (e.g. `"NVIDIA V100 (SM70)"` for a V100-only fork).
 
 ### Step 4 — Validate
 
@@ -207,7 +241,7 @@ validator automatically and post a comment on the PR with the result.
 
 | Segment | Examples | Rules |
 |---------|----------|-------|
-| `platform` | `nvidia`, `amd`, `ascend`, `apple`, `other` | Lowercase, one of the allowed values |
+| `platform` | `nvidia`, `amd`, `ascend`, `apple`, `google`, `moorethreads`, `other` | Lowercase alphanumeric, no underscores. Known identifiers live in `schema/platforms.json`; new ones validate fine — `validate_runners.py` just emits a warning suggesting you add them to the catalogue in a follow-up PR. |
 | `customname` | `vllm`, `trtllm_fp8`, `lmdeploy_tp4` | Lowercase alphanumeric and underscores, your choice |
 | `hash8` | `3f8a2c1d` | First 8 hex chars of SHA-256 of `runner.py` — computed automatically |
 
@@ -218,6 +252,7 @@ nvidia_trtllm_fp8_8d2f1a4b
 amd_vllm_rocm_7b2e1d8f
 ascend_mindie_9c4a3f11
 apple_mlx_b3e21f09
+moorethreads_vllm_musa_57ff5443
 ```
 
 ---
@@ -295,6 +330,53 @@ def get_supported_precisions(self, chip_name, env_info):
 
 When the run completes, `result.json` records the effective precision actually
 used. The leaderboard shows an amber ⚠ when BF16 was requested but FP16 was used.
+
+---
+
+## Adding a new accelerator family
+
+Adding a runner for an existing platform (NVIDIA, AMD, Ascend, Apple,
+Google TPU, Moore Threads) follows the 5 steps above — **no shared file
+needs to change**. The README matrix regenerates from `meta.json` and
+the schema accepts any well-formed identifier.
+
+Adding a runner for a *new* accelerator family is slightly more
+involved, but still self-contained. Drop a single file:
+
+```
+runners/platforms/<my_platform>.py
+```
+
+exporting any subset of the following module-level symbols:
+
+```python
+ID            = "my_platform"        # short identifier, lowercase
+DISPLAY_NAME  = "My Accelerator"
+VENDOR_LABEL  = "My Vendor"          # written to accelerator["vendor"]
+PRIORITY      = 50                   # lower runs first; default 50
+
+def collect() -> list[dict]: ...     # accelerator records; [] if absent
+
+# All functions below are optional
+def detect_runtime_version() -> str | None: ...
+def detect_pcie_gen() -> str | None: ...
+def detect_topology() -> str | None: ...
+def detect_intra_node_interconnect() -> str | None: ...
+def diagnostics(env, accelerators) -> list[str]: ...
+```
+
+`runners/collect_env.py` auto-discovers the file — no change required.
+
+Two optional polish steps when you're ready to merge:
+
+1. Add an entry to `schema/platforms.json` so the README matrix renders a
+   nice hardware label and stable sort order. Until then, the
+   matrix falls back to the capitalised identifier.
+2. Update `tools/generate_platforms_matrix.py`'s catalogue check if you
+   want the validator to recognise the new identifier as "official".
+
+`runners/meta.schema.json` already accepts any well-formed lowercase
+identifier as a `platform`, so you do **not** need to edit it.
 
 ---
 

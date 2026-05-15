@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "Catalog of known accelerator platforms used by AccelMark. The `platform` field in runners/meta.json is validated by a regex pattern (^[a-z][a-z0-9]*$), NOT by this list — so contributors can ship a runner for a new platform without ever editing this file. The catalog here is used purely for presentation: display names and sort order in the README/leaderboard matrix. tools/generate_platforms_matrix.py warns (does not error) when it encounters a platform id that is not listed here, prompting an optional follow-up PR to add it.",
+  "type": "object",
+  "required": ["platforms"],
+  "properties": {
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "display_name", "sort_order"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*$",
+            "description": "Platform identifier; matches the prefix of a runner folder name (e.g. nvidia in nvidia_vllm_47f5d58e)."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Human-readable hardware label used in the README matrix when a runner does not override it via meta.hardware_label."
+          },
+          "vendor": {
+            "type": ["string", "null"],
+            "description": "Vendor / manufacturer name. Informational only."
+          },
+          "accelerator_kind": {
+            "type": ["string", "null"],
+            "description": "Free-form category (GPU, NPU, TPU, SoC, ASIC, etc.). Informational only."
+          },
+          "sort_order": {
+            "type": "integer",
+            "description": "Sort key for the README matrix; lower values render first."
+          }
+        }
+      }
+    }
+  },
+  "platforms": [
+    {
+      "id": "nvidia",
+      "display_name": "NVIDIA GPU",
+      "vendor": "NVIDIA",
+      "accelerator_kind": "GPU",
+      "sort_order": 10
+    },
+    {
+      "id": "amd",
+      "display_name": "AMD GPU",
+      "vendor": "AMD",
+      "accelerator_kind": "GPU",
+      "sort_order": 20
+    },
+    {
+      "id": "ascend",
+      "display_name": "Huawei Ascend NPU",
+      "vendor": "Huawei",
+      "accelerator_kind": "NPU",
+      "sort_order": 30
+    },
+    {
+      "id": "apple",
+      "display_name": "Apple Silicon",
+      "vendor": "Apple",
+      "accelerator_kind": "SoC",
+      "sort_order": 40
+    },
+    {
+      "id": "google",
+      "display_name": "Google TPU",
+      "vendor": "Google",
+      "accelerator_kind": "TPU",
+      "sort_order": 50
+    },
+    {
+      "id": "moorethreads",
+      "display_name": "Moore Threads GPU",
+      "vendor": "Moore Threads",
+      "accelerator_kind": "GPU",
+      "sort_order": 60
+    },
+    {
+      "id": "other",
+      "display_name": "Other accelerator",
+      "vendor": null,
+      "accelerator_kind": null,
+      "sort_order": 999
+    }
+  ]
+}
