@@ -150,82 +150,6 @@
   border-color: color-mix(in srgb, var(--accent) 35%, transparent);
   background: var(--accent-soft);
 }
-.badge.flagged {
-  color: var(--bad);
-  border-color: color-mix(in srgb, var(--bad) 40%, transparent);
-  background: color-mix(in srgb, var(--bad) 10%, transparent);
-}
-
-/* Vendor pill */
-.vendor-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  border-radius: var(--r-sm);
-  background: var(--bg-elev-2);
-  color: var(--fg-muted);
-}
-.vendor-pill::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--vendor-color, var(--fg-faint));
-}
-/* `--vendor-color` is injected globally per `[data-vendor="<name>"]`
- * by data.js at init() time — no per-component selector needed. */
-
-/* Suite chip — for top nav of rankings etc. */
-.suite-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.32rem 0.65rem;
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  border-radius: 999px;
-  color: var(--fg-muted);
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-.suite-chip:hover { color: var(--fg); border-color: var(--accent); text-decoration: none; }
-.suite-chip.active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--fg-strong);
-}
-.suite-chip .suite-letter {
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: var(--bg-elev-2);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--fg);
-}
-.suite-chip.active .suite-letter { background: var(--accent-2); color: white; }
-
-/* ── Relative bar ─────────────────────────────────────────── */
-.rel-bar {
-  position: relative;
-  height: 6px;
-  background: var(--bg-elev-2);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.rel-bar > .fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: linear-gradient(90deg, var(--accent-2), var(--accent));
-  border-radius: 3px;
-}
-
 /* Compact KPI tile (with subtle vertical divider) */
 .kpi {
   display: flex;
@@ -400,16 +324,3 @@
   .hero-cta { flex-direction: column; align-items: stretch; }
   .hero-cta .btn { width: 100%; text-align: center; }
 }
-
-/* Rank medals */
-.rank {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: var(--fg-muted);
-  min-width: 1.8em;
-  display: inline-block;
-}
-.rank.gold   { color: var(--gold); }
-.rank.silver { color: var(--silver); }
-.rank.bronze { color: var(--bronze); }

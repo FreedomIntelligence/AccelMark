@@ -35,16 +35,6 @@ export function fmtNum(v, opts = {}) {
   });
 }
 
-export function fmtPct(v, decimals = 1) {
-  if (v === null || v === undefined || Number.isNaN(v)) return "-";
-  return `${Number(v).toFixed(decimals)}%`;
-}
-
-export function fmtMs(v, decimals = 0) {
-  if (v === null || v === undefined || Number.isNaN(v)) return "-";
-  return `${Number(v).toFixed(decimals)} ms`;
-}
-
 export function fmtDate(s) {
   if (!s) return "-";
   // Accept YYYY-MM-DD or ISO timestamp; return short YYYY-MM-DD.
@@ -175,18 +165,6 @@ export function groupBy(arr, keyFn) {
     m.get(k).push(item);
   }
   return m;
-}
-
-// Pick max by metric, treating null as -Infinity.
-export function maxBy(arr, fn) {
-  let best = null;
-  let bestV = -Infinity;
-  for (const x of arr) {
-    const v = fn(x);
-    if (v === null || v === undefined || Number.isNaN(v)) continue;
-    if (v > bestV) { bestV = v; best = x; }
-  }
-  return best;
 }
 
 // Hash-route param parsing: takes "#/foo/bar?a=1&b=2" → { path:"/foo/bar", params:{a,b} }
@@ -372,24 +350,4 @@ export async function downloadCanvasAsPng(sourceCanvas, opts = {}) {
   } catch (_) {
     return false;
   }
-}
-
-// Empty wrapper to keep view modules consistent.
-export function el(tag, props = {}, ...children) {
-  const node = document.createElement(tag);
-  for (const [k, v] of Object.entries(props || {})) {
-    if (k === "class") node.className = v;
-    else if (k === "html") node.innerHTML = v;
-    else if (k.startsWith("on") && typeof v === "function") {
-      node.addEventListener(k.slice(2).toLowerCase(), v);
-    } else if (v !== null && v !== undefined) {
-      node.setAttribute(k, v);
-    }
-  }
-  for (const c of children) {
-    if (c === null || c === undefined) continue;
-    if (typeof c === "string") node.appendChild(document.createTextNode(c));
-    else node.appendChild(c);
-  }
-  return node;
 }

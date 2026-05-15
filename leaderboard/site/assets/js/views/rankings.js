@@ -232,7 +232,6 @@ function renderColsToggle(suiteId, query, colsMode, hiddenCount) {
     : "Hide empty columns";
   return `
     <a class="rk-cols-toggle"
-       data-cols-toggle="${esc(isHiding ? "all" : "auto")}"
        href="${esc(href)}"
        title="${esc(isHiding ? "Show every metric column declared by this suite" : "Hide metric columns that are empty for every visible row")}">
       <span class="rk-cols-toggle-icon" aria-hidden="true">${isHiding ? "▸" : "▾"}</span>

@@ -7,7 +7,7 @@
 // All views consume LeaderboardData from this module.  Do not access
 // window.LEADERBOARD_DATA directly anywhere else.
 
-import { groupBy, maxBy, chipSlug, toTitleCase } from "./utils.js";
+import { groupBy, chipSlug, toTitleCase } from "./utils.js";
 
 // Each suite has a "primary metric" most relevant to a buyer's question.
 // This drives default sort on the rankings page and the top-3 podium on home.
@@ -412,13 +412,6 @@ let _byRunId = null;
 let _bySuite = null;
 let _ready = false;
 
-export function ready() { return _ready; }
-
-export function rows() {
-  if (!_rows) throw new Error("data.js: rows() called before init()");
-  return _rows;
-}
-
 export function init() {
   if (_ready) return;
   mergeSuiteSpecs();
@@ -796,12 +789,6 @@ export function bestPerSuiteForChip(slug) {
   return out;
 }
 
-// Unique chips list (representative row per chip slug).
-export function uniqueChips() {
-  if (!_ready) init();
-  return Array.from(_byChip.values()).map((rs) => rs[0]);
-}
-
 // High-level stats for hero strip.
 export function summary() {
   if (!_ready) init();
@@ -910,13 +897,6 @@ export function similarChipsTo(slug, { limit = 5 } = {}) {
   return candidates.slice(0, limit);
 }
 
-// Rank of a row within its suite (1-indexed).
-export function rankWithinSuite(row) {
-  const list = rowsForSuite(row.suite);
-  const idx = list.findIndex((r) => r.submission === row.submission);
-  return idx >= 0 ? { rank: idx + 1, total: list.length } : null;
-}
-
 // Suite-level facts derived from current data — model used,
 // baseline precision, total submissions, distinct chips.  Used in
 // the home suite-card header to give buyers immediate context
@@ -931,15 +911,6 @@ export function suiteFacts(suiteId) {
   const precision = mode(rows.map((r) => r.precision).filter(Boolean));
   const chips = new Set(rows.map((r) => r._chip_slug)).size;
   return { model, precision, submissions: rows.length, chips };
-}
-
-// Suite leader — best chip in this suite by the suite's primary metric
-// (one row per chip; the same chip can also appear at other chip counts
-// elsewhere on the rankings page).  Returns null if the suite has no
-// numeric data yet.
-export function suiteLeader(suiteId) {
-  const rows = bestPerChipForSuite(suiteId);
-  return rows.length ? rows[0] : null;
 }
 
 // Find the best row in a suite by an arbitrary metric key + direction.
