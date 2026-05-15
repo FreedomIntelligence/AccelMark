@@ -1,0 +1,205 @@
+/* components.css — buttons, cards, badges, tags, bars */
+
+/* ── Cards ────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 1.1rem 1.2rem;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+.card.is-link {
+  cursor: pointer;
+  display: block;
+  color: inherit;
+}
+.card.is-link:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--r-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--bg-elev);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.btn:hover { background: var(--bg-elev-2); border-color: var(--accent); text-decoration: none; }
+.btn.primary {
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+  color: white;
+}
+.btn.primary:hover { background: #2876f9; border-color: #2876f9; }
+.btn.ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--fg-muted);
+}
+.btn.ghost:hover { color: var(--fg); background: var(--bg-elev); border-color: var(--border-soft); }
+.btn.small { padding: 0.3rem 0.6rem; font-size: 0.78rem; }
+
+/* ── Badges & tags ────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--bg-elev-2);
+  color: var(--fg-muted);
+  border: 1px solid var(--border-soft);
+  white-space: nowrap;
+}
+.badge.tier-verified  { color: var(--good); border-color: rgba(63,185,80,0.35); background: rgba(63,185,80,0.08); }
+.badge.tier-community { color: var(--accent); border-color: rgba(88,166,255,0.35); background: var(--accent-soft); }
+.badge.flagged        { color: var(--bad); border-color: rgba(248,81,73,0.4); background: rgba(248,81,73,0.08); }
+
+/* Vendor pill */
+.vendor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  background: var(--bg-elev-2);
+  color: var(--fg-muted);
+}
+.vendor-pill::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vendor-color, var(--fg-faint));
+}
+.vendor-pill[data-vendor="NVIDIA"]   { --vendor-color: var(--v-nvidia); }
+.vendor-pill[data-vendor="AMD"]      { --vendor-color: var(--v-amd); }
+.vendor-pill[data-vendor="Apple"]    { --vendor-color: var(--v-apple); }
+.vendor-pill[data-vendor="Google"]   { --vendor-color: var(--v-google); }
+.vendor-pill[data-vendor="Huawei"]   { --vendor-color: var(--v-huawei); }
+.vendor-pill[data-vendor="Moore Threads"] { --vendor-color: var(--v-moore); }
+.vendor-pill[data-vendor="Intel"]    { --vendor-color: var(--v-intel); }
+
+/* Suite chip — for top nav of rankings etc. */
+.suite-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.65rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--fg-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.suite-chip:hover { color: var(--fg); border-color: var(--accent); text-decoration: none; }
+.suite-chip.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--fg-strong);
+}
+.suite-chip .suite-letter {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--bg-elev-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+.suite-chip.active .suite-letter { background: var(--accent-2); color: white; }
+
+/* ── Relative bar ─────────────────────────────────────────── */
+.rel-bar {
+  position: relative;
+  height: 6px;
+  background: var(--bg-elev-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.rel-bar > .fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  border-radius: 3px;
+}
+
+/* Compact KPI tile */
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.kpi .kpi-value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.02em;
+}
+.kpi .kpi-label {
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Hero strip (used by home + chip detail) */
+.hero {
+  padding: 1.5rem 0 0.75rem;
+}
+.hero h1 {
+  margin: 0 0 0.4rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.01em;
+}
+.hero .tagline {
+  color: var(--fg-muted);
+  margin: 0 0 1rem;
+  font-size: 0.98rem;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .hero h1 { font-size: 1.45rem; }
+  .hero-stats { gap: 1.25rem; }
+  .kpi .kpi-value { font-size: 1.2rem; }
+}
+
+/* Rank medals */
+.rank {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+  min-width: 1.8em;
+  display: inline-block;
+}
+.rank.gold   { color: var(--gold); }
+.rank.silver { color: var(--silver); }
+.rank.bronze { color: var(--bronze); }

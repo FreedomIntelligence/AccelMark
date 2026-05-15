@@ -1,0 +1,141 @@
+/* home.css — Home page (suite overview grid + recent additions) */
+
+.suite-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.1rem 1.2rem 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.suite-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+.suite-card-header .suite-letter-big {
+  flex: 0 0 auto;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.suite-card-header .suite-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  line-height: 1.25;
+}
+.suite-card-header .suite-tagline {
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  margin-top: 0.1rem;
+}
+
+.suite-card-meta {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  color: var(--fg-muted);
+}
+.suite-card-meta .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.podium {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.podium-row {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.podium-row .podium-name {
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.podium-row .podium-value {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+.podium-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.podium-row .rel-bar { height: 4px; }
+
+.suite-card-cta {
+  margin-top: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--accent);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.suite-card.is-link:hover .suite-card-cta { color: var(--fg-strong); }
+
+/* Empty suite (no submissions yet) */
+.suite-card.empty .podium {
+  color: var(--fg-faint);
+  font-style: italic;
+  font-size: 0.82rem;
+}
+
+/* Recent additions */
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.recent-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.6fr) 60px 80px 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.55rem 0.85rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  font-size: 0.85rem;
+  color: var(--fg);
+  text-decoration: none;
+}
+.recent-row:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+.recent-row .recent-suite { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-muted); }
+.recent-row .recent-metric { font-family: var(--font-mono); font-weight: 600; color: var(--fg-strong); }
+.recent-row .recent-date { color: var(--fg-muted); font-size: 0.78rem; }
+
+@media (max-width: 700px) {
+  .recent-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  .recent-row .recent-date,
+  .recent-row .recent-metric { font-size: 0.78rem; }
+}
