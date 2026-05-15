@@ -21,6 +21,64 @@
   --suite-color: var(--accent-2);
 }
 
+/* ── 4+3 suite grid ─────────────────────────────────────────
+   Row 1: 4 compact cards, span 3 cols of a 12-col grid.
+   Row 2: 3 wider cards, span 4 cols. Cards keep the same
+   internal structure; row-1 just gets a tighter head layout. */
+.suite-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.suite-grid > .suite-card { grid-column: span 4; }
+.suite-grid > .suite-card.is-compact { grid-column: span 3; }
+
+@media (max-width: 1100px) {
+  .suite-grid > .suite-card,
+  .suite-grid > .suite-card.is-compact { grid-column: span 6; }
+}
+@media (max-width: 640px) {
+  .suite-grid > .suite-card,
+  .suite-grid > .suite-card.is-compact { grid-column: span 12; }
+}
+
+/* Compact variant — row 1 cards need a stacked head so the title
+   gets the full card width (otherwise "Single-chip throughput"
+   truncates next to the metric pill at 25% width). */
+.suite-card.is-compact .suite-card-head {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.55rem;
+  padding: 0.75rem 0.95rem 0.7rem;
+}
+.suite-card.is-compact .suite-card-head .suite-head-left {
+  width: 100%;
+}
+.suite-card.is-compact .suite-card-head .suite-title {
+  font-size: 0.95rem;
+}
+.suite-card.is-compact .suite-card-head .suite-metric-tag {
+  align-self: flex-end;
+  font-size: 0.66rem;
+  padding: 0.18rem 0.55rem;
+}
+.suite-card.is-compact .suite-card-tag {
+  padding: 0.6rem 0.95rem 0.15rem;
+  font-size: 0.8rem;
+}
+.suite-card.is-compact .suite-card-body {
+  padding: 0.35rem 0.4rem 0.3rem;
+}
+.suite-card.is-compact .suite-card-foot {
+  padding: 0.55rem 0.95rem 0.95rem;
+}
+.suite-card.is-compact .lb-row { padding: 0.45rem 0.55rem; gap: 0.55rem; }
+.suite-card.is-compact .lb-row-name { font-size: 0.9rem; }
+.suite-card.is-compact .lb-row-sub  { font-size: 0.72rem; }
+.suite-card.is-compact .lb-row-score .score-val { font-size: 0.95rem; }
+.suite-card.is-compact .lb-row.lb-row--featured .lb-row-name { font-size: 0.95rem; }
+.suite-card.is-compact .lb-row.lb-row--featured .lb-row-score .score-val { font-size: 1.02rem; }
+
 /* ── Suite card ────────────────────────────────────────────
    Filled accent header (per-suite color) → tagline → top-5 row
    list (with #1 visually featured) → centered "View full →" CTA. */
@@ -70,14 +128,14 @@
 }
 .suite-card-head .suite-letter {
   flex: 0 0 auto;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   color: var(--on-accent);
   font-weight: 700;
-  font-size: 0.9rem;
-  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -193,7 +251,7 @@
   font-size: 1rem;
 }
 .lb-row.lb-row--featured .lb-row-score .score-val {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
 }
 
 .lb-row-rank {
@@ -218,8 +276,9 @@
   background: color-mix(in srgb, var(--suite-color) 18%, transparent);
   color: var(--suite-color);
   border-color: color-mix(in srgb, var(--suite-color) 35%, transparent);
-  font-family: var(--font-serif);
-  font-weight: 600;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .lb-row-main {
@@ -262,6 +321,17 @@
 .lb-row-sub .vendor-dot[data-vendor="Intel"]         { --vendor-color: var(--v-intel); }
 
 .lb-row-sub .sub-sep { color: var(--fg-faint); }
+.lb-row-sub .vendor-name { color: var(--fg-muted); }
+.lb-row-sub .fw-ver {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--fg-faint);
+  margin-left: 0.15rem;
+}
+.lb-row-sub .submitter {
+  color: var(--fg-muted);
+  font-feature-settings: "tnum";
+}
 .lb-row-sub .suite-tag {
   display: inline-flex;
   align-items: center;
@@ -283,18 +353,18 @@
   line-height: 1.1;
 }
 .lb-row-score .score-val {
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--fg-strong);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
 }
 .lb-row-score .score-unit {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   color: var(--fg-muted);
   letter-spacing: 0.02em;
-  margin-top: 0.05rem;
+  margin-top: 0.1rem;
 }
 
 /* Empty placeholder row inside a suite with no entries */
@@ -336,9 +406,9 @@
 }
 .suite-stats strong {
   color: var(--fg-strong);
-  font-family: var(--font-serif);
-  font-weight: 500;
-  font-size: 1.05rem;
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
   margin-right: 0.2rem;
 }
 

@@ -1,22 +1,24 @@
 // views/home.js — Home page (multi-suite overview).
 //
 // Layout (editorial, per-suite color):
-//   • Hero with subtle radial backdrop, serif h1, KPI strip between
-//     two thin rules, three CTAs.
-//   • Suite grid: 7 cards, each a small standalone leaderboard.
-//     Each card declares data-suite="A".."G" so CSS can paint:
-//       - header bar in the suite's category color
-//       - featured #1 row tinted in the suite's color (~8% alpha)
-//       - section-letter chip and CTA in the same hue
-//   • Recent submissions: same .lb-row, suite letter circle tinted
-//     in that submission's suite color.
+//   • Hero is centered (eyebrow + serif h1 + tagline + KPI strip + CTAs).
+//   • Suite grid: 4 compact cards on row 1 (A B C D, span 3 of 12),
+//     3 wider cards on row 2 (E F G, span 4 of 12).
+//   • Each suite card declares data-suite="A".."G" so CSS scopes
+//     --suite-color for the header bar, featured #1 row tint, and CTA.
+//   • Recent submissions: same .lb-row, suite letter circle tinted in
+//     that submission's suite color.
 
 import {
   SUITE_ORDER, SUITE_META,
   rowsForSuite, bestPerChipForSuite,
   summary, recent, formatPrimary,
 } from "../data.js";
-import { esc, fmtNum, fmtDate, chipHref, buildHash } from "../utils.js";
+import { esc, fmtNum, fmtDate, chipHref, buildHash, shortVersion, submitterHandle } from "../utils.js";
+
+// Row-1 (compact) suites — narrower 25%-ish cards. Anything not here
+// goes into row 2 (wider 33% cards).
+const COMPACT_SUITES = new Set(["suite_A", "suite_B", "suite_C", "suite_D"]);
 
 export function render({ el }) {
   const s = summary();
@@ -50,7 +52,7 @@ export function render({ el }) {
         </div>
         <span class="section-sub">Each suite measures a different real-world workload. Pick one to dive in.</span>
       </div>
-      <div class="grid grid-3" id="suite-grid"></div>
+      <div class="suite-grid" id="suite-grid"></div>
     </section>
 
     <section class="section">
@@ -78,11 +80,13 @@ export function render({ el }) {
 
 function renderSuiteCard(suiteId) {
   const meta = SUITE_META[suiteId];
-  const top = bestPerChipForSuite(suiteId).slice(0, 5);
+  const compact = COMPACT_SUITES.has(suiteId);
+  const limit = compact ? 4 : 5;
+  const top = bestPerChipForSuite(suiteId).slice(0, limit);
   const empty = top.length === 0;
 
   const card = document.createElement("article");
-  card.className = "card suite-card" + (empty ? " empty" : "");
+  card.className = "card suite-card" + (compact ? " is-compact" : "") + (empty ? " empty" : "");
   card.setAttribute("data-suite", meta.letter);
 
   const rankingsHref = buildHash("/rankings", { suite: suiteId });
@@ -107,7 +111,7 @@ function renderSuiteCard(suiteId) {
     return card;
   }
 
-  const body = top.map((r, i) => renderLbRow(r, suiteId, i + 1)).join("");
+  const body = top.map((r, i) => renderLbRow(r, suiteId, i + 1, compact)).join("");
   card.innerHTML = `
     ${header}
     <div class="suite-card-body">${body}</div>
@@ -117,30 +121,51 @@ function renderSuiteCard(suiteId) {
 }
 
 // Single ranked row used by suite cards.  Anchor → chip detail page.
-function renderLbRow(row, suiteId, rank) {
+// `compact` flag hides the submitter line so narrow row-1 cards stay
+// readable; row-2 (wider) cards show it.
+function renderLbRow(row, suiteId, rank, compact = false) {
   const meta = SUITE_META[suiteId];
   const value = row[meta.primary.key];
   const display = formatPrimary(value, suiteId);
   const { num, unit } = splitNumUnit(display);
   const medal = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
   const featured = rank === 1 ? " lb-row--featured" : "";
+  const fwLine = renderFwSub(row, compact);
   return `
     <a class="lb-row${featured}" href="${chipHref(row)}">
       <span class="lb-row-rank ${medal}">${rank}</span>
       <span class="lb-row-main">
         <span class="lb-row-name">${esc(row._chip_label)}</span>
-        <span class="lb-row-sub">
-          <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
-          <span>${esc(row.vendor)}</span>
-          <span class="sub-sep">·</span>
-          <span>${esc(row.framework)}${row.precision ? " · " + esc(row.precision) : ""}</span>
-        </span>
+        ${fwLine}
       </span>
       <span class="lb-row-score">
         <span class="score-val">${esc(num)}</span>
         ${unit ? `<span class="score-unit">${esc(unit)}</span>` : ""}
       </span>
     </a>
+  `;
+}
+
+// Sub line under chip name. Always shows vendor + framework@version +
+// precision. Submitter is shown on wider rows only (recent list +
+// row-2 suite cards) to keep compact rows tight.
+function renderFwSub(row, compact = false) {
+  const fw = row.framework || "";
+  const ver = shortVersion(row.framework_version);
+  const fwVer = ver ? `${esc(fw)} <span class="fw-ver">${esc(ver)}</span>` : esc(fw);
+  const precision = row.precision ? ` · ${esc(row.precision)}` : "";
+  const handle = submitterHandle(row.submitted_by);
+  const submitter = (!compact && handle)
+    ? `<span class="sub-sep">·</span><span class="submitter">@${esc(handle)}</span>`
+    : "";
+  return `
+    <span class="lb-row-sub">
+      <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
+      <span class="vendor-name">${esc(row.vendor)}</span>
+      <span class="sub-sep">·</span>
+      <span>${fwVer}${precision}</span>
+      ${submitter}
+    </span>
   `;
 }
 
@@ -151,6 +176,9 @@ function renderRecentRow(row) {
   const { num, unit } = splitNumUnit(display);
   const suiteLabel = row.suite.replace("suite_", "Suite ");
   const letter = meta ? meta.letter : "·";
+  const handle = submitterHandle(row.submitted_by);
+  const ver = shortVersion(row.framework_version);
+  const fwVer = ver ? `${esc(row.framework)} <span class="fw-ver">${esc(ver)}</span>` : esc(row.framework);
 
   const a = document.createElement("a");
   a.className = "lb-row";
@@ -162,9 +190,12 @@ function renderRecentRow(row) {
       <span class="lb-row-name">${esc(row._chip_label)}</span>
       <span class="lb-row-sub">
         <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
-        <span>${esc(row.vendor)}</span>
+        <span class="vendor-name">${esc(row.vendor)}</span>
+        <span class="sub-sep">·</span>
+        <span>${fwVer}${row.precision ? " · " + esc(row.precision) : ""}</span>
         <span class="sub-sep">·</span>
         <span class="suite-tag">${esc(suiteLabel)}</span>
+        ${handle ? `<span class="sub-sep">·</span><span class="submitter">@${esc(handle)}</span>` : ""}
         <span class="sub-sep">·</span>
         <span class="date">${esc(fmtDate(row.date))}</span>
       </span>

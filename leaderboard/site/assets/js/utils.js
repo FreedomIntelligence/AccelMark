@@ -51,6 +51,36 @@ export function fmtDate(s) {
   return String(s).slice(0, 10);
 }
 
+// Trim long framework versions to something display-friendly.
+//   "0.7.3"                         → "0.7.3"
+//   "0.19.1rc1.dev339+gedc364896"   → "0.19.1rc1"
+//   "0.18.0rc1"                     → "0.18.0rc1"
+// Strategy: cut at "+" (drops git hash), then at ".dev" (drops dev
+// build counter). If still long, hard-cap at 12 chars.
+export function shortVersion(v) {
+  if (!v) return "";
+  let s = String(v).split("+")[0];
+  s = s.split(".dev")[0];
+  if (s.length > 12) s = s.slice(0, 12);
+  return s;
+}
+
+// Normalize a submitter field to a bare handle (no leading @).
+// Accepts GitHub login, email, or "Name <email>" — falls back to the
+// part before the first @ for emails.
+export function submitterHandle(s) {
+  if (!s) return "";
+  let h = String(s).trim();
+  if (!h) return "";
+  if (h.startsWith("@")) h = h.slice(1);
+  if (h.includes("<") && h.includes(">")) {
+    const m = h.match(/<([^>]+)>/);
+    if (m) h = m[1];
+  }
+  if (h.includes("@")) h = h.split("@")[0]; // email → local part
+  return h;
+}
+
 // Stable slug for URLs.  Lowercase, hyphenated, ASCII-safe.
 export function slugify(s) {
   return String(s || "")
