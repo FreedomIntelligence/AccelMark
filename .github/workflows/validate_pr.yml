@@ -11,6 +11,7 @@ on:
       - 'schema/platforms.json'
       - 'tools/generate_platforms_matrix.py'
       - 'README.md'
+      - 'leaderboard/site/**'
 
 jobs:
   validate-runners:
@@ -206,3 +207,22 @@ jobs:
                 body,
               });
             }
+
+  frontend-tests:
+    name: Frontend unit tests (modal viz)
+    runs-on: ubuntu-latest
+    # Frontend tests don't need full git history; a shallow checkout
+    # plus Node 20 (which ships node:test) is enough.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # No npm install — the suite intentionally has zero runtime deps
+      # (a hand-written DOM stub stands in for jsdom / happy-dom).  Add
+      # extra files to leaderboard/site/test/ to widen coverage; the
+      # glob below picks them up automatically.
+      - name: Run leaderboard frontend tests
+        run: node --test leaderboard/site/test/*.test.mjs

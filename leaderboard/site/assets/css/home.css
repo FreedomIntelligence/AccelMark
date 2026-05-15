@@ -1,0 +1,564 @@
+/* home.css — Home page (suite overview grid + recent additions + vendor coverage)
+ *
+ * Each suite card declares its `data-suite="A".."G"` which scopes
+ *   --suite-color   (full saturation, used for header bar + accents)
+ *   --suite-tint    (~10% alpha, used for #1 row + letter chip bg)
+ */
+
+/* ── Per-suite color tokens via data attribute ──────────── */
+.suite-card[data-suite="A"], .lb-row[data-suite="A"], .vendor-suite-pill[data-suite="A"] { --suite-color: var(--suite-A); }
+.suite-card[data-suite="B"], .lb-row[data-suite="B"], .vendor-suite-pill[data-suite="B"] { --suite-color: var(--suite-B); }
+.suite-card[data-suite="C"], .lb-row[data-suite="C"], .vendor-suite-pill[data-suite="C"] { --suite-color: var(--suite-C); }
+.suite-card[data-suite="D"], .lb-row[data-suite="D"], .vendor-suite-pill[data-suite="D"] { --suite-color: var(--suite-D); }
+.suite-card[data-suite="E"], .lb-row[data-suite="E"], .vendor-suite-pill[data-suite="E"] { --suite-color: var(--suite-E); }
+.suite-card[data-suite="F"], .lb-row[data-suite="F"], .vendor-suite-pill[data-suite="F"] { --suite-color: var(--suite-F); }
+.suite-card[data-suite="G"], .lb-row[data-suite="G"], .vendor-suite-pill[data-suite="G"] { --suite-color: var(--suite-G); }
+
+/* Default fallback color */
+.suite-card,
+.lb-row,
+.vendor-suite-pill { --suite-color: var(--accent-2); }
+
+/* ── Uniform 3-col suite grid ──────────────────────────── */
+.suite-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+@media (max-width: 980px) {
+  .suite-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .suite-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Suite card ────────────────────────────────────────────
+   Header (filled in suite color) contains:
+     · letter + bigger title + right metric pill
+     · tagline (short description, moved out of the body)
+     · meta line (model · precision · N rows · M chips)
+   Body is the lb-row leaderboard only (top 6).
+   Footer is the centered "View full ranking →" CTA. */
+
+.suite-card {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-card);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+.suite-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+  border-color: color-mix(in srgb, var(--suite-color) 35%, var(--border-soft));
+}
+
+.suite-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.15rem 1.05rem;
+  background: var(--suite-color);
+  color: var(--on-accent);
+  position: relative;
+  overflow: hidden;
+}
+.suite-card-head::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 65%);
+  pointer-events: none;
+}
+.suite-card-head > * { position: relative; z-index: 1; }
+
+.suite-head-row1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.suite-head-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.suite-letter {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--on-accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.suite-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--on-accent);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+.suite-metric-tag {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  color: var(--on-accent);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.suite-head-tagline {
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.86);
+  margin: 0;
+}
+
+.suite-head-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.85rem;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.01em;
+  padding-top: 0.15rem;
+}
+.suite-head-meta .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.suite-head-meta .meta-item strong {
+  color: var(--on-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.suite-card-body {
+  padding: 0.4rem 0.55rem 0.35rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.suite-card-foot {
+  padding: 0.55rem 1.15rem 1rem;
+  text-align: center;
+  border-top: 1px solid var(--border-soft);
+  margin-top: 0.2rem;
+}
+.suite-card-foot a,
+.suite-card-foot .cta {
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--suite-color) 78%, var(--fg-strong));
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+.suite-card:hover .suite-card-foot .cta { color: var(--suite-color); }
+
+.suite-card.empty .suite-card-body {
+  padding: 1.5rem 1.1rem 1.25rem;
+  color: var(--fg-faint);
+  font-style: italic;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ── Leaderboard row (used in suite cards + recent list) ── */
+.lb-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  /* Row is a <div> (so the chip-name anchor inside can be a real <a>);
+     keep the link affordance for the row body. */
+  cursor: pointer;
+  padding: 0.62rem 0.7rem;
+  border-radius: var(--r-md);
+  text-decoration: none;
+  color: inherit;
+  transition: background 100ms ease;
+}
+.lb-row:hover {
+  background: var(--bg-elev-2);
+  text-decoration: none;
+}
+.lb-row + .lb-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0.65rem;
+  right: 0.65rem;
+  height: 1px;
+  background: var(--border-soft);
+  pointer-events: none;
+}
+.lb-row:hover::before,
+.lb-row:hover + .lb-row::before { background: transparent; }
+
+/* Featured #1 row — soft suite-color tint background */
+.lb-row.lb-row--featured {
+  background: color-mix(in srgb, var(--suite-color) 8%, transparent);
+  padding-top: 0.78rem;
+  padding-bottom: 0.78rem;
+  border-left: 2px solid var(--suite-color);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  margin-left: -2px;
+}
+.lb-row.lb-row--featured + .lb-row::before { background: transparent; }
+.lb-row.lb-row--featured:hover {
+  background: color-mix(in srgb, var(--suite-color) 14%, transparent);
+}
+.lb-row.lb-row--featured .lb-row-name { font-size: 1rem; }
+.lb-row.lb-row--featured .lb-row-score .score-val { font-size: 1.08rem; }
+
+.lb-row-rank {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--bg-elev-2);
+  color: var(--fg-muted);
+  border: 1px solid var(--border-soft);
+  font-variant-numeric: tabular-nums;
+}
+.lb-row-rank.gold   { background: var(--gold);   color: #1a1206; border-color: transparent; }
+.lb-row-rank.silver { background: var(--silver); color: #15171c; border-color: transparent; }
+.lb-row-rank.bronze { background: var(--bronze); color: #1e0e02; border-color: transparent; }
+.lb-row-rank.suite-tag-rank {
+  background: color-mix(in srgb, var(--suite-color) 18%, transparent);
+  color: var(--suite-color);
+  border-color: color-mix(in srgb, var(--suite-color) 35%, transparent);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lb-row-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.lb-row-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Renders as an <a> so the chip name navigates to /chip/<slug> while
+     the rest of the row opens the run modal.  Suppress the default
+     underline and surface it only on hover to keep the row visually
+     quiet. */
+  text-decoration: none;
+  display: inline-block;
+  max-width: 100%;
+  transition: color 100ms ease;
+}
+.lb-row-name:hover {
+  color: var(--accent-2);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.lb-row-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  color: var(--fg-muted);
+  line-height: 1.25;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.lb-row-sub .fw-line {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-row-byline {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--fg-faint);
+  line-height: 1.25;
+  margin-top: 0.05rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-row-sub .vendor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vendor-color, var(--fg-faint));
+  flex: 0 0 auto;
+}
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
+
+.lb-row-sub .sub-sep { color: var(--fg-faint); flex: 0 0 auto; }
+.lb-row-sub .vendor-name { color: var(--fg-muted); flex: 0 0 auto; }
+.lb-row-sub .fw-ver {
+  color: var(--fg-faint);
+  font-size: 0.7rem;
+  margin-left: 0.15rem;
+  font-variant-numeric: tabular-nums;
+}
+.lb-row-sub .suite-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.05rem 0.45rem;
+  background: color-mix(in srgb, var(--suite-color) 12%, transparent);
+  color: color-mix(in srgb, var(--suite-color) 80%, var(--fg-strong));
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.lb-row-score {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+}
+.lb-row-score .score-val {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+}
+.lb-row-score .score-unit {
+  font-size: 0.68rem;
+  color: var(--fg-muted);
+  letter-spacing: 0.02em;
+  margin-top: 0.1rem;
+}
+
+.lb-row.placeholder {
+  color: var(--fg-faint);
+  font-style: italic;
+  justify-content: center;
+  grid-template-columns: auto;
+}
+
+/* ── Recent submissions list ─────────────────────────────── */
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 0.5rem 0.55rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* ── Chip cloud (02 · Coverage) ──────────────────────────── */
+.chip-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0.5rem 0.5rem;
+}
+
+.chip-tile {
+  --vendor-color: var(--fg-faint);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--vendor-color) 14%, var(--bg-elev));
+  border: 1px solid color-mix(in srgb, var(--vendor-color) 32%, transparent);
+  color: var(--fg-strong);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  white-space: nowrap;
+}
+.chip-tile:hover {
+  background: color-mix(in srgb, var(--vendor-color) 26%, var(--bg-elev));
+  border-color: var(--vendor-color);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.chip-tile.size-sm { font-size: 0.8rem;  padding: 0.38rem 0.7rem;  }
+.chip-tile.size-md { font-size: 0.92rem; padding: 0.45rem 0.85rem; }
+.chip-tile.size-lg { font-size: 1.05rem; padding: 0.55rem 1.05rem; }
+.chip-tile.size-xl { font-size: 1.25rem; padding: 0.65rem 1.25rem; }
+
+/* Phone widths: tiles can't keep their popularity-tier size scaling
+   without overflowing the viewport (the longest chip names already
+   eat 200+ px at xl).  Collapse them to a single compact size and
+   allow the inner text to wrap. */
+@media (max-width: 480px) {
+  .chip-cloud { gap: 0.4rem; }
+  .chip-tile,
+  .chip-tile.size-sm,
+  .chip-tile.size-md,
+  .chip-tile.size-lg,
+  .chip-tile.size-xl {
+    font-size: 0.82rem;
+    padding: 0.36rem 0.6rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
+
+.chip-tile-count {
+  font-size: 0.7em;
+  font-weight: 500;
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+  padding-left: 0.4rem;
+  border-left: 1px solid color-mix(in srgb, var(--vendor-color) 30%, transparent);
+}
+
+.cloud-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.5rem;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.8rem;
+  color: var(--fg-muted);
+}
+.cloud-legend-item {
+  --vendor-color: var(--fg-faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
+.cloud-legend-item .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--vendor-color);
+  flex: 0 0 auto;
+}
+.cloud-legend-item .name {
+  color: var(--fg-strong);
+  font-weight: 600;
+}
+.cloud-legend-item .meta {
+  color: var(--fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Submit your result (04 · Contribute) ───────────────── */
+/* Borderless, blends into the page with a soft radial wash that
+   fades to the page background — visually quieter than a card. */
+.submit-section { margin: 4rem 0 1rem; }
+.submit-card {
+  position: relative;
+  padding: 3rem 1rem 2.5rem;
+  text-align: center;
+  border: none;
+  background: transparent;
+}
+.submit-card::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -4rem;
+  z-index: -1;
+  background:
+    radial-gradient(42% 80% at 26% 50%, color-mix(in srgb, var(--suite-A) 11%, transparent), transparent 65%),
+    radial-gradient(42% 80% at 74% 50%, color-mix(in srgb, var(--suite-D) 11%, transparent), transparent 65%);
+  -webkit-mask-image: radial-gradient(80% 95% at 50% 50%, #000 55%, transparent 100%);
+          mask-image: radial-gradient(80% 95% at 50% 50%, #000 55%, transparent 100%);
+  pointer-events: none;
+}
+.submit-card .eyebrow { justify-content: center; }
+.submit-card .eyebrow::before { display: none; }
+.submit-title {
+  font-size: 2.85rem;
+  font-weight: 700;
+  margin: 0.6rem 0 0.95rem;
+  color: var(--fg-strong);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.submit-body {
+  margin: 0 auto 1.75rem;
+  color: var(--fg-muted);
+  font-size: 1.08rem;
+  line-height: 1.65;
+  max-width: 58ch;
+}
+@media (max-width: 720px) {
+  .submit-title { font-size: 2.2rem; }
+  .submit-body { font-size: 1rem; }
+}
+.submit-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+/* Stats row inside suite card body (used by /suites listing). */
+.suite-stats {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--fg-muted);
+}
+.suite-stats strong {
+  color: var(--fg-strong);
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  margin-right: 0.2rem;
+}
+
+a.suite-card { text-decoration: none; color: inherit; }
+a.suite-card:hover { text-decoration: none; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .suite-card-head { padding: 0.85rem 0.95rem; }
+  .suite-title { font-size: 1.05rem; }
+  .suite-card-body { padding: 0.3rem 0.4rem 0.25rem; }
+  .suite-card-foot { padding: 0.5rem 0.95rem 0.9rem; }
+  .lb-row { padding: 0.45rem 0.55rem; gap: 0.55rem; }
+  .lb-row-name { font-size: 0.92rem; }
+  .lb-row-score .score-val { font-size: 0.95rem; }
+}
