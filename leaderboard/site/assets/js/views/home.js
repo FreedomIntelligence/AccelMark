@@ -1,16 +1,15 @@
 // views/home.js — Home page (multi-suite overview).
 //
-// Layout (per OpenCompass / user feedback):
-//   • Hero: title + tagline + KPI strip + CTAs
-//   • Suite grid: 7 cards, each a small standalone leaderboard (top 5)
-//     ┌─ accent header: A · Title          [tok/s] ─┐
-//     │ tagline                                      │
-//     │ ① NVIDIA H200 ×1     5,731 tok/s             │
-//     │ ② AMD MI300X ×1      5,128 tok/s             │
-//     │ …                                            │
-//     │            View full ranking →               │
-//     └──────────────────────────────────────────────┘
-//   • Recent submissions: same row style in one list card
+// Layout (editorial, per-suite color):
+//   • Hero with subtle radial backdrop, serif h1, KPI strip between
+//     two thin rules, three CTAs.
+//   • Suite grid: 7 cards, each a small standalone leaderboard.
+//     Each card declares data-suite="A".."G" so CSS can paint:
+//       - header bar in the suite's category color
+//       - featured #1 row tinted in the suite's color (~8% alpha)
+//       - section-letter chip and CTA in the same hue
+//   • Recent submissions: same .lb-row, suite letter circle tinted
+//     in that submission's suite color.
 
 import {
   SUITE_ORDER, SUITE_META,
@@ -23,7 +22,8 @@ export function render({ el }) {
   const s = summary();
   el.innerHTML = `
     <section class="hero">
-      <h1>AI accelerator benchmark — open and reproducible</h1>
+      <span class="eyebrow hero-eyebrow">AccelMark · Benchmark suite</span>
+      <h1>AI accelerator benchmark — <em>open and reproducible</em></h1>
       <p class="tagline">
         Independent measurements of inference performance across vendors.
         Every result links back to the runner code that produced it.
@@ -44,7 +44,10 @@ export function render({ el }) {
 
     <section class="section">
       <div class="section-header">
-        <h2>Rankings by workload</h2>
+        <div class="section-title">
+          <span class="eyebrow">01 · Workloads</span>
+          <h2>Rankings by workload</h2>
+        </div>
         <span class="section-sub">Each suite measures a different real-world workload. Pick one to dive in.</span>
       </div>
       <div class="grid grid-3" id="suite-grid"></div>
@@ -52,7 +55,10 @@ export function render({ el }) {
 
     <section class="section">
       <div class="section-header">
-        <h2>Recent submissions</h2>
+        <div class="section-title">
+          <span class="eyebrow">02 · Latest activity</span>
+          <h2>Recent submissions</h2>
+        </div>
         <a class="btn ghost small" href="#/rankings">See all →</a>
       </div>
       <div class="recent-list" id="recent-list"></div>
@@ -77,6 +83,7 @@ function renderSuiteCard(suiteId) {
 
   const card = document.createElement("article");
   card.className = "card suite-card" + (empty ? " empty" : "");
+  card.setAttribute("data-suite", meta.letter);
 
   const rankingsHref = buildHash("/rankings", { suite: suiteId });
 
@@ -114,11 +121,11 @@ function renderLbRow(row, suiteId, rank) {
   const meta = SUITE_META[suiteId];
   const value = row[meta.primary.key];
   const display = formatPrimary(value, suiteId);
-  // Split formatted value from trailing unit so we can render unit muted.
   const { num, unit } = splitNumUnit(display);
   const medal = rank === 1 ? "gold" : rank === 2 ? "silver" : rank === 3 ? "bronze" : "";
+  const featured = rank === 1 ? " lb-row--featured" : "";
   return `
-    <a class="lb-row" href="${chipHref(row)}">
+    <a class="lb-row${featured}" href="${chipHref(row)}">
       <span class="lb-row-rank ${medal}">${rank}</span>
       <span class="lb-row-main">
         <span class="lb-row-name">${esc(row._chip_label)}</span>
@@ -143,12 +150,14 @@ function renderRecentRow(row) {
   const display = formatPrimary(metricVal, row.suite);
   const { num, unit } = splitNumUnit(display);
   const suiteLabel = row.suite.replace("suite_", "Suite ");
+  const letter = meta ? meta.letter : "·";
 
   const a = document.createElement("a");
   a.className = "lb-row";
   a.href = chipHref(row);
+  a.setAttribute("data-suite", letter);
   a.innerHTML = `
-    <span class="lb-row-rank" aria-hidden="true">${esc(meta ? meta.letter : "·")}</span>
+    <span class="lb-row-rank suite-tag-rank" aria-hidden="true">${esc(letter)}</span>
     <span class="lb-row-main">
       <span class="lb-row-name">${esc(row._chip_label)}</span>
       <span class="lb-row-sub">

@@ -156,53 +156,95 @@
   border-radius: 3px;
 }
 
-/* Compact KPI tile */
+/* Compact KPI tile (with subtle vertical divider) */
 .kpi {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.25rem;
+  padding-right: 2rem;
+  position: relative;
+}
+.kpi + .kpi::before {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  width: 1px;
+  background: var(--border-soft);
 }
 .kpi .kpi-value {
-  font-family: var(--font-mono);
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 500;
   color: var(--fg-strong);
   letter-spacing: -0.02em;
-  line-height: 1.05;
+  line-height: 1;
 }
 .kpi .kpi-label {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   color: var(--fg-muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
+  font-weight: 500;
 }
 
-/* Hero strip (used by home + chip detail) */
+/* Hero — editorial layout with subtle radial spotlight backdrop */
 .hero {
-  padding: 1rem 0 2rem;
+  position: relative;
+  padding: 2.5rem 0 2.75rem;
+  margin-bottom: 1rem;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -1rem -3rem;
+  z-index: -1;
+  background:
+    radial-gradient(45% 70% at 15% 25%, color-mix(in srgb, var(--suite-A) 18%, transparent), transparent 70%),
+    radial-gradient(40% 60% at 88% 12%, color-mix(in srgb, var(--suite-D) 14%, transparent), transparent 65%),
+    radial-gradient(50% 80% at 70% 90%, color-mix(in srgb, var(--suite-B) 10%, transparent), transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+  opacity: 1;
+}
+.hero .hero-eyebrow {
+  margin-bottom: 1.1rem;
 }
 .hero h1 {
-  margin: 0 0 0.6rem;
-  font-size: 2.1rem;
-  font-weight: 700;
+  margin: 0 0 0.85rem;
+  font-family: var(--font-serif);
+  font-size: 2.7rem;
+  font-weight: 500;
   color: var(--fg-strong);
-  letter-spacing: -0.015em;
-  line-height: 1.15;
-  max-width: 44ch;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  max-width: 22ch;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--fg-strong);
+  font-weight: 500;
 }
 .hero .tagline {
   color: var(--fg-muted);
-  margin: 0 0 1.4rem;
+  margin: 0 0 1.75rem;
   font-size: 1.05rem;
-  line-height: 1.5;
-  max-width: 64ch;
+  line-height: 1.6;
+  max-width: 58ch;
 }
 
 .hero-stats {
   display: flex;
-  gap: 2.5rem;
+  gap: 2rem;
   flex-wrap: wrap;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.75rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
 }
 .hero-cta {
   display: flex;
@@ -211,11 +253,13 @@
 }
 
 @media (max-width: 640px) {
-  .hero { padding: 0.5rem 0 1.5rem; }
-  .hero h1 { font-size: 1.55rem; }
+  .hero { padding: 1.5rem 0 1.75rem; }
+  .hero h1 { font-size: 1.85rem; }
   .hero .tagline { font-size: 0.95rem; }
-  .hero-stats { gap: 1.5rem; }
-  .kpi .kpi-value { font-size: 1.4rem; }
+  .hero-stats { gap: 1.25rem; padding: 0.9rem 0; }
+  .kpi { padding-right: 1.25rem; }
+  .kpi + .kpi::before { left: -0.6rem; }
+  .kpi .kpi-value { font-size: 1.55rem; }
 }
 
 /* Rank medals */

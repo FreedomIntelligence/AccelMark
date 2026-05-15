@@ -1,73 +1,99 @@
-/* base.css — design tokens, reset, typography */
+/* base.css — design tokens, reset, typography
+ *
+ * Palette philosophy (after "feels monotone" feedback):
+ *   • Avoid pure black / pure white — dark uses off-black charcoal,
+ *     light uses warm parchment (#faf8f3, Anthropic-ish).
+ *   • Single accent (blue) for links / primary CTA stays — but each
+ *     suite gets its own per-category color, surfaced on the card head,
+ *     letter chip, and the featured #1 row.
+ *   • Type pairs serif headline + system sans body for editorial feel.
+ */
 
 :root {
   /* ── Dark theme (default) ─────────────────────────────── */
-  --bg:          #0d1117;
-  --bg-elev:     #161b22;
-  --bg-elev-2:   #1c2128;
-  --border:      #30363d;
-  --border-soft: #21262d;
+  --bg:           #0b0c10;
+  --bg-elev:      #14161c;
+  --bg-elev-2:    #1c1f27;
+  --bg-tinted:    #181a22;            /* slightly cooler tint for hero */
+  --border:       #2a2d36;
+  --border-soft:  #20232b;
 
-  --fg:          #e6edf3;
-  --fg-strong:   #f0f6fc;
-  --fg-muted:    #8b949e;
-  --fg-faint:    #6e7681;
+  --fg:           #d4d4d8;
+  --fg-strong:    #f4f4f5;
+  --fg-muted:     #a1a1aa;
+  --fg-faint:     #71717a;
 
-  --accent:      #58a6ff;
-  --accent-2:    #1f6feb;
-  --accent-3:    #2f4dc0;            /* deeper, for card headers */
-  --accent-soft: rgba(88, 166, 255, 0.12);
-  --on-accent:   #ffffff;            /* text color over accent fills */
+  --accent:       #93c5fd;             /* link color — readable on bg */
+  --accent-2:     #3b82f6;             /* primary button / strong link */
+  --accent-3:     #1e3a8a;             /* deep blue — fallback header */
+  --accent-soft:  rgba(59, 130, 246, 0.14);
+  --on-accent:    #ffffff;
 
-  --good:        #3fb950;
-  --warn:        #d29922;
-  --bad:         #f85149;
-  --gold:        #e3b341;
-  --silver:      #adb5bd;
-  --bronze:      #cd7f32;
+  --good:         #34d399;
+  --warn:         #fbbf24;
+  --bad:          #fb7185;
 
-  /* Vendor palette */
+  --gold:         #f5b50a;
+  --silver:       #c2c2c8;
+  --bronze:       #d4844a;
+
+  /* Per-suite category colors (chosen perceptually distinct, deep
+     enough that --on-accent white reads cleanly on top). */
+  --suite-A: #4f6bed;   /* cobalt — Single-chip throughput */
+  --suite-B: #7c4ddb;   /* violet — Multi-chip throughput */
+  --suite-C: #14b8a6;   /* teal — Quantization efficiency */
+  --suite-D: #d97757;   /* terracotta — Interactive latency */
+  --suite-E: #16a34a;   /* emerald — Scaling efficiency */
+  --suite-F: #db2777;   /* rose — Edge / low-power */
+  --suite-G: #6366f1;   /* indigo — Sustained load */
+
+  /* Vendor palette (kept) */
   --v-nvidia:   #76b900;
   --v-amd:      #ed1c24;
   --v-apple:    #a1a1aa;
   --v-google:   #4285f4;
-  --v-huawei:   #ff0000;
+  --v-huawei:   #ff4d4d;
   --v-moore:    #c084fc;
   --v-intel:    #0071c5;
 
-  /* Card shadow */
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.4);
+  /* Card shadow (soft on dark) */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
 
   /* Radii */
   --r-sm: 4px;
-  --r-md: 6px;
-  --r-lg: 12px;
+  --r-md: 8px;
+  --r-lg: 14px;
 
   /* Layout */
-  --max-w: 1200px;
-  --gap:   1rem;
+  --max-w:  1200px;
+  --gap:    1rem;
   --gap-lg: 1.5rem;
 
   /* Type */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans:  -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  --font-serif: ui-serif, "Iowan Old Style", "Source Serif Pro", "Charter", Georgia, serif;
+  --font-mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  color-scheme: dark;
 }
 
 /* ── Light theme (auto, follows OS) ───────────────────── */
 @media (prefers-color-scheme: light) {
   :root {
-    --bg:          #f7f8fb;
+    --bg:          #faf8f3;            /* warm parchment, not pure white */
     --bg-elev:     #ffffff;
-    --bg-elev-2:   #f1f3f6;
-    --border:      #d8dde5;
-    --border-soft: #e8ecf2;
+    --bg-elev-2:   #f3efe6;
+    --bg-tinted:   #f5f1e8;
+    --border:      #e6e1d4;
+    --border-soft: #efeadd;
 
-    --fg:          #1f2937;
-    --fg-strong:   #0f172a;
-    --fg-muted:    #5b6577;
-    --fg-faint:    #94a3b8;
+    --fg:          #44403c;
+    --fg-strong:   #1c1917;
+    --fg-muted:    #78716c;
+    --fg-faint:    #a8a29e;
 
-    --accent:      #1d4ed8;
+    --accent:      #2563eb;
     --accent-2:    #2563eb;
     --accent-3:    #1e40af;
     --accent-soft: rgba(37, 99, 235, 0.10);
@@ -76,11 +102,25 @@
     --good:        #15803d;
     --warn:        #b45309;
     --bad:         #b91c1c;
+
     --gold:        #b8860b;
     --silver:      #6b7280;
     --bronze:      #b45a30;
 
-    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+    /* Suite colors — slight darken for white bg so white text on the
+       filled header keeps WCAG AA. */
+    --suite-A: #3b5bdb;
+    --suite-B: #6d28d9;
+    --suite-C: #0f766e;
+    --suite-D: #c2410c;
+    --suite-E: #15803d;
+    --suite-F: #be185d;
+    --suite-G: #4338ca;
+
+    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
+    --shadow-lift: 0 8px 24px -10px rgba(15, 23, 42, 0.14);
+
+    color-scheme: light;
   }
 }
 
@@ -114,14 +154,34 @@ button {
 ::-webkit-scrollbar-thumb:hover { background: var(--fg-faint); }
 
 /* Utility */
-.muted    { color: var(--fg-muted); }
-.faint    { color: var(--fg-faint); }
-.mono     { font-family: var(--font-mono); }
-.text-xs  { font-size: 0.75rem; }
-.text-sm  { font-size: 0.85rem; }
-.text-lg  { font-size: 1.1rem; }
-.text-xl  { font-size: 1.35rem; }
-.text-2xl { font-size: 1.8rem; }
-.bold     { font-weight: 600; }
-.no-wrap  { white-space: nowrap; }
+.muted     { color: var(--fg-muted); }
+.faint     { color: var(--fg-faint); }
+.mono      { font-family: var(--font-mono); }
+.serif     { font-family: var(--font-serif); }
+.text-xs   { font-size: 0.75rem; }
+.text-sm   { font-size: 0.85rem; }
+.text-lg   { font-size: 1.1rem; }
+.text-xl   { font-size: 1.35rem; }
+.text-2xl  { font-size: 1.8rem; }
+.bold      { font-weight: 600; }
+.no-wrap   { white-space: nowrap; }
 .hide-mobile { /* set in layout.css responsive block */ }
+
+/* ── Editorial eyebrow ──────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.eyebrow::before {
+  content: "";
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}

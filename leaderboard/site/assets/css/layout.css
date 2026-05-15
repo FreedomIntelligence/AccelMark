@@ -97,26 +97,38 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); text-decorati
 
 /* Page section spacing */
 .section {
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
 }
 .section-header {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   gap: 1rem;
   flex-wrap: wrap;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.section-header .section-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
 }
 .section-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 500;
   color: var(--fg-strong);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
 }
 .section-header .section-sub {
   color: var(--fg-muted);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
+  max-width: 52ch;
+  line-height: 1.45;
 }
 
 /* Loading + empty states */
