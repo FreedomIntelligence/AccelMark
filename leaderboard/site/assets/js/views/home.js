@@ -14,7 +14,7 @@
 import {
   SUITE_ORDER, SUITE_META,
   bestPerChipForSuite, suiteFacts, chipCloudData,
-  summary, recent, formatPrimary,
+  summary, recent, recentSince, formatPrimary,
 } from "../data.js";
 import {
   esc, fmtNum, fmtDate, chipHref, buildHash,
@@ -22,9 +22,17 @@ import {
 } from "../utils.js";
 
 const TOP_N = 8;
+const RECENT_WINDOW_DAYS = 7;
 
 export function render({ el }) {
   const s = summary();
+  // 7-day momentum stat for the hero strip + standalone activity
+  // ribbon below the KPIs.  The ribbon is suppressed when zero so
+  // post-launch quiet weeks don't read as a regression to viewers.
+  const recentCount = recentSince(RECENT_WINDOW_DAYS);
+  const recentRibbon = recentCount > 0
+    ? renderRecentRibbon(recentCount)
+    : "";
   el.innerHTML = `
     <section class="hero">
       <h1>AccelMark Leaderboard</h1>
@@ -39,7 +47,14 @@ export function render({ el }) {
         <div class="kpi"><span class="kpi-value">${fmtNum(s.vendors)}</span><span class="kpi-label">vendors</span></div>
         <div class="kpi"><span class="kpi-value">${fmtNum(s.suites)}</span><span class="kpi-label">suites</span></div>
         <div class="kpi"><span class="kpi-value">${fmtNum(s.verified)}</span><span class="kpi-label">verified</span></div>
+        ${recentCount > 0 ? `
+          <div class="kpi kpi--fresh">
+            <span class="kpi-value">${fmtNum(recentCount)}</span>
+            <span class="kpi-label">this week</span>
+          </div>
+        ` : ""}
       </div>
+      ${recentRibbon}
       <div class="hero-cta">
         <a class="btn primary" href="#/rankings">Browse rankings →</a>
         <a class="btn" href="#/compare">Compare chips</a>
@@ -115,6 +130,27 @@ export function render({ el }) {
   for (const row of recent(8)) {
     recentEl.appendChild(renderRecentRow(row));
   }
+}
+
+// Hero ribbon directly below the KPI strip.  Tells contributors that
+// fresh submissions land on the front page (not buried in a per-suite
+// view) and gives a one-click way to scan the latest activity sorted
+// by date across the canonical default suite.
+function renderRecentRibbon(n) {
+  const label = n === 1 ? "submission" : "submissions";
+  const href = buildHash("/rankings", { suite: SUITE_ORDER[0], sort: "date:desc" });
+  return `
+    <a class="hero-recent-ribbon"
+       href="${esc(href)}"
+       title="Open rankings sorted by submission date.">
+      <span class="hero-recent-dot" aria-hidden="true"></span>
+      <span class="hero-recent-text">
+        <strong>${fmtNum(n)}</strong> new ${label}
+        <span class="hero-recent-window">in the last ${RECENT_WINDOW_DAYS} days</span>
+      </span>
+      <span class="hero-recent-cta" aria-hidden="true">See latest →</span>
+    </a>
+  `;
 }
 
 function renderSuiteCard(suiteId) {

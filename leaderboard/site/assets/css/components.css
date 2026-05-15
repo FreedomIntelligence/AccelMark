@@ -237,6 +237,61 @@
   justify-content: center;
 }
 
+/* Recent-activity ribbon between the KPI strip and the CTA row.  Uses
+   the accent palette to read as a "live" indicator without competing
+   with the primary CTA below.  The pulsing dot mirrors a status-LED
+   convention so contributors immediately register that the page
+   updates as new submissions land. */
+.hero-recent-ribbon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 auto 1.4rem;
+  padding: 0.5rem 0.95rem 0.5rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-elev));
+  color: var(--fg);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.hero-recent-ribbon:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-elev));
+  text-decoration: none;
+}
+.hero-recent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent);
+  animation: hero-recent-pulse 2s ease-out infinite;
+}
+@keyframes hero-recent-pulse {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent); }
+  70%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-recent-dot { animation: none; }
+}
+.hero-recent-text { color: var(--fg); }
+.hero-recent-text strong { color: var(--fg-strong); font-weight: 600; }
+.hero-recent-window { color: var(--fg-muted); margin-left: 0.25rem; }
+.hero-recent-cta {
+  color: var(--accent);
+  font-weight: 500;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
+/* Subtle accent on the freshness KPI so the "this week" tile reads as
+   the active counter without overpowering the static stats next to it. */
+.kpi.kpi--fresh .kpi-value { color: var(--accent); }
+.kpi.kpi--fresh .kpi-label { color: var(--accent); opacity: 0.85; }
+
 @media (max-width: 880px) {
   .hero .hero-sub { font-size: 1rem; }
 }
@@ -251,6 +306,9 @@
   .kpi { padding: 0 0.85rem; min-width: 4rem; }
   .kpi .kpi-value { font-size: 1.4rem; }
   .kpi .kpi-label { font-size: 0.65rem; letter-spacing: 0.08em; }
+  .hero-recent-ribbon { font-size: 0.82rem; padding: 0.4rem 0.75rem; max-width: 100%; }
+  .hero-recent-window { display: block; margin-left: 0; }
+  .hero-recent-cta { display: none; }
 }
 /* Very narrow viewports (≤420 — older phones, app drawer split-screen):
    long titles like "AccelMark Leaderboard" or "NVIDIA H100 80GB HBM3"

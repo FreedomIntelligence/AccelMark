@@ -708,6 +708,29 @@ export function recent(limit = 6) {
     .slice(0, limit);
 }
 
+// Count submissions with a `date` newer than `now - days`.  Used by
+// the home hero to surface a "this week" momentum stat without
+// double-rendering the recent activity list.  Accepts an optional
+// `now` for deterministic unit testing.
+//
+// Row dates are stored as calendar `YYYY-MM-DD` strings (no time
+// component); we compare lexicographically against a UTC cutoff,
+// which is correct for ISO-formatted dates and avoids timezone
+// rollover ambiguity around midnight.
+export function recentSince(days, now = new Date()) {
+  if (!_ready) init();
+  const n = Number(days);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  const ms = n * 24 * 60 * 60 * 1000;
+  const cutoff = new Date(now.getTime() - ms);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  let count = 0;
+  for (const r of _rows) {
+    if (r.date && String(r.date) >= cutoffStr) count++;
+  }
+  return count;
+}
+
 // Rank a *chip* within a suite leaderboard (one entry per chip slug,
 // scored by each chip's best primary metric).  Used by chip-detail to
 // surface "ranked #N of M" badges per suite — far more useful than the

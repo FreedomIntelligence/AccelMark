@@ -151,7 +151,16 @@ export function render({ el, query }) {
     <div class="cmp-basket">
       <span class="cmp-basket-label">Comparing</span>
       ${chips.map((c) => renderBasketChip(c)).join("")}
-      <button class="cmp-basket-clear" data-basket-clear="1" type="button">Clear all</button>
+      <div class="cmp-basket-actions">
+        <button class="cmp-basket-share"
+                data-basket-share="1"
+                type="button"
+                title="Copy a URL that pre-loads this comparison.">
+          <span class="cmp-basket-share-icon" aria-hidden="true">↗</span>
+          <span class="cmp-basket-share-label">Copy share link</span>
+        </button>
+        <button class="cmp-basket-clear" data-basket-clear="1" type="button">Clear all</button>
+      </div>
     </div>
 
     <div class="cmp-suite-row">
@@ -852,6 +861,80 @@ function renderCmpCell(value, col, isWinner, frac) {
   `;
 }
 
+// ── Share-link copy ───────────────────────────────────────────
+//
+// Build a self-contained URL that, when opened, restores the current
+// basket on the active suite.  We always include `?runs=` (basket
+// state isn't in `location.hash` after seed consumption) and pin the
+// suite so the recipient lands on the exact view the sender saw.
+function _shareUrlForBasket(suiteId) {
+  const rids = basketGet();
+  if (!rids.length) return location.href;
+  const params = new URLSearchParams();
+  params.set("runs", rids.join(","));
+  if (suiteId) params.set("suite", suiteId);
+  const base = location.origin + location.pathname + location.search;
+  return `${base}#/compare?${params.toString()}`;
+}
+
+// Briefly swap the button label to "Copied!" so the user sees the
+// click did something — toast frameworks would be overkill for this
+// one-off interaction.  Restores the original label after 1.6s, or on
+// the next click that touches the same button (whichever comes first).
+function _flashShareCopied(btn, ok) {
+  const labelEl = btn.querySelector(".cmp-basket-share-label");
+  if (!labelEl) return;
+  if (btn.__shareTimer) {
+    clearTimeout(btn.__shareTimer);
+    btn.__shareTimer = null;
+  }
+  if (btn.__shareOriginalLabel == null) {
+    btn.__shareOriginalLabel = labelEl.textContent || "Copy share link";
+  }
+  labelEl.textContent = ok ? "Copied!" : "Copy failed — select & ⌘C";
+  btn.classList.add(ok ? "is-copied" : "is-copy-failed");
+  btn.__shareTimer = setTimeout(() => {
+    labelEl.textContent = btn.__shareOriginalLabel;
+    btn.classList.remove("is-copied", "is-copy-failed");
+    btn.__shareTimer = null;
+  }, ok ? 1600 : 3500);
+}
+
+async function _copyShareLink(btn, suiteId) {
+  const url = _shareUrlForBasket(suiteId);
+  // navigator.clipboard requires a secure context (https or localhost)
+  // and a user gesture — this handler runs inside a click, so the
+  // gesture half is satisfied; the secure-context half is what gets
+  // us into the fallback path on file:// previews and intranet hosts.
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      await navigator.clipboard.writeText(url);
+      _flashShareCopied(btn, true);
+      return;
+    }
+  } catch (_) { /* fall through to legacy path */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = url;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand && document.execCommand("copy");
+    document.body.removeChild(ta);
+    if (ok) {
+      _flashShareCopied(btn, true);
+      return;
+    }
+  } catch (_) { /* ignore */ }
+  // Last resort — surface the URL in a prompt so the user can copy it
+  // manually.  Better than failing silently.
+  _flashShareCopied(btn, false);
+  try { window.prompt("Copy this share link:", url); } catch (_) { /* noop */ }
+}
+
 // ── Click delegation ──
 //
 // Attached once per mounted view; we re-derive the active suite from
@@ -880,6 +963,17 @@ function bindClicks(el) {
     if (t.closest("[data-basket-clear]")) {
       ev.preventDefault();
       for (const s of basketGet()) basketToggle(s);
+      return;
+    }
+
+    // Copy a shareable URL.  The basket lives in-memory on the
+    // /compare route (the seed ?runs= is stripped from the address bar
+    // after consumption), so we have to recompose the canonical link
+    // from the current basket + active suite at click time.
+    const shareBtn = t.closest("[data-basket-share]");
+    if (shareBtn) {
+      ev.preventDefault();
+      _copyShareLink(shareBtn, suiteId);
       return;
     }
 

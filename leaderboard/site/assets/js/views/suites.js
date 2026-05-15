@@ -341,22 +341,28 @@ export function render({ el }) {
             occupy different regions of that spectrum, hardware rankings
             <em>are not preserved</em> across them.
           </p>
-          <p>
-            A chip optimized for one region, say bandwidth-bound 8B decode,
-            diverges from a chip optimized for another, say compute-bound
-            long-context prefill, as soon as the workload moves. Collapsing
-            heterogeneous workloads into a single composite score hides
-            exactly the trade-offs a buyer needs to see.
-          </p>
-          <p>
-            AccelMark operationalizes <strong>spectrum sampling</strong>: a
-            set of suites, each anchored to a qualitatively distinct
-            bottleneck region. Bandwidth-bound serving at 8B (A) and 0.5B
-            (F); capacity-then-stack-bound 70B multi-chip (B); the
-            bandwidth-to-compute transition via quantization (C);
-            compute-bound long-context prefill (D); multi-chip communication
-            overhead (E); and sparse MoE routing (G).
-          </p>
+          <details class="why-prose-more">
+            <summary>
+              <span class="why-more-show">Read the full argument</span>
+              <span class="why-more-hide">Show less</span>
+            </summary>
+            <p>
+              A chip optimized for one region, say bandwidth-bound 8B decode,
+              diverges from a chip optimized for another, say compute-bound
+              long-context prefill, as soon as the workload moves. Collapsing
+              heterogeneous workloads into a single composite score hides
+              exactly the trade-offs a buyer needs to see.
+            </p>
+            <p>
+              AccelMark operationalizes <strong>spectrum sampling</strong>: a
+              set of suites, each anchored to a qualitatively distinct
+              bottleneck region. Bandwidth-bound serving at 8B (A) and 0.5B
+              (F); capacity-then-stack-bound 70B multi-chip (B); the
+              bandwidth-to-compute transition via quantization (C);
+              compute-bound long-context prefill (D); multi-chip communication
+              overhead (E); and sparse MoE routing (G).
+            </p>
+          </details>
         </div>
         ${renderRoofline()}
       </div>
@@ -477,6 +483,18 @@ export function render({ el }) {
       target.classList.add("suite-spec--flash");
     });
     el.__suitesScrollAttached = true;
+  }
+
+  // Default the methodology "Read the full argument" disclosure based
+  // on viewport width: desktop readers see the whole essay up front,
+  // mobile readers see the opening paragraph + an opt-in expander so
+  // the rest of the page stays reachable without a long scroll.  Pure
+  // mount-time decision — we don't react to viewport changes since
+  // toggling `open` mid-read would yank the user's scroll position.
+  for (const det of el.querySelectorAll(".why-prose-more")) {
+    const isDesktop = typeof window.matchMedia === "function"
+      && window.matchMedia("(min-width: 880px)").matches;
+    det.open = isDesktop;
   }
 }
 

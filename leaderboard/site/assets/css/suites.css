@@ -107,6 +107,47 @@
 .why-prose strong { color: var(--fg-strong); font-weight: 600; }
 .why-prose em { color: var(--fg-strong); font-style: italic; }
 
+/* "Read the full argument" disclosure.  Default-open on desktop (set
+   imperatively at mount), default-closed on mobile so the page stays
+   short.  We strip the native triangle marker because it visually
+   collides with the eyebrow + h2 header above. */
+.why-prose-more { margin-top: 0; }
+.why-prose-more > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  margin: 0.25rem 0 0;
+  border-radius: 999px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  color: var(--fg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.why-prose-more > summary::-webkit-details-marker { display: none; }
+.why-prose-more > summary:hover {
+  background: var(--bg);
+  border-color: var(--border);
+}
+.why-prose-more > summary::after {
+  content: "▾";
+  display: inline-block;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  transition: transform 120ms ease;
+}
+.why-prose-more[open] > summary::after { transform: rotate(180deg); }
+.why-prose-more .why-more-hide { display: none; }
+.why-prose-more[open] .why-more-show { display: none; }
+.why-prose-more[open] .why-more-hide { display: inline; }
+.why-prose-more > p { margin-top: 1rem; }
+.why-prose-more[open] > p:first-of-type { margin-top: 1rem; }
+
 /* ── Roofline mini-diagram (sidebar of the methodology section) ── */
 .roofline-diagram {
   background: var(--bg-elev);
