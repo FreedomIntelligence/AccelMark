@@ -947,21 +947,28 @@ function _renderSuiteC(el, row, viz) {
 
   if (viz.online_by_precision && viz.online_by_precision.length) {
     el.appendChild(_section("Online — TTFT p99 by QPS across formats"));
-    const qpsLabels = viz.online_by_precision[0].qps_labels;
+    // qps_labels and sla_met are both optional sidecars in the per-format
+    // record — fall back gracefully so a partial fixture (e.g. forgot to
+    // emit sla_met, or this format has no online block at all) doesn't
+    // turn the whole Visualize tab white with a TypeError.
+    const qpsLabels = (viz.online_by_precision[0] && viz.online_by_precision[0].qps_labels) || [];
     const { wrap, canvas } = _mkCanvas(240);
     el.appendChild(wrap);
     _activeCharts.push(new window.Chart(canvas, {
       type: "line",
       data: {
         labels: qpsLabels,
-        datasets: viz.online_by_precision.map((fp) => ({
-          label: fp.precision,
-          data:  fp.ttft_p99,
-          borderColor:     precColor(fp.precision),
-          backgroundColor: precColor(fp.precision) + "22",
-          pointBackgroundColor: fp.sla_met.map((m) => (m === false ? C.red : precColor(fp.precision))),
-          pointRadius: 5, tension: 0.2, fill: false,
-        })),
+        datasets: viz.online_by_precision.map((fp) => {
+          const slaPoints = Array.isArray(fp.sla_met) ? fp.sla_met : [];
+          return {
+            label: fp.precision,
+            data:  fp.ttft_p99 || [],
+            borderColor:     precColor(fp.precision),
+            backgroundColor: precColor(fp.precision) + "22",
+            pointBackgroundColor: slaPoints.map((m) => (m === false ? C.red : precColor(fp.precision))),
+            pointRadius: 5, tension: 0.2, fill: false,
+          };
+        }),
       },
       options: {
         responsive: true, maintainAspectRatio: false,

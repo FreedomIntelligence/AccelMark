@@ -101,6 +101,40 @@ export function render({ el, query }) {
     .map((rid) => ({ rid, row: rowByRunId(rid) }))
     .filter((x) => x.row);
 
+  // Edge case: the basket has entries but every one of them resolves to
+  // null — almost always a shared comparison URL whose runs have since
+  // been re-uploaded under new ids or pruned.  Without this short-
+  // circuit the page renders a header-only table and an empty chart
+  // grid with no explanation, which reads like a broken UI.
+  if (seeds.length === 0) {
+    el.innerHTML = `
+      <section class="cmp-hero">
+        <span class="eyebrow">Compare</span>
+        <h1 class="cmp-hero-title">Side-by-Side Comparison</h1>
+        <p class="cmp-hero-sub">
+          This comparison link refers to ${runIds.length === 1 ? "a run" : `${runIds.length} runs`}
+          that ${runIds.length === 1 ? "is" : "are"} no longer in the dataset
+          (re-uploaded or pruned). Pick chips below to start a new comparison.
+        </p>
+      </section>
+      <div class="cmp-basket cmp-basket--empty">
+        <span class="cmp-basket-label">Comparing</span>
+        <span class="cmp-basket-stale">${runIds.length} stale ${runIds.length === 1 ? "run" : "runs"}</span>
+        <div class="cmp-basket-actions">
+          <button class="cmp-basket-clear" data-basket-clear="1" type="button">Clear &amp; start over</button>
+        </div>
+      </div>
+      ${renderChipCloudBlock({
+        title: "Pick chips to compare",
+        hint: "Each click adds that chip's most recent run.  Choose any two or more.",
+        compact: false,
+      })}
+    `;
+    bindClicks(el);
+    attachBasketListener(el);
+    return;
+  }
+
   // Default suite: first one in canonical order that any selected run
   // has data for; otherwise the seed's own suite.  Lets the page open
   // on something useful even without a ?suite= param.

@@ -599,6 +599,16 @@
   color: var(--fg-muted);
   margin-right: 0.4rem;
 }
+/* Stale-link variant: basket has entries but every run resolves to
+ * null.  We render the basket strip with just a count label (italic,
+ * muted) so it's obvious the chips themselves can't be shown.
+ */
+.cmp-basket--empty .cmp-basket-stale {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--fg-muted);
+  margin-right: auto;
+}
 .cmp-basket-chip {
   display: inline-flex;
   align-items: center;
