@@ -1,27 +1,50 @@
+# ── Python ──────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
+*.egg
 *.egg-info/
 dist/
 build/
 .venv/
 venv/
 env/
-*.egg
+
+# ── Editor / IDE ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.tmp
 .DS_Store
-*.log
-my_submission/
-mini_result/
-/tmp/
-leaderboard/site/leaderboard.js
-leaderboard/site/api/
+
+# ── Test / lint caches ──────────────────────────────────────────────────────
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# ── Jupyter ─────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── AccelMark local-only files ──────────────────────────────────────────────
 configs/models_local.yaml
 configs/submitter.yaml
 configs/runner_configs/*.yaml
+leaderboard/site/leaderboard.js
+leaderboard/site/api/
 
-# Local-only benchmark artifacts (not needed for submission)
+# ── Benchmark artifacts (local-only — not part of submissions) ──────────────
+samples.jsonl
+samples.jsonl.ipynb_checkpoints/
 accuracy_outputs.jsonl
 run.log
-samples.jsonl.ipynb_checkpoints/
+*.log
+my_submission/
+mini_result/
 *_backup/
 backup/
-.ipynb_checkpoints/
+/tmp/

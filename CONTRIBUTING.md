@@ -11,9 +11,10 @@ in the leaderboard and submitting your results.
 **Got a GPU? Here's the shortest path to getting on the leaderboard:**
 
 ```bash
-# 1. Clone and install
-git clone https://github.com/JuhaoLiang1997/AccelMark.git
+# 1. Fork the repo on GitHub, then clone your fork
+git clone https://github.com/<you>/AccelMark.git
 cd AccelMark
+pip install -e .
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 
 # 2. Set your name (one-time setup)
@@ -23,14 +24,19 @@ cp configs/submitter.yaml.example configs/submitter.yaml
 # 3. Run the benchmark (~11 min on A100 for default scenarios)
 #    Accuracy gate runs automatically before the benchmark starts.
 #    Output directory is auto-named using run_name, e.g.:
-    #    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557
-    python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
+#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
-# 4. Submit — open a GitHub Issue and paste your result.json
-# https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md
+# 4. Open a pull request with your result
+git checkout -b submit/<your-hardware>
+git add results/ && git commit -m "results: <hardware> on suite_A"
+git push origin submit/<your-hardware>
+gh pr create   # or open the PR via the GitHub web UI
 ```
 
-That's it. The CI bot handles the rest.
+That's it. CI validates the result automatically; merging the PR publishes it to the leaderboard.
+
+> _Prefer not to use git?_ Open a [Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md), paste your `result.json`, and the CI bot will draft the PR on your behalf.
 
 ---
 
@@ -86,6 +92,22 @@ models:
 
 `configs/models_local.yaml` is gitignored. Once configured, you don't
 need `--model-path` on the command line.
+
+### Per-runner config overrides (optional)
+
+If you want to permanently change a runner's defaults (e.g. raise
+`max_num_seqs`, enable `enforce_eager`, set `tensor_parallel_size`) without
+adding flags to every invocation, drop a yaml at
+`configs/runner_configs/runner_<runner_id>.yaml`. The file is
+**gitignored** — only `*.yaml.example` companions are checked into the
+repo. That makes the override strictly local to your machine and keeps
+the canonical defaults intact for everyone else.
+
+```bash
+cp configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml.example \
+   configs/runner_configs/runner_nvidia_vllm_47f5d58e.yaml
+# edit freely — your benchmarks now pick up the overrides automatically
+```
 
 ---
 
@@ -238,7 +260,7 @@ Add **speculative** (~3 min extra on Suite A, ~24 min extra on Suite D) or **bur
 
 ---
 
-## Submitting your results
+## Submitting a result
 
 ### Accuracy gate (automatic)
 
@@ -271,28 +293,42 @@ framework, same precision, same inference stack.
 **Resuming an interrupted run:** Re-running the same command resumes from
 where it stopped. Completed steps are skipped automatically.
 
-### Step 1: Open a GitHub Issue
+### Recommended: open a pull request
 
-Go to [Issues → New → Community Submission](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
+After a successful run, validate locally and open a PR:
 
-Paste the full contents of your `result.json` into the code block and submit.
+```bash
+# Validate the produced files against the schemas (the same check CI runs).
+python runners/validate_submission.py \
+    results/community/<run_name>/result.json
 
-> **The CI bot validates your result automatically** — recommend to run
-> `validate_submission.py` locally first. If validation fails, the bot
-> comments on your issue explaining what to fix.
+# Stage just the new result and env file.
+git checkout -b submit/<your-hardware>
+git add results/community/<run_name>/
+git commit -m "results: <hardware> on suite_A"
+git push origin submit/<your-hardware>
 
-> **Why paste instead of attach?** The CI bot reads `result.json` directly
-> from the issue body. File attachments are not accessible to GitHub Actions.
+# Open the PR — either via the GitHub web UI or:
+gh pr create --fill
+```
 
-### Step 2: Done
+What gets committed is *only* the new files under `results/community/<run_name>/`:
+your `result.json`, `env_info.json`, and (optionally) `samples.jsonl`. Nothing
+else in the repo should change.
 
-The CI bot will:
-1. Validate your `result.json` against the schema
-2. Open a PR with your result files
-3. Comment on your issue with a link to the PR
+CI then re-runs the schema validator and the runner-folder integrity check.
+When both pass and a contributor reviews the diff, the PR is merged and your
+result shows up on the leaderboard on the next site build.
 
-Your result appears on the **Community** tab after the maintainer reviews
-and merges the PR — usually within a day or two.
+### Alternative: open a submission issue (no git required)
+
+If you'd rather not use git, paste your `result.json` into a
+[Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
+A bot will validate the JSON, draft a PR with the files in the right place,
+and link it back to your issue. You don't need to touch git or fork the repo.
+
+> **Why paste instead of attach?** The bot reads `result.json` directly from
+> the issue body. File attachments are not accessible to GitHub Actions.
 
 ---
 
@@ -300,10 +336,13 @@ and merges the PR — usually within a day or two.
 
 | Tier | How to get it | Leaderboard placement |
 |------|--------------|----------------------|
-| **community** | Submit via GitHub Issue, passes CI validation | Community tab |
-| **verified** | Maintainer reproduced your result within 5% | Main leaderboard |
+| **community** | Submit a PR (or issue → bot-drafted PR) and pass CI validation | Community tab |
+| **verified** | Independently reproduced on the same hardware/runner within 5% | Main leaderboard |
 
-To request verification, comment on your submission issue.
+To promote a community result to **verified**, anyone with the same hardware
+and runner can run the same suite and open a follow-up PR that lands the
+reproduction in `results/verified/`. Maintainers do not gate this — every
+verified result is itself reproducible by definition.
 
 ---
 
@@ -329,11 +368,29 @@ If your local copy was downloaded at a different revision, add a note in
 
 ---
 
-## Adding support for a new platform
+## Adding a new runner
 
-Create a new runner folder under `runners/` by subclassing `BenchmarkRunner`.
-See [DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation guide including
-how to compute your runner's hash ID.
+A "runner" here is a Python class that wraps an inference framework (vLLM,
+SGLang, mlx-lm, …) and exposes the AccelMark standard interface. Adding
+one for an **existing** platform (NVIDIA, AMD, Ascend, Apple, Google TPU,
+Moore Threads, …) does not require touching any shared file. The full
+walk-through lives in [`runners/README.md`](runners/README.md); the short
+version is:
+
+1. Copy `runners/template/runner.py` into a temporary folder and fill in
+   the three required methods (`load_model`, `inference_fn_offline`,
+   `release_resources`) plus `inference_fn_streaming` if your framework
+   has a streaming API.
+2. Compute the hash and rename the folder:
+   `python runners/hash_runner.py runners/tmp/`
+   produces e.g. `nvidia_myframework_3f8a2c1d`.
+3. Write `meta.json` next to it, including `suite_support` — that field
+   is **how the top-level `README.md` table picks up your runner**. You
+   never edit `README.md` yourself.
+4. Add a `requirements.txt`.
+5. Validate: `python runners/validate_runners.py --dir runners/<your_folder>`.
+6. Regenerate the README matrix locally:
+   `python tools/generate_platforms_matrix.py`.
 
 ```python
 # runners/your_platform_{hash8}/runner.py
@@ -347,7 +404,7 @@ class MyFrameworkRunner(BenchmarkRunner):
     SUPPORTS_ONLINE     = True
     SUPPORTS_MULTI_CHIP = True    # set False if no tensor parallelism
 
-    def load_model(self, model_path: str, suite: dict, parallelism: dict) -> None:
+    def load_model(self, model_path: str, parallelism: dict) -> None:
         tp_size = parallelism["tensor_parallel_size"]
         self.model = MyFramework.load(model_path, tp=tp_size)
 
@@ -383,14 +440,37 @@ if __name__ == "__main__":
 All orchestration (result building, accuracy reuse, Suite E, etc.) is
 inherited from `BenchmarkRunner` automatically.
 
-**Checklist for a new platform PR:**
+**Checklist for a new-runner PR (existing platform):**
 - [ ] Runner folder named `{platform}_{name}_{hash8}` with correct hash
 - [ ] `runner.py` subclasses `BenchmarkRunner` and passes `runners/validate_runners.py`
-- [ ] `meta.json` present and valid (see `runners/meta.schema.json`)
+- [ ] `meta.json` present and valid (see `runners/meta.schema.json`), with
+      `suite_support` declared for every suite your runner can or cannot run
 - [ ] `requirements.txt` included
-- [ ] At least one reference result in `results/community/`
-- [ ] `runners/collect_env.py` updated to detect your hardware (see [DEVELOPMENT.md](DEVELOPMENT.md))
-- [ ] `README.md` supported platforms table updated
+- [ ] `tools/generate_platforms_matrix.py --check` passes locally (CI also
+      enforces this)
+- [ ] At least one reference result in `results/community/` (validated by CI)
+
+### Adding a new accelerator family
+
+If you are bringing up a **new platform** (e.g. a vendor not yet in
+`schema/platforms.json`), the only additional file you need to ship is
+
+```
+runners/platforms/<your_platform>.py
+```
+
+which exports module-level `collect()`, `detect_runtime_version()` and a
+few optional helpers. The collector at `runners/collect_env.py`
+auto-discovers it; no change to that file is required. See
+[`runners/README.md`](runners/README.md#adding-a-new-accelerator-family)
+for the full protocol and a worked example.
+
+Optional polish steps when the new platform stabilises:
+
+- Add an entry to `schema/platforms.json` so the README matrix renders a
+  pretty hardware label and stable sort order. Until then, the matrix
+  renders the bare identifier and `validate_runners.py` emits a
+  non-fatal warning prompting this follow-up.
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for the full implementation reference.
 
@@ -404,9 +484,10 @@ If a result looks wrong:
 2. Include: the submission name, what looks wrong, and ideally your own
    run on the same hardware as evidence
 
-Maintainers will investigate. If confirmed suspicious, the result's `meta.flagged`
-field will be set to a reason string and it will appear with a ⚠️ badge on the
-leaderboard.
+The community discusses the report in the issue. If the consensus is that
+the result is suspicious, a PR sets `meta.flagged` on that result to a
+reason string and the entry shows up with a ⚠️ badge on the leaderboard.
+Anyone can open that follow-up PR.
 
 ---
 

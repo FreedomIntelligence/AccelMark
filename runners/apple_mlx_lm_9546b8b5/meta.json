@@ -7,5 +7,15 @@
   "description": "Apple Silicon inference via mlx_lm (Metal). Offline uses stream_generate; streaming scenarios use asyncio.to_thread. Online scenario disabled (single-device sync API).",
   "supersedes_chain": [],
   "notes": "Tensor parallelism not supported; chip_count=1. Match mlx_example.py load/generate patterns.",
-  "created": "2026-04-20"
+  "created": "2026-04-20",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "unsupported",
+    "C": "unsupported",
+    "D": "pending",
+    "E": "unsupported",
+    "F": "pending",
+    "G": "unsupported"
+  }
 }

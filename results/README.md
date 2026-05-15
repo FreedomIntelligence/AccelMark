@@ -6,10 +6,10 @@ Benchmark results organized by trust tier.
 
 | Tier | Description |
 |------|-------------|
-| `verified/` | Independently reproduced by a maintainer within 5%. Shown on the main leaderboard. |
+| `verified/` | Independently reproduced on the same hardware / runner and matches the original within 5%. Shown on the main leaderboard. |
 | `community/` | Passed schema validation, not yet independently reproduced. Shown on the community tab. |
 
-Submissions start in `community/` and may be promoted to `verified/` by a maintainer.
+Submissions start in `community/`. Anyone with the same hardware can promote a result to `verified/` by submitting a reproduction PR.
 
 ---
 

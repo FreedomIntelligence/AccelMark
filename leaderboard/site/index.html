@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <title>AccelMark — AI Accelerator Leaderboard</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,6 +24,13 @@
       font-size: 1.5rem;
       font-weight: 700;
       color: #f0f6fc;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    header h1 .brand-mark {
+      flex: 0 0 auto;
     }
 
     header p {
@@ -489,7 +497,25 @@
 <body>
 
 <header>
-  <h1>⚡ AccelMark Leaderboard</h1>
+  <h1>
+    <svg class="brand-mark" viewBox="0 0 72 72" width="34" height="34" role="img" aria-hidden="true">
+      <defs>
+        <linearGradient id="lbBolt" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#FCD34D"/>
+          <stop offset="100%" stop-color="#FBBF24"/>
+        </linearGradient>
+        <linearGradient id="lbGauge" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#93C5FD"/>
+          <stop offset="100%" stop-color="#60A5FA"/>
+        </linearGradient>
+      </defs>
+      <path d="M 10 50 A 26 26 0 1 1 62 50" fill="none" stroke="url(#lbGauge)" stroke-width="5.5" stroke-linecap="round"/>
+      <circle cx="10" cy="50" r="3" fill="url(#lbGauge)"/>
+      <circle cx="62" cy="50" r="3" fill="url(#lbGauge)"/>
+      <path d="M 40 14 L 24 42 L 33 42 L 28 58 L 50 30 L 41 30 Z" fill="url(#lbBolt)" stroke="#78350F" stroke-width="0.7" stroke-linejoin="round"/>
+    </svg>
+    <span>AccelMark Leaderboard</span>
+  </h1>
   <p>Open benchmark for AI accelerators on LLM workloads · <a href="https://github.com/JuhaoLiang1997/AccelMark" style="color:#58a6ff">GitHub</a></p>
 </header>
 
@@ -829,7 +855,8 @@
           `}
         </div>
         <div class="card-model">
-          ${row.model || ''} · ${row.framework || ''} ·
+          ${row.model || ''} ·
+          <span title="${row.implementation_id ? 'runner: ' + row.implementation_id : ''}">${row.framework || ''}${row.framework_version ? ' ' + row.framework_version : ''}</span> ·
           ${row.precision_fallback
             ? `<span style="color:#d29922" title="BF16 not supported on this hardware — using FP16">${row.precision || ''} ⚠</span>`
             : (row.precision || '')}
@@ -876,6 +903,7 @@
     const fwVersion = row.framework_version || '';
     const script = row.reproduce_script || '';
     const notes = row.notes || '';
+    const runnerId = row.implementation_id || '';
 
     if (!fw || fw === 'unknown') {
       return `<span class="framework-unknown">—</span>`;
@@ -890,7 +918,10 @@
       ? `<span class="badge" style="background:#3d2b00;color:#d29922;margin-left:4px;font-size:0.7rem">custom</span>`
       : '';
 
+    const versionInline = fwVersion ? ` <span style="color:#8b949e;font-weight:400;font-size:0.85em">${fwVersion}</span>` : '';
+
     const tooltipLines = [];
+    if (runnerId)  tooltipLines.push(`Runner: ${runnerId}`);
     if (fwVersion) tooltipLines.push(`Version: ${fwVersion}`);
     if (script)    tooltipLines.push(`Script: ${script}`);
     if (notes)     tooltipLines.push(`Notes: ${notes}`);
@@ -900,7 +931,7 @@
 
     return `
       <div class="framework-wrapper">
-        <span class="framework-cell ${colorClass}">${fw}${badge}</span>
+        <span class="framework-cell ${colorClass}">${fw}${versionInline}${badge}</span>
         ${tooltip}
       </div>
     `;
