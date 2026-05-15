@@ -714,7 +714,7 @@ Common patterns:
 # Resolve model path (checks models_local.yaml)
 path = br._resolve_model_path(model_id, args.model_path)
 
-# Parse scenarios config (handles legacy flat array and new dict format)
+# Parse scenarios config — expects {"default": [...], "extra": [...]}
 default, extra = br._parse_scenarios_config(suite)
 
 # Merge scenario results after running offline+online+interactive

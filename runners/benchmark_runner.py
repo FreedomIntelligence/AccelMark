@@ -2269,16 +2269,9 @@ class BenchmarkRunner(ABC):
         """
         Parse the suite's scenarios config into (default_scenarios, extra_scenarios).
 
-        Handles both legacy flat-array format and new dict format:
-          Legacy: "scenarios": ["accuracy", "offline", "online", "interactive"]
-          New:    "scenarios": {"default": [...], "extra": [...]}
-
-        Returns (default_scenarios, extra_scenarios).
+        Expects the dict form: "scenarios": {"default": [...], "extra": [...]}.
         """
-        config = suite.get("scenarios", {})
-        if isinstance(config, list):
-            # Legacy format — entire list is treated as default, no extras
-            return config, []
+        config  = suite.get("scenarios", {})
         default = config.get("default", [])
         extra   = config.get("extra", [])
         return default, extra
@@ -2618,43 +2611,37 @@ class BenchmarkRunner(ABC):
 
     def _resolve_requests_path(self, suite: dict) -> Path:
         """
-        Resolve the requests.jsonl path for a suite.
-
-        Resolution order:
-          1. suite["dataset"] key → datasets/{dataset}/requests.jsonl
-          2. Legacy: suites/{suite_id}/requests.jsonl (backward compatible)
+        Resolve the requests.jsonl path for a suite via its `dataset` key.
 
         Datasets are shared immutable collections in the datasets/ folder.
-        Suites reference them by name: "dataset": "sharegpt_standard_v1".
-        If not found at either location, raises FileNotFoundError with a
-        helpful message.
+        Suites reference them by name: "dataset": "sharegpt_standard_v1",
+        which resolves to datasets/sharegpt_standard_v1/requests.jsonl.
+
+        Raises FileNotFoundError with a helpful message if `dataset` is
+        absent or the referenced dataset folder does not exist.
         """
         suite_id = suite.get("suite_id", "")
         dataset  = suite.get("dataset")
 
-        if dataset:
-            dataset_path = _REPO_ROOT / "datasets" / dataset / "requests.jsonl"
-            if dataset_path.exists():
-                return dataset_path
+        if not dataset:
             raise FileNotFoundError(
-                f"Dataset '{dataset}' not found at {dataset_path}.\n"
-                f"Check 'dataset' field in suites/{suite_id}/suite.json.\n"
-                f"Available datasets: "
-                + ", ".join(
-                    p.name for p in (_REPO_ROOT / "datasets").iterdir()
-                    if p.is_dir() and (p / "requests.jsonl").exists()
-                )
+                f"Suite '{suite_id}' is missing the 'dataset' key in suite.json. "
+                f"Add e.g. \"dataset\": \"sharegpt_standard_v1\" so the runner "
+                f"can find datasets/<name>/requests.jsonl."
             )
 
-        # Legacy path — suite has its own requests.jsonl
-        legacy_path = _REPO_ROOT / "suites" / suite_id / "requests.jsonl"
-        if legacy_path.exists():
-            return legacy_path
+        dataset_path = _REPO_ROOT / "datasets" / dataset / "requests.jsonl"
+        if dataset_path.exists():
+            return dataset_path
 
         raise FileNotFoundError(
-            f"No requests.jsonl found for suite '{suite_id}'.\n"
-            f"Either add 'dataset' key to suite.json or create "
-            f"suites/{suite_id}/requests.jsonl."
+            f"Dataset '{dataset}' not found at {dataset_path}.\n"
+            f"Check 'dataset' field in suites/{suite_id}/suite.json.\n"
+            f"Available datasets: "
+            + ", ".join(
+                p.name for p in (_REPO_ROOT / "datasets").iterdir()
+                if p.is_dir() and (p / "requests.jsonl").exists()
+            )
         )
 
     def _generate_output_dir(self, args, env_info: dict) -> str:

@@ -80,9 +80,8 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
     hw_precisions     = br._detect_supported_precisions(env_info)
     baseline_precision = "BF16" if "BF16" in hw_precisions else "FP16"
 
-    # runner_backends   = [b.lower() for b in br.SUPPORTED_QUANTIZATION_BACKENDS]
     precisions_to_run = []
-    skipped           = []   # runner doesn't declare support for this backend
+    skipped           = []   # other full-precision baseline that isn't the hw default
     for p in all_precisions:
         if p == baseline_precision:
             precisions_to_run.append(p)
@@ -90,22 +89,16 @@ def _run_suite_c(br, args, suite: dict, env_info: dict) -> None:
             # The other full-precision baseline — skip silently, not the hw baseline.
             skipped.append(p)
         else:
-            # # Quantized format — only gate on whether the runner declares support
-            # # for this backend. Hardware compatibility (e.g. FP8 on V100) is left
-            # # to the inference engine: if the hardware can't run it, the subprocess
-            # # fails with the engine's own error, which is recorded in the summary.
-            # fmt_entry = precision_model_map.get(p, {})
-            # backend   = (fmt_entry.get("engine_kwargs") or {}).get("quantization", "")
-            # if not backend or backend.lower() not in runner_backends:
-            #     skipped.append(p)
-            # else:
+            # Quantized format. Hardware compatibility (e.g. FP8 on V100) is left
+            # to the inference engine: if the hardware can't run it, the subprocess
+            # fails with the engine's own error, which is recorded in the summary.
             precisions_to_run.append(p)
 
     print(f"\n{'='*60}")
     print(f"  Suite C — Quantization Efficiency Benchmark")
     print(f"  Formats to run : {precisions_to_run}")
     if skipped:
-        print(f"  Skipped        : {skipped} (backend not in SUPPORTED_QUANTIZATION_BACKENDS)")
+        print(f"  Skipped        : {skipped} (other full-precision baseline)")
     print(f"  Base output    : {base_dir}")
     print(f"{'='*60}\n")
 
