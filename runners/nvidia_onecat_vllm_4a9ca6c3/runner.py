@@ -1,31 +1,8 @@
 """
 AccelMark — NVIDIA 1Cat-vLLM (SM70 / V100) benchmark script.
 
-Implements BenchmarkRunner for `1Cat-vLLM`, the community fork of vLLM that
-re-enables modern model serving on Tesla V100 / SM70 hardware. The fork
-preserves the standard vLLM Python API (``LLM``, ``AsyncLLMEngine``,
-``SamplingParams``) but ships several SM70-specific pieces:
-
-  - the ``FLASH_ATTN_V100`` attention backend (FlashAttention re-implemented
-    for Volta) — set as this runner's default
-  - AWQ 4-bit kernels patched in from lmdeploy TurboMind for SM70
-  - validated paths for Qwen3.5 / Qwen3.6 dense + MoE on 4 x V100 32 GB
-  - FP8 KV cache (``fp8_e5m2``) as an experimental option
-
-Because the Python entry points are identical to upstream vLLM, this runner
-is structurally a clone of ``nvidia_vllm_*`` with three runtime overrides:
-
-  1. ``SUPPORTED_PRECISIONS`` drops BF16 (V100 cannot do BF16 in hardware).
-  2. ``SUPPORTED_QUANTIZATION_BACKENDS`` advertises only ``awq`` — the fork's
-     headline feature; other quantizations are unproven on this stack.
-  3. ``load_model()`` auto-injects ``attention_backend="FLASH_ATTN_V100"``
-     into the engine kwargs unless the user has explicitly set one.
-
-Reference build:
-    Python 3.12 · CUDA 12.8 · torch 2.9.1+cu128 · 1Cat-vLLM 1.0.0 wheels
-    Validated on 4 x Tesla PG503 / V100 32 GB.
-
-All orchestration logic still lives in runners/benchmark_runner.py.
+Thin vLLM runner wrapper for the 1Cat-vLLM fork on Tesla V100 / V100S.
+See README.md in this folder for install, hardware scope, and tuning.
 """
 
 import asyncio
@@ -34,7 +11,6 @@ import time
 from pathlib import Path
 from typing import Optional
 
-# Add repo root to path
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
@@ -47,37 +23,20 @@ from runners.benchmark_runner import BenchmarkRunner, InferenceRequest
 from loadgen.types import InferenceResult
 
 
-
-# Suppress per-request vLLM logs by default
 import logging
 logging.getLogger("vllm.engine.async_llm_engine").setLevel(logging.WARNING)
 logging.getLogger("vllm.engine.llm_engine").setLevel(logging.WARNING)
 
 
 class OneCatVLLMRunner(BenchmarkRunner):
-    """
-    AccelMark benchmark runner using 1Cat-vLLM (SM70 / V100 fork) on NVIDIA.
-
-    This runner is intended **specifically for Tesla V100 / V100S (SM70)**.
-    Other NVIDIA GPUs should use the upstream ``nvidia_vllm_*`` runner —
-    1Cat-vLLM's kernels are tuned for Volta and provide no advantage on
-    Ampere or newer hardware.
-    """
+    """1Cat-vLLM on NVIDIA V100 / V100S (SM70). Use nvidia_vllm_* on newer GPUs."""
 
     SUPPORTS_STREAMING = True
     SUPPORTS_BATCHING = True
     SUPPORTS_ONLINE = True
     SUPPORTS_MULTI_CHIP = True
 
-    # V100 has no BF16 datapath — drop BF16 entirely so the suite picks
-    # FP16 as the effective precision without an amber warning. FP32 is left
-    # in for completeness but is essentially never used in inference.
     SUPPORTED_PRECISIONS = ["fp16", "fp32"]
-
-    # 1Cat-vLLM's flagship contribution is AWQ 4-bit on SM70 (via lmdeploy
-    # TurboMind kernels). Other quantization backends are not validated on
-    # this stack — keep the surface conservative and let users opt-in by
-    # subclassing if they want to try FP8 KV cache (``fp8_e5m2`` only).
     SUPPORTED_QUANTIZATION_BACKENDS = ["awq"]
 
     def __init__(self):
@@ -88,7 +47,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         self._loop: asyncio.AbstractEventLoop = None
 
     def _get_chip_count(self) -> int:
-        """Return the number of available CUDA GPUs."""
         try:
             import torch
             n = torch.cuda.device_count()
@@ -100,12 +58,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         return "1Cat-vLLM"
 
     def _get_framework_version(self) -> str:
-        """Report vllm.__version__ plus the flash_attn_v100 wheel version.
-
-        1Cat-vLLM ships two coupled wheels (`vllm` patched fork + `flash_attn_v100`)
-        and the FA-V100 wheel is the bit that actually changes attention
-        performance on Volta. Recording both makes the result reproducible.
-        """
         core = "unknown"
         try:
             import vllm
@@ -129,7 +81,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         return core
 
     def load_model(self, model_path: str, parallelism: dict) -> None:
-        """Load model — sync LLM for offline/accuracy, async engine for streaming."""
         tp_size = parallelism["tensor_parallel_size"]
         pp_size = parallelism["pipeline_parallel_size"]
         ep_size = parallelism.get("expert_parallel_size", 1)
@@ -141,22 +92,10 @@ class OneCatVLLMRunner(BenchmarkRunner):
         enforce_eager = getattr(self, "_enforce_eager", False)
 
         cfg             = getattr(self, "_runner_config", {})
-        # 1Cat-vLLM public defaults for 4 x V100 32 GB:
-        #   max_num_seqs = 1 (baseline) or 4 (MTP profile)
-        #   gpu_memory_utilization = 0.88
-        # These differ noticeably from upstream vLLM's 512 / 0.90 defaults
-        # because 256K context on V100 demands a much tighter KV budget.
         max_num_seqs    = cfg.get("max_num_seqs", 1)
         gpu_memory_util = cfg.get("gpu_memory_utilization", 0.88)
         extra_kwargs    = dict(cfg.get("engine_kwargs") or {})
 
-        # ── Default to FLASH_ATTN_V100 attention backend ──────────────────────
-        # 1Cat-vLLM's public recommendation for V100 is FLASH_ATTN_V100. Inject
-        # it as the default unless the user explicitly set a backend in their
-        # runner config engine_kwargs, or via the VLLM_ATTENTION_BACKEND
-        # environment variable. We support both spellings because vLLM accepts
-        # the kwarg as `attention_backend` and the env var as
-        # VLLM_ATTENTION_BACKEND.
         import os
         if (
             "attention_backend" not in extra_kwargs
@@ -164,10 +103,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         ):
             extra_kwargs["attention_backend"] = "FLASH_ATTN_V100"
 
-        # ── Filter engine_kwargs to only fields this vLLM version accepts ─────
-        # Avoids TypeError when the runner config YAML references a field that
-        # doesn't exist in the installed vLLM version (EngineArgs is a strict
-        # dataclass — unknown keyword arguments raise TypeError immediately).
         try:
             import dataclasses
             from vllm.engine.arg_utils import EngineArgs as _EngineArgs
@@ -178,43 +113,29 @@ class OneCatVLLMRunner(BenchmarkRunner):
                       f"1Cat-vLLM version and will be ignored: {list(_dropped)}")
             extra_kwargs = {k: v for k, v in extra_kwargs.items() if k in _valid}
         except Exception:
-            pass  # If introspection fails, pass kwargs as-is and let vLLM report the error
+            pass
 
-        # Use precision resolved by BenchmarkRunner._resolve_precision()
         effective_precision = getattr(self, "_effective_precision", "BF16").upper()
         precision           = getattr(self, "_precision", None) or effective_precision
 
-        # dtype_override and quantization may be injected by benchmark_runner from
-        # precision_model_map entry fields (dtype_override, engine_kwargs.quantization).
-        # These take priority over the runner's own precision→dtype mapping below.
         _dtype_override  = getattr(self, "_precision_dtype_override", None)
         _prec_eng_kwargs = dict(getattr(self, "_precision_engine_kwargs", None) or {})
 
         quantization = _prec_eng_kwargs.pop("quantization", None)
 
-        # Map native precision names to explicit dtypes.
-        # Quantized formats (anything not in this map) use dtype="auto" — vLLM reads
-        # the storage dtype from the checkpoint's config.json, and the quantization
-        # kernel is set explicitly via the `quantization` kwarg already populated above
-        # from precision_model_map engine_kwargs. No fallback guessing needed here.
         _NATIVE_DTYPE_MAP = {
             "BF16":  "bfloat16",
             "FP16":  "float16",
             "FP32":  "float32",
         }
         dtype = _NATIVE_DTYPE_MAP.get(precision, "auto")
-        self._quantization_method = quantization  # None for native, explicit str for quantized
+        self._quantization_method = quantization
 
-        # dtype_override from precision_model_map wins over the mapping above.
-        # Used for e.g. FP16 baseline on pre-Ampere hardware (V100/T4).
         if _dtype_override:
             dtype = _dtype_override
 
-        # Merge remaining precision_engine_kwargs (after popping quantization) into
-        # extra_kwargs so they reach LLM() / AsyncEngineArgs. Runner YAML engine_kwargs
-        # still take final precedence via the **extra_kwargs spread at the end.
         if _prec_eng_kwargs:
-            _prec_eng_kwargs.update(extra_kwargs)   # runner YAML wins on conflict
+            _prec_eng_kwargs.update(extra_kwargs)
             extra_kwargs = _prec_eng_kwargs
 
         print(f"Loading model: precision={precision}, dtype={dtype}"
@@ -259,8 +180,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
                 trust_remote_code=False,
                 enforce_eager=enforce_eager,
                 gpu_memory_utilization=gpu_memory_util,
-                # engine_kwargs values override named fields above if the same key appears in both.
-                # This is intentional — engine_kwargs is the power-user escape hatch.
                 **extra_kwargs,
             )
             if ep_size > 1:
@@ -271,42 +190,23 @@ class OneCatVLLMRunner(BenchmarkRunner):
             self.engine = AsyncLLMEngine.from_engine_args(engine_args)
 
     def get_effective_dtype(self) -> Optional[str]:
-        """
-        Report the actual compute dtype vLLM used after model loading.
-
-        vLLM exposes the resolved dtype via model_config after initialization.
-        This captures cases like FP8 weights on A100 computing in BF16.
-        """
         try:
             if self.llm is not None:
-                # Sync LLM path
                 dtype = self.llm.llm_engine.model_config.dtype
                 return str(dtype).replace("torch.", "")
             elif self.engine is not None:
-                # Async engine path
                 dtype = self.engine.engine.model_config.dtype
                 return str(dtype).replace("torch.", "")
         except Exception:
             pass
-        # Fall back to declared dtype if introspection fails
         return getattr(self, "_effective_dtype", None)
 
     def inference_fn_offline(self, requests: list[InferenceRequest]) -> list[InferenceResult]:
-        """Send all requests to vLLM at once. vLLM handles internal batching.
-
-        total_time_ms in each returned InferenceResult is set to the wall-clock
-        elapsed time of the entire batch — NOT an individual per-request latency.
-        vLLM's sync LLM.generate() blocks until all requests finish, so there is
-        no per-request completion timestamp available. All results share the same
-        total_time_ms value, which is the correct denominator for throughput:
-            throughput = total_tokens / (elapsed_ms / 1000)
-        """
         formatted = [self._format_prompt(r.prompt) for r in requests]
         t_start = time.perf_counter()
         outputs = self.llm.generate(formatted, self.sampling_params)
         elapsed = time.perf_counter() - t_start
 
-        # Store output text for _run_accuracy_integrated()
         self._last_accuracy_outputs = [o.outputs[0].text for o in outputs]
 
         results = []
@@ -322,7 +222,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         return results
 
     async def inference_fn_streaming(self, request: InferenceRequest) -> InferenceResult:
-        """Stream a single request, measuring TTFT."""
         from vllm.utils import random_uuid
 
         formatted = self._format_prompt(request.prompt)
@@ -354,15 +253,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         )
 
     async def inference_fn_token_stream(self, request: InferenceRequest):
-        """
-        Async generator yielding decoded text deltas for the serve layer.
-
-        Each yield is the delta text since the last output — new characters
-        only, not the full accumulated string.
-
-        vLLM's engine.generate() yields cumulative outputs, so we track the
-        previous text length and slice off only the new portion each step.
-        """
         from vllm.utils import random_uuid
 
         formatted   = self._format_prompt(request.prompt)
@@ -385,7 +275,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
             return None
 
     def release_resources(self) -> None:
-        """Release vLLM engines and distributed state."""
         if self.llm is not None:
             try:
                 del self.llm
@@ -405,18 +294,10 @@ class OneCatVLLMRunner(BenchmarkRunner):
                 pass
             self.engine = None
 
-        # Destroy vLLM's distributed state so the next engine initialisation
-        # creates a fresh TCPStore server.  Must call destroy_model_parallel()
-        # first to clear vLLM's cached group references; only then is it safe
-        # to destroy the underlying torch process group.  Skipping this step
-        # leaves torch.distributed.is_initialized()==True, which causes
-        # init_distributed_environment() to skip creating the new TCPStore
-        # server, so spawned worker processes can never connect (→ 600 s timeout).
         try:
             from vllm.distributed.parallel_state import cleanup_dist_env_and_memory
             cleanup_dist_env_and_memory(shutdown_ray=False)
         except Exception:
-            # Fallback for older vLLM builds that lack cleanup_dist_env_and_memory
             try:
                 from vllm.distributed.parallel_state import (
                     destroy_model_parallel, destroy_distributed_environment,
@@ -426,12 +307,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
             except Exception:
                 pass
 
-        # Final guard: if torch.distributed is still initialized after the cleanup
-        # attempts above, destroy the default process group here.  Without this,
-        # vLLM's init_distributed_environment() skips TCPStore server creation on
-        # the next LLM() init, so new worker processes can never join the barrier
-        # (→ 1800 s Gloo timeout) because the main driver calls barrier() on the
-        # stale old group while workers wait on a fresh one that never reaches quorum.
         try:
             if torch.distributed.is_initialized():
                 torch.distributed.destroy_process_group()
@@ -439,12 +314,9 @@ class OneCatVLLMRunner(BenchmarkRunner):
             pass
 
     def parse_args(self):
-        """Add vLLM/NVIDIA-specific CLI flags. Base class pre-loads runner config."""
         args = super().parse_args()
         cfg = self._runner_config
 
-        # ── Runner-specific CLI flags ─────────────────────────────────────────
-        # Defined here (not in benchmark_runner) — vLLM/NVIDIA-specific concepts.
         import argparse
         parser = argparse.ArgumentParser(add_help=False)
         parser.add_argument("--tensor-parallel-size", type=int, default=None,
@@ -457,8 +329,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
                             dest="enforce_eager")
         extra, _ = parser.parse_known_args()
 
-        # Priority: CLI flag > yaml config > required_chips > auto-detected > default 1
-        # Fully resolved by base class.
         tp_size, _tp_source = self._resolve_tensor_parallel_size(
             extra.tensor_parallel_size
         )
@@ -469,7 +339,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         ep_size = (extra.expert_parallel_size
                    if extra.expert_parallel_size is not None
                    else cfg.get("expert_parallel_size", 1))
-        # enforce_eager: CLI flag OR yaml setting (either activates it)
         self._enforce_eager = extra.enforce_eager or cfg.get("enforce_eager", False)
 
         print(f"  tensor_parallel_size = {tp_size}  [{_tp_source}]")
@@ -483,9 +352,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
             pp_size = 1
             ep_size = 1
 
-        # Report to base class — used by _compute_run_id(), _build_result_json(), etc.
-        # Note: for MoE with expert parallelism, chips are shared between TP and EP
-        # dimensions — ep_size does not add to chip count independently.
         self._parallelism = {
             "tensor_parallel_size":   tp_size,
             "pipeline_parallel_size": pp_size,
@@ -497,7 +363,6 @@ class OneCatVLLMRunner(BenchmarkRunner):
         return args
 
     def get_extra_subprocess_args(self, args) -> list[str]:
-        """Forward vLLM/NVIDIA-specific flags to subprocess invocations."""
         extra = [
             "--tensor-parallel-size",
             str(self._parallelism.get("tensor_parallel_size", 1)),

@@ -1,0 +1,17 @@
+# AccelMark extras for nvidia_onecat_vllm_4a9ca6c3.
+# Install 1Cat-vLLM (flash_attn_v100 + vllm fork) first — see README.md.
+
+transformers==4.57.6
+tokenizers==0.22.2
+huggingface-hub==0.35.0
+accelerate==1.10.1
+safetensors==0.6.2
+
+numpy==1.26.4
+jsonschema==4.25.1
+psutil==7.1.0
+tqdm==4.67.1
+
+nvidia-ml-py==13.580.82
+aiohttp==3.12.15
+PyYAML==6.0.2
