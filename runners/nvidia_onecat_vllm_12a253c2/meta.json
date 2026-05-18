@@ -1,12 +1,12 @@
 {
-  "id": "nvidia_onecat_vllm_4a9ca6c3",
+  "id": "nvidia_onecat_vllm_12a253c2",
   "platform": "nvidia",
   "name": "1Cat-vLLM (V100 / SM70 fork) on NVIDIA",
   "framework": "1Cat-vLLM",
   "submitted_by": "JuhaoLiang1997",
   "description": "AccelMark runner for Tesla V100 (SM70) using 1Cat-vLLM 1.0.0 — community vLLM fork with FLASH_ATTN_V100 and SM70 AWQ kernels. Use nvidia_vllm_* on Ampere or newer.",
-  "supersedes_chain": ["nvidia_onecat_vllm_a43d1bcf"],
-  "notes": "Auto-injects attention_backend=FLASH_ATTN_V100 unless overridden. V100: disable prefix caching in runner config (see README). External dependency: https://github.com/1CatAI/1Cat-vLLM",
+  "supersedes_chain": ["nvidia_onecat_vllm_4a9ca6c3", "nvidia_onecat_vllm_a43d1bcf"],
+  "notes": "Auto-injects attention_backend=FLASH_ATTN_V100 unless overridden. V100: disable prefix caching and chunked prefill in runner config (see README). External dependency: https://github.com/1CatAI/1Cat-vLLM",
   "created": "2026-05-15",
   "hardware_label": "NVIDIA V100 (SM70)",
   "suite_support": {

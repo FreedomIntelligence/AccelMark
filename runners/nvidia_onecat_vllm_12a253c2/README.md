@@ -1,4 +1,4 @@
-# nvidia_onecat_vllm_4a9ca6c3 — 1Cat-vLLM Runner (Tesla V100 / SM70)
+# nvidia_onecat_vllm_12a253c2 — 1Cat-vLLM Runner (Tesla V100 / SM70)
 
 AccelMark runner for **Tesla V100 / V100S only**, using
 [1Cat-vLLM](https://github.com/1CatAI/1Cat-vLLM) (community vLLM fork for Volta).
@@ -28,8 +28,8 @@ Release notes: [1Cat-vLLM v1.0.0](https://github.com/1CatAI/1Cat-vLLM/releases/t
 | `attention_backend` | `FLASH_ATTN_V100` (auto unless overridden) |
 | `SUPPORTED_PRECISIONS` | `fp16`, `fp32` (no BF16 on V100) |
 | `SUPPORTED_QUANTIZATION_BACKENDS` | `awq` only |
-| `max_num_seqs` | `1` (via runner config) |
-| `gpu_memory_utilization` | `0.88` |
+| `max_num_seqs` | `512` global default (same as upstream vLLM); use `1` for suite D / long-context |
+| `gpu_memory_utilization` | `0.90` |
 
 ## Supported suites
 
@@ -75,7 +75,7 @@ python -m pip install --prefer-binary --no-cache-dir \
     "https://github.com/1CatAI/1Cat-vLLM/releases/download/v1.0.0/vllm-1.0.0-cp312-cp312-linux_x86_64.whl"
 
 cd /path/to/AccelMark
-pip install -r runners/nvidia_onecat_vllm_4a9ca6c3/requirements.txt
+pip install -r runners/nvidia_onecat_vllm_12a253c2/requirements.txt
 ```
 
 ### Path B — Build from source (Ubuntu 22.04 / glibc 2.35)
@@ -117,7 +117,7 @@ pip install "$DIST"/flash_attn_v100-*.whl
 cd /tmp && pip install --no-deps --force-reinstall "$DIST"/vllm-*.whl
 
 cd /path/to/AccelMark
-pip install -r runners/nvidia_onecat_vllm_4a9ca6c3/requirements.txt
+pip install -r runners/nvidia_onecat_vllm_12a253c2/requirements.txt
 ```
 
 Do **not** run AccelMark from inside the cloned `1Cat-vLLM/` directory; Python
@@ -145,21 +145,35 @@ PY
 Copy and edit:
 
 ```bash
-cp configs/runner_configs/runner_nvidia_onecat_vllm_4a9ca6c3.yaml.example \
-   configs/runner_configs/runner_nvidia_onecat_vllm_4a9ca6c3.yaml
+cp configs/runner_configs/runner_nvidia_onecat_vllm_12a253c2.yaml.example \
+   configs/runner_configs/runner_nvidia_onecat_vllm_12a253c2.yaml
 ```
 
-**Single V100 32GB** — recommended `engine_kwargs` (avoids prefix prefill shared-memory
-crash on SM70: `Shared memory exceeds 96KB`):
+**Single V100 32GB** — recommended `engine_kwargs` (avoids SM70
+`Shared memory exceeds 96KB` in `prefill_paged_fwd`):
 
 ```yaml
 tensor_parallel_size: 1
-max_num_seqs: 1
-gpu_memory_utilization: 0.88
+max_num_seqs: 512
+gpu_memory_utilization: 0.90
 engine_kwargs:
   enable_prefix_caching: false
+  enable_chunked_prefill: false
   kv_cache_auto_trim_ratio: 0.0
+
+suites:
+  suite_D:
+    max_num_seqs: 1
+    gpu_memory_utilization: 0.85
 ```
+
+If it still crashes, export before `python run.py`:
+
+```bash
+export VLLM_FLASH_V100_DISABLE_PAGED_PREFILL=1
+```
+
+That forces the slower paged-KV gather fallback instead of `prefill_paged_fwd`.
 
 **4× V100 32GB** — set `tensor_parallel_size: 4`; keep the same `engine_kwargs`
 unless you are deliberately testing 1Cat's MTP / prefix-cache profile (see
@@ -169,6 +183,7 @@ Other tuning:
 
 | Symptom | Try |
 |---------|-----|
+| `Shared memory exceeds 96KB` | `enable_chunked_prefill: false` + `enable_prefix_caching: false` (above); then `export VLLM_FLASH_V100_DISABLE_PAGED_PREFILL=1` |
 | First request hangs (CUDA graph) | `enforce_eager: true` or `--enforce-eager` |
 | OOM at engine init | Lower `gpu_memory_utilization` (e.g. `0.85`) |
 | `GLIBC_2.38 not found` | Path B source build, or Ubuntu 24.04+ |
@@ -184,11 +199,11 @@ cp configs/models_local.yaml.example configs/models_local.yaml   # map local mod
 export PYTHONPATH=/path/to/AccelMark   # if pip install -e . is unavailable
 
 # Suite A smoke (1× V100)
-python run.py --runner nvidia_onecat_vllm_4a9ca6c3 \
+python run.py --runner nvidia_onecat_vllm_12a253c2 \
     --suite suite_A --scenario accuracy --tensor-parallel-size 1
 
 # Suite B (4× V100)
-python run.py --runner nvidia_onecat_vllm_4a9ca6c3 \
+python run.py --runner nvidia_onecat_vllm_12a253c2 \
     --suite suite_B --tensor-parallel-size 4
 ```
 
@@ -196,8 +211,9 @@ python run.py --runner nvidia_onecat_vllm_4a9ca6c3 \
 
 ## Known limitations
 
-- Prefix caching + chunked paged prefill can exceed V100's 96KB shared memory per SM;
-  disable `enable_prefix_caching` (see config above).
+- Prefix caching and **chunked prefill** (even with prefix caching off) can hit the
+  `prefill_paged_fwd` kernel (>96KB shared memory on SM70). Disable both in config;
+  use `VLLM_FLASH_V100_DISABLE_PAGED_PREFILL=1` if needed (see above).
 - `max_num_seqs: 1` limits batch throughput vs upstream vLLM defaults — intentional
   for 1Cat's long-context V100 profile.
 - Suite F is marked unsupported in `meta.json` (use upstream runner on V100 if needed).

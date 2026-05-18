@@ -92,8 +92,8 @@ class OneCatVLLMRunner(BenchmarkRunner):
         enforce_eager = getattr(self, "_enforce_eager", False)
 
         cfg             = getattr(self, "_runner_config", {})
-        max_num_seqs    = cfg.get("max_num_seqs", 1)
-        gpu_memory_util = cfg.get("gpu_memory_utilization", 0.88)
+        max_num_seqs    = cfg.get("max_num_seqs", 512)
+        gpu_memory_util = cfg.get("gpu_memory_utilization", 0.90)
         extra_kwargs    = dict(cfg.get("engine_kwargs") or {})
 
         import os
