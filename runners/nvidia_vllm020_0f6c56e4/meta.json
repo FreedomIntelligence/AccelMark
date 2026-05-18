@@ -1,0 +1,21 @@
+{
+  "id": "nvidia_vllm020_0f6c56e4",
+  "platform": "nvidia",
+  "name": "vLLM 0.20 on NVIDIA",
+  "framework": "vLLM",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "AccelMark reference runner for NVIDIA GPUs using vLLM 0.20.x. Supersedes nvidia_vllm_47f5d58e (vLLM 0.7.3). Supports suites A–G.",
+  "supersedes_chain": [],
+  "notes": "vLLM 0.20.x line: torch 2.11, CUDA 13.0 default. Adds turboquant backend. Suite C requires enforce_eager in runner config (see README).",
+  "created": "2026-05-15",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "pending",
+    "G": "pending"
+  }
+}

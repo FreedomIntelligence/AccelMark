@@ -1,6 +1,6 @@
-# AccelMark runner config — nvidia_vllm_0c1710bd (vLLM 0.20 on NVIDIA)
+# AccelMark runner config — nvidia_vllm020_0f6c56e4 (vLLM 0.20 on NVIDIA)
 #
-# Copy this file to runner_nvidia_vllm_0c1710bd.yaml (remove .example suffix)
+# Copy this file to runner_nvidia_vllm020_0f6c56e4.yaml (remove .example suffix)
 # and edit as needed for your hardware. The actual .yaml is gitignored.
 #
 # These settings adapt the runner to your hardware environment.
@@ -52,6 +52,13 @@ gpu_memory_utilization: 0.90
 # are never loaded or recorded.
 
 suites:
+  suite_C:
+    # Quantization suite (FP8/W8A8/W8A16 via compressed-tensors).
+    # vLLM 0.20 + CUDA graphs can produce repetitive garbage on quantized
+    # checkpoints (accuracy ~0 while offline throughput looks normal).
+    # enforce_eager disables CUDAGraph — required for correct Suite C accuracy.
+    enforce_eager: true
+
   suite_D:
     # Long-context suite — reduce batch size and reserve more memory.
     max_num_seqs: 64
