@@ -1,6 +1,6 @@
-# AccelMark runner config — moorethreads_vllm_musa_57ff5443 (vllm-musa on Moore Threads)
+# AccelMark runner config — moorethreads_vllm_musa_f2f6f965 (vllm-musa on Moore Threads)
 #
-# Copy this file to runner_moorethreads_vllm_musa_57ff5443.yaml (remove
+# Copy this file to runner_moorethreads_vllm_musa_f2f6f965.yaml (remove
 # .example suffix) and edit as needed for your hardware. The actual .yaml
 # is gitignored.
 #
@@ -45,8 +45,6 @@ suites:
     gpu_memory_utilization: 0.80
 
   suite_F:
-    # Consumer / edge GPU — enforce_eager often safer for first runs.
-    # enforce_eager: true
     max_num_seqs: 128
 
 # ── Speculative decoding (suite_A / suite_D extra scenario) ─────────────────
