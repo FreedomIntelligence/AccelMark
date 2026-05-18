@@ -36,7 +36,7 @@
         "vendor": {
           "type": "string",
           "enum": ["NVIDIA","AMD","Intel","Google","Huawei","Cambricon","Biren",
-                   "Enflame","MetaX","Iluvatar","Apple","Qualcomm","Other"]
+                   "Enflame","MetaX","Moore Threads","Iluvatar","Apple","Qualcomm","Other"]
         },
         "count": { "type": "integer", "minimum": 1 },
         "memory_gb": { "type": "number", "minimum": 0 },
