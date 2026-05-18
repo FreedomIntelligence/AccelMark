@@ -844,5 +844,23 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 1026.12
+  },
+  "mtt_s4000x1_suite_A_moorethreads_vllm_musa_f2f6f965_cabb7bd0": {
+    "chip_name": "MTT S4000",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 332.62
+  },
+  "mtt_s4000x1_suite_F_moorethreads_vllm_musa_f2f6f965_4f66d29d": {
+    "chip_name": "MTT S4000",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 2004.02
   }
 }
