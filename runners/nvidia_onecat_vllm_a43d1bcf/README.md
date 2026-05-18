@@ -55,25 +55,63 @@ To opt into the MTP + prefix-cache profile (Qwen3.6-27B-AWQ), bump
 | Suite F — Qwen2.5-0.5B edge | Not interesting on V100 — the model fits trivially; use upstream runner. |
 | Suite G — MoE | Sweet spot — `Qwen3.6-35B-A3B-AWQ`, `Qwen3.5-122B-A10B-AWQ` are exactly the validated MoE models in 1Cat 1.0.0. |
 
-## Prerequisites
+## Environment setup
+
+1Cat-vLLM 1.0.0 ships **prebuilt wheels only** (no PyPI `vllm`). Install the
+wheels **before** `requirements.txt` — the extras file intentionally omits
+`torch` / `vllm` so it does not fight the cu128 index used by the wheels.
+
+### Validated stack (1Cat-vLLM 1.0.0)
+
+| Component | Version |
+|-----------|---------|
+| OS | Ubuntu **24.04** (glibc ≥ 2.38) |
+| Python | **3.12** (`cp312` wheels only) |
+| CUDA | **12.8** toolkit + matching driver (570.x recommended) |
+| PyTorch | **2.9.1+cu128** (pulled in by the wheels) |
+| GPU | Tesla V100 / V100S (SM70) |
+
+Upstream reference: [1Cat-vLLM releases](https://github.com/1CatAI/1Cat-vLLM/releases/tag/v1.0.0)
+and [installation guide](https://github.com/1CatAI/1Cat-vLLM#quick-start).
+
+### Ubuntu 22.04 and other older hosts
+
+The release wheels are linked against **glibc 2.38**. On Ubuntu 22.04 (glibc
+2.35), `pip install` may succeed but `import vllm` fails with
+`GLIBC_2.38 not found`. Options:
+
+- Run on **Ubuntu 24.04** (bare metal or VM), or
+- Use a **glibc ≥ 2.38 container** on the host (see the [1Cat-vLLM Docker
+  notes](https://github.com/1CatAI/1Cat-vLLM#docker-deployment) — build/run
+  on a machine where the Docker daemon is available; nested dev containers
+  without `docker.sock` bind-mount usually cannot host Docker), or
+- **Build from source** on your host glibc (see 1Cat-vLLM “Source build”).
+
+### Install steps
+
+From the AccelMark repo root, in a fresh **Python 3.12** environment:
 
 ```bash
-# 1. CUDA 12.8 toolkit + matching driver (570.x recommended)
+# 1. CUDA 12.8 toolkit + driver
 #    https://developer.nvidia.com/cuda-12-8-0-download-archive
 
-# 2. Python 3.12 (1Cat 1.0.0 ships cp312 wheels only)
-conda create -y -n 1cat-vllm-1.0.0 python=3.12
-conda activate 1cat-vllm-1.0.0
+conda create -y -n onecat-vllm python=3.12
+conda activate onecat-vllm
+python -m pip install --upgrade pip setuptools wheel
 
-# 3. Install the 1Cat-vLLM wheels
-pip install --prefer-binary --no-cache-dir \
+# 2. 1Cat-vLLM wheels (install BOTH together — do not use PyPI vllm)
+python -m pip install --prefer-binary --no-cache-dir \
     --extra-index-url https://download.pytorch.org/whl/cu128 \
     "https://github.com/1CatAI/1Cat-vLLM/releases/download/v1.0.0/flash_attn_v100-1.0.0-cp312-cp312-linux_x86_64.whl" \
     "https://github.com/1CatAI/1Cat-vLLM/releases/download/v1.0.0/vllm-1.0.0-cp312-cp312-linux_x86_64.whl"
 
-# 4. Install AccelMark extras
-pip install -r runners/nvidia_onecat_vllm_a43d1bcf/requirements.txt
+# 3. AccelMark runner extras only
+python -m pip install -r runners/nvidia_onecat_vllm_a43d1bcf/requirements.txt
 ```
+
+Do **not** install `vllm` from PyPI afterward — it will replace the fork.
+Run benchmarks from a directory **outside** a cloned 1Cat-vLLM source tree so
+Python does not import the local `vllm/` package instead of the wheel.
 
 ## Smoke test the install
 
