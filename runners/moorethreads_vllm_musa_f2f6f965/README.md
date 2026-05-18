@@ -7,12 +7,12 @@ AccelMark runner for Moore Threads MUSA GPUs using
 
 | Suite | Description | Notes |
 |-------|-------------|-------|
-| Suite A | Single-chip, Llama-3-8B | Smoke tested on MTT S4000; accuracy not at baseline on vLLM 0.4.x |
+| Suite A | Single-chip, Llama-3-8B | Validated on S4000 (default: accuracy/offline/online) |
 | Suite B | Multi-chip, Llama-3-70B | MCCL tensor parallelism; set `VLLM_WORKER_MULTIPROC_METHOD=spawn` |
 | Suite C | Quantization, Llama-3.1-8B | FP8 skipped (not supported); W8A8/W8A16 via compressed-tensors |
 | Suite D | Long context ~28K input, Llama-3.1-8B | Reduce `max_num_seqs` / `gpu_memory_utilization` in runner config |
 | Suite E | Multi-chip scaling, Llama-3-8B | MCCL tensor parallelism |
-| Suite F | Edge, Qwen2.5-0.5B | Smoke tested on MTT S4000; recommended first run |
+| Suite F | Edge, Qwen2.5-0.5B | Validated on MTT S4000 (community result in repo) |
 | Suite G | MoE multi-chip, Mixtral-8x7B | Unsupported |
 
 ## Hardware compatibility

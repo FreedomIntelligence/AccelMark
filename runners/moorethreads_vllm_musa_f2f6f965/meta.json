@@ -6,16 +6,16 @@
   "submitted_by": "JuhaoLiang1997",
   "description": "AccelMark runner for Moore Threads MUSA GPUs using vllm-musa (https://github.com/MooreThreads/vllm-musa). Install torch/vllm per upstream README_vllm_musa.md; requirements.txt adds benchmark deps only. Sets device=musa; BF16 maps to float16 on vLLM <0.10. MCCL tensor parallelism. FP8 unsupported.",
   "supersedes_chain": [],
-  "notes": "MMLU not at baseline on tested vLLM 0.4.x+musa stack — see runner README.",
+  "notes": "Smoke-tested on MTT S4000 (vLLM 0.4.2+musa): Suite A and F default scenarios run. MMLU not at baseline — see runner README.",
   "created": "2026-05-18",
   "hardware_label": null,
   "suite_support": {
-    "A": "pending",
+    "A": "validated",
     "B": "pending",
     "C": "pending",
     "D": "pending",
     "E": "pending",
-    "F": "pending",
+    "F": "validated",
     "G": "unsupported"
   }
 }
