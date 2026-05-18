@@ -1,17 +1,13 @@
 """Moore Threads MUSA GPU platform plug-in.
 
-Moore Threads ships its own driver and management tooling:
+Used by ``runners/collect_env.py`` to populate ``env_info.json``.
 
-* ``mthreads-gmi`` — the moral equivalent of ``nvidia-smi`` / ``rocm-smi``.
-* ``pymtml`` — Python bindings analogous to NVML / pynvml.
-* ``torchada`` — a CUDA→MUSA compatibility shim that exposes the standard
-  ``torch.cuda`` API, with the real backend version available via
-  ``torch.version.musa``.
+Detection order (first non-empty wins):
 
-This plug-in first tries the Python bindings (best machine-readable
-output) and falls back to scraping ``mthreads-gmi`` text output. Both
-paths are best-effort: when none of the tools are installed the plug-in
-silently reports zero accelerators and the collector moves on.
+  1. ``pymtml`` (mthreads-ml-py) — same API as used in the vllm-musa runner
+  2. ``mthreads-gmi`` text output
+  3. ``torch`` device properties (``torch.cuda`` aliased to MUSA via torchada,
+     or native ``torch.musa`` when available)
 """
 from __future__ import annotations
 
@@ -23,8 +19,6 @@ DISPLAY_NAME = "Moore Threads"
 VENDOR_LABEL = "Moore Threads"
 PRIORITY = 60
 
-# S5000 / S4000 datacenter SKUs ship with native BF16 support; the older
-# consumer-class MTT S80/S70 cards are FP16-only.
 _BF16_SUPPORTED_HINTS = ("s5000", "s4000", "s3000")
 _NO_BF16_HINTS = ("s80", "s70", "s60", "s50")
 
@@ -40,50 +34,68 @@ def _supports_bf16(chip_name: str) -> bool:
     return True
 
 
+def _driver_version_from_smi() -> str | None:
+    try:
+        out = subprocess.check_output(
+            ["mthreads-gmi"], text=True, stderr=subprocess.DEVNULL
+        )
+        m = re.search(r"Driver\s+Version\s*:\s*(\S+)", out, re.IGNORECASE)
+        if m:
+            return m.group(1)
+    except Exception:
+        pass
+    return None
+
+
 def _collect_via_pymtml() -> list[dict]:
     try:
-        import pymtml as mtml  # type: ignore[import-not-found]
+        import pymtml
     except ImportError:
         return []
 
     try:
-        mtml.mtmlInit()
+        pymtml.mtmlInit()
     except Exception:
         return []
 
+    driver = _driver_version_from_smi() or "unknown"
     accelerators: list[dict] = []
     try:
-        count = mtml.mtmlDeviceGetCount()
+        count = pymtml.mtmlDeviceGetCount()
     except Exception:
         try:
-            mtml.mtmlShutdown()
+            pymtml.mtmlShutdown()
         except Exception:
             pass
         return []
 
     for idx in range(int(count)):
         try:
-            handle = mtml.mtmlDeviceGetHandleByIndex(idx)
-            name = mtml.mtmlDeviceGetName(handle)
-            mem = mtml.mtmlDeviceGetMemoryInfo(handle)
-            total_mb = getattr(mem, "total", None) or mem.get("total", 0)
-            driver = mtml.mtmlSystemGetDriverVersion()
+            dev = pymtml.mtmlDeviceGetByIndex(idx)
+            name = pymtml.mtmlDeviceGetName(dev)
+            mem = pymtml.mtmlDeviceGetMemoryInfo(dev)
+            total_bytes = getattr(mem, "total", None)
+            if total_bytes is None and isinstance(mem, dict):
+                total_bytes = mem.get("total")
         except Exception:
             continue
+        if not isinstance(name, str):
+            name = name.decode("utf-8", "ignore")
+        memory_gb = round(int(total_bytes) / (1024 ** 3), 1) if total_bytes else None
         accelerators.append(
             {
                 "index": idx,
-                "name": name if isinstance(name, str) else name.decode("utf-8", "ignore"),
+                "name": name,
                 "vendor": VENDOR_LABEL,
-                "memory_gb": round(int(total_mb) / 1024, 1) if total_mb else None,
-                "driver_version": driver if isinstance(driver, str) else driver.decode("utf-8", "ignore"),
+                "memory_gb": memory_gb,
+                "driver_version": driver,
                 "firmware_version": None,
-                "supports_bf16": _supports_bf16(str(name)),
+                "supports_bf16": _supports_bf16(name),
             }
         )
 
     try:
-        mtml.mtmlShutdown()
+        pymtml.mtmlShutdown()
     except Exception:
         pass
 
@@ -91,12 +103,7 @@ def _collect_via_pymtml() -> list[dict]:
 
 
 def _collect_via_smi() -> list[dict]:
-    """Fallback parser for ``mthreads-gmi`` text output.
-
-    The output format mirrors nvidia-smi: a header with the driver / MUSA
-    versions followed by per-device blocks listing the product name and
-    memory usage. We only need the device name and total memory.
-    """
+    """Parse ``mthreads-gmi`` text output (mthreads-gmi 1.14+ tabular format)."""
     try:
         out = subprocess.check_output(
             ["mthreads-gmi"], text=True, stderr=subprocess.DEVNULL
@@ -110,21 +117,18 @@ def _collect_via_smi() -> list[dict]:
         driver = m.group(1)
 
     accelerators: list[dict] = []
-    # Per-device rows look like:
-    #   |   0  MTT S4000                  ...     | 0000:65:00.0  Off |   ... |
-    # followed by:
-    #   |   0%   45C    P0    ... /   ... |    234MiB / 49152MiB |    ... |
+    # Example row:
+    #   0    MTT S4000      |00000000:28:00.0    |0%    4MiB(49152MiB)
     for match in re.finditer(
-        r"\|\s*(\d+)\s+(MTT\s+\S+(?:\s+\S+)?)\s*", out
+        r"^(\d+)\s+(MTT\s+\S+)\s+\|",
+        out,
+        re.MULTILINE,
     ):
         idx = int(match.group(1))
         name = match.group(2).strip()
-        # Search downstream of this match for the memory line
-        tail = out[match.end():]
-        mem_match = re.search(r"(\d+)MiB\s*/\s*(\d+)MiB", tail)
-        memory_gb = None
-        if mem_match:
-            memory_gb = round(int(mem_match.group(2)) / 1024, 1)
+        tail = out[match.end(): match.end() + 256]
+        mem_match = re.search(r"\d+MiB\((\d+)MiB\)", tail)
+        memory_gb = round(int(mem_match.group(1)) / 1024, 1) if mem_match else None
         accelerators.append(
             {
                 "index": idx,
@@ -139,23 +143,69 @@ def _collect_via_smi() -> list[dict]:
     return accelerators
 
 
+def _collect_via_torch() -> list[dict]:
+    """Fallback when management libraries are missing but torch MUSA is loaded."""
+    try:
+        import torch
+    except ImportError:
+        return []
+
+    driver = _driver_version_from_smi() or "unknown"
+    accelerators: list[dict] = []
+
+    if hasattr(torch, "musa"):
+        try:
+            count = torch.musa.device_count()
+            get_props = torch.musa.get_device_properties
+        except Exception:
+            count = 0
+            get_props = None
+    else:
+        try:
+            count = torch.cuda.device_count()
+            get_props = torch.cuda.get_device_properties
+        except Exception:
+            return []
+
+    for idx in range(int(count)):
+        try:
+            props = get_props(idx)
+            name = getattr(props, "name", None) or f"MTT GPU {idx}"
+            total = getattr(props, "total_memory", None)
+            memory_gb = round(total / (1024 ** 3), 1) if total else None
+        except Exception:
+            continue
+        accelerators.append(
+            {
+                "index": idx,
+                "name": name if isinstance(name, str) else str(name),
+                "vendor": VENDOR_LABEL,
+                "memory_gb": memory_gb,
+                "driver_version": driver,
+                "firmware_version": None,
+                "supports_bf16": _supports_bf16(str(name)),
+            }
+        )
+    return accelerators
+
+
 def collect() -> list[dict]:
-    accelerators = _collect_via_pymtml()
-    if accelerators:
-        return accelerators
-    return _collect_via_smi()
+    for fn in (_collect_via_pymtml, _collect_via_smi, _collect_via_torch):
+        accelerators = fn()
+        if accelerators:
+            return accelerators
+    return []
 
 
 def detect_runtime_version() -> str | None:
-    """Prefer torch.version.musa (most reliable when torchada is installed),
-    fall back to scraping ``mthreads-gmi`` header.
-    """
     try:
         import torch
 
         ver = getattr(torch.version, "musa", None)
         if ver:
             return f"MUSA {ver}"
+        if getattr(torch.version, "cuda", None):
+            return f"MUSA (torch.cuda shim) {torch.version.cuda}"
     except ImportError:
         pass
 
@@ -174,17 +224,43 @@ def detect_runtime_version() -> str | None:
     return None
 
 
+def detect_pcie_gen() -> str | None:
+    try:
+        out = subprocess.check_output(
+            ["mthreads-gmi"], text=True, stderr=subprocess.DEVNULL
+        )
+        m = re.search(r"\|\s*(\d+)x\((\d+)x\)\s*\|", out)
+        if m:
+            return f"PCIe {m.group(1)}x/{m.group(2)}x"
+    except Exception:
+        pass
+    return None
+
+
+def detect_intra_node_interconnect() -> str | None:
+    """Moore Threads multi-GPU hosts typically use MCCL over PCIe."""
+    accels = collect()
+    if len(accels) > 1:
+        return "MCCL/PCIe"
+    return None
+
+
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     notes: list[str] = []
-    if accelerators and (env.get("pytorch_version") or "") == "unknown":
+    if not accelerators:
         notes.append(
-            "PyTorch (with the torchada MUSA shim) is not installed — "
-            "pytorch_version is unknown."
+            "No Moore Threads MUSA GPUs detected (tried pymtml, mthreads-gmi, "
+            "and torch). Install the MUSA driver/toolkit per "
+            "https://github.com/MooreThreads/vllm-musa ."
         )
-    if accelerators and (env.get("runtime_version") or "") == "unknown":
+        return notes
+    if (env.get("pytorch_version") or "") == "unknown":
+        notes.append(
+            "PyTorch with MUSA support is not installed — pytorch_version is unknown."
+        )
+    if (env.get("runtime_version") or "") == "unknown":
         notes.append(
             "Could not detect MUSA runtime (tried torch.version.musa and "
-            "mthreads-gmi). runtime_version is unknown — install torchada "
-            "or the Moore Threads MUSA toolkit."
+            "mthreads-gmi). runtime_version is unknown."
         )
     return notes

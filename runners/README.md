@@ -252,7 +252,7 @@ nvidia_trtllm_fp8_8d2f1a4b
 amd_vllm_rocm_7b2e1d8f
 ascend_mindie_9c4a3f11
 apple_mlx_b3e21f09
-moorethreads_vllm_musa_57ff5443
+moorethreads_vllm_musa_f2f6f965
 ```
 
 ---

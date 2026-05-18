@@ -1,0 +1,60 @@
+# AccelMark runner config — moorethreads_vllm_musa_f2f6f965 (vllm-musa on Moore Threads)
+#
+# Copy this file to runner_moorethreads_vllm_musa_f2f6f965.yaml (remove
+# .example suffix) and edit as needed for your hardware. The actual .yaml
+# is gitignored.
+#
+# These settings adapt the runner to your hardware environment. They are
+# recorded in result.json task.extra_config for transparency but are NOT
+# part of the benchmark identity (not hashed into run_id).
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults (apply to all suites) ─────────────────────────────────────
+
+# Tensor parallel size — number of Moore Threads GPUs to use (default: 1).
+# For multi-card runs make sure to export VLLM_WORKER_MULTIPROC_METHOD=spawn.
+tensor_parallel_size: 1
+
+# Disable Triton CUDA-graph / compilation. Set true if you hit Triton kernel
+# errors on first request (most common on S3000 / S80 paths).
+enforce_eager: false
+
+# Maximum number of sequences in a batch (default: 256).
+# Reduce on lower-memory cards: 128 on 24 GB cards, 64 on 16 GB cards.
+max_num_seqs: 256
+
+# Fraction of MUSA HBM reserved for the KV cache (default: 0.85). Reduce if
+# you hit OOM; the vLLM flag is named gpu_memory_utilization but applies to
+# MUSA HBM via torchada.
+gpu_memory_utilization: 0.85
+
+# Pass-through kwargs forwarded directly to vLLM LLM() / AsyncEngineArgs().
+# Unknown keys are dropped automatically with a warning, so this is safe to
+# use across vLLM 0.10.x / 0.13.x.
+# engine_kwargs:
+#   swap_space: 8
+#   max_seq_len_to_capture: 4096
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+
+suites:
+  suite_D:
+    # Long-context — reduce batch size and reserve more memory.
+    max_num_seqs: 32
+    gpu_memory_utilization: 0.80
+
+  suite_F:
+    max_num_seqs: 128
+
+# ── Speculative decoding (suite_A / suite_D extra scenario) ─────────────────
+# Uncomment to enable. vllm-musa accepts the same speculative_config dict as
+# upstream vLLM; the runner translates flat keys (speculative_model,
+# num_speculative_tokens, ...) into speculative_config automatically.
+#
+# suites:
+#   suite_A:
+#     engine_kwargs:
+#       speculative_model: "meta-llama/Llama-3.2-1B-Instruct"
+#       num_speculative_tokens: 4
+#       speculative_draft_tensor_parallel_size: 1
