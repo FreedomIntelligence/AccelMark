@@ -1,0 +1,19 @@
+# AccelMark runner config — nvidia_onecat_vllm_12a253c2 (1Cat-vLLM on V100)
+# Copy to runner_nvidia_onecat_vllm_12a253c2.yaml (gitignored). See runner README.
+
+tensor_parallel_size: 1
+enforce_eager: false
+max_num_seqs: 512
+gpu_memory_utilization: 0.90
+
+engine_kwargs:
+  enable_prefix_caching: false
+  enable_chunked_prefill: false
+  kv_cache_auto_trim_ratio: 0.0
+
+suites:
+  suite_D:
+    max_num_seqs: 1
+    gpu_memory_utilization: 0.85
+  suite_C:
+    max_num_seqs: 1
