@@ -677,5 +677,19 @@
         "best_interactive_ttft_p99_ms": 28.5
       }
     }
+  },
+  "Tesla V100-PCIE-32GB": {
+    "best_throughput_tokens_per_sec": 6292.79,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 671.4,
+        "best_online_max_qps": 0.0
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 6292.8,
+        "best_online_max_qps": 0.0,
+        "best_interactive_ttft_p99_ms": 40.7
+      }
+    }
   }
 }
