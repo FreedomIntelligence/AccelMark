@@ -627,7 +627,7 @@
         "mean": 53.5,
         "std": 7.9,
         "cv_pct": 14.84,
-        "stability": "unstable",
+        "stability": "high-variance",
         "runs": [
           67.8,
           42.6,

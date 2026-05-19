@@ -78,12 +78,23 @@ def _percentile(data: list, p: float):
 # is non-positive, in which case the frontend hides the badge entirely so
 # users do not see a meaningless "stable ✓" on a single-run measurement.
 
-# Stability thresholds. These are intentionally permissive on first launch —
-# real-world hardware noise (especially memory thrashing on first cycle)
-# regularly crosses 2 % even on healthy systems. Tune in the schema after we
-# observe the first wave of submissions.
-_STABILITY_THRESHOLD_STABLE_PCT = 2.0
-_STABILITY_THRESHOLD_NOISY_PCT  = 5.0
+# Stability thresholds. Calibrated from the initial 255-result sustained
+# backfill (May 2026), which had a CV median of 3.1 % and p90 of 13.1 %.
+# Tighter thresholds (e.g. ≤ 2 % / ≤ 5 %) labelled the literal median run
+# "noisy" and ~30 % of submissions "unstable" — those labels were too
+# pejorative for what is really normal hardware jitter. The buckets here
+# split the empirical distribution into ~48 % stable / ~35 % noisy /
+# ~17 % high-variance, with the high-variance bucket dominated by chips
+# we expect to genuinely throttle (RTX 5090, A6000, V100s) or scale-out
+# topologies with real network jitter (Ascend ×16).
+#
+# Important wording choice: the third tier is named "high-variance", not
+# "unstable", because high CV does not mean the measurement is wrong — it
+# means the headline number carries irreducible variability the reader
+# should be aware of. The frontend reflects this with a colour cue and
+# no error glyph; "high-variance" is a description, not a verdict.
+_STABILITY_THRESHOLD_STABLE_PCT = 3.0
+_STABILITY_THRESHOLD_NOISY_PCT  = 8.0
 
 
 def _cv_pct(values: list) -> Optional[float]:
@@ -102,14 +113,14 @@ def _cv_pct(values: list) -> Optional[float]:
 
 
 def _stability_label(cv_pct: Optional[float]) -> Optional[str]:
-    """Map a CV percentage to a stable/noisy/unstable label, or None."""
+    """Map a CV percentage to a stable / noisy / high-variance label, or None."""
     if cv_pct is None:
         return None
     if cv_pct <= _STABILITY_THRESHOLD_STABLE_PCT:
         return "stable"
     if cv_pct <= _STABILITY_THRESHOLD_NOISY_PCT:
         return "noisy"
-    return "unstable"
+    return "high-variance"
 
 
 def _reliability_block(values: list, *, decimals: int = 2) -> dict:

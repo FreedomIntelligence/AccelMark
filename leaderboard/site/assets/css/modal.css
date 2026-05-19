@@ -142,10 +142,15 @@
   border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
   background: color-mix(in srgb, currentColor 10%, transparent);
 }
-.modal-reliab-pill.stable   { color: var(--good, #2da44e); }
-.modal-reliab-pill.noisy    { color: var(--warn, #d29922); }
-.modal-reliab-pill.unstable { color: var(--bad,  #cf222e); }
-.modal-reliab-pill.unknown  { color: var(--fg-faint); }
+.modal-reliab-pill.stable         { color: var(--good, #2da44e); }
+.modal-reliab-pill.noisy          { color: var(--warn, #d29922); }
+/* High-variance uses an orange tone (not pure red) on purpose: red would
+ * read as an error glyph, but a high-CV submission may be a perfectly
+ * correct measurement of a legitimately jittery hardware × workload pair
+ * (e.g. consumer cards under sustained load). Orange says "look at this"
+ * without saying "this is broken". */
+.modal-reliab-pill.high_variance  { color: #d97706; }
+.modal-reliab-pill.unknown        { color: var(--fg-faint); }
 
 .modal-close {
   background: transparent;

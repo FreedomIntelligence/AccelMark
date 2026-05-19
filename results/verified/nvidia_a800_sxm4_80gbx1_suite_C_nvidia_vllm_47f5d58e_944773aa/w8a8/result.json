@@ -367,7 +367,7 @@
         "mean": 715.7,
         "std": 43.7,
         "cv_pct": 6.1,
-        "stability": "unstable",
+        "stability": "noisy",
         "runs": [
           717.7,
           704.7,

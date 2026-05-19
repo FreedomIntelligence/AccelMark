@@ -400,7 +400,7 @@
         "mean": 58.7,
         "std": 3.2,
         "cv_pct": 5.46,
-        "stability": "unstable",
+        "stability": "noisy",
         "runs": [
           55.4,
           59.7,

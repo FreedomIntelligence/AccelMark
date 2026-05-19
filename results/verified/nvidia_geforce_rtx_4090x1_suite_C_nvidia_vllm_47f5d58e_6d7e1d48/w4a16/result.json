@@ -380,7 +380,7 @@
         "mean": 606.2,
         "std": 15.7,
         "cv_pct": 2.59,
-        "stability": "noisy",
+        "stability": "stable",
         "runs": [
           584.6,
           597.4,

@@ -945,8 +945,23 @@ shipping `samples.jsonl`. Shape:
 }
 ```
 
-`stability` thresholds (tunable): `cv_pct ≤ 2 → stable ✓`,
-`≤ 5 → noisy ⚠`, otherwise `unstable ✗`.
+`stability` thresholds: `cv_pct ≤ 3 → stable ✓`, `≤ 8 → noisy ⚠`,
+otherwise `high-variance`. Calibrated from the May-2026 backfill — see
+the comment above `_STABILITY_THRESHOLD_*` in `loadgen/loadgen.py` for the
+empirical distribution that informed the choice. Tunable centrally there.
+
+**`high-variance` is informational, not a verdict.** High CV means the
+hardware × workload combo carries irreducible jitter (thermal throttle on
+consumer cards, HCCL noise on 16-chip Ascend topologies, acceptance-rate
+fluctuation on speculative decoding) — it is **not** a sign the
+submission is broken. The frontend reflects this: high-variance pills
+use an orange tone with no error glyph, while only stable / noisy carry
+✓ / ⚠ icons.
+
+If you submit a result that lands as high-variance, you do not need to
+re-run. The badge is for downstream readers picking hardware for
+latency-sensitive workloads — they can use the CV % to size their
+safety margins, while peak-throughput shoppers can largely ignore it.
 
 | Scenario | Field path | Reliability source |
 |---|---|---|

@@ -398,12 +398,23 @@ function _detailSection(title, rows) {
 //
 // Reliability blocks are emitted by loadgen.py for each scenario starting in
 // the "feat: emit reliability stats" series. Each block has shape:
-//   { n, mean, std, cv_pct, stability: "stable" | "noisy" | "unstable", runs: [...] }
+//   { n, mean, std, cv_pct, stability: "stable"|"noisy"|"high-variance", runs:[…] }
 // Older results (pre-feature) carry an empty {} which we skip silently — the
 // section header is suppressed if no scenario reported a block, so old runs
 // look the same as before.
+//
+// Design note on iconography:
+//   stable          → ✓  Green — the headline number is the property of the chip.
+//   noisy           → ⚠  Amber — modest jitter (≤8 % CV). Common, not a problem.
+//   high-variance   →    No glyph, red-tinted text — informational, not a verdict.
+// We intentionally do NOT use an ✗ for high-variance. High CV means "this
+// hardware × workload combo carries irreducible variability the reader
+// should be aware of", not "this measurement is wrong". An ✗ would
+// implicitly indict submissions whose hardware simply lacks proper cooling,
+// or scale-out runs whose network jitter is genuine. The colour cue
+// communicates "look closer" without the verdict.
 
-const _STABILITY_ICON = { stable: "✓", noisy: "⚠", unstable: "✗" };
+const _STABILITY_ICON = { stable: "✓", noisy: "⚠", "high-variance": "" };
 
 function _hasReliability(block) {
   return block && typeof block === "object" && block.cv_pct != null;
@@ -442,16 +453,24 @@ function _pickWorstReliability(row) {
 }
 
 // Build the small `cv X.X% ✓` pill that appears in the modal subtitle row.
+// Tooltip explains the thresholds and what they mean, since `high-variance`
+// is a description rather than a verdict — readers should see "natural
+// variability" not "broken measurement".
 function _reliabilityPill(row) {
   const w = _pickWorstReliability(row);
   if (!w) return "";
-  const icon = _STABILITY_ICON[w.stability] || "·";
-  const cls  = "modal-reliab-pill " + (w.stability || "unknown");
+  const icon = _STABILITY_ICON[w.stability] || "";
+  // CSS class names must be CSS-safe: replace "-" → "_" for high_variance.
+  const stabilitySlug = (w.stability || "unknown").replace(/-/g, "_");
+  const cls  = "modal-reliab-pill " + stabilitySlug;
   const title = `Worst inter-run CV across scenarios: ${w.cv_pct}% ` +
     `(${w.scenario} ${w.metric}). ` +
-    `≤2% stable, ≤5% noisy, >5% unstable.`;
+    `≤3% stable, ≤8% noisy, >8% high-variance. ` +
+    `High-variance is informational — it means this hardware × workload ` +
+    `combo has irreducible jitter, not that the measurement is wrong.`;
+  const head = icon ? `${icon} cv ${w.cv_pct}%` : `cv ${w.cv_pct}%`;
   return `<span class="${esc(cls)}" title="${esc(title)}">` +
-         `reliability ${icon} cv ${esc(String(w.cv_pct))}%</span>`;
+         `reliability ${esc(head)}</span>`;
 }
 
 // Render one row per scenario in the Details tab. Skipped if a scenario has
@@ -460,9 +479,14 @@ function _reliabilityRows(row) {
   const viz = row.viz || {};
   const rows = [];
 
-  const fmtBlock = (b) =>
-    `${b.cv_pct}% · ${_STABILITY_ICON[b.stability] || ""} ` +
-    `<span class="muted-note">${esc(b.stability || "")} (n=${b.n})</span>`;
+  // Format: "4.19% ⚠ noisy (n=14)" or "12.4% high-variance (n=14)".
+  // Icon is omitted (not just blank) for high-variance so we don't render
+  // a dangling "·" — the label and colour carry the meaning instead.
+  const fmtBlock = (b) => {
+    const icon = _STABILITY_ICON[b.stability] || "";
+    const head = icon ? `${b.cv_pct}% · ${icon}` : `${b.cv_pct}%`;
+    return `${head} <span class="muted-note">${esc(b.stability || "")} (n=${b.n})</span>`;
+  };
 
   // offline — show the worst (largest CV) of all client_concurrency rows.
   // That's the limiting concurrency for stability claims.

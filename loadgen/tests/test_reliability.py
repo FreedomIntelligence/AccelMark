@@ -45,11 +45,13 @@ def test_cv_pct_returns_none_for_small_or_invalid_input():
 
 
 def test_stability_labels():
+    # Boundaries: ≤3% stable, ≤8% noisy, >8% high-variance.
     assert _stability_label(0.5) == "stable"
-    assert _stability_label(2.0) == "stable"   # inclusive boundary
-    assert _stability_label(3.0) == "noisy"
-    assert _stability_label(5.0) == "noisy"    # inclusive boundary
-    assert _stability_label(7.0) == "unstable"
+    assert _stability_label(3.0) == "stable"          # inclusive boundary
+    assert _stability_label(3.01) == "noisy"
+    assert _stability_label(8.0) == "noisy"           # inclusive boundary
+    assert _stability_label(8.01) == "high-variance"
+    assert _stability_label(20.0) == "high-variance"
     assert _stability_label(None) is None
 
 
@@ -150,7 +152,7 @@ def test_offline_emits_throughput_reliability(tmp_path):
     assert rel, "offline scenario did not emit reliability block"
     assert rel["n"] == 3
     assert rel["cv_pct"] is not None
-    assert rel["stability"] in {"stable", "noisy", "unstable"}
+    assert rel["stability"] in {"stable", "noisy", "high-variance"}
     assert len(rel["runs"]) == 3
 
 
@@ -214,7 +216,7 @@ def test_sustained_emits_throughput_post_warmup_reliability(tmp_path):
     # cv_pct may be None if not enough post-warmup samples landed; we only
     # require the field exists. When n >= 2 the stability must be set.
     if rel.get("n", 0) >= 2:
-        assert rel["stability"] in {"stable", "noisy", "unstable"}
+        assert rel["stability"] in {"stable", "noisy", "high-variance"}
 
 
 def test_burst_emits_recovery_time_seconds(tmp_path):

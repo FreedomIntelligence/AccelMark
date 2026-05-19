@@ -383,7 +383,7 @@
         "mean": 32.3,
         "std": 11.7,
         "cv_pct": 36.18,
-        "stability": "unstable",
+        "stability": "high-variance",
         "runs": [
           25.6,
           25.6,
