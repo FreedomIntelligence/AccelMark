@@ -41,3 +41,19 @@ Each line in `requests.jsonl`:
   "prompt_type": "conversational"
 }
 ```
+
+## License & attribution
+
+Bundled prompt data keeps its **upstream license**, not AccelMark's
+Apache-2.0. The three ShareGPT-derived datasets shipped here are
+redistributed under **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**
+from [shibing624/sharegpt_gpt4](https://huggingface.co/datasets/shibing624/sharegpt_gpt4).
+
+If you add a new dataset, its `README.md` **must** include:
+
+1. The upstream source (URL or HuggingFace ID).
+2. The upstream license (link to the canonical text).
+3. A citation block if the upstream authors request one.
+
+See [`../NOTICE`](../NOTICE) for the full third-party attribution that ships
+with the repository.

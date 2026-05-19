@@ -32,13 +32,14 @@ AccelMark/
 │   ├── loadgen.py          ← Shared timing and measurement engine
 │   └── types.py            ← InferenceResult, SampleRecord
 ├── suites/
-│   ├── suite_A/suite.json + requests.jsonl
-│   ├── suite_B/suite.json + requests.jsonl
-│   ├── suite_C/suite.json + suite.py + requests.jsonl
-│   ├── suite_D/suite.json + requests.jsonl
-│   ├── suite_E/suite.json + suite.py + requests.jsonl
-│   ├── suite_F/suite.json + requests.jsonl
-│   └── suite_G/suite.json + requests.jsonl
+│   ├── suite_A/suite.json
+│   ├── suite_B/suite.json
+│   ├── suite_C/suite.json + suite.py     ← suite.py is optional; only C and E ship one
+│   ├── suite_D/suite.json
+│   ├── suite_E/suite.json + suite.py
+│   ├── suite_F/suite.json
+│   └── suite_G/suite.json
+│   (request data lives in datasets/, referenced by "dataset" in suite.json)
 ├── datasets/
 │   ├── sharegpt_standard_v1/requests.jsonl  ← 500 prompts, ~280/310 tok
 │   ├── sharegpt_longctx_v1/requests.jsonl   ← 200 prompts, ~28K input tok (Suite D)
@@ -554,12 +555,15 @@ descriptions and distributions.
 If you need a custom distribution:
 
 1. Create `datasets/{your_dataset}_v1/requests.jsonl`
-2. Create `datasets/{your_dataset}_v1/README.md`
+2. Create `datasets/{your_dataset}_v1/README.md` (must document source +
+   upstream license — see `datasets/README.md`)
 3. Set `"dataset": "{your_dataset}_v1"` in your suite.json
 
-If your suite needs a custom dataset only used by that suite, you can
-also place `requests.jsonl` directly in `suites/suite_X/` — the
-benchmark runner checks there as a fallback.
+The `dataset` field is **required** — `BenchmarkRunner._resolve_requests_path`
+loads `datasets/<name>/requests.jsonl` and raises `FileNotFoundError` if it
+cannot find the file. Earlier versions allowed putting `requests.jsonl`
+directly under `suites/suite_X/`; that fallback has been removed in favor
+of the immutable, versioned `datasets/` layout.
 
 Dataset format (one JSON object per line):
 ```json
@@ -619,6 +623,38 @@ Add a section following the same format as existing suites:
 Before announcing the suite, submit at least one verified result
 from reference hardware. New suites without reference results are
 not shown on the main leaderboard.
+
+---
+
+## Adding a new scenario type
+
+If you need a scenario name that none of `accuracy / offline / online /
+interactive / sustained / speculative / burst` covers, you can register
+one without forking the dispatch logic:
+
+1. Open `runners/benchmark_runner.py` and add a row to
+   `_SCENARIO_REGISTRY` near the top of the file:
+
+   ```python
+   "your_scenario": ScenarioSpec(
+       name="your_scenario",
+       inference_kind="streaming",   # or "offline"
+       needs_streaming=True,         # require SUPPORTS_STREAMING?
+       use_async=True,               # passed to load_model()
+       merge_key="your_scenario",    # None = no-merge (e.g. accuracy)
+   ),
+   ```
+
+2. If the scenario needs special LoadGen behaviour (e.g. like `sustained`),
+   add a branch under "Run benchmark" inside `_run_single_scenario`.
+
+3. List the new scenario name in your suite's
+   `scenarios.{default,extra}` array — the merge order is derived from
+   the registry automatically.
+
+Without a registry entry the base class falls back to a streaming
+inference path with `merge_key = <scenario>`. Register an entry whenever
+you want the scenario to be treated differently (offline, no merge, etc.).
 
 ---
 
@@ -1098,6 +1134,6 @@ python runners/validate_submission.py --dir /tmp/accelmark_test/
 ## Questions and Support
 
 - **Bug in LoadGen or schema:** Open a GitHub Issue
-- **New suite proposal:** Open a GitHub Issue with the "Request new suite" template
+- **New suite proposal:** Open a GitHub Issue with the [**Propose a new suite**](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=new_suite.md) template
 - **New platform support:** Open a PR with a working platform script and at least one verified result
 - **Leaderboard question:** Check `leaderboard/generate.py` — it's well-commented

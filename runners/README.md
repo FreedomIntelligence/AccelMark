@@ -89,13 +89,15 @@ class MyFrameworkRunner(BenchmarkRunner):
     # You almost never need to restrict this below ["bf16", "fp16", "fp32"].
     SUPPORTED_PRECISIONS = ["bf16", "fp16", "fp32"]
 
-    # Declare supported quantization formats for Suite C.
-    # BF16 is always included. List only formats your framework can load.
-    # FP8 requires native FP8 hardware (H100, MI300X).
-    SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]  # H100 full support
-    # SUPPORTED_QUANTIZATIONS = ["w8a8", "w8a16", "w4a16"]        # A100 (no FP8)
-    # SUPPORTED_QUANTIZATIONS = ["w8a8", "w4a16"]                 # ROCm example
-    # SUPPORTED_QUANTIZATIONS = []                                 # Apple MLX
+    # Declare the framework's quantization backends. Suite C cross-references
+    # each precision_model_map entry's engine_kwargs.quantization against this
+    # list to decide which formats to run on this runner. The strings must
+    # match the engine's own backend names (e.g. vLLM's `quantization=` kwarg),
+    # NOT suite-level precision tags like W8A8/FP8.
+    SUPPORTED_QUANTIZATION_BACKENDS = ["fp8", "compressed-tensors", "gptq_marlin"]  # vLLM full
+    # SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq_marlin"]       # A100 (no FP8)
+    # SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq_marlin"]       # ROCm
+    # SUPPORTED_QUANTIZATION_BACKENDS = []                                          # Apple MLX
 
     def load_model(self, model_path: str, parallelism: dict) -> None:
         from myframework import Engine
@@ -268,7 +270,7 @@ Override these class attributes in your runner to declare what the framework sup
 | `SUPPORTS_ONLINE` | `True` | Set `False` if framework cannot handle concurrent requests |
 | `SUPPORTS_MULTI_CHIP` | `True` | Set `False` if no tensor parallelism — tensor_parallel_size from runner config and CLI is ignored; runner always uses 1 chip |
 | `SUPPORTED_PRECISIONS` | `["bf16", "fp16", "fp32"]` | Maximum compute precisions on capable hardware. Hardware detection automatically restricts this (V100 → FP16, MI100 → FP16, M1 → FP16). Only restrict below the default if your framework genuinely cannot use a precision regardless of hardware. |
-| `SUPPORTED_QUANTIZATIONS` | `[]` | Quantization formats supported for Suite C. Use uppercase strings: `"FP8"`, `"W8A8"`, `"W8A16"`, `"W4A16"`. BF16 is always supported and does not need to be listed. Empty list means this runner skips all quantized formats in Suite C. |
+| `SUPPORTED_QUANTIZATION_BACKENDS` | `[]` | Framework-level quantization backends Suite C can use, named after the engine's own identifiers (vLLM examples: `"fp8"`, `"compressed-tensors"`, `"gptq_marlin"`, `"awq"`). NOT the suite precision tags (`W8A8`, `FP8`, `W4A16` …). BF16/FP16/FP32 are always allowed and must not be listed. Empty list means this runner skips every quantized entry in Suite C's `precision_model_map`. |
 
 ---
 

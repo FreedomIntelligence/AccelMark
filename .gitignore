@@ -12,11 +12,20 @@ env/
 # ── Editor / IDE ────────────────────────────────────────────────────────────
 .idea/
 .vscode/
+.cursor/
 *.swp
 *.swo
 *~
 *.tmp
 .DS_Store
+.aider*
+.envrc
+.direnv/
+
+# ── Node / frontend tooling ─────────────────────────────────────────────────
+node_modules/
+.eslintcache
+npm-debug.log*
 
 # ── Test / lint caches ──────────────────────────────────────────────────────
 .pytest_cache/

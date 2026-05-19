@@ -1,0 +1,215 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "AccelMark Suite",
+  "description": "Contract for suites/<suite_id>/suite.json. Validates the fields BenchmarkRunner and the leaderboard generator depend on. Inline notes (keys prefixed with '_') are intentionally allowed.",
+  "type": "object",
+
+  "required": [
+    "suite_id",
+    "description",
+    "model_id",
+    "model_revision",
+    "dataset",
+    "scenarios",
+    "precision_required",
+    "allowed_precisions",
+    "max_model_len",
+    "output_tokens_max",
+    "concurrency_levels",
+    "num_runs",
+    "warmup_runs",
+    "request_count"
+  ],
+
+  "additionalProperties": true,
+
+  "properties": {
+    "suite_id": {
+      "type": "string",
+      "pattern": "^suite_[A-Z][A-Za-z0-9_]*$",
+      "description": "Folder name under suites/. Must match the directory name."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical model identifier (typically a HuggingFace repo id)."
+    },
+    "model_revision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Pinned model revision (commit SHA or tag) — never 'main'."
+    },
+    "dataset": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_]*_v[0-9]+$",
+      "description": "Dataset folder name under datasets/. Must exist as datasets/<name>/requests.jsonl."
+    },
+
+    "scenarios": {
+      "type": "object",
+      "required": ["default", "extra"],
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/scenarioName" },
+          "uniqueItems": true,
+          "minItems": 1,
+          "description": "Scenarios executed when `--scenario default` (or no --scenario) is passed."
+        },
+        "extra": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/scenarioName" },
+          "uniqueItems": true,
+          "description": "Opt-in scenarios runnable with --scenario all or --scenario <name>."
+        }
+      }
+    },
+
+    "precision_required": { "$ref": "#/definitions/precisionTag" },
+    "allowed_precisions": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/precisionTag" },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+
+    "max_model_len": { "type": "integer", "minimum": 128 },
+    "output_tokens_max": { "type": "integer", "minimum": 1 },
+
+    "concurrency_levels": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+
+    "num_runs": { "type": "integer", "minimum": 1 },
+    "warmup_runs": { "type": "integer", "minimum": 0 },
+    "warmup_minutes": { "type": "number", "minimum": 0 },
+
+    "request_count": { "type": "integer", "minimum": 1 },
+
+    "request_distribution": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "input_tokens_p25":  { "type": "number", "minimum": 0 },
+        "input_tokens_p50":  { "type": "number", "minimum": 0 },
+        "input_tokens_p75":  { "type": "number", "minimum": 0 },
+        "input_tokens_p99":  { "type": "number", "minimum": 0 },
+        "output_tokens_p50": { "type": "number", "minimum": 0 },
+        "output_tokens_p99": { "type": "number", "minimum": 0 },
+        "source": { "type": "string" }
+      }
+    },
+
+    "online_qps_levels": {
+      "type": ["array", "null"],
+      "items": { "type": "number", "exclusiveMinimum": 0 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "online_sla_ttft_ms":         { "type": ["integer", "null"], "minimum": 1 },
+    "online_sla_ttft_ms_relaxed": { "type": ["integer", "null"], "minimum": 1 },
+    "online_request_count":       { "type": ["integer", "null"], "minimum": 1 },
+    "online_warmup_runs":         { "type": "integer", "minimum": 0 },
+
+    "interactive_request_count":  { "type": ["integer", "null"], "minimum": 1 },
+    "interactive_warmup_runs":    { "type": "integer", "minimum": 0 },
+
+    "sustained_concurrency":      { "type": "integer", "minimum": 1 },
+    "duration_minutes":           { "type": "number",  "minimum": 0 },
+    "sample_interval_seconds":    { "type": "number",  "minimum": 0 },
+
+    "accuracy_threshold_delta":   { "type": "number" },
+
+    "required_chips": {
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "type": "string", "enum": ["auto"] }
+      ],
+      "description": "Either an explicit chip count or the literal string 'auto'."
+    },
+
+    "chip_counts_required": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1 },
+      "uniqueItems": true
+    },
+    "chip_counts_optional": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1 },
+      "uniqueItems": true
+    },
+    "chip_counts_all": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1 },
+      "uniqueItems": true
+    },
+
+    "speculative_draft_model_id":       { "type": "string", "minLength": 1 },
+    "speculative_draft_model_revision": { "type": "string", "minLength": 1 },
+    "speculative_num_tokens":           { "type": "integer", "minimum": 1 },
+
+    "burst_steady_qps":       { "type": "number", "exclusiveMinimum": 0 },
+    "burst_peak_qps":         { "type": "number", "exclusiveMinimum": 0 },
+    "burst_duration_seconds": { "type": "number", "exclusiveMinimum": 0 },
+    "burst_interval_seconds": { "type": "number", "exclusiveMinimum": 0 },
+
+    "precision_model_map": {
+      "type": "object",
+      "description": "Suite C only — maps each precision tag to a fixed quantized checkpoint.",
+      "patternProperties": {
+        "^[A-Z][A-Z0-9]*$": {
+          "type": "object",
+          "required": ["model_id", "model_revision"],
+          "additionalProperties": true,
+          "properties": {
+            "model_id":       { "type": "string", "minLength": 1 },
+            "model_revision": { "type": "string", "minLength": 1 },
+            "dtype_override": { "type": "string" },
+            "engine_kwargs":  { "type": "object" }
+          }
+        }
+      }
+    },
+    "precision_levels": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/precisionTag" },
+      "uniqueItems": true,
+      "description": "Suite C only — ordered list of precisions to evaluate."
+    },
+    "accuracy_thresholds": {
+      "type": "object",
+      "description": "Suite C only — per-format accuracy delta thresholds.",
+      "patternProperties": {
+        "^[A-Z][A-Z0-9]*$": { "type": "number" }
+      }
+    }
+  },
+
+  "definitions": {
+    "scenarioName": {
+      "type": "string",
+      "enum": [
+        "accuracy",
+        "offline",
+        "online",
+        "interactive",
+        "sustained",
+        "speculative",
+        "burst"
+      ]
+    },
+    "precisionTag": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*$",
+      "description": "Uppercase precision tag (BF16, FP16, FP32, FP8, W8A8, W8A16, W4A16, …)."
+    }
+  }
+}

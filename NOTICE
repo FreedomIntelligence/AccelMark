@@ -1,0 +1,71 @@
+AccelMark
+Copyright 2024-2026 Juhao Liang and The AccelMark Contributors
+
+This product includes software developed as part of the AccelMark project
+(https://github.com/JuhaoLiang1997/AccelMark).
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+================================================================================
+Third-party bundled data
+================================================================================
+
+The AccelMark source tree includes a small amount of third-party data so that
+benchmark runs are fully reproducible without network access. Each bundled
+dataset retains its upstream license; the Apache 2.0 license above covers only
+the AccelMark code, schemas, and configuration around it.
+
+--------------------------------------------------------------------------------
+1. datasets/sharegpt_standard_v1/requests.jsonl   (500 prompts)
+   datasets/sharegpt_edge_v1/requests.jsonl       (500 prompts)
+   datasets/sharegpt_longctx_v1/requests.jsonl    (200 prompts)
+--------------------------------------------------------------------------------
+
+  Derived from the ShareGPT GPT-4 conversational dataset curated by:
+
+    shibing624/sharegpt_gpt4
+    https://huggingface.co/datasets/shibing624/sharegpt_gpt4
+    License: CC BY 4.0
+            (https://creativecommons.org/licenses/by/4.0/)
+
+  The upstream corpus was assembled from publicly shared ChatGPT/GPT-4
+  conversations. AccelMark's variants are filtered subsets used as fixed
+  benchmark inputs; no derivation is intended as the authoritative copy.
+
+  Attribution: shibing624/sharegpt_gpt4 contributors, distributed under CC BY 4.0.
+
+  See datasets/<name>/README.md for the per-subset filtering criteria and
+  token statistics.
+
+--------------------------------------------------------------------------------
+2. schema/accuracy_subset.jsonl                   (100 multiple-choice items)
+--------------------------------------------------------------------------------
+
+  A 100-question subset of MMLU (Massive Multitask Language Understanding):
+
+    Hendrycks, D., Burns, C., Basart, S., Zou, A., Mazeika, M., Song, D.,
+    & Steinhardt, J. (2021). "Measuring Massive Multitask Language
+    Understanding." International Conference on Learning Representations.
+    https://arxiv.org/abs/2009.03300
+    https://github.com/hendrycks/test
+
+    License: MIT
+            (https://opensource.org/licenses/MIT)
+
+  AccelMark uses this subset purely as an accuracy gate (model-quality
+  sanity check) — it is NOT a measurement of MMLU performance. The subset
+  is immutable; see CONTRIBUTING.md "A few rules".
+
+================================================================================
+Third-party software dependencies
+================================================================================
+
+AccelMark's Python runtime dependencies (jsonschema, numpy, pyyaml, …) and
+the framework backends invoked by each runner (vLLM, SGLang, mlx-lm,
+vllm-ascend, vllm-rocm, vllm-tpu, vllm-musa, …) retain their own licenses.
+See each runner's requirements.txt for pinned versions; see the upstream
+projects for the corresponding license terms.

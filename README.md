@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://juhaoliang1997.github.io/AccelMark"><img src="https://img.shields.io/badge/leaderboard-live-brightgreen" alt="Live Leaderboard"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributions-welcome-orange.svg" alt="Contributions welcome"></a>
 </p>
 
@@ -21,6 +21,16 @@
   <a href="suites/README.md">Suites</a> ·
   <a href="https://github.com/JuhaoLiang1997/AccelMark/discussions">Discussions</a> ·
   <a href="DEVELOPMENT.md">Development</a>
+</p>
+
+<p align="center">
+  <img src="docs/assets/framework-overview.png"
+       alt="AccelMark framework pipeline: five stages — workload suites, pinned execution, validation, publish, consume — with a community contribution loop closing back to the suites."
+       width="980">
+</p>
+
+<p align="center">
+  <em>From workload spec to published result — every row on the leaderboard carries its runner hash, environment fingerprint, and accuracy receipt.</em>
 </p>
 
 ---
@@ -53,9 +63,11 @@ python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 
 # 4. Submit your result — open a pull request:
 #    git checkout -b submit/<your-hardware>
-#    cp results/your-result.json results/community/<runner_id>/result.json
-#    git add results/ env_info.json && git commit -m "results: <hardware>"
+#    git add results/community/<run_name>/ && git commit -m "results: <hardware>"
 #    gh pr create   # or open via the GitHub web UI
+#
+# <run_name> is the directory auto-created by run.py — it already contains
+# your result.json and env_info.json; no manual file moves are needed.
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. If you'd rather skip the PR workflow, [open a submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md) instead and a bot will draft the PR for you.
@@ -77,6 +89,18 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. If you'd rather skip 
 Suites A, B, and D also include optional **speculative decoding** and/or **burst load** extra scenarios — see [suites/README.md](suites/README.md) for per-suite details.
 
 See [suites/README.md](suites/README.md) for full specs, time budgets, SLA definitions, and metric descriptions.
+
+---
+
+## Currently on the leaderboard
+
+<p align="center">
+  <img src="docs/assets/chip-cloud.png"
+       alt="Chips currently on the AccelMark leaderboard, sized by submission count and coloured by vendor — NVIDIA, Huawei Ascend, Google TPU, Moore Threads, and Apple."
+       width="980">
+</p>
+
+A snapshot of accelerators that have at least one submission on the leaderboard. Tile size is proportional to submission count; colour denotes vendor. See the [**live leaderboard**](https://juhaoliang1997.github.io/AccelMark) for current rankings, per-suite breakdowns, and the underlying `result.json` files.
 
 ---
 
@@ -141,7 +165,7 @@ If you use AccelMark results in research, please cite:
 ```bibtex
 @misc{accelmark2026,
   title  = {AccelMark: Open Benchmark Leaderboard for AI Accelerators on LLM Workloads},
-  author = {Liang, Juhao and {The AccelMark Contributors}},
+  author = {Liang, Juhao and Zhang, Zhiyuan and Li, Siyu and Lin, Zhihang and Yu, Minchen and Zeng, Li and Chen, Zizhong and Sun, Ruoyu and Wang, Benyou},
   year   = {2026},
   url    = {https://github.com/JuhaoLiang1997/AccelMark}
 }
@@ -151,5 +175,6 @@ If you use AccelMark results in research, please cite:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Apache 2.0 — see [LICENSE](LICENSE).
 Submitted benchmark results are contributed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Bundled third-party data (datasets, accuracy subsets) keeps its upstream license — see [NOTICE](NOTICE).

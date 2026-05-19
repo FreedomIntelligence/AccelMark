@@ -3,7 +3,7 @@ name = "accelmark"
 version = "0.1.0"
 description = "Open benchmark leaderboard for AI accelerators on LLM workloads"
 readme = "README.md"
-license = "MIT"
+license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [
@@ -31,7 +31,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: System :: Benchmark",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -60,4 +60,20 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["loadgen*"]
+# AccelMark is primarily a clone-and-run repository (see `python run.py`
+# in README.md). `pip install -e .` is supported so contributors can pick
+# up the shared deps and import the helper packages (`loadgen`, the base
+# `runners.benchmark_runner` class, `serve.adapter` / `serve.capacity`,
+# and the `openclaw_skill` entry points) from anywhere — but there is no
+# top-level `accelmark` package to invoke via `python -m`.
+include = [
+    "loadgen*",
+    "runners*",
+    "serve*",
+    "openclaw_skill*",
+]
+exclude = [
+    "tests*",
+    "*.tests",
+    "*.tests.*",
+]

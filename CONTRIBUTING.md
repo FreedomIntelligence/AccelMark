@@ -320,6 +320,21 @@ CI then re-runs the schema validator and the runner-folder integrity check.
 When both pass and a contributor reviews the diff, the PR is merged and your
 result shows up on the leaderboard on the next site build.
 
+### Optional: preview the leaderboard locally
+
+The static site is generated from `results/` by `leaderboard/generate.py`.
+After dropping your result into `results/community/<run_name>/`, you can
+preview the final UI before opening the PR:
+
+```bash
+python leaderboard/generate.py                       # writes leaderboard/site/leaderboard.js + api/
+python -m http.server -d leaderboard/site 8000       # serve the static site
+# open http://localhost:8000
+```
+
+Both `leaderboard.js` and `leaderboard/site/api/` are gitignored — the GitHub
+Actions workflow regenerates them on every merge to `main`.
+
 ### Alternative: open a submission issue (no git required)
 
 If you'd rather not use git, paste your `result.json` into a

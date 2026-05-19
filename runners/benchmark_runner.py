@@ -82,12 +82,43 @@ class InferenceRequest:
     extra:        dict           = dataclass_field(default_factory=dict)
 
 
-# ── Scenario constants ────────────────────────────────────────────────────────
+# ── Scenario registry ────────────────────────────────────────────────────────
+#
+# Each ScenarioSpec describes how the base class should drive a scenario name
+# at runtime. Adding a new scenario means appending one row to
+# ``_SCENARIO_REGISTRY`` (and, if needed, implementing a new inference method
+# on the runner) — no edits to the if/elif ladders or merge order constants.
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class ScenarioSpec:
+    """Declarative contract for one scenario name."""
+
+    name: str
+    inference_kind: str            # "offline" | "streaming"
+    needs_streaming: bool          # raise an error if SUPPORTS_STREAMING is False
+    use_async: bool                # passed to load_model() as use_async
+    merge_key: Optional[str]       # key under metrics dict to merge (None = no-merge, e.g. accuracy)
+
+
+_SCENARIO_REGISTRY: "dict[str, ScenarioSpec]" = {
+    "accuracy":    ScenarioSpec("accuracy",    "offline",   False, False, None),
+    "offline":     ScenarioSpec("offline",     "offline",   False, False, "offline"),
+    "online":      ScenarioSpec("online",      "streaming", True,  True,  "online"),
+    "interactive": ScenarioSpec("interactive", "streaming", True,  True,  "interactive"),
+    "sustained":   ScenarioSpec("sustained",   "streaming", True,  True,  "sustained"),
+    "speculative": ScenarioSpec("speculative", "offline",   False, False, "speculative"),
+    "burst":       ScenarioSpec("burst",       "streaming", True,  True,  "burst"),
+    "training":    ScenarioSpec("training",    "offline",   False, False, "training"),
+}
 
 # Canonical order in which scenario metrics are merged into a suite result.
-_MERGE_SCENARIO_KEYS = [
-    "offline", "online", "interactive", "sustained", "training",
-    "speculative", "burst",
+# Derived from the registry so adding a new scenario only requires editing
+# the registry above.
+_MERGE_SCENARIO_KEYS: list[str] = [
+    spec.merge_key for spec in _SCENARIO_REGISTRY.values() if spec.merge_key
 ]
 
 # ── Base class ────────────────────────────────────────────────────────────────
@@ -315,13 +346,9 @@ class BenchmarkRunner(ABC):
         """
         return None
 
-    def format_prompt(self, prompt: str) -> str:
-        """
-        Apply chat template or other prompt formatting.
-        Override if the platform requires specific prompt formatting.
-        Default: return prompt unchanged.
-        """
-        return prompt
+    # ``format_prompt`` is defined further down (it depends on self.tokenizer
+    # which subclasses populate during load_model). Keeping it as a single
+    # source of truth avoids two definitions on the same class.
 
     def get_supported_precisions(
         self, chip_name: str, env_info: dict
@@ -933,6 +960,152 @@ class BenchmarkRunner(ABC):
 
         return args
 
+    # ── Scenario dispatch helpers ────────────────────────────────────────────
+
+    @classmethod
+    def _scenario_spec(cls, scenario: str) -> ScenarioSpec:
+        """Return the ScenarioSpec for ``scenario``.
+
+        Falls back to a synthetic streaming spec for names not declared in
+        the global registry — this preserves the historical behaviour where
+        unknown scenarios defaulted to streaming inference. New scenarios
+        SHOULD register themselves in ``_SCENARIO_REGISTRY`` so the merge
+        order and use_async flag are picked up automatically.
+        """
+        spec = _SCENARIO_REGISTRY.get(scenario)
+        if spec is not None:
+            return spec
+        return ScenarioSpec(
+            name=scenario,
+            inference_kind="streaming",
+            needs_streaming=False,
+            use_async=True,
+            merge_key=scenario,
+        )
+
+    def _resolve_inference_fn(self, scenario: str):
+        """Pick the runner's inference function for the given scenario name.
+
+        Dispatch rules are derived from the scenario registry:
+          - ``inference_kind == "offline"`` → ``inference_fn_offline``
+          - ``inference_kind == "streaming"`` → ``inference_fn_streaming``
+            (requires ``SUPPORTS_STREAMING = True``; aborts otherwise when
+            the scenario explicitly demands streaming)
+          - Unknown / non-streaming runners fall back to a sync wrapper
+            around ``inference_fn_offline``.
+        """
+        spec = self._scenario_spec(scenario)
+
+        if spec.inference_kind == "offline":
+            return self.inference_fn_offline
+
+        if spec.inference_kind == "streaming":
+            if self.SUPPORTS_STREAMING:
+                return self.inference_fn_streaming
+            if spec.needs_streaming:
+                print(
+                    f"Error: scenario '{scenario}' requires "
+                    f"SUPPORTS_STREAMING = True."
+                )
+                sys.exit(1)
+            def _sync_wrapper(request: InferenceRequest) -> InferenceResult:
+                results = self.inference_fn_offline([request])
+                return results[0]
+            return _sync_wrapper
+
+        raise ValueError(
+            f"Unknown inference_kind '{spec.inference_kind}' for scenario "
+            f"'{scenario}'. Update _SCENARIO_REGISTRY in benchmark_runner.py."
+        )
+
+    # ── Shared load-context preparation ───────────────────────────────────────
+
+    def _prepare_load_context(self, args, suite: dict, output_dir: Path) -> dict:
+        """
+        Common pre-`load_model` plumbing shared by accuracy and benchmark
+        scenarios. Resolves the precision-aware model id, model path,
+        parallelism, env_info, and configures the precision-related instance
+        variables (``_precision_dtype_override``, ``_precision_engine_kwargs``,
+        ``_effective_precision``). Returns a dict of locally useful values.
+
+        Centralising this avoids the precision_model_map / dtype-override /
+        engine_kwargs glue being copy-pasted between branches.
+        """
+        # For Suite C subprocesses, --precision is set and precision_model_map
+        # holds the actual checkpoint being loaded. Use it for the display
+        # label so the log doesn't show "Loading meta-llama/..." when in fact
+        # loading the FP8/W8A8/... variant.
+        _precision_arg = getattr(args, "precision", None)
+        _precision_model_map = suite.get("precision_model_map", {})
+        _fmt_entry = _precision_model_map.get((_precision_arg or "").upper(), {})
+
+        model_id = _fmt_entry.get("model_id") or suite.get("model_id", "unknown")
+        effective_model_path = self._resolve_model_path(
+            model_id, getattr(args, "model_path", None)
+        )
+
+        if getattr(args, "model_note", None):
+            self._model_note_override = args.model_note
+        if getattr(args, "model_name", None):
+            self._model_name_override = args.model_name
+
+        _par = getattr(self, "_parallelism", {})
+        parallelism = {
+            "tensor_parallel_size":   _par.get("tensor_parallel_size", 1),
+            "pipeline_parallel_size": _par.get("pipeline_parallel_size", 1),
+            "expert_parallel_size":   _par.get("expert_parallel_size", 1),
+            "data_parallel_size":     _par.get("data_parallel_size", 1),
+        }
+
+        # Read env_info.json from task directory. For standalone runs it's in
+        # output_dir; for --scenario all it's in the parent. For deeply nested
+        # subprocess runs it may be two levels up — search up the tree.
+        env_info: dict = {}
+        for _candidate in (output_dir, output_dir.parent, output_dir.parent.parent):
+            _p = _candidate / "env_info.json"
+            if _p.exists():
+                with open(_p) as _f:
+                    env_info = json.load(_f)
+                break
+
+        # Resolve precision — explicit --precision (e.g. set by a suite
+        # subprocess) takes priority over hardware-derived selection.
+        if getattr(args, "precision", None):
+            effective_precision = args.precision.upper()
+        else:
+            effective_precision = self._resolve_precision(suite, env_info)
+        self._effective_precision = effective_precision
+
+        # Inject dtype_override and engine_kwargs from precision_model_map
+        # so the runner can apply the correct quantization kernel and dtype.
+        self._precision_dtype_override = _fmt_entry.get("dtype_override")
+        self._precision_engine_kwargs = dict(_fmt_entry.get("engine_kwargs") or {})
+
+        # If the precision_model_map entry declares a quantization
+        # engine_kwarg, the runner will use dtype="auto", which lets vLLM
+        # default the compute dtype to BF16 internally. On pre-Ampere
+        # hardware (V100/T4) that does not support BF16 this silently
+        # produces wrong results — force float16 when no dtype_override was
+        # already set and the hardware can't do BF16.
+        _entry_has_quantization = bool(
+            (_fmt_entry.get("engine_kwargs") or {}).get("quantization")
+        )
+        if (
+            not self._precision_dtype_override
+            and _entry_has_quantization
+            and "BF16" not in self._detect_supported_precisions(env_info)
+        ):
+            self._precision_dtype_override = "float16"
+
+        return {
+            "model_id":             model_id,
+            "effective_model_path": effective_model_path,
+            "parallelism":          parallelism,
+            "env_info":             env_info,
+            "effective_precision":  effective_precision,
+            "fmt_entry":            _fmt_entry,
+        }
+
     # ── Single scenario ───────────────────────────────────────────────────────
 
     def _run_single_scenario(self, args, suite: dict) -> dict:
@@ -956,96 +1129,23 @@ class BenchmarkRunner(ABC):
             output_dir.mkdir(parents=True, exist_ok=True)
             self._setup_logging(str(output_dir))
 
-            # Resolve and load model
-            # For Suite C subprocesses, --precision is set — use precision_model_map
-            # to get the actual checkpoint model_id for display and metadata.
-            _precision_arg = getattr(args, "precision", None)
-            _precision_model_map = suite.get("precision_model_map", {})
-            _fmt_entry = _precision_model_map.get((_precision_arg or "").upper(), {})
-            model_id = (
-                _fmt_entry.get("model_id")
-                or suite.get("model_id", "unknown")
-            )
-            effective_model_path = self._resolve_model_path(
-                model_id, getattr(args, "model_path", None)
-            )
-            if getattr(args, "model_note", None):
-                self._model_note_override = args.model_note
-            if getattr(args, "model_name", None):
-                self._model_name_override = args.model_name
-            _par    = getattr(self, "_parallelism", {})
-            tp_size = _par.get("tensor_parallel_size", 1)
-            pp_size = _par.get("pipeline_parallel_size", 1)
-            ep_size = _par.get("expert_parallel_size", 1)
-            dp_size = _par.get("data_parallel_size", 1)
-
-            # Load env_info for precision resolution (search up to 2 levels)
-            _acc_env_info: dict = {}
-            for _c in [output_dir, output_dir.parent, output_dir.parent.parent]:
-                _p = _c / "env_info.json"
-                if _p.exists():
-                    with open(_p) as _f:
-                        _acc_env_info = json.load(_f)
-                    break
-
-            if getattr(args, "precision", None):
-                effective_precision = args.precision.upper()
-            else:
-                effective_precision = self._resolve_precision(suite, _acc_env_info)
-            self._effective_precision = effective_precision
-
-            # Inject dtype_override and engine_kwargs from precision_model_map entry
-            # so the runner can apply the correct quantization kernel and dtype.
-            self._precision_dtype_override  = _fmt_entry.get("dtype_override")
-            self._precision_engine_kwargs   = dict(_fmt_entry.get("engine_kwargs") or {})
-
-            # If the precision_model_map entry declares a quantization engine_kwarg, the
-            # runner will use dtype="auto", which lets vLLM default the compute dtype to
-            # BF16 internally. On pre-Ampere hardware (V100/T4) that doesn't support BF16
-            # this silently produces wrong results. If no dtype_override was already set
-            # by the suite entry and the hardware doesn't support BF16, force float16.
-            _entry_has_quantization = bool(
-                (_fmt_entry.get("engine_kwargs") or {}).get("quantization")
-            )
-            if (not self._precision_dtype_override
-                    and _entry_has_quantization
-                    and "BF16" not in self._detect_supported_precisions(_acc_env_info)):
-                self._precision_dtype_override = "float16"
-
-            if (args.scenario == "speculative"
-                    and "speculative_model" not in self._precision_engine_kwargs):
-                _draft_id = suite.get("speculative_draft_model_id")
-                if _draft_id:
-                    _saved = (
-                        getattr(self, "_model_source", None),
-                        getattr(self, "_model_name_override", None),
-                        getattr(self, "_model_note_override", None),
-                    )
-                    _draft_path = self._resolve_model_path(_draft_id, None)
-                    (self._model_source,
-                     self._model_name_override,
-                     self._model_note_override) = _saved
-                    self._precision_engine_kwargs["speculative_model"] = _draft_path
-                    self._precision_engine_kwargs.setdefault(
-                        "num_speculative_tokens",
-                        suite.get("speculative_num_tokens", 4),
-                    )
-                    self._precision_engine_kwargs.setdefault(
-                        "speculative_draft_tensor_parallel_size", 1,
-                    )
+            # Resolve precision-aware model_id, parallelism, env_info, and
+            # configure self._precision_* via the shared helper. Accuracy is
+            # always plain decode, so no speculative-draft injection here.
+            _ctx = self._prepare_load_context(args, suite, output_dir)
+            model_id             = _ctx["model_id"]
+            effective_model_path = _ctx["effective_model_path"]
+            parallelism          = _ctx["parallelism"]
 
             print(f"Loading {model_id} for accuracy check...")
             t_load = time.perf_counter()
             self._current_scenario = "accuracy"
             self._advance_dist_port()
             self.load_model(effective_model_path, {
-                "tensor_parallel_size":   tp_size,
-                "pipeline_parallel_size": pp_size,
-                "expert_parallel_size":   ep_size,
-                "data_parallel_size":     dp_size,
-                "max_tokens":             suite.get("output_tokens_max", 512),
-                "max_model_len":          suite.get("max_model_len"),
-                "use_async":              False,
+                **parallelism,
+                "max_tokens":    suite.get("output_tokens_max", 512),
+                "max_model_len": suite.get("max_model_len"),
+                "use_async":     False,
             })
             print(f"Model loaded in {round(time.perf_counter() - t_load, 1)}s")
 
@@ -1072,74 +1172,17 @@ class BenchmarkRunner(ABC):
         # Load submitter profile
         profile = self._load_submitter_profile()
 
-        # Resolve model path
-        # For Suite C subprocesses, --precision is set and precision_model_map holds
-        # the actual checkpoint being loaded. Use it for the display label so the log
-        # doesn't show "Loading meta-llama/Llama-3.1-8B-Instruct..." when loading FP8.
-        _precision_arg = getattr(args, "precision", None)
-        _precision_model_map = suite.get("precision_model_map", {})
-        _fmt_entry = _precision_model_map.get((_precision_arg or "").upper(), {})
-        model_id = (
-            _fmt_entry.get("model_id")
-            or suite.get("model_id", "unknown")
-        )
-        effective_model_path = self._resolve_model_path(
-            model_id, getattr(args, "model_path", None)
-        )
-        if getattr(args, "model_note", None):
-            self._model_note_override = args.model_note
-        if getattr(args, "model_name", None):
-            self._model_name_override = args.model_name
+        # Resolve precision-aware model_id, parallelism, env_info, and
+        # configure self._precision_* via the shared helper.
+        _ctx = self._prepare_load_context(args, suite, output_dir)
+        model_id             = _ctx["model_id"]
+        effective_model_path = _ctx["effective_model_path"]
+        parallelism          = _ctx["parallelism"]
+        env_info             = _ctx["env_info"]
 
-        # Read env_info.json from task directory.
-        # For standalone runs it's in output_dir; for --scenario all it's in the parent.
-        # For deeply nested subprocess runs it may be two levels up — search up the tree.
-        env_info = {}
-        for _candidate in [output_dir, output_dir.parent, output_dir.parent.parent]:
-            _p = _candidate / "env_info.json"
-            if _p.exists():
-                with open(_p) as f:
-                    env_info = json.load(f)
-                break
-
-        # Load model
-        _par    = getattr(self, "_parallelism", {})
-        tp_size = _par.get("tensor_parallel_size", 1)
-        pp_size = _par.get("pipeline_parallel_size", 1)
-        ep_size = _par.get("expert_parallel_size", 1)
-        dp_size = _par.get("data_parallel_size", 1)
-
-        print(f"Loading {model_id}...")
-        t_load_start = time.perf_counter()
-        self._current_scenario = args.scenario
-        self._advance_dist_port()
-
-        # Resolve precision — handles BF16→FP16 fallback for older hardware.
-        # Explicit --precision (e.g. set by a suite subprocess) takes priority.
-        if getattr(args, "precision", None):
-            effective_precision = args.precision.upper()
-        else:
-            effective_precision = self._resolve_precision(suite, env_info)
-        self._effective_precision = effective_precision
-
-        # Inject dtype_override and engine_kwargs from precision_model_map entry
-        # so the runner can apply the correct quantization kernel and dtype.
-        self._precision_dtype_override  = _fmt_entry.get("dtype_override")
-        self._precision_engine_kwargs   = dict(_fmt_entry.get("engine_kwargs") or {})
-
-        # If the precision_model_map entry declares a quantization engine_kwarg, the
-        # runner will use dtype="auto", which lets vLLM default the compute dtype to
-        # BF16 internally. On pre-Ampere hardware (V100/T4) that doesn't support BF16
-        # this silently produces wrong results. If no dtype_override was already set
-        # by the suite entry and the hardware doesn't support BF16, force float16.
-        _entry_has_quantization = bool(
-            (_fmt_entry.get("engine_kwargs") or {}).get("quantization")
-        )
-        if (not self._precision_dtype_override
-                and _entry_has_quantization
-                and "BF16" not in self._detect_supported_precisions(env_info)):
-            self._precision_dtype_override = "float16"
-
+        # Inject speculative-decoding draft model (only relevant in the
+        # ``speculative`` scenario branch — accuracy / offline / online never
+        # need a draft model and the suite contract may not declare one).
         if (args.scenario == "speculative"
                 and "speculative_model" not in self._precision_engine_kwargs):
             _draft_id = suite.get("speculative_draft_model_id")
@@ -1162,14 +1205,16 @@ class BenchmarkRunner(ABC):
                     "speculative_draft_tensor_parallel_size", 1,
                 )
 
+        print(f"Loading {model_id}...")
+        t_load_start = time.perf_counter()
+        self._current_scenario = args.scenario
+        self._advance_dist_port()
+
         self.load_model(effective_model_path, {
-            "tensor_parallel_size":   tp_size,
-            "pipeline_parallel_size": pp_size,
-            "expert_parallel_size":   ep_size,
-            "data_parallel_size":     dp_size,
-            "max_tokens":             suite.get("output_tokens_max", 512),
-            "max_model_len":          suite.get("max_model_len"),
-            "use_async":              args.scenario not in ("offline", "accuracy", "speculative"),
+            **parallelism,
+            "max_tokens":    suite.get("output_tokens_max", 512),
+            "max_model_len": suite.get("max_model_len"),
+            "use_async":     self._scenario_spec(args.scenario).use_async,
         })
         model_load_seconds = round(time.perf_counter() - t_load_start, 1)
         print(f"Model loaded in {model_load_seconds}s")
@@ -1204,29 +1249,10 @@ class BenchmarkRunner(ABC):
             chip_count=chip_count,
         )
 
-        # Select inference function
-        if args.scenario == "offline":
-            inference_fn = self.inference_fn_offline
-        elif args.scenario == "speculative":
-            inference_fn = self.inference_fn_offline
-        elif args.scenario == "sustained":
-            if not self.SUPPORTS_STREAMING:
-                print(f"Error: sustained scenario requires SUPPORTS_STREAMING = True.")
-                sys.exit(1)
-            inference_fn = self.inference_fn_streaming
-        elif args.scenario == "burst":
-            if not self.SUPPORTS_STREAMING:
-                print(f"Error: burst scenario requires SUPPORTS_STREAMING = True.")
-                sys.exit(1)
-            inference_fn = self.inference_fn_streaming
-        elif self.SUPPORTS_STREAMING:
-            inference_fn = self.inference_fn_streaming
-        else:
-            # Fallback for platforms without streaming
-            def _sync_wrapper(request: InferenceRequest) -> InferenceResult:
-                results = self.inference_fn_offline([request])
-                return results[0]
-            inference_fn = _sync_wrapper
+        # Select inference function via the scenario registry. Unknown
+        # scenarios fall through with a sensible default — streaming when
+        # supported, otherwise a sync wrapper around inference_fn_offline.
+        inference_fn = self._resolve_inference_fn(args.scenario)
 
         # Run benchmark
         benchmark_start = datetime.now(timezone.utc)
@@ -1457,7 +1483,6 @@ class BenchmarkRunner(ABC):
                     return
                 else:
                     print("  --skip-accuracy-gate set -- continuing anyway.\n")
-                    acc_result = None
                     acc_result = None
             else:
                 # Subprocess succeeded — read accuracy.json written by the child
@@ -1746,6 +1771,87 @@ class BenchmarkRunner(ABC):
         except Exception:
             return None
 
+    def _score_accuracy_questions(self, questions: list) -> tuple:
+        """
+        Run the accuracy question bank through ``inference_fn_offline`` and
+        score the answers.
+
+        Returns ``(score, correct, total, wrong_examples, scored_outputs)``
+        — shared by both :meth:`_run_accuracy_scenario` and
+        :meth:`_run_accuracy_scenario_for_format` so the inference/scoring
+        path stays identical (only baseline policy differs between callers).
+        """
+        # Build InferenceRequest objects with raw (unformatted) prompts.
+        # format_prompt() is called by the runner's inference_fn_offline
+        # internally — passing raw prompts here avoids double-formatting.
+        accuracy_requests = []
+        for i, q in enumerate(questions):
+            raw = (
+                f"Question: {q['question']}\n"
+                f"A) {q['choices'][0]}\n"
+                f"B) {q['choices'][1]}\n"
+                f"C) {q['choices'][2]}\n"
+                f"D) {q['choices'][3]}\n"
+                f"Answer:"
+            )
+            accuracy_requests.append(InferenceRequest(
+                prompt=raw,
+                request_id=i,
+            ))
+
+        t_start = time.perf_counter()
+        try:
+            results = self.inference_fn_offline(accuracy_requests)
+        except Exception as e:
+            raise RuntimeError(f"Accuracy inference failed: {e}") from e
+        elapsed = round(time.perf_counter() - t_start, 1)
+        print(f"Completed in {elapsed}s")
+
+        correct = 0
+        wrong_examples: list[str] = []
+        scored_outputs: list[dict] = []
+        for i, result in enumerate(results):
+            text = (result.output_text or "").strip()
+            match = re.search(r"\b([ABCD])\b", text.upper())
+            predicted = match.group(1) if match else "?"
+            expected = questions[i].get("answer", "")
+            is_correct = (predicted == expected)
+            if is_correct:
+                correct += 1
+            elif len(wrong_examples) < 3:
+                wrong_examples.append(
+                    f"  Q: {questions[i]['question'][:65]}\n"
+                    f"  Expected: {expected}, Got: {predicted} "
+                    f"(raw: '{text[:20]}')"
+                )
+            scored_outputs.append({
+                "question_id": questions[i].get("question_id", i),
+                "question":    questions[i]["question"],
+                "choices":     questions[i]["choices"],
+                "expected":    expected,
+                "predicted":   predicted,
+                "correct":     is_correct,
+                "raw_output":  text[:500],
+            })
+
+        score = round(correct / len(questions), 4) if questions else 0.0
+        return score, correct, len(questions), wrong_examples, scored_outputs
+
+    @staticmethod
+    def _write_accuracy_artifacts(
+        output_dir: Path, acc: dict, scored_outputs: list
+    ) -> None:
+        """Persist accuracy.json and accuracy_outputs.jsonl for one scenario."""
+        acc_path = output_dir / "accuracy.json"
+        with open(acc_path, "w") as f:
+            json.dump(acc, f, indent=2)
+        print(f"Saved to: {acc_path}")
+
+        outputs_path = output_dir / "accuracy_outputs.jsonl"
+        with open(outputs_path, "w") as f:
+            for row in scored_outputs:
+                f.write(json.dumps(row) + "\n")
+
     def _run_accuracy_scenario(
         self,
         suite: dict,
@@ -1770,62 +1876,8 @@ class BenchmarkRunner(ABC):
         print(f"  Precision: {getattr(self, '_effective_precision', None) or suite.get('precision_required', 'BF16')}")
         print(f"{'='*60}\n")
 
-        # Build InferenceRequest objects with raw (unformatted) prompts.
-        # format_prompt() is called by the runner's inference_fn_offline internally —
-        # passing raw prompts here avoids double-formatting.
-        accuracy_requests = []
-        for i, q in enumerate(questions):
-            raw = (
-                f"Question: {q['question']}\n"
-                f"A) {q['choices'][0]}\n"
-                f"B) {q['choices'][1]}\n"
-                f"C) {q['choices'][2]}\n"
-                f"D) {q['choices'][3]}\n"
-                f"Answer:"
-            )
-            accuracy_requests.append(InferenceRequest(
-                prompt=raw,
-                request_id=i,
-            ))
-
-        # Run through inference_fn_offline — same model, framework, precision
-        t_start = time.perf_counter()
-        try:
-            results = self.inference_fn_offline(accuracy_requests)
-        except Exception as e:
-            raise RuntimeError(f"Accuracy inference failed: {e}") from e
-        elapsed = round(time.perf_counter() - t_start, 1)
-        print(f"Completed in {elapsed}s")
-
-        # Score answers
-        correct = 0
-        wrong_examples = []
-        scored_outputs = []
-        for i, result in enumerate(results):
-            text = (result.output_text or "").strip()
-            match = re.search(r"\b([ABCD])\b", text.upper())
-            predicted = match.group(1) if match else "?"
-            expected = questions[i].get("answer", "")
-            is_correct = (predicted == expected)
-            if is_correct:
-                correct += 1
-            elif len(wrong_examples) < 3:
-                wrong_examples.append(
-                    f"  Q: {questions[i]['question'][:65]}\n"
-                    f"  Expected: {expected}, Got: {predicted} "
-                    f"(raw: '{text[:20]}')"
-                )
-            scored_outputs.append({
-                "question_id": questions[i].get("question_id", i),
-                "question": questions[i]["question"],
-                "choices": questions[i]["choices"],
-                "expected": expected,
-                "predicted": predicted,
-                "correct": is_correct,
-                "raw_output": text[:500],
-            })
-
-        score = round(correct / len(questions), 4) if questions else 0.0
+        score, correct, total, wrong_examples, scored_outputs = \
+            self._score_accuracy_questions(questions)
 
         # Compare to baseline — one-sided: score must not drop more than threshold
         # below baseline. Scoring ABOVE baseline is always valid.
@@ -1844,7 +1896,7 @@ class BenchmarkRunner(ABC):
         valid = (delta >= -threshold) if delta is not None else True
 
         # Print results
-        print(f"Score: {correct}/{len(questions)} = {score:.4f}")
+        print(f"Score: {correct}/{total} = {score:.4f}")
         if baseline_score is not None:
             sign = "+" if delta >= 0 else ""
             print(f"Baseline: {baseline_score:.4f}")
@@ -1859,30 +1911,18 @@ class BenchmarkRunner(ABC):
                   f"(threshold: {threshold}) — submission will be flagged")
 
         acc = {
-            "subset_score": score,
+            "subset_score":   score,
             "baseline_delta": delta,
-            "valid": valid,
-            "framework": self._get_framework_name(),
-            "precision": getattr(self, "_effective_precision", None) or suite.get("precision_required", "BF16"),
+            "valid":          valid,
+            "framework":      self._get_framework_name(),
+            "precision":      getattr(self, "_effective_precision", None) or suite.get("precision_required", "BF16"),
             "notes": (
                 f"Integrated accuracy check — used same "
                 f"{self._get_framework_name()} instance as benchmark."
             ),
         }
 
-        # Save accuracy.json to submission directory
-        acc_path = output_dir / "accuracy.json"
-        with open(acc_path, "w") as f:
-            json.dump(acc, f, indent=2)
-        print(f"Saved to: {acc_path}")
-
-        # Save per-question outputs (gitignored — for local debugging only)
-        outputs_path = output_dir / "accuracy_outputs.jsonl"
-        with open(outputs_path, "w") as f:
-            for row in scored_outputs:
-                f.write(json.dumps(row) + "\n")
-        print(f"Per-question outputs saved to: {outputs_path}")
-
+        self._write_accuracy_artifacts(output_dir, acc, scored_outputs)
         return acc
 
     def _run_accuracy_scenario_for_format(
@@ -1918,60 +1958,8 @@ class BenchmarkRunner(ABC):
         print(f"  Framework: {self._get_framework_name()}")
         print(f"{'='*60}\n")
 
-        # Build InferenceRequest objects with raw (unformatted) prompts.
-        # format_prompt() is called by the runner's inference_fn_offline internally.
-        accuracy_requests = []
-        for i, q in enumerate(questions):
-            raw = (
-                f"Question: {q['question']}\n"
-                f"A) {q['choices'][0]}\n"
-                f"B) {q['choices'][1]}\n"
-                f"C) {q['choices'][2]}\n"
-                f"D) {q['choices'][3]}\n"
-                f"Answer:"
-            )
-            accuracy_requests.append(InferenceRequest(
-                prompt=raw,
-                request_id=i,
-            ))
-
-        t_start = time.perf_counter()
-        try:
-            results = self.inference_fn_offline(accuracy_requests)
-        except Exception as e:
-            raise RuntimeError(f"Accuracy inference failed: {e}") from e
-        elapsed = round(time.perf_counter() - t_start, 1)
-        print(f"Completed in {elapsed}s")
-
-        # Score answers
-        correct = 0
-        wrong_examples = []
-        scored_outputs = []
-        for i, result in enumerate(results):
-            text = (result.output_text or "").strip()
-            match = re.search(r"\b([ABCD])\b", text.upper())
-            predicted = match.group(1) if match else "?"
-            expected  = questions[i].get("answer", "")
-            is_correct = (predicted == expected)
-            if is_correct:
-                correct += 1
-            elif len(wrong_examples) < 3:
-                wrong_examples.append(
-                    f"  Q: {questions[i]['question'][:65]}\n"
-                    f"  Expected: {expected}, Got: {predicted} "
-                    f"(raw: '{text[:20]}')"
-                )
-            scored_outputs.append({
-                "question_id": questions[i].get("question_id", i),
-                "question":    questions[i]["question"],
-                "choices":     questions[i]["choices"],
-                "expected":    expected,
-                "predicted":   predicted,
-                "correct":     is_correct,
-                "raw_output":  text[:500],
-            })
-
-        score = round(correct / len(questions), 4) if questions else 0.0
+        score, correct, total, wrong_examples, scored_outputs = \
+            self._score_accuracy_questions(questions)
 
         # Per-format baseline and threshold
         baseline_score = self._load_accuracy_baseline_for_format(model_id, precision)
@@ -1982,7 +1970,7 @@ class BenchmarkRunner(ABC):
         # None = baseline not set yet (placeholder) — not a failure
 
         # Print results
-        print(f"Score: {correct}/{len(questions)} = {score:.4f}")
+        print(f"Score: {correct}/{total} = {score:.4f}")
         if baseline_score is not None:
             sign = "+" if delta >= 0 else ""
             print(f"Baseline ({precision}): {baseline_score:.4f}")
@@ -2010,18 +1998,7 @@ class BenchmarkRunner(ABC):
             "notes":          f"Suite C per-format accuracy check. Threshold: {threshold}",
         }
 
-        # Write accuracy.json
-        acc_path = output_dir / "accuracy.json"
-        with open(acc_path, "w") as f:
-            json.dump(acc, f, indent=2)
-        print(f"Saved to: {acc_path}")
-
-        # Write per-question outputs (gitignored)
-        outputs_path = output_dir / "accuracy_outputs.jsonl"
-        with open(outputs_path, "w") as f:
-            for row in scored_outputs:
-                f.write(json.dumps(row) + "\n")
-
+        self._write_accuracy_artifacts(output_dir, acc, scored_outputs)
         return acc
 
     # ── GPU memory release ────────────────────────────────────────────────────
@@ -2111,28 +2088,10 @@ class BenchmarkRunner(ABC):
         ep_size = _par.get("expert_parallel_size", 1)
         dp_size = _par.get("data_parallel_size", 1)
 
-        # For Suite C subprocesses, --precision is set and precision_model_map holds
-        # the actual quantized checkpoint. Use it so each per-format result.json records
-        # the real model_id/revision (e.g. RedHatAI/...-FP8), not the suite-level model_id.
-        _result_precision = (
-            getattr(self, "_effective_precision", None)
-            or getattr(args, "precision", None)
-        )
-        _pm_entry = suite.get("precision_model_map", {}).get(
-            (_result_precision or "").upper(), {}
-        )
-        _result_model_id = (
-            _pm_entry.get("model_id")
-            or suite.get("model_id", "unknown")
-        )
-        _result_model_revision = (
-            _pm_entry.get("model_revision")
-            or suite.get("model_revision", "unknown")
-        )
-
-        # For Suite C subprocesses, --precision is set and precision_model_map holds
-        # the actual quantized checkpoint. Use it so each per-format result.json records
-        # the real model_id/revision (e.g. RedHatAI/...-FP8), not the suite-level model_id.
+        # For Suite C subprocesses, --precision is set and precision_model_map
+        # holds the actual quantized checkpoint. Use it so each per-format
+        # result.json records the real model_id/revision (e.g.
+        # RedHatAI/...-FP8), not the suite-level model_id.
         _result_precision = (
             getattr(self, "_effective_precision", None)
             or getattr(args, "precision", None)
@@ -2196,7 +2155,7 @@ class BenchmarkRunner(ABC):
                 "subset_score": None,
                 "baseline_delta": None,
                 "valid": False,
-        "notes": "Run --scenario accuracy to check model accuracy.",
+                "notes": "Run --scenario accuracy to check model accuracy.",
             },
             "meta": {
                 "submitted_by": profile.get("submitted_by", ""),
