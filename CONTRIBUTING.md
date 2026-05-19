@@ -36,8 +36,6 @@ gh pr create   # or open the PR via the GitHub web UI
 
 That's it. CI validates the result automatically; merging the PR publishes it to the leaderboard.
 
-> _Prefer not to use git?_ Open a [Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md), paste your `result.json`, and the CI bot will draft the PR on your behalf.
-
 ---
 
 ## One-time setup
@@ -335,23 +333,13 @@ python -m http.server -d leaderboard/site 8000       # serve the static site
 Both `leaderboard.js` and `leaderboard/site/api/` are gitignored — the GitHub
 Actions workflow regenerates them on every merge to `main`.
 
-### Alternative: open a submission issue (no git required)
-
-If you'd rather not use git, paste your `result.json` into a
-[Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
-A bot will validate the JSON, draft a PR with the files in the right place,
-and link it back to your issue. You don't need to touch git or fork the repo.
-
-> **Why paste instead of attach?** The bot reads `result.json` directly from
-> the issue body. File attachments are not accessible to GitHub Actions.
-
 ---
 
 ## Leaderboard tiers
 
 | Tier | How to get it | Leaderboard placement |
 |------|--------------|----------------------|
-| **community** | Submit a PR (or issue → bot-drafted PR) and pass CI validation | Community tab |
+| **community** | Submit a PR and pass CI validation | Community tab |
 | **verified** | Independently reproduced on the same hardware/runner within 5% | Main leaderboard |
 
 To promote a community result to **verified**, anyone with the same hardware

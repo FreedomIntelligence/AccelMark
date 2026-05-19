@@ -7,7 +7,7 @@ import {
 } from "../data.js";
 import { esc, fmtNum, buildHash, shortModel } from "../utils.js";
 
-const GH_BASE = "https://github.com/JuhaoLiang1997/AccelMark";
+const GH_BASE = "https://github.com/FreedomIntelligence/AccelMark";
 
 // One concrete finding per suite, distilled from the paper.  Kept short
 // enough to fit inside a single card but specific enough to be useful.

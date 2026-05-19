@@ -40,7 +40,7 @@ providing an initial assessment. We aim to publish a fix and credit the
 reporter within **30 days** of acknowledgement; if a fix is going to take
 longer we will say so in the response.
 
-[advisory]: https://github.com/JuhaoLiang1997/AccelMark/security/advisories/new
+[advisory]: https://github.com/FreedomIntelligence/AccelMark/security/advisories/new
 
 When reporting, please include:
 

@@ -14,7 +14,7 @@ assignees: ''
   merging.
 
   Full walk-through: DEVELOPMENT.md "Adding a new suite"
-                     https://github.com/JuhaoLiang1997/AccelMark/blob/main/DEVELOPMENT.md
+                     https://github.com/FreedomIntelligence/AccelMark/blob/main/DEVELOPMENT.md
 -->
 
 ## Why this suite?
