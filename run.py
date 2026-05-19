@@ -128,8 +128,11 @@ def cmd_list(args) -> int:
             print(f"      {meta.get('description', '')}")
             if supersedes_chain:
                 print(f"      Replaces: {supersedes_chain[0]}")
+            install_sh = RUNNERS_DIR / rid / "install.sh"
             req_path = RUNNERS_DIR / rid / "requirements.txt"
-            if req_path.exists():
+            if install_sh.exists():
+                print(f"      Install: bash runners/{rid}/install.sh")
+            elif req_path.exists():
                 print(f"      Install: pip install -r runners/{rid}/requirements.txt")
             print()
 

@@ -561,8 +561,19 @@ class BenchmarkRunner(ABC):
         unexpected path or from the base class directly).
         """
         try:
-            # Get the path of the concrete subclass file (not benchmark_runner.py)
-            runner_file = Path(inspect.getfile(self.__class__))
+            # Resolve runner.py path. Prefer the defining module's __file__ because
+            # torch may patch inspect.getfile() and break dynamic imports.
+            runner_file = None
+            mod = sys.modules.get(self.__class__.__module__)
+            if mod is not None:
+                mod_file = getattr(mod, "__file__", None)
+                if mod_file:
+                    runner_file = Path(mod_file).resolve()
+            if runner_file is None or runner_file.name != "runner.py":
+                try:
+                    runner_file = Path(inspect.getfile(self.__class__)).resolve()
+                except (TypeError, OSError):
+                    return None
 
             # The runner must be inside a folder named {platform}_{name}_{hash8}
             folder      = runner_file.parent

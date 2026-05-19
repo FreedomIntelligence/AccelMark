@@ -1,0 +1,19 @@
+# AccelMark — NVIDIA vLLM 0.20.x dependencies
+#
+# Install:  bash install.sh
+# Do not:   pip install -r requirements.txt   (pip mistral-common[image] resolver bug)
+#
+# Python 3.10–3.12. Reference stack: torch 2.11 + vllm 0.20.1 + CUDA 13.0
+# CUDA 12.8: PYTORCH_INDEX=https://download.pytorch.org/whl/cu128 bash install.sh
+
+# --- vLLM stack (install.sh stages these; torch/transformers pulled by vllm) ---
+mistral-common==1.11.2
+vllm==0.20.1
+
+# --- AccelMark utilities ---
+numpy>=1.26.0,<2.0
+jsonschema>=4.20.0
+psutil>=7.0.0
+tqdm>=4.66.0
+nvidia-ml-py>=13.0
+PyYAML>=6.0

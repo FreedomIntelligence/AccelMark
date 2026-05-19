@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_vllm020_0f6c56e4",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 80.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-05-18T05:56:25.789998+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "580.65.06",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "nvidia",
+    "accelerator_topology": "\tGPU0\tNIC0\tNIC1\tNIC2\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tPXB\tSYS\tSYS\t0-63,128-191\t0\t\tN/A\nNIC0\tPXB\t X \tSYS\tSYS\t\t\t\t\nNIC1\tSYS\tSYS\t X \tPIX\t\t\t\t\nNIC2\tSYS\tSYS\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "AMD EPYC 7742 64-Core Processor",
+      "physical_cores": 128,
+      "logical_cores": 255,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.7,
+    "pcie_generation": "PCIe Gen 4",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.12.0",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 13.0",
+    "pytorch_version": "2.11.0+cu130"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.20.1+transformers-5.8.1",
+    "driver_version": "580.65.06",
+    "runtime_version": "CUDA 13.0",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.12.0"
+  },
+  "model": {
+    "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+    "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e",
+    "model_name": null,
+    "model_note": "INT4 weight-only quantization by RedHatAI using AWQ. Weights INT4, activations FP16.",
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "W4A16",
+    "effective_dtype": null,
+    "quantization_method": "gptq",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "tensor_parallel_size": 1,
+      "enforce_eager": true,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    },
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 10,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 50.42,
+          "ttft_ms_p90": 64.62,
+          "ttft_ms_p99": 104.73,
+          "tpot_ms_p50": 18.15,
+          "tpot_ms_p90": 19.16,
+          "tpot_ms_p99": 19.62,
+          "elapsed_seconds_median": 71.1,
+          "sla_met": true
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 57.89,
+          "ttft_ms_p90": 72.82,
+          "ttft_ms_p99": 84.96,
+          "tpot_ms_p50": 21.11,
+          "tpot_ms_p90": 23.03,
+          "tpot_ms_p99": 24.31,
+          "elapsed_seconds_median": 38.5,
+          "sla_met": true
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 97.24,
+          "ttft_ms_p90": 6365.08,
+          "ttft_ms_p99": 7073.94,
+          "tpot_ms_p50": 25.46,
+          "tpot_ms_p90": 27.98,
+          "tpot_ms_p99": 31.21,
+          "elapsed_seconds_median": 29.2,
+          "sla_met": false
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 918.12,
+          "ttft_ms_p90": 9805.4,
+          "ttft_ms_p99": 10437.5,
+          "tpot_ms_p50": 25.2,
+          "tpot_ms_p90": 27.67,
+          "tpot_ms_p99": 32.45,
+          "elapsed_seconds_median": 26.7,
+          "sla_met": false
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-05-18",
+    "time": "14:53:48",
+    "run_id": "b1eb2d96",
+    "run_name": "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm020_0f6c56e4_b1eb2d96",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm020_0f6c56e4/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-05-18T14:45:34.287656+00:00",
+    "benchmark_end_time": "2026-05-18T14:53:48.716951+00:00",
+    "benchmark_elapsed_minutes": 8.2,
+    "model_load_seconds": 29.3
+  }
+}
