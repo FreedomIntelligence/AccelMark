@@ -912,6 +912,56 @@ class InferenceResult:
 | speculative | Offline throughput with draft model (same path as offline, engine uses speculative decoding) | `throughput_tokens_per_sec`; optional `task.runtime_metrics.acceptance_rate` if runner overrides `get_runtime_metrics()` |
 | burst | Two-state bursty load: alternates steady QPS and burst QPS windows | `burst_degradation_ratio` (burst_ttft_p99 / steady_ttft_p99); `sla_met_during_burst` |
 
+### Warmup contract
+
+Cold engines inflate the first few timed requests by hundreds of ms (JIT
+compile, CUDA-graph allocation, KV cache priming). Each scenario discards
+a configurable prefix:
+
+| Scenario | Suite key | Default | Unit |
+|---|---|---|---|
+| offline / speculative / interactive | `warmup_runs` / `interactive_warmup_runs` | `1` / `0` | full passes |
+| online | `online_warmup_requests` | `10` | dummy requests fired before QPS sweep |
+| burst | `burst_warmup_requests` | `10` | dummy requests fired before first cycle |
+| sustained | `warmup_minutes` | `2` | minutes of samples excluded from analysis |
+
+Warmup-time exceptions are logged and swallowed — they never abort the
+timed phase.
+
+### Reliability metrics
+
+Each scenario emits an inter-run reliability block alongside its primary
+metrics so submitters can prove their results are reproducible without
+shipping `samples.jsonl`. Shape:
+
+```json
+{
+  "n":         3,
+  "mean":      1234.5,
+  "std":         21.3,
+  "cv_pct":      1.7,
+  "stability": "stable",
+  "runs": [1230.1, 1255.2, 1218.2]
+}
+```
+
+`stability` thresholds (tunable): `cv_pct ≤ 2 → stable ✓`,
+`≤ 5 → noisy ⚠`, otherwise `unstable ✗`.
+
+| Scenario | Field path | Reliability source |
+|---|---|---|
+| offline | `metrics.offline.results_by_concurrency[i].throughput_tokens_per_sec_reliability` | per-run throughput across `num_runs` |
+| online | `metrics.online.results_by_qps[i].ttft_ms_p99_reliability` | per-run TTFT p99 across `num_runs` |
+| interactive | `metrics.interactive.ttft_ms_p99_reliability` | per-run TTFT p99 across `num_runs` |
+| sustained | `metrics.sustained.throughput_post_warmup_reliability` | per-interval throughput (post-warmup) |
+| burst | `metrics.burst.recovery_time_seconds` (+ `_per_cycle`) | seconds until rolling p99 returns to ≤ 1.5× steady baseline |
+
+Backfilling these for existing results is done by
+`tools/backfill_distribution_stats.py`, which reads each result's local
+`samples.jsonl` and writes the summary stats in place. Offline reliability
+cannot be backfilled because per-run throughput was never recorded in
+`samples.jsonl` historically — it stays `{}` for old offline results.
+
 ---
 
 ## Schema and Validation

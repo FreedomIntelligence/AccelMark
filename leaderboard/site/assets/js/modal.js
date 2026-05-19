@@ -293,6 +293,8 @@ function _fillModal(row) {
     parts.push(esc(row.precision) + fallback);
   }
   if (row.date) parts.push(esc(fmtDate(row.date)));
+  const pill = _reliabilityPill(row);
+  if (pill) parts.push(pill);
   subEl.innerHTML = parts.filter(Boolean).join(' <span class="sep">·</span> ');
 
   // Footer: submission + script link.
@@ -392,6 +394,171 @@ function _detailSection(title, rows) {
   `;
 }
 
+// ── Reliability rendering ────────────────────────────────────────────────────
+//
+// Reliability blocks are emitted by loadgen.py for each scenario starting in
+// the "feat: emit reliability stats" series. Each block has shape:
+//   { n, mean, std, cv_pct, stability: "stable" | "noisy" | "unstable", runs: [...] }
+// Older results (pre-feature) carry an empty {} which we skip silently — the
+// section header is suppressed if no scenario reported a block, so old runs
+// look the same as before.
+
+const _STABILITY_ICON = { stable: "✓", noisy: "⚠", unstable: "✗" };
+
+function _hasReliability(block) {
+  return block && typeof block === "object" && block.cv_pct != null;
+}
+
+// Pick the worst (highest CV%) reliability block from a row's viz, used by
+// the modal subtitle pill. Returns { cv_pct, stability, scenario, metric } or
+// null. The "scenario" hint helps users find where to drill in.
+function _pickWorstReliability(row) {
+  const viz = row.viz || {};
+  let worst = null;
+  const consider = (b, scenario, metric) => {
+    if (!_hasReliability(b)) return;
+    if (!worst || b.cv_pct > worst.cv_pct) {
+      worst = { cv_pct: b.cv_pct, stability: b.stability, scenario, metric };
+    }
+  };
+
+  // offline (per-concurrency, multiple blocks)
+  if (viz.offline && Array.isArray(viz.offline.throughput_reliability)) {
+    viz.offline.throughput_reliability.forEach((b) =>
+      consider(b, "offline", "throughput"));
+  }
+  // online (per-QPS, multiple blocks)
+  if (viz.online && Array.isArray(viz.online.ttft_ms_p99_reliability)) {
+    viz.online.ttft_ms_p99_reliability.forEach((b) =>
+      consider(b, "online", "TTFT p99"));
+  }
+  // interactive (single block)
+  consider(viz.interactive && viz.interactive.ttft_ms_p99_reliability,
+           "interactive", "TTFT p99");
+  // sustained (single block)
+  consider(viz.sustained && viz.sustained.throughput_post_warmup_reliability,
+           "sustained", "throughput");
+  return worst;
+}
+
+// Build the small `cv X.X% ✓` pill that appears in the modal subtitle row.
+function _reliabilityPill(row) {
+  const w = _pickWorstReliability(row);
+  if (!w) return "";
+  const icon = _STABILITY_ICON[w.stability] || "·";
+  const cls  = "modal-reliab-pill " + (w.stability || "unknown");
+  const title = `Worst inter-run CV across scenarios: ${w.cv_pct}% ` +
+    `(${w.scenario} ${w.metric}). ` +
+    `≤2% stable, ≤5% noisy, >5% unstable.`;
+  return `<span class="${esc(cls)}" title="${esc(title)}">` +
+         `reliability ${icon} cv ${esc(String(w.cv_pct))}%</span>`;
+}
+
+// Render one row per scenario in the Details tab. Skipped if a scenario has
+// no block (older results). Burst gets recovery_time_seconds appended.
+function _reliabilityRows(row) {
+  const viz = row.viz || {};
+  const rows = [];
+
+  const fmtBlock = (b) =>
+    `${b.cv_pct}% · ${_STABILITY_ICON[b.stability] || ""} ` +
+    `<span class="muted-note">${esc(b.stability || "")} (n=${b.n})</span>`;
+
+  // offline — show the worst (largest CV) of all client_concurrency rows.
+  // That's the limiting concurrency for stability claims.
+  if (viz.offline && Array.isArray(viz.offline.throughput_reliability)) {
+    const labels = viz.offline.labels || [];
+    const blocks = viz.offline.throughput_reliability;
+    const indexed = blocks
+      .map((b, i) => ({ b, label: labels[i] || `cc=${i}` }))
+      .filter((x) => _hasReliability(x.b));
+    if (indexed.length) {
+      indexed.sort((a, b) => b.b.cv_pct - a.b.cv_pct);
+      const w = indexed[0];
+      rows.push(_detailRow(
+        `Offline throughput (cc=${w.label})`,
+        fmtBlock(w.b),
+        { html: true },
+      ));
+    }
+  }
+
+  if (viz.online && Array.isArray(viz.online.ttft_ms_p99_reliability)) {
+    const labels = viz.online.labels || [];
+    const blocks = viz.online.ttft_ms_p99_reliability;
+    const indexed = blocks
+      .map((b, i) => ({ b, label: labels[i] || `qps=${i}` }))
+      .filter((x) => _hasReliability(x.b));
+    if (indexed.length) {
+      indexed.sort((a, b) => b.b.cv_pct - a.b.cv_pct);
+      const w = indexed[0];
+      rows.push(_detailRow(
+        `Online TTFT p99 (qps=${w.label})`,
+        fmtBlock(w.b),
+        { html: true },
+      ));
+    }
+  }
+
+  if (viz.interactive && _hasReliability(viz.interactive.ttft_ms_p99_reliability)) {
+    rows.push(_detailRow(
+      "Interactive TTFT p99",
+      fmtBlock(viz.interactive.ttft_ms_p99_reliability),
+      { html: true },
+    ));
+  }
+
+  if (viz.sustained && _hasReliability(viz.sustained.throughput_post_warmup_reliability)) {
+    rows.push(_detailRow(
+      "Sustained throughput (post-warmup)",
+      fmtBlock(viz.sustained.throughput_post_warmup_reliability),
+      { html: true },
+    ));
+  }
+
+  // Burst — non-CV stability metric: time-to-recover after a peak window.
+  if (viz.burst && viz.burst.recovery_time_seconds != null) {
+    const sec = Number(viz.burst.recovery_time_seconds);
+    rows.push(_detailRow(
+      "Burst recovery time",
+      `${sec.toFixed(2)} s ` +
+      `<span class="muted-note">median per-cycle, threshold 1.5× steady p99</span>`,
+      { html: true },
+    ));
+  } else if (viz.burst && Array.isArray(viz.burst.recovery_time_seconds_per_cycle)
+             && viz.burst.recovery_time_seconds_per_cycle.length === 0) {
+    // Burst ran but never recovered within any cycle's post-burst window.
+    rows.push(_detailRow(
+      "Burst recovery time",
+      `not measurable <span class="muted-note">(never returned to baseline within steady window)</span>`,
+      { html: true },
+    ));
+  }
+
+  return rows;
+}
+
+// Flatten env_info.vendor_details into rows. Keys that are objects/arrays are
+// JSON-stringified for display; null/empty values are dropped. We intentionally
+// do not try to humanise key names — vendors disagree on terminology and the
+// keys themselves are the documented contract.
+function _vendorDetailRows(row) {
+  const obj = (row.detail || {}).env_vendor_details;
+  if (!obj || typeof obj !== "object") return [];
+  const rows = [];
+  for (const k of Object.keys(obj).sort()) {
+    const v = obj[k];
+    if (v === null || v === undefined || v === "") continue;
+    if (Array.isArray(v) && v.length === 0) continue;
+    if (typeof v === "object" && !Array.isArray(v) && Object.keys(v).length === 0) continue;
+    const display = (typeof v === "object")
+      ? JSON.stringify(v)
+      : String(v);
+    rows.push(_detailRow(k, display, { mono: true }));
+  }
+  return rows;
+}
+
 function _renderDetails(row, panel) {
   const d = row.detail || {};
 
@@ -457,6 +624,8 @@ function _renderDetails(row, panel) {
       d.run_pp != null ? _detailRow("Pipeline parallel size", d.run_pp) : null,
       d.run_dp != null ? _detailRow("Data parallel size",     d.run_dp) : null,
     ]),
+    _detailSection("Reliability", _reliabilityRows(row)),
+    _detailSection("Vendor-specific environment", _vendorDetailRows(row)),
     _detailSection("Accuracy", [
       _detailRow("Subset score", d.acc_score, {
         format: (v) => Number(v).toFixed(2),

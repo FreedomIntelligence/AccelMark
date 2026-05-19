@@ -127,6 +127,26 @@
   margin-right: 0.3rem;
 }
 
+/* Inter-run reliability pill that lives in the modal subtitle. Colours
+ * track --good / --warn / --bad so the existing palette controls dark-mode
+ * behaviour. We intentionally tone down opacity so the badge does not
+ * compete with the primary metric callouts above. */
+.modal-reliab-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.modal-reliab-pill.stable   { color: var(--good, #2da44e); }
+.modal-reliab-pill.noisy    { color: var(--warn, #d29922); }
+.modal-reliab-pill.unstable { color: var(--bad,  #cf222e); }
+.modal-reliab-pill.unknown  { color: var(--fg-faint); }
+
 .modal-close {
   background: transparent;
   border: 1px solid var(--border-soft);

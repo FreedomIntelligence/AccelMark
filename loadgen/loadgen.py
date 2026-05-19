@@ -66,6 +66,112 @@ def _percentile(data: list, p: float):
     return sorted_data[lo] + (sorted_data[hi] - sorted_data[lo]) * (idx - lo)
 
 
+# ── Reliability helpers ──────────────────────────────────────────────────────
+#
+# These produce the inter-run variability metrics consumed by the leaderboard
+# UI's "Reliability" panel. They live here (not in types.py) because they are
+# pure functions over already-collected per-run lists and are easier to
+# regression-test alongside the scenario implementations.
+#
+# Coefficient of Variation (CV) = std / mean × 100 %, computed with ddof=1
+# (sample std) when n ≥ 2. Returns None when input is too small or the mean
+# is non-positive, in which case the frontend hides the badge entirely so
+# users do not see a meaningless "stable ✓" on a single-run measurement.
+
+# Stability thresholds. These are intentionally permissive on first launch —
+# real-world hardware noise (especially memory thrashing on first cycle)
+# regularly crosses 2 % even on healthy systems. Tune in the schema after we
+# observe the first wave of submissions.
+_STABILITY_THRESHOLD_STABLE_PCT = 2.0
+_STABILITY_THRESHOLD_NOISY_PCT  = 5.0
+
+
+def _cv_pct(values: list) -> Optional[float]:
+    """Coefficient of variation as a percentage. None if too small / undefined."""
+    if not values or len(values) < 2:
+        return None
+    arr = np.asarray(values, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if len(arr) < 2:
+        return None
+    mean = float(arr.mean())
+    if mean <= 0:
+        return None
+    std = float(arr.std(ddof=1))
+    return round(std / mean * 100.0, 2)
+
+
+def _stability_label(cv_pct: Optional[float]) -> Optional[str]:
+    """Map a CV percentage to a stable/noisy/unstable label, or None."""
+    if cv_pct is None:
+        return None
+    if cv_pct <= _STABILITY_THRESHOLD_STABLE_PCT:
+        return "stable"
+    if cv_pct <= _STABILITY_THRESHOLD_NOISY_PCT:
+        return "noisy"
+    return "unstable"
+
+
+def _reliability_block(values: list, *, decimals: int = 2) -> dict:
+    """
+    Build the standard {n, mean, std, cv_pct, stability, runs} block emitted
+    per metric. Returns an empty dict (not None) so the result schema retains
+    a consistent shape — frontend gates on `cv_pct` being numeric.
+    """
+    if not values:
+        return {}
+    arr = np.asarray(values, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if len(arr) == 0:
+        return {}
+    mean = float(arr.mean())
+    std  = float(arr.std(ddof=1)) if len(arr) >= 2 else 0.0
+    cv   = _cv_pct(arr.tolist())
+    return {
+        "n":         int(len(arr)),
+        "mean":      round(mean, decimals),
+        "std":       round(std, decimals),
+        "cv_pct":    cv,
+        "stability": _stability_label(cv),
+        "runs":      [round(float(v), decimals) for v in arr.tolist()],
+    }
+
+
+def _compute_recovery_time(
+    arrivals: list,
+    ttfts: list,
+    *,
+    threshold_ms: float,
+    window_s: float = 3.0,
+    min_samples: int = 5,
+) -> Optional[float]:
+    """
+    Find the elapsed time (seconds, relative to the start of the post-burst
+    steady window) at which a rolling-window p99 of TTFT first falls below
+    `threshold_ms`. Returns None if it never recovers within the window or
+    if there are too few samples to compute a stable percentile.
+
+    `arrivals` and `ttfts` are parallel arrays — arrivals must be relative
+    times in seconds from the start of the measurement window.
+    """
+    if not arrivals or len(arrivals) < min_samples:
+        return None
+    pairs = sorted(zip(arrivals, ttfts))
+    a = [p[0] for p in pairs]
+    t = [p[1] for p in pairs]
+    n = len(a)
+    j = 0
+    for i in range(n):
+        while j < i and a[j] < a[i] - window_s:
+            j += 1
+        if i - j + 1 < min_samples:
+            continue
+        window = t[j:i + 1]
+        if float(np.percentile(window, 99)) < threshold_ms:
+            return round(float(a[i]), 2)
+    return None
+
+
 class AccelMarkLoadGen:
 
     def __init__(
@@ -154,8 +260,7 @@ class AccelMarkLoadGen:
                     "_run_interactive requires an async inference_fn(request: InferenceRequest) -> InferenceResult. "
                     "Pass an async coroutine (inference_fn_streaming)."
                 )
-            loop = asyncio.get_event_loop()
-            return loop.run_until_complete(self._run_interactive_async(inference_fn))
+            return asyncio.run(self._run_interactive_async(inference_fn))
         elif self.scenario == "training":
             return self._run_training(inference_fn)
         elif self.scenario == "multiturn":
@@ -340,6 +445,12 @@ class AccelMarkLoadGen:
         if len(ttft_p99s) >= 2:
             ttft_p99_drift_ms = round(ttft_p99s[-1] - ttft_p99s[0], 1)
 
+        # Inter-sample throughput stability across the post-warmup window.
+        # This is conceptually distinct from `throttle_ratio` (min/max): CV
+        # measures dispersion around the mean and is a better signal for
+        # "the chip throttles intermittently" vs "the chip is degrading".
+        throughput_cv_block = _reliability_block(throughputs, decimals=1)
+
         return {
             "sustained": {
                 "sustained_concurrency":               sustained_concurrency,
@@ -351,6 +462,7 @@ class AccelMarkLoadGen:
                 "throttle_ratio":                      throttle_ratio,
                 "throttle_onset_minute":               throttle_onset_minute,
                 "ttft_p99_drift_ms":                   ttft_p99_drift_ms,
+                "throughput_post_warmup_reliability":  throughput_cv_block,
             }
         }
 
@@ -518,6 +630,12 @@ class AccelMarkLoadGen:
                     "power_watts_avg": None,
                     "power_watts_peak": None,
                     "oom": False,
+                    # Per-run throughput reliability: lets the UI show "stable ✓ /
+                    # noisy ⚠ / unstable ✗" without forcing the user to download
+                    # samples.jsonl. `runs` preserves the underlying values so
+                    # future stability rules can be recomputed without a re-run.
+                    "throughput_tokens_per_sec_reliability":
+                        _reliability_block(run_throughputs, decimals=2),
                     "_throughput_note": "output_only",
                     "_concurrency_note": (
                         "client_concurrency is the number of requests sent simultaneously. "
@@ -548,8 +666,7 @@ class AccelMarkLoadGen:
                 "Pass an async coroutine (inference_fn_streaming), "
                 "not a sync wrapper."
             )
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(self._run_online_async(inference_fn))
+        return asyncio.run(self._run_online_async(inference_fn))
 
     async def _warmup_requests(self, async_inference_fn, count: int, label: str) -> None:
         """
@@ -658,6 +775,15 @@ class AccelMarkLoadGen:
             tpot_p90 = float(np.percentile(all_tpots, 90)) if all_tpots else 0
             tpot_p99 = float(np.percentile(all_tpots, 99)) if all_tpots else 0
 
+            # Per-run p99s, used to surface inter-run TTFT variability.
+            # We compute each run's p99 independently; the scenario's overall
+            # `ttft_ms_p99` (above) is computed by pooling all per-request
+            # TTFTs, which is the headline number, while this CV captures
+            # whether that number is reproducible across `num_runs`.
+            ttft_p99_per_run = [
+                float(np.percentile(run, 99)) for run in run_ttfts if run
+            ]
+
             sla_met = ttft_p99 < sla_ms
             if sla_met:
                 max_valid_qps = target_qps
@@ -677,6 +803,8 @@ class AccelMarkLoadGen:
                 "tpot_ms_p99": round(tpot_p99, 2),
                 "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1),
                 "sla_met": sla_met,
+                "ttft_ms_p99_reliability":
+                    _reliability_block(ttft_p99_per_run, decimals=2),
             })
 
         self._write_samples(all_samples)
@@ -741,7 +869,16 @@ class AccelMarkLoadGen:
         all_samples: list[SampleRecord] = []
 
         async def fire_window(qps: float, duration_secs: float, label: str):
-            """Fire requests at Poisson QPS for duration_secs. Returns list of InferenceResult."""
+            """
+            Fire requests at Poisson QPS for duration_secs.
+
+            Returns
+                results       : list[InferenceResult] in arrival order
+                elapsed       : wall-clock seconds the window took
+                arrival_times : list[float] — each request's intended arrival
+                                relative to window start (parallel to results).
+                                Used to compute post-burst recovery_time_seconds.
+            """
             n_expected = max(1, int(qps * duration_secs * 1.5))
             requests_pool = (self.requests * ((n_expected // len(self.requests)) + 2))[:n_expected]
 
@@ -750,7 +887,7 @@ class AccelMarkLoadGen:
 
             pairs = [(req, t) for req, t in zip(requests_pool, arrival_times) if t < duration_secs]
             if not pairs:
-                return [], 0.0
+                return [], 0.0, []
 
             t_start = loop.time()
 
@@ -762,26 +899,49 @@ class AccelMarkLoadGen:
 
             results = list(await asyncio.gather(*[send(req, t) for req, t in pairs]))
             elapsed = loop.time() - t_start
-            return results, elapsed
+            window_arrivals = [t for (_, t) in pairs]
+            return results, elapsed, window_arrivals
+
+        # Each cycle's per-request data, captured so we can compute
+        # recovery_time_seconds in a single post-processing pass after
+        # all cycles complete.
+        cycle_data: list[dict] = []
 
         for cycle_idx in range(num_runs):
             tqdm.write(f"[burst] cycle {cycle_idx + 1}/{num_runs} — steady({steady_qps} qps)...")
 
-            steady_results, steady_elapsed = await fire_window(steady_qps, steady_dur, "steady")
-            steady_ttfts = [r.first_token_time_ms for r in steady_results
-                            if r.success and r.first_token_time_ms is not None]
+            steady_results, steady_elapsed, steady_arrivals = await fire_window(
+                steady_qps, steady_dur, "steady"
+            )
+            steady_ttfts_pairs = [
+                (a, r.first_token_time_ms)
+                for r, a in zip(steady_results, steady_arrivals)
+                if r.success and r.first_token_time_ms is not None
+            ]
+            steady_ttfts = [v for _, v in steady_ttfts_pairs]
 
             tqdm.write(f"[burst] cycle {cycle_idx + 1}/{num_runs} — burst({burst_qps} qps)...")
 
-            burst_results, burst_elapsed = await fire_window(burst_qps, burst_dur, "burst")
-            burst_ttfts = [r.first_token_time_ms for r in burst_results
-                           if r.success and r.first_token_time_ms is not None]
+            burst_results, burst_elapsed, burst_arrivals = await fire_window(
+                burst_qps, burst_dur, "burst"
+            )
+            burst_ttfts_pairs = [
+                (a, r.first_token_time_ms)
+                for r, a in zip(burst_results, burst_arrivals)
+                if r.success and r.first_token_time_ms is not None
+            ]
+            burst_ttfts = [v for _, v in burst_ttfts_pairs]
 
             all_steady_ttfts.extend(steady_ttfts)
             all_burst_ttfts.extend(burst_ttfts)
 
             cycle_steady_p99 = float(np.percentile(steady_ttfts, 99)) if steady_ttfts else None
             cycle_burst_p99  = float(np.percentile(burst_ttfts, 99)) if burst_ttfts else None
+
+            cycle_data.append({
+                "steady_pairs": steady_ttfts_pairs,
+                "burst_pairs":  burst_ttfts_pairs,
+            })
 
             results_by_cycle.append({
                 "cycle": cycle_idx + 1,
@@ -808,6 +968,39 @@ class AccelMarkLoadGen:
         sla_met_during_burst = (burst_p99 < sla_ms) if burst_p99 is not None else False
         degradation = round(burst_p99 / steady_p99, 3) if (burst_p99 and steady_p99) else None
 
+        # ── Recovery time after burst ─────────────────────────────────────────
+        # Definition: seconds elapsed within a post-burst steady window before
+        # the rolling p99 TTFT drops below 1.5× the long-term steady baseline.
+        #
+        # Implementation: the loop above runs `steady → burst` per cycle, so
+        # cycle (i+1)'s steady window is the post-burst recovery window for
+        # cycle i's burst. We compute one recovery time per cycle that has a
+        # successor steady window, then emit the median (more robust than
+        # mean to a single outlier cycle).
+        recovery_baseline_p99 = steady_p99  # long-term, post-warmup baseline
+        cycle_recovery_times: list[float] = []
+        if recovery_baseline_p99 and recovery_baseline_p99 > 0:
+            threshold = 1.5 * recovery_baseline_p99
+            for i in range(len(cycle_data) - 1):
+                post = cycle_data[i + 1]["steady_pairs"]
+                if not post:
+                    continue
+                arrivals = [a for a, _ in post]
+                ttfts    = [t for _, t in post]
+                rec = _compute_recovery_time(
+                    arrivals, ttfts,
+                    threshold_ms=threshold,
+                    window_s=min(3.0, steady_dur / 2),
+                    min_samples=5,
+                )
+                if rec is not None:
+                    cycle_recovery_times.append(rec)
+
+        recovery_time_seconds = (
+            round(float(np.median(cycle_recovery_times)), 2)
+            if cycle_recovery_times else None
+        )
+
         sla_icon = "✓" if sla_met_during_burst else "✗"
         chip_str = f"  ({self.chip_count} chips)" if self.chip_count > 1 else ""
         tqdm.write(
@@ -832,6 +1025,15 @@ class AccelMarkLoadGen:
             "burst_ttft_p99_ms":  round(burst_p99, 2) if burst_p99 else None,
             "sla_met_during_burst": sla_met_during_burst,
             "burst_degradation_ratio": degradation,
+            "recovery_time_seconds": recovery_time_seconds,
+            "recovery_time_seconds_per_cycle": [
+                round(v, 2) for v in cycle_recovery_times
+            ] if cycle_recovery_times else [],
+            "_recovery_definition": (
+                "Median seconds within the post-burst steady window before "
+                "rolling TTFT p99 drops below 1.5x the long-term steady baseline. "
+                "Lower is better; None means it never recovered within the window."
+            ),
             "results_by_cycle": results_by_cycle,
         }}
 
@@ -841,8 +1043,7 @@ class AccelMarkLoadGen:
             raise TypeError(
                 "_run_burst requires an async inference_fn(request: InferenceRequest) -> InferenceResult."
             )
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(self._run_burst_async(inference_fn))
+        return asyncio.run(self._run_burst_async(inference_fn))
 
     # ------------------------------------------------------------------
     # Interactive scenario
@@ -853,11 +1054,15 @@ class AccelMarkLoadGen:
         Send one request at a time, waiting for completion before sending the next.
         Measures single-request latency in isolation (no queueing pressure).
         Uses the same async engine as online to ensure consistent TTFT measurement.
+
+        Per-run TTFT p99s are captured so the result emits an inter-run
+        reliability block alongside the pooled metrics.
         """
         all_ttfts: list[float] = []
         all_tpots: list[float] = []
         all_samples: list[SampleRecord] = []
         run_elapsed_times: list[float] = []
+        ttft_p99_per_run: list[float] = []
 
         total_runs = self.warmup_runs + self.suite["num_runs"]
 
@@ -908,6 +1113,8 @@ class AccelMarkLoadGen:
             all_ttfts.extend(run_ttfts)
             all_tpots.extend(run_tpots)
             run_elapsed_times.append(run_elapsed)
+            if run_ttfts:
+                ttft_p99_per_run.append(float(np.percentile(run_ttfts, 99)))
 
             if run_ttfts:
                 tqdm.write(
@@ -929,6 +1136,8 @@ class AccelMarkLoadGen:
             "tpot_ms_p99": round(float(np.percentile(all_tpots, 99)), 2) if all_tpots else None,
             "peak_memory_gb": None,
             "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1) if run_elapsed_times else None,
+            "ttft_ms_p99_reliability":
+                _reliability_block(ttft_p99_per_run, decimals=2),
         }}
 
     # ------------------------------------------------------------------
