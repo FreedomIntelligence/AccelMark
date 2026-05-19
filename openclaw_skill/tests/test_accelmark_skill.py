@@ -4,7 +4,8 @@ Unit tests for openclaw_skill/accelmark_skill.py
 Covers the skill entry point functions — no real GPU, no real network.
 All external calls (urllib, subprocess) are mocked.
 - main(): follow-up flows for "submit" and "details"
-- handle_submit(): GitHub Issue posting, success and failure paths
+- handle_submit(): renders PR submission instructions (the skill no
+  longer auto-creates a GitHub Issue — AccelMark is PR-only)
 - query_ranking(): graceful None on any network error
 - format_details(): table rendering, ← best marker
 - _summarize_chips(): GPU env and CPU-only env
@@ -99,36 +100,38 @@ def test_query_ranking_returns_none_for_unknown_chip():
 
 # ── handle_submit ─────────────────────────────────────────────────────────────
 
-def test_handle_submit_success():
-    mock_resp = MagicMock()
-    mock_resp.__enter__ = lambda s: s
-    mock_resp.__exit__ = MagicMock(return_value=False)
+def test_handle_submit_returns_pr_instructions():
+    msg = handle_submit(_make_result(), openclaw_username="testuser")
 
-    with patch("urllib.request.urlopen", return_value=mock_resp):
-        msg = handle_submit(_make_result(), openclaw_username="testuser")
-
-    assert "✅" in msg
-    assert "leaderboard" in msg.lower()
+    # Instructions, not auto-submission confirmation
+    assert "pull request" in msg.lower() or "pr" in msg.lower()
+    assert "results/community/" in msg
+    assert "CONTRIBUTING.md" in msg
 
 
 def test_handle_submit_sets_submitted_by():
     result = _make_result()
-    mock_resp = MagicMock()
-    mock_resp.__enter__ = lambda s: s
-    mock_resp.__exit__ = MagicMock(return_value=False)
-
-    with patch("urllib.request.urlopen", return_value=mock_resp):
-        handle_submit(result, openclaw_username="alice")
-
+    handle_submit(result, openclaw_username="alice")
     assert result["meta"]["submitted_by"] == "alice"
 
 
-def test_handle_submit_failure_returns_error_message():
-    with patch("urllib.request.urlopen", side_effect=Exception("connection refused")):
-        msg = handle_submit(_make_result(), openclaw_username="bob")
+def test_handle_submit_embeds_result_json():
+    result = _make_result(chip_name="NVIDIA H100")
+    msg = handle_submit(result, openclaw_username="bob")
 
-    assert "❌" in msg
-    assert "manually" in msg.lower() or "github" in msg.lower()
+    # The full result.json is embedded in a ```json fenced block so the
+    # user can copy it directly into their PR.
+    assert "```json" in msg
+    assert "NVIDIA H100" in msg
+    assert '"submitted_by": "bob"' in msg
+
+
+def test_handle_submit_makes_no_network_call():
+    # Regression: this function used to POST to api.github.com. The new
+    # implementation must be purely local — no urllib usage at all.
+    with patch("urllib.request.urlopen") as mock_urlopen:
+        handle_submit(_make_result(), openclaw_username="carol")
+    mock_urlopen.assert_not_called()
 
 
 # ── format_details ────────────────────────────────────────────────────────────
@@ -163,14 +166,11 @@ def test_main_details_without_pending_result():
 
 def test_main_submit_with_pending_result():
     ctx = {"accelmark_pending_result": _make_result(), "user": {"username": "carol"}}
-    mock_resp = MagicMock()
-    mock_resp.__enter__ = lambda s: s
-    mock_resp.__exit__ = MagicMock(return_value=False)
+    msg = main("submit", ctx)
 
-    with patch("urllib.request.urlopen", return_value=mock_resp):
-        msg = main("submit", ctx)
-
-    assert "✅" in msg
+    # New flow: hand the user PR instructions instead of auto-posting.
+    assert "pull request" in msg.lower() or "pr" in msg.lower()
+    assert "CONTRIBUTING.md" in msg
 
 
 def test_main_details_with_pending_result():

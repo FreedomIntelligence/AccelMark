@@ -70,7 +70,7 @@ python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 # your result.json and env_info.json; no manual file moves are needed.
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. If you'd rather skip the PR workflow, [open a submission issue](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=community_submission.md) instead and a bot will draft the PR for you.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ---
 
@@ -136,7 +136,7 @@ Adding a new runner? See [CONTRIBUTING.md#adding-a-new-runner](CONTRIBUTING.md#a
 
 | Tier | How | Where |
 |------|-----|-------|
-| **community** | Submitted by anyone via PR (or issue → bot-drafted PR) and passes CI validation | Community tab |
+| **community** | Submitted by anyone via PR and passes CI validation | Community tab |
 | **verified** | Independently reproduced on the same hardware/runner and matches the original within 5% | Main leaderboard |
 
 Community results are fully visible and comparable — they just haven't been independently reproduced yet. Anyone with the listed hardware can promote a community result to verified by submitting a reproduction PR.

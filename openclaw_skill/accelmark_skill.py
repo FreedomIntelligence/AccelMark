@@ -10,8 +10,12 @@ This skill:
 3. Runs the benchmark (5 min max)
 4. Queries AccelMark leaderboard for ranking
 5. Returns human-readable report to user
-6. Optionally submits result to community leaderboard
+6. On "submit", returns copy-pasteable PR submission instructions
+   (AccelMark uses a PR-only submission flow; the skill no longer posts
+   to GitHub directly)
 """
+
+from __future__ import annotations
 
 import json
 import os
@@ -22,7 +26,8 @@ from pathlib import Path
 
 
 ACCELMARK_REPO = os.environ.get("ACCELMARK_PATH", "~/accelmark")
-LEADERBOARD_API = "https://juhaoliang1997.github.io/AccelMark/api"
+LEADERBOARD_API = "https://freedomintelligence.github.io/AccelMark/api"
+REPO_URL = "https://github.com/FreedomIntelligence/AccelMark"
 
 
 def ensure_accelmark_installed() -> Path:
@@ -31,7 +36,7 @@ def ensure_accelmark_installed() -> Path:
 
     if not repo_path.exists():
         subprocess.run(
-            ["git", "clone", "https://github.com/JuhaoLiang1997/AccelMark.git", str(repo_path)],
+            ["git", "clone", f"{REPO_URL}.git", str(repo_path)],
             check=True
         )
 
@@ -102,49 +107,39 @@ def query_submission_rank(submission_name: str) -> dict | None:
 
 def handle_submit(result: dict, openclaw_username: str) -> str:
     """
-    Submit result to AccelMark leaderboard via GitHub Issue.
-    The issue is processed by the process_submissions.yml CI workflow
-    which validates and creates a PR automatically.
+    Format submission instructions for the user.
+
+    AccelMark uses a pull-request-only submission flow — bot-driven
+    automation via GitHub Issues was removed because it required org-level
+    permissions and added a hard-to-audit attack surface. This function
+    returns the finalised result.json (with ``submitted_by`` set) and the
+    copy-pasteable steps the user needs to follow to open a PR themselves.
     """
-    import urllib.request
-
     result["meta"]["submitted_by"] = openclaw_username
-
-    issue_body = f"""## AccelMark Community Submission
-
-**Chip**: {result['chip']['name']}
-**Suite**: {result['suite_id']}
-**Date**: {result['meta']['date']}
-**Submitted via**: OpenClaw AccelMark Skill
-
-```json
-{json.dumps(result, indent=2)}
-```
-"""
-    payload = json.dumps({
-        "title": f"[submission] {result['chip']['name']} {result['suite_id']}",
-        "body": issue_body,
-        "labels": ["community-submission"],
-    }).encode()
-
-    req = urllib.request.Request(
-        "https://api.github.com/repos/JuhaoLiang1997/AccelMark/issues",
-        data=payload,
-        headers={"Content-Type": "application/json"},
+    run_name = (
+        result.get("meta", {}).get("run_name")
+        or f"{result.get('chip', {}).get('name', 'unknown')}_{result.get('suite_id', 'unknown')}"
     )
+    result_json = json.dumps(result, indent=2)
 
-    try:
-        urllib.request.urlopen(req, timeout=10)
-        return (
-            "✅ Submitted! Your result will appear on the leaderboard "
-            "after automated validation (usually within a few minutes).\n"
-            f"View leaderboard: {LEADERBOARD_API.replace('/api', '/')}"
-        )
-    except Exception as e:
-        return (
-            f"❌ Submission failed: {str(e)}\n"
-            "You can submit manually at: https://github.com/JuhaoLiang1997/AccelMark"
-        )
+    return (
+        "📦 Your benchmark result is ready to submit.\n"
+        "\n"
+        "AccelMark uses a pull-request-only submission flow. To add this\n"
+        "result to the public leaderboard:\n"
+        "\n"
+        f"  1. Fork and clone {REPO_URL}\n"
+        f"  2. mkdir -p results/community/{run_name}\n"
+        f"  3. Save the JSON below as results/community/{run_name}/result.json\n"
+        "  4. Commit, push, and open a pull request — CI auto-validates.\n"
+        "\n"
+        f"Full guide: {REPO_URL}/blob/main/CONTRIBUTING.md\n"
+        "\n"
+        "--- result.json ---\n"
+        "```json\n"
+        f"{result_json}\n"
+        "```"
+    )
 
 
 def format_details(result: dict) -> str:
