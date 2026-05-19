@@ -114,6 +114,16 @@ export function initModal() {
       _downloadVizChart(dlBtn);
       return;
     }
+    // Pills / buttons that ask the modal to scroll to a named section
+    // inside the Details panel. Currently used by the reliability pill in
+    // the subtitle; future header chips can reuse `data-scroll-to` for
+    // the same effect without each one wiring its own handler.
+    const jumpTrigger = ev.target.closest("[data-scroll-to]");
+    if (jumpTrigger && _modalEl.contains(jumpTrigger)) {
+      ev.preventDefault();
+      _scrollToDetailSection(jumpTrigger.dataset.scrollTo);
+      return;
+    }
   });
 
   // Esc closes from anywhere.
@@ -383,15 +393,49 @@ function _detailRow(label, v, opts = {}) {
   return `<div class="detail-row"><span class="detail-label">${esc(label)}</span><span class="detail-value${mono}${cls}">${display}</span></div>`;
 }
 
-function _detailSection(title, rows) {
+function _detailSection(title, rows, opts = {}) {
   const content = rows.filter(Boolean).join("");
   if (!content) return "";
+  // `anchor` becomes a data attribute the subtitle pill can scroll to.
+  // `caption` is a small prose block rendered under the section title —
+  // used by Reliability to explain CV / thresholds inline so readers
+  // don't need to rely on the (delayed, plain-text) native title tooltip.
+  const anchor = opts.anchor ? ` data-section="${esc(opts.anchor)}"` : "";
+  const caption = opts.caption
+    ? `<p class="detail-section-help">${opts.caption}</p>`
+    : "";
   return `
-    <div class="detail-section">
+    <div class="detail-section"${anchor}>
       <div class="detail-section-title">${esc(title)}</div>
+      ${caption}
       ${content}
     </div>
   `;
+}
+
+// Scroll the Details tab body to the section tagged data-section=<name>.
+// Activates the Details tab first if the user is on Viz / Implementation
+// when they click the subtitle pill, so the scroll target is actually
+// in the visible panel.
+function _scrollToDetailSection(name) {
+  if (!_modalEl || !name) return;
+  if (_activeTab !== "details") _setTab("details");
+  const target = _modalEl.querySelector(`.detail-section[data-section="${name}"]`);
+  if (!target) return;
+  // Use the modal body as the scroll container so we don't reflow the
+  // whole document. `scrollIntoView` with `{ block: "start" }` would push
+  // the section to the very top, hiding the title — offset by 12 px so
+  // the section heading stays nicely below the modal subheader.
+  const body = _modalEl.querySelector(".modal-body");
+  if (body) {
+    const top = target.offsetTop - 12;
+    body.scrollTo({ top, behavior: "smooth" });
+  } else {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  // Brief highlight so users notice where the page jumped to.
+  target.classList.add("detail-section-flash");
+  setTimeout(() => target.classList.remove("detail-section-flash"), 1400);
 }
 
 // ── Reliability rendering ────────────────────────────────────────────────────
@@ -453,9 +497,16 @@ function _pickWorstReliability(row) {
 }
 
 // Build the small `cv X.X% ✓` pill that appears in the modal subtitle row.
-// Tooltip explains the thresholds and what they mean, since `high-variance`
-// is a description rather than a verdict — readers should see "natural
-// variability" not "broken measurement".
+//
+// The pill is interactive in three ways, layered so each user type has a
+// path to the full explanation:
+//   - Hover (mouse)        → native title tooltip with one-line explanation
+//   - Click (any device)   → scrolls the Details tab to the Reliability
+//                            section, which carries the full prose caption
+//   - `cursor: help` + ⓘ glyph cue readers that this is hoverable
+//
+// The data-scroll-to attribute lets us delegate the click handler at the
+// modal level (see _wireReliabilityPillJump) — no per-pill listener needed.
 function _reliabilityPill(row) {
   const w = _pickWorstReliability(row);
   if (!w) return "";
@@ -463,14 +514,17 @@ function _reliabilityPill(row) {
   // CSS class names must be CSS-safe: replace "-" → "_" for high_variance.
   const stabilitySlug = (w.stability || "unknown").replace(/-/g, "_");
   const cls  = "modal-reliab-pill " + stabilitySlug;
-  const title = `Worst inter-run CV across scenarios: ${w.cv_pct}% ` +
-    `(${w.scenario} ${w.metric}). ` +
+  const title = `Coefficient of variation across runs: ${w.cv_pct}% ` +
+    `(worst across scenarios; from ${w.scenario} ${w.metric}). ` +
     `≤3% stable, ≤8% noisy, >8% high-variance. ` +
     `High-variance is informational — it means this hardware × workload ` +
-    `combo has irreducible jitter, not that the measurement is wrong.`;
+    `combo has irreducible jitter, not that the measurement is wrong. ` +
+    `Click for details.`;
   const head = icon ? `${icon} cv ${w.cv_pct}%` : `cv ${w.cv_pct}%`;
-  return `<span class="${esc(cls)}" title="${esc(title)}">` +
-         `reliability ${esc(head)}</span>`;
+  return `<button type="button" class="${esc(cls)}" ` +
+         `title="${esc(title)}" data-scroll-to="reliability">` +
+         `reliability ${esc(head)} <span class="modal-reliab-help" aria-hidden="true">ⓘ</span>` +
+         `</button>`;
 }
 
 // Render one row per scenario in the Details tab. Skipped if a scenario has
@@ -648,7 +702,20 @@ function _renderDetails(row, panel) {
       d.run_pp != null ? _detailRow("Pipeline parallel size", d.run_pp) : null,
       d.run_dp != null ? _detailRow("Data parallel size",     d.run_dp) : null,
     ]),
-    _detailSection("Reliability", _reliabilityRows(row)),
+    _detailSection("Reliability", _reliabilityRows(row), {
+      anchor: "reliability",
+      // Plain HTML (not auto-escaped) so we can highlight the threshold
+      // pills. Keep the wording short — readers shouldn't need to read a
+      // paragraph to decode a single percentage in the table below.
+      caption:
+        "Inter-run <strong>coefficient of variation</strong> " +
+        "(CV = std / mean × 100%) across the runs that produced this " +
+        "submission — lower is more reproducible. " +
+        "<span class=\"reliab-legend stable\">✓ stable</span> ≤ 3% &nbsp;·&nbsp; " +
+        "<span class=\"reliab-legend noisy\">⚠ noisy</span> ≤ 8% &nbsp;·&nbsp; " +
+        "<span class=\"reliab-legend high_variance\">high-variance</span> &gt; 8% " +
+        "(informational — natural jitter, not a measurement error).",
+    }),
     _detailSection("Vendor-specific environment", _vendorDetailRows(row)),
     _detailSection("Accuracy", [
       _detailRow("Subset score", d.acc_score, {

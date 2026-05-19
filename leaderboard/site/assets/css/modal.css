@@ -134,6 +134,7 @@
 .modal-reliab-pill {
   display: inline-flex;
   align-items: center;
+  gap: 0.25rem;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
   font-size: 0.7rem;
@@ -141,6 +142,23 @@
   letter-spacing: 0.01em;
   border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
   background: color-mix(in srgb, currentColor 10%, transparent);
+  /* Pill is rendered as a <button> so it can be clicked / focused; strip
+   * the default button chrome and signal "this is hoverable for help"
+   * via the cursor + the ⓘ glyph inside. */
+  font-family: inherit;
+  cursor: help;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.modal-reliab-pill:hover  { filter: brightness(1.05); transform: translateY(-1px); }
+.modal-reliab-pill:active { transform: translateY(0); }
+.modal-reliab-pill:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 55%, transparent);
+  outline-offset: 2px;
+}
+.modal-reliab-help {
+  opacity: 0.65;
+  font-weight: 500;
+  font-size: 0.78em;
 }
 .modal-reliab-pill.stable         { color: var(--good, #2da44e); }
 .modal-reliab-pill.noisy          { color: var(--warn, #d29922); }
@@ -151,6 +169,36 @@
  * without saying "this is broken". */
 .modal-reliab-pill.high_variance  { color: #d97706; }
 .modal-reliab-pill.unknown        { color: var(--fg-faint); }
+
+/* Inline help paragraph rendered under a detail-section title. Currently
+ * only the Reliability section uses this, so the styling stays modest —
+ * we don't want it competing with the data rows below. */
+.detail-section-help {
+  margin: 0 0 0.55rem 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--fg-muted, #6b7280);
+}
+.detail-section-help .reliab-legend {
+  display: inline-block;
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.92em;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+.detail-section-help .reliab-legend.stable        { color: var(--good, #2da44e); }
+.detail-section-help .reliab-legend.noisy         { color: var(--warn, #d29922); }
+.detail-section-help .reliab-legend.high_variance { color: #d97706; }
+
+/* Brief highlight flash when a click-jump from the subtitle pill lands on
+ * a detail section, so the user notices the scroll target. The animation
+ * is deliberately gentle (1.4 s fade-out via JS-toggled class). */
+.detail-section.detail-section-flash {
+  background: color-mix(in srgb, var(--accent, #2563eb) 8%, transparent);
+  border-radius: 6px;
+  transition: background-color 0.4s ease;
+}
 
 .modal-close {
   background: transparent;
