@@ -14,6 +14,12 @@ on:
       - 'README.md'
       - 'leaderboard/site/**'
 
+# Lock the default GITHUB_TOKEN down to read-only on repo contents for every
+# job (GitHub's hardening recommendation for OSS repos). Jobs that need more
+# (e.g. posting a PR comment) opt in explicitly via their own `permissions:`.
+permissions:
+  contents: read
+
 jobs:
   validate-runners:
     name: Validate runner folders
@@ -116,6 +122,13 @@ jobs:
   validate:
     name: Validate result submissions
     runs-on: ubuntu-latest
+    # Needs pull-requests:write to post the validation summary comment
+    # via actions/github-script. After the FreedomIntelligence transfer
+    # the default GITHUB_TOKEN is read-only on issues/pull-requests, so
+    # this must be granted explicitly.
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout PR
