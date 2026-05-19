@@ -306,7 +306,7 @@ function _fillModal(row) {
   const impl = row.impl || {};
   let scriptUrl = null;
   if (d.meta_reproduce_script) {
-    scriptUrl = `https://github.com/JuhaoLiang1997/AccelMark/blob/main/${d.meta_reproduce_script}`;
+    scriptUrl = `https://github.com/FreedomIntelligence/AccelMark/blob/main/${d.meta_reproduce_script}`;
     // If the result references an old (superseded) runner path, point to
     // the current runner.py instead.
     if (impl.supersedes_chain && Array.isArray(impl.supersedes_chain)) {

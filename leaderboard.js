@@ -162,8 +162,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-20",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/apple_mlx_lm_9546b8b5",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/apple_mlx_lm_9546b8b5/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/apple_mlx_lm_9546b8b5",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/apple_mlx_lm_9546b8b5/runner.py"
     },
     "implementation_id": "apple_mlx_lm_9546b8b5"
   },
@@ -329,8 +329,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-18",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
     "implementation_id": "google_vllm_tpu_68cc9ffa"
   },
@@ -503,8 +503,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-18",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
     "implementation_id": "google_vllm_tpu_68cc9ffa"
   },
@@ -660,8 +660,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-18",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
     "implementation_id": "google_vllm_tpu_68cc9ffa"
   },
@@ -827,8 +827,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-18",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
     "implementation_id": "google_vllm_tpu_68cc9ffa"
   },
@@ -1483,8 +1483,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -2067,8 +2067,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -2466,8 +2466,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -3118,8 +3118,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -3280,8 +3280,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -3895,8 +3895,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -4547,8 +4547,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -4709,8 +4709,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -5324,8 +5324,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -5980,8 +5980,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -6564,8 +6564,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -6963,8 +6963,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
     "implementation_id": "ascend_vllm_ascend_d4aa9fda"
   },
@@ -7619,8 +7619,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -8244,8 +8244,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -8828,8 +8828,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -9227,8 +9227,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -9879,8 +9879,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -10041,8 +10041,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -10656,8 +10656,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -11307,8 +11307,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-05-15",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
     "implementation_id": "nvidia_vllm020_0f6c56e4"
   },
@@ -11963,8 +11963,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -12588,8 +12588,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-05-15",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
     "implementation_id": "nvidia_vllm020_0f6c56e4"
   },
@@ -13213,8 +13213,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -13797,8 +13797,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-05-15",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
     "implementation_id": "nvidia_vllm020_0f6c56e4"
   },
@@ -14381,8 +14381,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -14780,8 +14780,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-05-15",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
     "implementation_id": "nvidia_vllm020_0f6c56e4"
   },
@@ -15179,8 +15179,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -15835,8 +15835,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -16460,8 +16460,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -17044,8 +17044,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -17443,8 +17443,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -18095,8 +18095,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -18257,8 +18257,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -18872,8 +18872,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -19523,8 +19523,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -20147,8 +20147,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -20546,8 +20546,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -20703,8 +20703,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -21354,8 +21354,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -21979,8 +21979,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -22378,8 +22378,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -22535,8 +22535,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -23186,8 +23186,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -23811,8 +23811,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -24210,8 +24210,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -24862,8 +24862,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -25024,8 +25024,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -25639,8 +25639,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -26290,8 +26290,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -26728,8 +26728,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -27312,8 +27312,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -27711,8 +27711,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -28367,8 +28367,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -28568,8 +28568,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -29152,8 +29152,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -29551,8 +29551,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -30207,8 +30207,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -30832,8 +30832,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -31421,8 +31421,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -31820,8 +31820,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -32472,8 +32472,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -32634,8 +32634,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -33249,8 +33249,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -33905,8 +33905,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -34530,8 +34530,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -35114,8 +35114,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -35513,8 +35513,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -36165,8 +36165,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -36327,8 +36327,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -36942,8 +36942,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -37563,8 +37563,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -37962,8 +37962,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -38361,8 +38361,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -39017,8 +39017,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -39642,8 +39642,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -40226,8 +40226,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -40625,8 +40625,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -41281,8 +41281,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -41905,8 +41905,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -42489,8 +42489,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -42888,8 +42888,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -43540,8 +43540,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -43702,8 +43702,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -44317,8 +44317,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -44716,8 +44716,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -45372,8 +45372,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -45718,8 +45718,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -46302,8 +46302,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -46701,8 +46701,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -47353,8 +47353,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -47515,8 +47515,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -48130,8 +48130,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
     "implementation_id": "nvidia_vllm_47f5d58e"
   },
@@ -48320,8 +48320,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-05-18",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
     "implementation_id": "moorethreads_vllm_musa_f2f6f965"
   },
@@ -48504,8 +48504,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-05-18",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
     "implementation_id": "moorethreads_vllm_musa_f2f6f965"
   },
@@ -49160,8 +49160,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
     "implementation_id": "nvidia_sglang_c43a8309"
   },
@@ -49599,8 +49599,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
     "implementation_id": "nvidia_sglang_c43a8309"
   },
@@ -50188,8 +50188,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
     "implementation_id": "nvidia_sglang_c43a8309"
   },
@@ -50587,8 +50587,8 @@ const LEADERBOARD_DATA = [
       "created": "2026-04-03",
       "supersedes_chain": [],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
     "implementation_id": "nvidia_sglang_c43a8309"
   },
@@ -50780,8 +50780,8 @@ const LEADERBOARD_DATA = [
         "nvidia_onecat_vllm_a43d1bcf"
       ],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_onecat_vllm_12a253c2",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_onecat_vllm_12a253c2/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_onecat_vllm_12a253c2",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_onecat_vllm_12a253c2/runner.py"
     },
     "implementation_id": "nvidia_onecat_vllm_12a253c2"
   },
@@ -50967,8 +50967,8 @@ const LEADERBOARD_DATA = [
         "nvidia_onecat_vllm_a43d1bcf"
       ],
       "deprecated_by": null,
-      "github_url": "https://github.com/JuhaoLiang1997/AccelMark/tree/main/runners/nvidia_onecat_vllm_12a253c2",
-      "runner_url": "https://github.com/JuhaoLiang1997/AccelMark/blob/main/runners/nvidia_onecat_vllm_12a253c2/runner.py"
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_onecat_vllm_12a253c2",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_onecat_vllm_12a253c2/runner.py"
     },
     "implementation_id": "nvidia_onecat_vllm_12a253c2"
   }
