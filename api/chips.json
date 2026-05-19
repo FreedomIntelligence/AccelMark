@@ -1,5 +1,11 @@
 [
   {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "submission_count": 8,
+    "best_throughput_tokens_per_sec": 22884.92,
+    "median_throughput_tokens_per_sec": 2439.2
+  },
+  {
     "name": "NVIDIA H100 80GB HBM3",
     "submission_count": 4,
     "best_throughput_tokens_per_sec": 18910.96,
@@ -46,12 +52,6 @@
     "submission_count": 6,
     "best_throughput_tokens_per_sec": 11440.55,
     "median_throughput_tokens_per_sec": 1531.1
-  },
-  {
-    "name": "NVIDIA A100-SXM4-80GB",
-    "submission_count": 4,
-    "best_throughput_tokens_per_sec": 11011.89,
-    "median_throughput_tokens_per_sec": 2389.0
   },
   {
     "name": "NVIDIA RTX A6000",

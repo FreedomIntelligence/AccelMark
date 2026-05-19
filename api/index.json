@@ -168,13 +168,13 @@
     }
   },
   "NVIDIA A100-SXM4-80GB": {
-    "best_throughput_tokens_per_sec": 11011.89,
+    "best_throughput_tokens_per_sec": 22884.92,
     "suites": {
       "suite_A": {
-        "best_throughput_tokens_per_sec": 2700.6,
+        "best_throughput_tokens_per_sec": 3916.7,
         "best_online_max_qps": 5,
-        "best_interactive_ttft_p99_ms": 68.3,
-        "best_sustained_throughput_tokens_per_sec": 551.9,
+        "best_interactive_ttft_p99_ms": 59.4,
+        "best_sustained_throughput_tokens_per_sec": 712.3,
         "throttle_ratio": 0.868
       },
       "suite_C": {
@@ -189,10 +189,10 @@
         "throttle_ratio": 0.501
       },
       "suite_F": {
-        "best_throughput_tokens_per_sec": 11011.9,
-        "best_online_max_qps": 10,
-        "best_interactive_ttft_p99_ms": 32.4,
-        "best_sustained_throughput_tokens_per_sec": 2386.8,
+        "best_throughput_tokens_per_sec": 22884.9,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 14.7,
+        "best_sustained_throughput_tokens_per_sec": 11576.2,
         "throttle_ratio": 0.746
       }
     }
