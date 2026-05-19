@@ -95,19 +95,35 @@ class AccelMarkLoadGen:
         # Use different request counts per scenario
         # offline: use request_count (default 200, fast)
         # online/interactive: use online_request_count if set, else all requests
+        #
+        # Warmup semantics differ per scenario:
+        #   offline / interactive : `warmup_runs` = number of full passes to discard
+        #                           (interactive_warmup_runs may override for interactive)
+        #   sustained             : `warmup_minutes` = time window discarded
+        #   online / burst        : `online_warmup_requests` / `burst_warmup_requests`
+        #                           = number of dummy requests fired sequentially before
+        #                           the timed phase, used to JIT-compile kernels, allocate
+        #                           CUDA graphs, prime the KV cache, etc. Results are
+        #                           never recorded. Without this warmup, the first few
+        #                           requests of the first QPS level inflate p99 by
+        #                           hundreds of ms on cold engines.
+        self.online_warmup_requests = 0
+        self.burst_warmup_requests = 0
         if scenario == "offline":
             count = suite.get("request_count")
             self.warmup_runs = suite.get("warmup_runs", 1)
         elif scenario == "online":
             # online and interactive need more requests for reliable p99
             count = suite.get("online_request_count", suite.get("request_count"))
-            self.warmup_runs = suite.get("online_warmup_runs", 0)
+            self.warmup_runs = 0  # online doesn't use full-pass warmup
+            self.online_warmup_requests = suite.get("online_warmup_requests", 10)
         elif scenario == "interactive":
             count = suite.get("interactive_request_count", suite.get("request_count"))
             self.warmup_runs = suite.get("interactive_warmup_runs", 0)
         elif scenario == "burst":
             count = suite.get("online_request_count", suite.get("request_count"))
-            self.warmup_runs = suite.get("online_warmup_runs", 0)
+            self.warmup_runs = 0  # burst doesn't use full-pass warmup
+            self.burst_warmup_requests = suite.get("burst_warmup_requests", 10)
         elif scenario == "speculative":
             count = suite.get("request_count")
             self.warmup_runs = suite.get("warmup_runs", 1)
@@ -535,17 +551,52 @@ class AccelMarkLoadGen:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(self._run_online_async(inference_fn))
 
+    async def _warmup_requests(self, async_inference_fn, count: int, label: str) -> None:
+        """
+        Fire `count` dummy requests sequentially before timed measurement.
+
+        Cycles through self.requests if count > len(requests). All results are
+        discarded — purpose is to JIT-compile kernels, allocate CUDA graphs,
+        prime the KV cache, and let the engine reach steady-state schedules
+        before the timed phase. Without this, the first few timed requests on
+        cold engines inflate p99 by hundreds of milliseconds.
+
+        Exceptions during warmup are logged and swallowed; warmup failures
+        must never abort the timed run.
+        """
+        if count <= 0 or not self.requests:
+            return
+        tqdm.write(
+            f"[{label} warmup] firing {count} dummy requests "
+            "(results discarded — engine JIT/cache warm-up)"
+        )
+        for i in range(count):
+            req = self.requests[i % len(self.requests)]
+            try:
+                await async_inference_fn(req)
+            except Exception as e:
+                tqdm.write(f"[{label} warmup] request {i} failed (ignored): {e}")
+
     async def _run_online_async(self, async_inference_fn) -> dict:
         """
         Async implementation of the online scenario.
         Generates Poisson arrival times upfront, then fires all requests
         concurrently via asyncio.gather so the engine sees real concurrent load.
+
+        A warmup phase fires `online_warmup_requests` dummy requests
+        sequentially before the QPS sweep. Their latencies are not recorded
+        in `results_by_qps`. This prevents cold-engine TTFT spikes from
+        inflating p99 at the first QPS level.
         """
         loop = asyncio.get_event_loop()
         sla_ms = self.suite["online_sla_ttft_ms"]
         results_by_qps = []
         all_samples: list[SampleRecord] = []
         max_valid_qps = 0.0
+
+        await self._warmup_requests(
+            async_inference_fn, self.online_warmup_requests, "online"
+        )
 
         for target_qps in self.suite["online_qps_levels"]:
             print(f"[online] target_qps={target_qps}")
@@ -665,6 +716,11 @@ class AccelMarkLoadGen:
             sla_met_during_burst    — bool: p99 TTFT during burst < online_sla_ttft_ms
             burst_degradation_ratio — burst_ttft_p99 / steady_ttft_p99 (higher = worse)
             results_by_cycle        — per-cycle breakdown
+
+        A warmup phase fires `burst_warmup_requests` dummy requests
+        sequentially before the first cycle. Their latencies are excluded
+        from steady/burst windows so the first cycle's steady-state
+        measurement is not contaminated by cold-engine TTFT spikes.
         """
         loop = asyncio.get_event_loop()
         sla_ms = self.suite["online_sla_ttft_ms"]
@@ -673,6 +729,10 @@ class AccelMarkLoadGen:
         burst_dur = self.suite["burst_duration_seconds"]
         steady_dur = self.suite["burst_interval_seconds"]
         num_runs = self.suite.get("num_runs", 3)
+
+        await self._warmup_requests(
+            async_inference_fn, self.burst_warmup_requests, "burst"
+        )
 
         all_steady_ttfts: list[float] = []
         all_burst_ttfts: list[float] = []

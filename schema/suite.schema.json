@@ -117,10 +117,22 @@
     "online_sla_ttft_ms":         { "type": ["integer", "null"], "minimum": 1 },
     "online_sla_ttft_ms_relaxed": { "type": ["integer", "null"], "minimum": 1 },
     "online_request_count":       { "type": ["integer", "null"], "minimum": 1 },
-    "online_warmup_runs":         { "type": "integer", "minimum": 0 },
+    "online_warmup_runs":         {
+      "type": "integer", "minimum": 0,
+      "description": "DEPRECATED. Previously unused — kept only to silence schema warnings on older suites. Use online_warmup_requests instead."
+    },
+    "online_warmup_requests":     {
+      "type": "integer", "minimum": 0,
+      "description": "Number of dummy requests fired sequentially before the online QPS sweep. Results are discarded. Used to JIT-compile kernels and prime the engine on cold start. Defaults to 10 if not set."
+    },
 
     "interactive_request_count":  { "type": ["integer", "null"], "minimum": 1 },
     "interactive_warmup_runs":    { "type": "integer", "minimum": 0 },
+
+    "burst_warmup_requests":      {
+      "type": "integer", "minimum": 0,
+      "description": "Number of dummy requests fired sequentially before the first burst cycle. Results are discarded. Defaults to 10 if not set."
+    },
 
     "sustained_concurrency":      { "type": "integer", "minimum": 1 },
     "duration_minutes":           { "type": "number",  "minimum": 0 },
