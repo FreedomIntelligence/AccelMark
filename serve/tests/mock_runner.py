@@ -105,9 +105,14 @@ class TokenStreamingMockRunner(MockRunner):
     Mock runner that *does* implement true token streaming — yields the
     response text word by word with a small async delay. Used by tests
     that exercise the multi-chunk SSE path in serve/server.py.
+
+    Spaces are emitted as a leading separator before each word *after*
+    the first, so concatenating every delta reconstructs the original
+    response text exactly (no trailing space) — matching how real
+    tokenizers stream BPE / SentencePiece pieces.
     """
 
     async def inference_fn_token_stream(self, request: InferenceRequest):
-        for word in self._response_text.split():
+        for i, word in enumerate(self._response_text.split()):
             await asyncio.sleep(0.001)
-            yield word + " "
+            yield (" " + word) if i else word
