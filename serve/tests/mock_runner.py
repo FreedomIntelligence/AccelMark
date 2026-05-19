@@ -73,10 +73,14 @@ class MockRunner:
         )
 
     async def inference_fn_token_stream(self, request: InferenceRequest):
-        """Yield response word by word to simulate token streaming."""
-        for word in self._response_text.split():
-            await asyncio.sleep(0.001)
-            yield word + " "
+        """
+        Per RunnerProtocol, true token streaming is optional. MockRunner
+        declares "not supported" by raising NotImplementedError so the
+        serve layer exercises its single-chunk fallback path. Use
+        TokenStreamingMockRunner below to test the true-streaming path.
+        """
+        raise NotImplementedError("MockRunner does not implement true token streaming")
+        yield  # pragma: no cover - keeps this an async generator for the protocol shape
 
     def format_prompt(self, prompt: str) -> str:
         return prompt  # pass through unchanged
@@ -94,3 +98,16 @@ class MockRunner:
 class NoStreamingMockRunner(MockRunner):
     """Mock runner that declares SUPPORTS_STREAMING = False."""
     SUPPORTS_STREAMING = False
+
+
+class TokenStreamingMockRunner(MockRunner):
+    """
+    Mock runner that *does* implement true token streaming — yields the
+    response text word by word with a small async delay. Used by tests
+    that exercise the multi-chunk SSE path in serve/server.py.
+    """
+
+    async def inference_fn_token_stream(self, request: InferenceRequest):
+        for word in self._response_text.split():
+            await asyncio.sleep(0.001)
+            yield word + " "
