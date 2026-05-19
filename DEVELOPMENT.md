@@ -520,7 +520,8 @@ Copy the closest existing suite and modify. Required fields:
   "online_sla_ttft_ms": 500,
   "num_runs": 3,
   "warmup_runs": 1,
-  "online_warmup_runs": 0,
+  "online_warmup_requests": 10,
+  "burst_warmup_requests": 10,
   "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.1,
   "request_count": 200,
@@ -910,6 +911,71 @@ class InferenceResult:
 | sustained | Throughput + TTFT sampled every N seconds over 30 min | `sustained_throughput_tokens_per_sec`, `throttle_ratio` |
 | speculative | Offline throughput with draft model (same path as offline, engine uses speculative decoding) | `throughput_tokens_per_sec`; optional `task.runtime_metrics.acceptance_rate` if runner overrides `get_runtime_metrics()` |
 | burst | Two-state bursty load: alternates steady QPS and burst QPS windows | `burst_degradation_ratio` (burst_ttft_p99 / steady_ttft_p99); `sla_met_during_burst` |
+
+### Warmup contract
+
+Cold engines inflate the first few timed requests by hundreds of ms (JIT
+compile, CUDA-graph allocation, KV cache priming). Each scenario discards
+a configurable prefix:
+
+| Scenario | Suite key | Default | Unit |
+|---|---|---|---|
+| offline / speculative / interactive | `warmup_runs` / `interactive_warmup_runs` | `1` / `0` | full passes |
+| online | `online_warmup_requests` | `10` | dummy requests fired before QPS sweep |
+| burst | `burst_warmup_requests` | `10` | dummy requests fired before first cycle |
+| sustained | `warmup_minutes` | `2` | minutes of samples excluded from analysis |
+
+Warmup-time exceptions are logged and swallowed — they never abort the
+timed phase.
+
+### Reliability metrics
+
+Each scenario emits an inter-run reliability block alongside its primary
+metrics so submitters can prove their results are reproducible without
+shipping `samples.jsonl`. Shape:
+
+```json
+{
+  "n":         3,
+  "mean":      1234.5,
+  "std":         21.3,
+  "cv_pct":      1.7,
+  "stability": "stable",
+  "runs": [1230.1, 1255.2, 1218.2]
+}
+```
+
+`stability` thresholds: `cv_pct ≤ 3 → stable ✓`, `≤ 8 → noisy ⚠`,
+otherwise `high-variance`. Calibrated from the May-2026 backfill — see
+the comment above `_STABILITY_THRESHOLD_*` in `loadgen/loadgen.py` for the
+empirical distribution that informed the choice. Tunable centrally there.
+
+**`high-variance` is informational, not a verdict.** High CV means the
+hardware × workload combo carries irreducible jitter (thermal throttle on
+consumer cards, HCCL noise on 16-chip Ascend topologies, acceptance-rate
+fluctuation on speculative decoding) — it is **not** a sign the
+submission is broken. The frontend reflects this: high-variance pills
+use an orange tone with no error glyph, while only stable / noisy carry
+✓ / ⚠ icons.
+
+If you submit a result that lands as high-variance, you do not need to
+re-run. The badge is for downstream readers picking hardware for
+latency-sensitive workloads — they can use the CV % to size their
+safety margins, while peak-throughput shoppers can largely ignore it.
+
+| Scenario | Field path | Reliability source |
+|---|---|---|
+| offline | `metrics.offline.results_by_concurrency[i].throughput_tokens_per_sec_reliability` | per-run throughput across `num_runs` |
+| online | `metrics.online.results_by_qps[i].ttft_ms_p99_reliability` | per-run TTFT p99 across `num_runs` |
+| interactive | `metrics.interactive.ttft_ms_p99_reliability` | per-run TTFT p99 across `num_runs` |
+| sustained | `metrics.sustained.throughput_post_warmup_reliability` | per-interval throughput (post-warmup) |
+| burst | `metrics.burst.recovery_time_seconds` (+ `_per_cycle`) | seconds until rolling p99 returns to ≤ 1.5× steady baseline |
+
+Backfilling these for existing results is done by
+`tools/backfill_distribution_stats.py`, which reads each result's local
+`samples.jsonl` and writes the summary stats in place. Offline reliability
+cannot be backfilled because per-run throughput was never recorded in
+`samples.jsonl` historically — it stays `{}` for old offline results.
 
 ---
 

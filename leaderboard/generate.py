@@ -6,6 +6,8 @@ Usage:
     python leaderboard/generate.py
 """
 
+from __future__ import annotations
+
 import hashlib
 import json
 import re
@@ -238,6 +240,11 @@ def extract_detail(result: dict) -> dict:
         "meta_model_load_sec":   meta.get("model_load_seconds"),
         "meta_start_time":       meta.get("benchmark_start_time"),
         "meta_notes":            meta.get("notes"),
+        # Vendor-specific environment fields collected by platforms/<vendor>.py
+        # (e.g. ROCm-SMI link health, NVML clock telemetry). The modal flattens
+        # this dict and shows only non-null entries — different vendors record
+        # different keys by design and no UI tries to unify them.
+        "env_vendor_details":    env.get("vendor_details") or {},
     }
 
 
@@ -297,6 +304,9 @@ def extract_viz(result: dict, metrics: dict) -> dict:
     def _online_block():
         online   = metrics.get("online", {})
         qps_rows = online.get("results_by_qps", [])
+        # Per-QPS reliability blocks. Emitted as a parallel array so the
+        # frontend can render a badge next to each QPS row without joining
+        # by index from a separate object.
         return {
             "labels":        [str(r.get("target_qps", "")) for r in qps_rows],
             "ttft_p50":      [r.get("ttft_ms_p50") for r in qps_rows],
@@ -304,6 +314,8 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "tpot_p50":      [r.get("tpot_ms_p50") for r in qps_rows],
             "sla_met":       [r.get("sla_met")      for r in qps_rows],
             "max_valid_qps": online.get("max_valid_qps"),
+            "ttft_ms_p99_reliability":
+                [r.get("ttft_ms_p99_reliability") or {} for r in qps_rows],
         }
 
     def _interactive_block():
@@ -315,6 +327,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "tpot_p50": iv.get("tpot_ms_p50"),
             "tpot_p90": iv.get("tpot_ms_p90"),
             "tpot_p99": iv.get("tpot_ms_p99"),
+            "ttft_ms_p99_reliability": iv.get("ttft_ms_p99_reliability") or {},
         }
 
     def _sustained_block():
@@ -334,6 +347,8 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "throttle_ratio":        s.get("throttle_ratio"),
             "throttle_onset_minute": s.get("throttle_onset_minute"),
             "ttft_p99_drift_ms":     s.get("ttft_p99_drift_ms"),
+            "throughput_post_warmup_reliability":
+                s.get("throughput_post_warmup_reliability") or {},
             "samples":               samples,
         }
 
@@ -352,6 +367,9 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "burst_requests_total":         b.get("burst_requests_total"),
             "sla_met_during_burst":         b.get("sla_met_during_burst"),
             "burst_degradation_ratio":      b.get("burst_degradation_ratio"),
+            "recovery_time_seconds":        b.get("recovery_time_seconds"),
+            "recovery_time_seconds_per_cycle":
+                b.get("recovery_time_seconds_per_cycle") or [],
             "results_by_cycle":             b.get("results_by_cycle"),
         }
 
@@ -370,6 +388,11 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "mean_accepted_tokens": rm.get("mean_accepted_tokens"),
         }
 
+    # Per-concurrency-level offline reliability blocks. Parallel array to
+    # `throughput` and `memory_gb` so the frontend can join by row index.
+    def _offline_reliability(rows):
+        return [r.get("throughput_tokens_per_sec_reliability") or {} for r in rows]
+
     if suite == "suite_A":
         rows = _offline_rows()
         return {
@@ -378,6 +401,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                 "labels":     _concurrency_labels(rows),
                 "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
                 "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+                "throughput_reliability": _offline_reliability(rows),
             },
             "online":      _online_block(),
             "interactive": _interactive_block(),
@@ -395,6 +419,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                 "throughput":          [r.get("throughput_tokens_per_sec")          for r in rows],
                 "throughput_per_chip": [r.get("throughput_tokens_per_sec_per_chip") for r in rows],
                 "memory_gb":           [r.get("peak_memory_gb")                     for r in rows],
+                "throughput_reliability": _offline_reliability(rows),
             },
             "online":    _online_block(),
             "sustained": _sustained_block(),
@@ -409,6 +434,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                 "labels":     _concurrency_labels(rows),
                 "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
                 "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+                "throughput_reliability": _offline_reliability(rows),
             },
             "interactive": _interactive_block(),
             "sustained":   _sustained_block(),
@@ -514,6 +540,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                 "labels":     _concurrency_labels(rows),
                 "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
                 "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+                "throughput_reliability": _offline_reliability(rows),
             },
             "online":      _online_block(),
             "interactive": _interactive_block(),
@@ -530,6 +557,7 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                 "labels":     _concurrency_labels(rows),
                 "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
                 "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+                "throughput_reliability": _offline_reliability(rows),
             },
             "online":      _online_block(),
             "interactive": _interactive_block(),

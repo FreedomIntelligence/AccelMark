@@ -377,7 +377,44 @@
       "sustained_throughput_tokens_per_sec": 32.3,
       "throttle_ratio": 0.461,
       "throttle_onset_minute": 2.0,
-      "ttft_p99_drift_ms": 2424.7
+      "ttft_p99_drift_ms": 2424.7,
+      "throughput_post_warmup_reliability": {
+        "n": 28,
+        "mean": 32.3,
+        "std": 11.7,
+        "cv_pct": 36.18,
+        "stability": "high-variance",
+        "runs": [
+          25.6,
+          25.6,
+          25.6,
+          55.4,
+          25.6,
+          29.9,
+          25.6,
+          51.2,
+          25.6,
+          29.9,
+          25.6,
+          55.5,
+          25.6,
+          25.6,
+          25.6,
+          25.6,
+          55.5,
+          25.6,
+          29.9,
+          51.1,
+          25.7,
+          25.6,
+          29.9,
+          25.6,
+          55.5,
+          25.6,
+          25.6,
+          25.6
+        ]
+      }
     }
   },
   "accuracy": {

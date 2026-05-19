@@ -361,7 +361,30 @@
       "sustained_throughput_tokens_per_sec": 715.7,
       "throttle_ratio": 0.843,
       "throttle_onset_minute": 10.0,
-      "ttft_p99_drift_ms": -94.9
+      "ttft_p99_drift_ms": -94.9,
+      "throughput_post_warmup_reliability": {
+        "n": 14,
+        "mean": 715.7,
+        "std": 43.7,
+        "cv_pct": 6.1,
+        "stability": "noisy",
+        "runs": [
+          717.7,
+          704.7,
+          752.5,
+          762.7,
+          771.9,
+          752.2,
+          759.1,
+          732.5,
+          743.4,
+          681.3,
+          653.7,
+          669.9,
+          667.5,
+          650.6
+        ]
+      }
     }
   },
   "accuracy": {

@@ -114,6 +114,16 @@ export function initModal() {
       _downloadVizChart(dlBtn);
       return;
     }
+    // Pills / buttons that ask the modal to scroll to a named section
+    // inside the Details panel. Currently used by the reliability pill in
+    // the subtitle; future header chips can reuse `data-scroll-to` for
+    // the same effect without each one wiring its own handler.
+    const jumpTrigger = ev.target.closest("[data-scroll-to]");
+    if (jumpTrigger && _modalEl.contains(jumpTrigger)) {
+      ev.preventDefault();
+      _scrollToDetailSection(jumpTrigger.dataset.scrollTo);
+      return;
+    }
   });
 
   // Esc closes from anywhere.
@@ -293,6 +303,8 @@ function _fillModal(row) {
     parts.push(esc(row.precision) + fallback);
   }
   if (row.date) parts.push(esc(fmtDate(row.date)));
+  const pill = _reliabilityPill(row);
+  if (pill) parts.push(pill);
   subEl.innerHTML = parts.filter(Boolean).join(' <span class="sep">·</span> ');
 
   // Footer: submission + script link.
@@ -381,15 +393,248 @@ function _detailRow(label, v, opts = {}) {
   return `<div class="detail-row"><span class="detail-label">${esc(label)}</span><span class="detail-value${mono}${cls}">${display}</span></div>`;
 }
 
-function _detailSection(title, rows) {
+function _detailSection(title, rows, opts = {}) {
   const content = rows.filter(Boolean).join("");
   if (!content) return "";
+  // `anchor` becomes a data attribute the subtitle pill can scroll to.
+  // `caption` is a small prose block rendered under the section title —
+  // used by Reliability to explain CV / thresholds inline so readers
+  // don't need to rely on the (delayed, plain-text) native title tooltip.
+  const anchor = opts.anchor ? ` data-section="${esc(opts.anchor)}"` : "";
+  const caption = opts.caption
+    ? `<p class="detail-section-help">${opts.caption}</p>`
+    : "";
   return `
-    <div class="detail-section">
+    <div class="detail-section"${anchor}>
       <div class="detail-section-title">${esc(title)}</div>
+      ${caption}
       ${content}
     </div>
   `;
+}
+
+// Scroll the Details tab body to the section tagged data-section=<name>.
+// Activates the Details tab first if the user is on Viz / Implementation
+// when they click the subtitle pill, so the scroll target is actually
+// in the visible panel.
+function _scrollToDetailSection(name) {
+  if (!_modalEl || !name) return;
+  if (_activeTab !== "details") _setTab("details");
+  const target = _modalEl.querySelector(`.detail-section[data-section="${name}"]`);
+  if (!target) return;
+  // Use the modal body as the scroll container so we don't reflow the
+  // whole document. `scrollIntoView` with `{ block: "start" }` would push
+  // the section to the very top, hiding the title — offset by 12 px so
+  // the section heading stays nicely below the modal subheader.
+  const body = _modalEl.querySelector(".modal-body");
+  if (body) {
+    const top = target.offsetTop - 12;
+    body.scrollTo({ top, behavior: "smooth" });
+  } else {
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  // Brief highlight so users notice where the page jumped to.
+  target.classList.add("detail-section-flash");
+  setTimeout(() => target.classList.remove("detail-section-flash"), 1400);
+}
+
+// ── Reliability rendering ────────────────────────────────────────────────────
+//
+// Reliability blocks are emitted by loadgen.py for each scenario starting in
+// the "feat: emit reliability stats" series. Each block has shape:
+//   { n, mean, std, cv_pct, stability: "stable"|"noisy"|"high-variance", runs:[…] }
+// Older results (pre-feature) carry an empty {} which we skip silently — the
+// section header is suppressed if no scenario reported a block, so old runs
+// look the same as before.
+//
+// Design note on iconography:
+//   stable          → ✓  Green — the headline number is the property of the chip.
+//   noisy           → ⚠  Amber — modest jitter (≤8 % CV). Common, not a problem.
+//   high-variance   →    No glyph, red-tinted text — informational, not a verdict.
+// We intentionally do NOT use an ✗ for high-variance. High CV means "this
+// hardware × workload combo carries irreducible variability the reader
+// should be aware of", not "this measurement is wrong". An ✗ would
+// implicitly indict submissions whose hardware simply lacks proper cooling,
+// or scale-out runs whose network jitter is genuine. The colour cue
+// communicates "look closer" without the verdict.
+
+const _STABILITY_ICON = { stable: "✓", noisy: "⚠", "high-variance": "" };
+
+function _hasReliability(block) {
+  return block && typeof block === "object" && block.cv_pct != null;
+}
+
+// Pick the worst (highest CV%) reliability block from a row's viz, used by
+// the modal subtitle pill. Returns { cv_pct, stability, scenario, metric } or
+// null. The "scenario" hint helps users find where to drill in.
+function _pickWorstReliability(row) {
+  const viz = row.viz || {};
+  let worst = null;
+  const consider = (b, scenario, metric) => {
+    if (!_hasReliability(b)) return;
+    if (!worst || b.cv_pct > worst.cv_pct) {
+      worst = { cv_pct: b.cv_pct, stability: b.stability, scenario, metric };
+    }
+  };
+
+  // offline (per-concurrency, multiple blocks)
+  if (viz.offline && Array.isArray(viz.offline.throughput_reliability)) {
+    viz.offline.throughput_reliability.forEach((b) =>
+      consider(b, "offline", "throughput"));
+  }
+  // online (per-QPS, multiple blocks)
+  if (viz.online && Array.isArray(viz.online.ttft_ms_p99_reliability)) {
+    viz.online.ttft_ms_p99_reliability.forEach((b) =>
+      consider(b, "online", "TTFT p99"));
+  }
+  // interactive (single block)
+  consider(viz.interactive && viz.interactive.ttft_ms_p99_reliability,
+           "interactive", "TTFT p99");
+  // sustained (single block)
+  consider(viz.sustained && viz.sustained.throughput_post_warmup_reliability,
+           "sustained", "throughput");
+  return worst;
+}
+
+// Build the small `cv X.X% ✓` pill that appears in the modal subtitle row.
+//
+// The pill is interactive in three ways, layered so each user type has a
+// path to the full explanation:
+//   - Hover (mouse)        → native title tooltip with one-line explanation
+//   - Click (any device)   → scrolls the Details tab to the Reliability
+//                            section, which carries the full prose caption
+//   - `cursor: help` + ⓘ glyph cue readers that this is hoverable
+//
+// The data-scroll-to attribute lets us delegate the click handler at the
+// modal level (see _wireReliabilityPillJump) — no per-pill listener needed.
+function _reliabilityPill(row) {
+  const w = _pickWorstReliability(row);
+  if (!w) return "";
+  const icon = _STABILITY_ICON[w.stability] || "";
+  // CSS class names must be CSS-safe: replace "-" → "_" for high_variance.
+  const stabilitySlug = (w.stability || "unknown").replace(/-/g, "_");
+  const cls  = "modal-reliab-pill " + stabilitySlug;
+  const title = `Coefficient of variation across runs: ${w.cv_pct}% ` +
+    `(worst across scenarios; from ${w.scenario} ${w.metric}). ` +
+    `≤3% stable, ≤8% noisy, >8% high-variance. ` +
+    `High-variance is informational — it means this hardware × workload ` +
+    `combo has irreducible jitter, not that the measurement is wrong. ` +
+    `Click for details.`;
+  const head = icon ? `${icon} cv ${w.cv_pct}%` : `cv ${w.cv_pct}%`;
+  return `<button type="button" class="${esc(cls)}" ` +
+         `title="${esc(title)}" data-scroll-to="reliability">` +
+         `reliability ${esc(head)} <span class="modal-reliab-help" aria-hidden="true">ⓘ</span>` +
+         `</button>`;
+}
+
+// Render one row per scenario in the Details tab. Skipped if a scenario has
+// no block (older results). Burst gets recovery_time_seconds appended.
+function _reliabilityRows(row) {
+  const viz = row.viz || {};
+  const rows = [];
+
+  // Format: "4.19% ⚠ noisy (n=14)" or "12.4% high-variance (n=14)".
+  // Icon is omitted (not just blank) for high-variance so we don't render
+  // a dangling "·" — the label and colour carry the meaning instead.
+  const fmtBlock = (b) => {
+    const icon = _STABILITY_ICON[b.stability] || "";
+    const head = icon ? `${b.cv_pct}% · ${icon}` : `${b.cv_pct}%`;
+    return `${head} <span class="muted-note">${esc(b.stability || "")} (n=${b.n})</span>`;
+  };
+
+  // offline — show the worst (largest CV) of all client_concurrency rows.
+  // That's the limiting concurrency for stability claims.
+  if (viz.offline && Array.isArray(viz.offline.throughput_reliability)) {
+    const labels = viz.offline.labels || [];
+    const blocks = viz.offline.throughput_reliability;
+    const indexed = blocks
+      .map((b, i) => ({ b, label: labels[i] || `cc=${i}` }))
+      .filter((x) => _hasReliability(x.b));
+    if (indexed.length) {
+      indexed.sort((a, b) => b.b.cv_pct - a.b.cv_pct);
+      const w = indexed[0];
+      rows.push(_detailRow(
+        `Offline throughput (cc=${w.label})`,
+        fmtBlock(w.b),
+        { html: true },
+      ));
+    }
+  }
+
+  if (viz.online && Array.isArray(viz.online.ttft_ms_p99_reliability)) {
+    const labels = viz.online.labels || [];
+    const blocks = viz.online.ttft_ms_p99_reliability;
+    const indexed = blocks
+      .map((b, i) => ({ b, label: labels[i] || `qps=${i}` }))
+      .filter((x) => _hasReliability(x.b));
+    if (indexed.length) {
+      indexed.sort((a, b) => b.b.cv_pct - a.b.cv_pct);
+      const w = indexed[0];
+      rows.push(_detailRow(
+        `Online TTFT p99 (qps=${w.label})`,
+        fmtBlock(w.b),
+        { html: true },
+      ));
+    }
+  }
+
+  if (viz.interactive && _hasReliability(viz.interactive.ttft_ms_p99_reliability)) {
+    rows.push(_detailRow(
+      "Interactive TTFT p99",
+      fmtBlock(viz.interactive.ttft_ms_p99_reliability),
+      { html: true },
+    ));
+  }
+
+  if (viz.sustained && _hasReliability(viz.sustained.throughput_post_warmup_reliability)) {
+    rows.push(_detailRow(
+      "Sustained throughput (post-warmup)",
+      fmtBlock(viz.sustained.throughput_post_warmup_reliability),
+      { html: true },
+    ));
+  }
+
+  // Burst — non-CV stability metric: time-to-recover after a peak window.
+  if (viz.burst && viz.burst.recovery_time_seconds != null) {
+    const sec = Number(viz.burst.recovery_time_seconds);
+    rows.push(_detailRow(
+      "Burst recovery time",
+      `${sec.toFixed(2)} s ` +
+      `<span class="muted-note">median per-cycle, threshold 1.5× steady p99</span>`,
+      { html: true },
+    ));
+  } else if (viz.burst && Array.isArray(viz.burst.recovery_time_seconds_per_cycle)
+             && viz.burst.recovery_time_seconds_per_cycle.length === 0) {
+    // Burst ran but never recovered within any cycle's post-burst window.
+    rows.push(_detailRow(
+      "Burst recovery time",
+      `not measurable <span class="muted-note">(never returned to baseline within steady window)</span>`,
+      { html: true },
+    ));
+  }
+
+  return rows;
+}
+
+// Flatten env_info.vendor_details into rows. Keys that are objects/arrays are
+// JSON-stringified for display; null/empty values are dropped. We intentionally
+// do not try to humanise key names — vendors disagree on terminology and the
+// keys themselves are the documented contract.
+function _vendorDetailRows(row) {
+  const obj = (row.detail || {}).env_vendor_details;
+  if (!obj || typeof obj !== "object") return [];
+  const rows = [];
+  for (const k of Object.keys(obj).sort()) {
+    const v = obj[k];
+    if (v === null || v === undefined || v === "") continue;
+    if (Array.isArray(v) && v.length === 0) continue;
+    if (typeof v === "object" && !Array.isArray(v) && Object.keys(v).length === 0) continue;
+    const display = (typeof v === "object")
+      ? JSON.stringify(v)
+      : String(v);
+    rows.push(_detailRow(k, display, { mono: true }));
+  }
+  return rows;
 }
 
 function _renderDetails(row, panel) {
@@ -457,6 +702,21 @@ function _renderDetails(row, panel) {
       d.run_pp != null ? _detailRow("Pipeline parallel size", d.run_pp) : null,
       d.run_dp != null ? _detailRow("Data parallel size",     d.run_dp) : null,
     ]),
+    _detailSection("Reliability", _reliabilityRows(row), {
+      anchor: "reliability",
+      // Plain HTML (not auto-escaped) so we can highlight the threshold
+      // pills. Keep the wording short — readers shouldn't need to read a
+      // paragraph to decode a single percentage in the table below.
+      caption:
+        "Inter-run <strong>coefficient of variation</strong> " +
+        "(CV = std / mean × 100%) across the runs that produced this " +
+        "submission — lower is more reproducible. " +
+        "<span class=\"reliab-legend stable\">✓ stable</span> ≤ 3% &nbsp;·&nbsp; " +
+        "<span class=\"reliab-legend noisy\">⚠ noisy</span> ≤ 8% &nbsp;·&nbsp; " +
+        "<span class=\"reliab-legend high_variance\">high-variance</span> &gt; 8% " +
+        "(informational — natural jitter, not a measurement error).",
+    }),
+    _detailSection("Vendor-specific environment", _vendorDetailRows(row)),
     _detailSection("Accuracy", [
       _detailRow("Subset score", d.acc_score, {
         format: (v) => Number(v).toFixed(2),

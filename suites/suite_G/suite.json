@@ -31,7 +31,7 @@
   "num_runs": 3,
   "warmup_runs": 1,
   "warmup_minutes": 2,
-  "online_warmup_runs": 0,
+  "online_warmup_requests": 10,
   "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.1,
   "request_count": 100,

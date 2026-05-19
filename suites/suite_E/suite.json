@@ -32,7 +32,7 @@
   "online_sla_ttft_ms_relaxed": null,
   "num_runs": 3,
   "warmup_runs": 1,
-  "online_warmup_runs": 0,
+  "online_warmup_requests": 10,
   "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.1,
   "request_count": 150,
