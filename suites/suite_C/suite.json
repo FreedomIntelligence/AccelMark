@@ -47,7 +47,7 @@
   },
 
   "precision_levels": ["BF16", "FP16", "FP8", "W8A8", "W8A16", "W4A16"],
-  "_precision_levels_note": "FP16 runs on all hardware including pre-Ampere. FP8 requires Ampere+ and is skipped automatically on FP16-only runners via SUPPORTED_QUANTIZATIONS.",
+  "_precision_levels_note": "FP16 runs on all hardware including pre-Ampere. FP8 requires Ampere+ and is skipped automatically on FP16-only runners via SUPPORTED_QUANTIZATION_BACKENDS.",
 
   "accuracy_thresholds": {
     "BF16":  0.03,

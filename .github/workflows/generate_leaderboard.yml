@@ -11,8 +11,9 @@ on:
     paths:
       - 'results/**'
       - 'leaderboard/**'
+      - 'suites/**'
+      - 'schema/**'
       - 'tools/generate_platforms_matrix.py'
-      - 'schema/platforms.json'
       - 'runners/*/meta.json'
 
   # Allow manual trigger from Actions tab (useful for first deploy or to
@@ -36,6 +37,9 @@ jobs:
 
       - name: Validate all runner meta.json files and hashes
         run: python runners/validate_runners.py
+
+      - name: Validate all suite definitions
+        run: python runners/validate_suites.py
 
   generate:
     name: Generate and deploy leaderboard

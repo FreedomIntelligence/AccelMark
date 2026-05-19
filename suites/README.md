@@ -309,8 +309,10 @@ not model version differences.
 
 Each format runs against the same 100 prompts with concurrency levels
 `[1, 4, 16, 64]` from `suite_C/suite.json` (not the same sweep as Suite A’s
-`[8, 32, 128]`). Format availability depends on the runner's `SUPPORTED_QUANTIZATIONS`
-declaration — unsupported formats are skipped automatically.
+`[8, 32, 128]`). Format availability depends on the runner's
+`SUPPORTED_QUANTIZATION_BACKENDS` declaration — unsupported formats are
+skipped automatically by matching each entry's `engine_kwargs.quantization`
+against the runner's backend list.
 
 ### Metrics
 
@@ -341,13 +343,15 @@ On H100, FP8 would show ~1.5-1.8× speedup.
 
 ### Runner requirements
 
-Declare which formats your runner supports:
+Declare which quantization backends your runner's framework supports. The
+strings are the engine's own backend identifiers (vLLM names shown), NOT
+suite precision tags such as W8A8/FP8/W4A16:
 
 ```python
 # In your runner class:
-SUPPORTED_QUANTIZATIONS = ["fp8", "w8a8", "w8a16", "w4a16"]  # H100
-SUPPORTED_QUANTIZATIONS = ["w8a8", "w8a16", "w4a16"]          # A100 (no native FP8)
-SUPPORTED_QUANTIZATIONS = []                                   # BF16 only
+SUPPORTED_QUANTIZATION_BACKENDS = ["fp8", "compressed-tensors", "gptq_marlin"]  # vLLM full
+SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq_marlin"]         # No native FP8
+SUPPORTED_QUANTIZATION_BACKENDS = []                                            # BF16 only
 ```
 
 Each format's checkpoint must be available locally. Add to
@@ -712,7 +716,7 @@ submissions.
 
 ## Adding a new suite
 
-1. Open a GitHub Issue using the "Request new suite" template
+1. Open a GitHub Issue using the [**Propose a new suite**](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=new_suite.md) template
 2. Specify: model, chip count, scenarios, and rationale
 3. Discuss the proposal in the issue thread — interested contributors weigh in
 4. Create `suites/suite_X/suite.json` referencing a shared dataset

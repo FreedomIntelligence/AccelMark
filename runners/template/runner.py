@@ -65,11 +65,24 @@ class TemplateRunner(BenchmarkRunner):
     BenchmarkRunner auto-detects hardware limits and intersects with this list.
     """
 
-    SUPPORTED_QUANTIZATIONS = []
+    SUPPORTED_QUANTIZATION_BACKENDS = []
     """
-    Quantization formats for Suite C. List any of: "fp8", "w8a8", "w8a16", "w4a16"
-    BF16 is always supported — do not list it here.
-    Empty list = this runner skips all quantized formats in Suite C.
+    Framework-level quantization backends supported by this runner. The
+    values are passed directly to the engine (e.g. vLLM's `quantization=`
+    kwarg), so the names mirror the engine's vocabulary — NOT the suite-level
+    precision tags (W8A8, FP8, W4A16, …).
+
+    Suite C cross-references each precision_model_map entry's
+    engine_kwargs.quantization against this list to decide which formats to
+    run on this runner. Adding a new quantized format becomes a pure suite
+    edit — no runner change is needed if the backend is already supported.
+
+    Examples (vLLM names):
+        SUPPORTED_QUANTIZATION_BACKENDS = ["fp8", "compressed-tensors", "gptq_marlin"]
+        SUPPORTED_QUANTIZATION_BACKENDS = ["compressed-tensors", "gptq_marlin"]
+        SUPPORTED_QUANTIZATION_BACKENDS = []  # BF16/FP16/FP32 only
+
+    BF16/FP16/FP32 are always allowed — do not list them here.
     """
 
     # ── Initializer ───────────────────────────────────────────────────────────

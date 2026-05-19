@@ -8,7 +8,8 @@ on:
     paths:
       - 'results/**'
       - 'runners/**'
-      - 'schema/platforms.json'
+      - 'suites/**'
+      - 'schema/**'
       - 'tools/generate_platforms_matrix.py'
       - 'README.md'
       - 'leaderboard/site/**'
@@ -87,6 +88,29 @@ jobs:
         run: |
           echo "::group::tools/generate_platforms_matrix.py --check"
           python tools/generate_platforms_matrix.py --check
+          echo "::endgroup::"
+
+  validate-suites:
+    name: Validate suite definitions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install jsonschema
+
+      # Always validate every suite (and re-validate on schema changes too).
+      # This catches drift introduced by shared changes — e.g. a
+      # suite.schema.json edit that breaks an unrelated existing suite.
+      - name: Validate all suite folders (drift check)
+        run: |
+          echo "::group::Validating every suite folder in the repo"
+          python runners/validate_suites.py
           echo "::endgroup::"
 
   validate:
@@ -226,3 +250,46 @@ jobs:
       # glob below picks them up automatically.
       - name: Run leaderboard frontend tests
         run: node --test leaderboard/site/test/*.test.mjs
+
+  python-tests:
+    name: Python unit tests (serve + skill)
+    runs-on: ubuntu-latest
+    # Lightweight checks for the FastAPI serve layer and the OpenClaw skill
+    # entry point. No GPU, no real model — everything is mocked. Tests are
+    # opt-in per package so missing deps in one folder don't take the rest
+    # of the suite down with them.
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install test dependencies
+        # numpy is pulled in transitively by loadgen (imported when serve.server
+        # touches runners.benchmark_runner). Keep this list lean — these are the
+        # only packages required to *collect and run* the unit tests; no torch,
+        # no vendor SDKs, no real runner.
+        run: |
+          pip install --quiet pytest pydantic fastapi httpx pyyaml jsonschema numpy
+
+      - name: Run serve unit tests
+        run: |
+          if [ -d serve/tests ]; then
+            echo "::group::pytest serve/tests"
+            python -m pytest serve/tests -q --no-header --color=no
+            echo "::endgroup::"
+          else
+            echo "serve/tests/ not present — skipping."
+          fi
+
+      - name: Run OpenClaw skill unit tests
+        run: |
+          if [ -d openclaw_skill/tests ]; then
+            echo "::group::pytest openclaw_skill/tests"
+            python -m pytest openclaw_skill/tests -q --no-header --color=no
+            echo "::endgroup::"
+          else
+            echo "openclaw_skill/tests/ not present — skipping."
+          fi
