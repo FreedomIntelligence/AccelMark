@@ -267,8 +267,12 @@ jobs:
           cache: pip
 
       - name: Install test dependencies
+        # numpy is pulled in transitively by loadgen (imported when serve.server
+        # touches runners.benchmark_runner). Keep this list lean — these are the
+        # only packages required to *collect and run* the unit tests; no torch,
+        # no vendor SDKs, no real runner.
         run: |
-          pip install --quiet pytest pydantic fastapi httpx pyyaml jsonschema
+          pip install --quiet pytest pydantic fastapi httpx pyyaml jsonschema numpy
 
       - name: Run serve unit tests
         run: |

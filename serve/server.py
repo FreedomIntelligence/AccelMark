@@ -24,7 +24,6 @@ import uuid
 from contextlib import asynccontextmanager
 from typing import Optional, Union
 
-import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 
@@ -397,6 +396,10 @@ def start_server(
     logger.info("=" * 60)
 
     # ── Launch uvicorn ─────────────────────────────────────────────────────
+    # Imported lazily so importing `serve.server` (e.g. from tests, or to
+    # build the ASGI `app` for an external runner) does not require uvicorn.
+    import uvicorn
+
     uvicorn.run(
         app,
         host=host,
