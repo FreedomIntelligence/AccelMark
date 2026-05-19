@@ -48,12 +48,12 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage      = "https://github.com/JuhaoLiang1997/AccelMark"
-Leaderboard   = "https://juhaoliang1997.github.io/AccelMark"
-Documentation = "https://github.com/JuhaoLiang1997/AccelMark/blob/main/README.md"
-Repository    = "https://github.com/JuhaoLiang1997/AccelMark"
-Issues        = "https://github.com/JuhaoLiang1997/AccelMark/issues"
-Changelog     = "https://github.com/JuhaoLiang1997/AccelMark/releases"
+Homepage      = "https://github.com/FreedomIntelligence/AccelMark"
+Leaderboard   = "https://freedomintelligence.github.io/AccelMark"
+Documentation = "https://github.com/FreedomIntelligence/AccelMark/blob/main/README.md"
+Repository    = "https://github.com/FreedomIntelligence/AccelMark"
+Issues        = "https://github.com/FreedomIntelligence/AccelMark/issues"
+Changelog     = "https://github.com/FreedomIntelligence/AccelMark/releases"
 
 [build-system]
 requires = ["setuptools>=68"]

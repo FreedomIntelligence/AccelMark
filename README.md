@@ -10,16 +10,16 @@
 </p>
 
 <p align="center">
-  <a href="https://juhaoliang1997.github.io/AccelMark"><img src="https://img.shields.io/badge/leaderboard-live-brightgreen" alt="Live Leaderboard"></a>
+  <a href="https://freedomintelligence.github.io/AccelMark"><img src="https://img.shields.io/badge/leaderboard-live-brightgreen" alt="Live Leaderboard"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributions-welcome-orange.svg" alt="Contributions welcome"></a>
 </p>
 
 <p align="center">
-  <a href="https://juhaoliang1997.github.io/AccelMark"><strong>→ Live Leaderboard</strong></a> ·
+  <a href="https://freedomintelligence.github.io/AccelMark"><strong>→ Live Leaderboard</strong></a> ·
   <a href="CONTRIBUTING.md">Contributing</a> ·
   <a href="suites/README.md">Suites</a> ·
-  <a href="https://github.com/JuhaoLiang1997/AccelMark/discussions">Discussions</a> ·
+  <a href="https://github.com/FreedomIntelligence/AccelMark/discussions">Discussions</a> ·
   <a href="DEVELOPMENT.md">Development</a>
 </p>
 
@@ -49,7 +49,7 @@
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/JuhaoLiang1997/AccelMark.git
+git clone https://github.com/FreedomIntelligence/AccelMark.git
 cd AccelMark
 pip install -e .                                              # installs framework dependencies (Python >=3.10 required)
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt # installs runner dependencies
@@ -70,7 +70,7 @@ python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
 # your result.json and env_info.json; no manual file moves are needed.
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. If you'd rather skip the PR workflow, [open a submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md) instead and a bot will draft the PR for you.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. If you'd rather skip the PR workflow, [open a submission issue](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=community_submission.md) instead and a bot will draft the PR for you.
 
 ---
 
@@ -100,7 +100,7 @@ See [suites/README.md](suites/README.md) for full specs, time budgets, SLA defin
        width="980">
 </p>
 
-A snapshot of accelerators that have at least one submission on the leaderboard. Tile size is proportional to submission count; colour denotes vendor. See the [**live leaderboard**](https://juhaoliang1997.github.io/AccelMark) for current rankings, per-suite breakdowns, and the underlying `result.json` files.
+A snapshot of accelerators that have at least one submission on the leaderboard. Tile size is proportional to submission count; colour denotes vendor. See the [**live leaderboard**](https://freedomintelligence.github.io/AccelMark) for current rankings, per-suite breakdowns, and the underlying `result.json` files.
 
 ---
 
@@ -150,8 +150,8 @@ The most valuable contribution is running the benchmark on hardware not yet in t
 - **Submit a result** → [Submitting a result](CONTRIBUTING.md#submitting-a-result)
 - **Add a new runner** → [Adding a new runner](CONTRIBUTING.md#adding-a-new-runner)
 - **Add a new accelerator family** → [Platform plug-in guide](runners/README.md#adding-a-new-accelerator-family)
-- **Report a bug** → [Open an issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=bug_report.md)
-- **Ask a question / share results** → [Discussions](https://github.com/JuhaoLiang1997/AccelMark/discussions)
+- **Report a bug** → [Open an issue](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=bug_report.md)
+- **Ask a question / share results** → [Discussions](https://github.com/FreedomIntelligence/AccelMark/discussions)
 - **Extend the leaderboard** → [Development guide](DEVELOPMENT.md)
 
 > _Optional:_ AccelMark also ships a small voice-driven launcher for the [OpenClaw](https://clawhub.ai) ecosystem — see [`openclaw_skill/`](openclaw_skill/README.md). It's not required to run, contribute, or submit results.
@@ -167,7 +167,7 @@ If you use AccelMark results in research, please cite:
   title  = {Beyond NVIDIA! A  Multi-Regime Framework for Benchmarking Heterogeneous AI Accelerators},
   author = {Liang, Juhao and Zhang, Zhiyuan and Li, Siyu and Lin, Zhihang and Yu, Minchen and Zeng, Li and Chen, Zizhong and Sun, Ruoyu and Wang, Benyou},
   year   = {2026},
-  url    = {https://github.com/JuhaoLiang1997/AccelMark}
+  url    = {https://github.com/FreedomIntelligence/AccelMark}
 }
 ```
 

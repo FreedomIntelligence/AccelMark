@@ -107,10 +107,10 @@ export function render({ el }) {
         </p>
         <div class="submit-cta">
           <a class="btn primary"
-             href="https://github.com/JuhaoLiang1997/AccelMark/blob/main/CONTRIBUTING.md"
+             href="https://github.com/FreedomIntelligence/AccelMark/blob/main/CONTRIBUTING.md"
              target="_blank" rel="noopener">Contributor guide →</a>
           <a class="btn"
-             href="https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=submission.md"
+             href="https://github.com/FreedomIntelligence/AccelMark/issues/new?template=submission.md"
              target="_blank" rel="noopener">Open a submission</a>
         </div>
       </div>

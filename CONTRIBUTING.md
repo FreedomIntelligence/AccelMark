@@ -36,7 +36,7 @@ gh pr create   # or open the PR via the GitHub web UI
 
 That's it. CI validates the result automatically; merging the PR publishes it to the leaderboard.
 
-> _Prefer not to use git?_ Open a [Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md), paste your `result.json`, and the CI bot will draft the PR on your behalf.
+> _Prefer not to use git?_ Open a [Community Submission issue](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=community_submission.md), paste your `result.json`, and the CI bot will draft the PR on your behalf.
 
 ---
 
@@ -338,7 +338,7 @@ Actions workflow regenerates them on every merge to `main`.
 ### Alternative: open a submission issue (no git required)
 
 If you'd rather not use git, paste your `result.json` into a
-[Community Submission issue](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=community_submission.md).
+[Community Submission issue](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=community_submission.md).
 A bot will validate the JSON, draft a PR with the files in the right place,
 and link it back to your issue. You don't need to touch git or fork the repo.
 

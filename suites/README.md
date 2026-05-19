@@ -716,7 +716,7 @@ submissions.
 
 ## Adding a new suite
 
-1. Open a GitHub Issue using the [**Propose a new suite**](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=new_suite.md) template
+1. Open a GitHub Issue using the [**Propose a new suite**](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=new_suite.md) template
 2. Specify: model, chip count, scenarios, and rationale
 3. Discuss the proposal in the issue thread — interested contributors weigh in
 4. Create `suites/suite_X/suite.json` referencing a shared dataset

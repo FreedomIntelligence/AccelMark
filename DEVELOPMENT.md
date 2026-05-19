@@ -1134,6 +1134,6 @@ python runners/validate_submission.py --dir /tmp/accelmark_test/
 ## Questions and Support
 
 - **Bug in LoadGen or schema:** Open a GitHub Issue
-- **New suite proposal:** Open a GitHub Issue with the [**Propose a new suite**](https://github.com/JuhaoLiang1997/AccelMark/issues/new?template=new_suite.md) template
+- **New suite proposal:** Open a GitHub Issue with the [**Propose a new suite**](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=new_suite.md) template
 - **New platform support:** Open a PR with a working platform script and at least one verified result
 - **Leaderboard question:** Check `leaderboard/generate.py` — it's well-commented

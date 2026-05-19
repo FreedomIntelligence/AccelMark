@@ -75,7 +75,7 @@ appointed representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the project maintainers by opening a confidential security
-advisory at <https://github.com/JuhaoLiang1997/AccelMark/security/advisories/new>
+advisory at <https://github.com/FreedomIntelligence/AccelMark/security/advisories/new>
 or, when GitHub access is not available, by emailing the maintainer listed
 in the repository profile. All complaints will be reviewed and investigated
 promptly and fairly.
