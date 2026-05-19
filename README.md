@@ -164,7 +164,7 @@ If you use AccelMark results in research, please cite:
 
 ```bibtex
 @misc{accelmark2026,
-  title  = {AccelMark: Open Benchmark Leaderboard for AI Accelerators on LLM Workloads},
+  title  = {Beyond NVIDIA! A  Multi-Regime Framework for Benchmarking Heterogeneous AI Accelerators},
   author = {Liang, Juhao and Zhang, Zhiyuan and Li, Siyu and Lin, Zhihang and Yu, Minchen and Zeng, Li and Chen, Zizhong and Sun, Ruoyu and Wang, Benyou},
   year   = {2026},
   url    = {https://github.com/JuhaoLiang1997/AccelMark}
