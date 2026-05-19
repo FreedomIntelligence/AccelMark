@@ -105,11 +105,9 @@ cp configs/runner_configs/runner_nvidia_vllm020_0f6c56e4.yaml.example \
 
 Merge priority: CLI flags > suite-specific section > global defaults.
 
-### Suite C — quantization (`enforce_eager` required)
+### Suite C — quantization
 
-vLLM 0.20 enables CUDA graphs by default. With `compressed-tensors` checkpoints (FP8, W8A8, W8A16), graphs can produce **repetitive garbage output**: offline throughput looks normal but MMLU accuracy drops to ~0.
-
-The example config sets this only for Suite C so other suites keep CUDA graphs:
+Copy `runner_nvidia_vllm020_0f6c56e4.yaml` from the example and keep the `suite_C` override:
 
 ```yaml
 suites:
@@ -117,7 +115,9 @@ suites:
     enforce_eager: true
 ```
 
-CLI override: `--enforce-eager`. Without it, Suite C accuracy results are invalid even if throughput is high.
+**`enforce_eager` (required for W8A8 / W8A16 on all GPUs):** vLLM 0.20 + CUDA graphs + `compressed-tensors` can yield repetitive garbage (`-addon-addon-…`) with normal-looking offline throughput. Suite C must set `enforce_eager: true` (or pass `--enforce-eager`).
+
+**FP8 on Ampere (A100 / A800 / RTX 30xx, compute capability &lt; 8.9):** vLLM 0.20 does **not** run RedHatAI FP8 checkpoints correctly. The engine falls back to weight-only Marlin FP8 (`marlin_utils_fp8` warning in the log) and accuracy stays ~0 even with `enforce_eager: true`. This is a vLLM 0.20 limitation, not an AccelMark bug. On these GPUs, Suite C **W8A8 / W8A16 / BF16** are valid; for FP8 use **H100+** (sm ≥ 8.9) or the [`nvidia_vllm_47f5d58e`](../nvidia_vllm_47f5d58e/) runner on vLLM 0.7.3.
 
 ### Optional `engine_kwargs` (0.20)
 
@@ -149,7 +149,9 @@ This runner targets Ampere+ with CUDA 12.8/13.0. For Volta/Turing, use [`nvidia_
 
 ### Suite C accuracy ~0 but offline OK
 
-Enable `enforce_eager` for `suite_C` in the runner config (see above) and re-run the accuracy scenario.
+1. Confirm `configs/runner_configs/runner_nvidia_vllm020_0f6c56e4.yaml` exists and has `suites.suite_C.enforce_eager: true`.
+2. Re-run accuracy with `--force` (or delete the format’s `accuracy/` folder).
+3. If the log shows `Weight-only FP8 compression will be used leveraging the Marlin kernel` on an **A100**, FP8 will stay ~0 on vLLM 0.20 — use W8A8/W8A16 or H100+ for FP8 (see Suite C section above).
 
 ## Hardware matrix
 

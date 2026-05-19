@@ -54,9 +54,9 @@ gpu_memory_utilization: 0.90
 suites:
   suite_C:
     # Quantization suite (FP8/W8A8/W8A16 via compressed-tensors).
-    # vLLM 0.20 + CUDA graphs can produce repetitive garbage on quantized
-    # checkpoints (accuracy ~0 while offline throughput looks normal).
-    # enforce_eager disables CUDAGraph — required for correct Suite C accuracy.
+    # enforce_eager disables CUDA graphs — required for W8A8/W8A16 accuracy on vLLM 0.20.
+    # Note: FP8 still fails on Ampere (A100, sm < 8.9): vLLM 0.20 uses broken Marlin
+    # weight-only FP8 fallback. Use H100+ for Suite C FP8, or vLLM 0.7.3 runner on A100.
     enforce_eager: true
 
   suite_D:
