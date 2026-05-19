@@ -112,7 +112,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 165.8,
       "meta_model_load_sec": 1.8,
       "meta_start_time": "2026-04-20T12:42:52.864465+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -131,6 +132,11 @@ const LEADERBOARD_DATA = [
           1.24,
           1.24,
           1.24
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -139,7 +145,8 @@ const LEADERBOARD_DATA = [
         "ttft_p90": [],
         "tpot_p50": [],
         "sla_met": [],
-        "max_valid_qps": null
+        "max_valid_qps": null,
+        "ttft_ms_p99_reliability": []
       },
       "interactive": {
         "ttft_p50": null,
@@ -147,7 +154,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": null,
         "tpot_p50": null,
         "tpot_p90": null,
-        "tpot_p99": null
+        "tpot_p99": null,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null
     },
@@ -279,7 +287,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 1.3,
       "meta_model_load_sec": 56.2,
       "meta_start_time": "2026-04-18T03:37:02.159337+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -298,6 +307,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -306,7 +320,8 @@ const LEADERBOARD_DATA = [
         "ttft_p90": [],
         "tpot_p50": [],
         "sla_met": [],
-        "max_valid_qps": null
+        "max_valid_qps": null,
+        "ttft_ms_p99_reliability": []
       },
       "interactive": {
         "ttft_p50": null,
@@ -314,7 +329,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": null,
         "tpot_p50": null,
         "tpot_p90": null,
-        "tpot_p99": null
+        "tpot_p99": null,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null
     },
@@ -447,7 +463,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 5.0,
       "meta_model_load_sec": 67.5,
       "meta_start_time": "2026-04-18T04:13:13.798030+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -466,6 +483,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -474,7 +496,8 @@ const LEADERBOARD_DATA = [
         "ttft_p90": [],
         "tpot_p50": [],
         "sla_met": [],
-        "max_valid_qps": null
+        "max_valid_qps": null,
+        "ttft_ms_p99_reliability": []
       },
       "interactive": {
         "ttft_p50": null,
@@ -482,7 +505,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": null,
         "tpot_p50": null,
         "tpot_p90": null,
-        "tpot_p99": null
+        "tpot_p99": null,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null,
       "speculative": {
@@ -620,7 +644,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 23.5,
       "meta_model_load_sec": 68.9,
       "meta_start_time": "2026-04-18T04:25:04.523831+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -636,6 +661,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -644,7 +673,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": null,
         "tpot_p50": null,
         "tpot_p90": null,
-        "tpot_p99": null
+        "tpot_p99": null,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null,
       "speculative": null
@@ -777,7 +807,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 1.5,
       "meta_model_load_sec": 49.5,
       "meta_start_time": "2026-04-18T04:04:39.021437+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -796,6 +827,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -804,7 +840,8 @@ const LEADERBOARD_DATA = [
         "ttft_p90": [],
         "tpot_p50": [],
         "sla_met": [],
-        "max_valid_qps": null
+        "max_valid_qps": null,
+        "ttft_ms_p99_reliability": []
       },
       "interactive": {
         "ttft_p50": null,
@@ -812,7 +849,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": null,
         "tpot_p50": null,
         "tpot_p90": null,
-        "tpot_p99": null
+        "tpot_p99": null,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null
     },
@@ -949,7 +987,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 126.2,
       "meta_model_load_sec": 76.2,
       "meta_start_time": "2026-04-14T14:21:45.435917+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -968,6 +1007,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -996,7 +1040,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 57.13,
@@ -1004,7 +1053,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 97.76,
         "tpot_p50": 25.0,
         "tpot_p90": 26.31,
-        "tpot_p99": 27.16
+        "tpot_p99": 27.16,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -1138,6 +1188,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.868,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -21.4,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 268.0,
+          "std": 8.9,
+          "cv_pct": 3.3,
+          "stability": "noisy",
+          "runs": [
+            251.1,
+            271.0,
+            265.9,
+            264.0,
+            276.5,
+            269.5,
+            247.8,
+            277.0,
+            283.2,
+            262.3,
+            271.0,
+            266.3,
+            268.9,
+            252.2,
+            267.2,
+            263.6,
+            271.2,
+            285.4,
+            270.5,
+            266.6,
+            270.5,
+            277.3,
+            266.5,
+            259.0,
+            279.0,
+            268.9,
+            271.4,
+            260.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -1447,6 +1534,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 361.412,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -1603,7 +1692,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 140.7,
       "meta_model_load_sec": 109.0,
       "meta_start_time": "2026-04-14T13:38:17.379193+00:00",
-      "meta_notes": "Partial run: ['offline', 'interactive', 'sustained', 'online'] succeeded, ['speculative'] failed."
+      "meta_notes": "Partial run: ['offline', 'interactive', 'sustained', 'online'] succeeded, ['speculative'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -1619,6 +1709,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -1627,7 +1721,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 3539.16,
         "tpot_p50": 33.73,
         "tpot_p90": 34.21,
-        "tpot_p99": 34.64
+        "tpot_p99": 34.64,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -1761,6 +1856,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.733,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -20614.1,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 53.2,
+          "std": 5.6,
+          "cv_pct": 10.6,
+          "stability": "high-variance",
+          "runs": [
+            46.9,
+            59.7,
+            51.2,
+            51.2,
+            55.5,
+            46.9,
+            64.0,
+            46.9,
+            59.7,
+            46.9,
+            55.5,
+            55.5,
+            46.9,
+            59.8,
+            46.9,
+            59.7,
+            46.9,
+            59.7,
+            51.2,
+            51.2,
+            55.4,
+            46.9,
+            64.0,
+            46.9,
+            55.5,
+            51.2,
+            55.5,
+            51.2
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -2187,7 +2319,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 53.8,
       "meta_model_load_sec": 63.4,
       "meta_start_time": "2026-04-14T14:27:24.168121+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -2206,6 +2339,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -2229,7 +2367,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 46.52,
@@ -2237,7 +2379,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 76.43,
         "tpot_p50": 21.35,
         "tpot_p90": 21.99,
-        "tpot_p99": 22.69
+        "tpot_p99": 22.69,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -2311,6 +2454,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.883,
         "throttle_onset_minute": 6.0,
         "ttft_p99_drift_ms": -302.5,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 1238.9,
+          "std": 47.1,
+          "cv_pct": 3.8,
+          "stability": "noisy",
+          "runs": [
+            1230.3,
+            1302.7,
+            1288.1,
+            1349.2,
+            1277.4,
+            1204.2,
+            1213.4,
+            1211.4,
+            1191.5,
+            1223.0,
+            1239.3,
+            1204.1,
+            1199.3,
+            1210.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -2587,7 +2753,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 144.5,
       "meta_model_load_sec": 362.6,
       "meta_start_time": "2026-04-14T10:56:48.122297+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -2611,6 +2778,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -2644,7 +2816,13 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 2
+        "max_valid_qps": 2,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -2778,6 +2956,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.616,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -127.8,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 53.2,
+          "std": 7.0,
+          "cv_pct": 13.23,
+          "stability": "high-variance",
+          "runs": [
+            56.7,
+            55.0,
+            54.4,
+            54.2,
+            52.3,
+            40.7,
+            62.1,
+            54.1,
+            52.1,
+            63.0,
+            40.6,
+            65.9,
+            41.9,
+            44.9,
+            65.4,
+            50.3,
+            58.2,
+            52.0,
+            49.0,
+            55.4,
+            49.7,
+            51.5,
+            54.8,
+            55.4,
+            63.5,
+            45.1,
+            55.0,
+            45.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -3082,6 +3297,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 2.354,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -3240,7 +3457,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 15.8,
       "meta_model_load_sec": 76.8,
       "meta_start_time": "2026-04-14T15:38:34.045492+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -3400,7 +3618,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 78.5,
       "meta_model_load_sec": 124.8,
       "meta_start_time": "2026-04-14T15:49:24.669099+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -3419,6 +3638,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -3447,7 +3671,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 2
+        "max_valid_qps": 2,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 73.38,
@@ -3455,7 +3684,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 165.68,
         "tpot_p50": 32.03,
         "tpot_p90": 32.45,
-        "tpot_p99": 32.59
+        "tpot_p99": 32.59,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -3589,6 +3819,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.821,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -109.1,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 226.6,
+          "std": 11.3,
+          "cv_pct": 5.01,
+          "stability": "noisy",
+          "runs": [
+            217.7,
+            215.0,
+            227.9,
+            236.8,
+            220.7,
+            231.6,
+            213.2,
+            230.9,
+            230.7,
+            225.5,
+            221.6,
+            244.7,
+            201.0,
+            231.4,
+            239.6,
+            239.7,
+            220.8,
+            225.3,
+            238.2,
+            201.8,
+            239.8,
+            226.4,
+            222.9,
+            219.6,
+            241.1,
+            236.3,
+            213.8,
+            231.0
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -4016,7 +4283,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 144.7,
       "meta_model_load_sec": 107.1,
       "meta_start_time": "2026-04-14T15:01:19.879548+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -4040,6 +4308,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -4073,7 +4346,13 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 2
+        "max_valid_qps": 2,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -4207,6 +4486,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.603,
         "throttle_onset_minute": 3.0,
         "ttft_p99_drift_ms": -14.8,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 53.5,
+          "std": 7.9,
+          "cv_pct": 14.84,
+          "stability": "high-variance",
+          "runs": [
+            67.8,
+            42.6,
+            54.7,
+            54.2,
+            54.7,
+            64.5,
+            52.3,
+            41.8,
+            48.5,
+            63.0,
+            47.9,
+            60.4,
+            59.1,
+            54.8,
+            48.3,
+            50.3,
+            50.4,
+            54.4,
+            63.6,
+            48.6,
+            56.1,
+            46.2,
+            60.1,
+            40.9,
+            67.1,
+            42.5,
+            60.5,
+            43.5
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -4511,6 +4827,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 3.3,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -4669,7 +4987,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 14.5,
       "meta_model_load_sec": 58.6,
       "meta_start_time": "2026-04-15T01:40:48.242402+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -4829,7 +5148,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 72.4,
       "meta_model_load_sec": 100.3,
       "meta_start_time": "2026-04-14T19:19:20.634421+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -4848,6 +5168,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -4876,7 +5201,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 2
+        "max_valid_qps": 2,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 59.88,
@@ -4884,7 +5214,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 110.98,
         "tpot_p50": 26.88,
         "tpot_p90": 27.83,
-        "tpot_p99": 28.7
+        "tpot_p99": 28.7,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -5018,6 +5349,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.861,
         "throttle_onset_minute": 8.0,
         "ttft_p99_drift_ms": -18.4,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 262.2,
+          "std": 9.5,
+          "cv_pct": 3.62,
+          "stability": "noisy",
+          "runs": [
+            262.3,
+            254.2,
+            254.5,
+            278.0,
+            260.2,
+            267.7,
+            253.4,
+            262.9,
+            259.5,
+            276.3,
+            252.2,
+            242.8,
+            280.9,
+            268.2,
+            253.6,
+            260.4,
+            264.4,
+            273.4,
+            259.1,
+            264.3,
+            258.9,
+            253.2,
+            263.8,
+            265.3,
+            263.8,
+            250.9,
+            256.8,
+            282.0
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -5446,7 +5814,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 109.0,
       "meta_model_load_sec": 56.5,
       "meta_start_time": "2026-04-14T18:35:57.991130+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -5465,6 +5834,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -5493,7 +5867,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 47.05,
@@ -5501,7 +5880,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 71.2,
         "tpot_p50": 19.93,
         "tpot_p90": 20.19,
-        "tpot_p99": 20.42
+        "tpot_p99": 20.42,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -5635,6 +6015,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.893,
         "throttle_onset_minute": 21.0,
         "ttft_p99_drift_ms": -8.0,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 376.6,
+          "std": 11.4,
+          "cv_pct": 3.03,
+          "stability": "noisy",
+          "runs": [
+            368.1,
+            384.3,
+            387.7,
+            375.4,
+            366.8,
+            376.1,
+            382.0,
+            372.0,
+            377.9,
+            372.0,
+            369.6,
+            377.6,
+            376.8,
+            385.8,
+            362.3,
+            392.8,
+            363.8,
+            393.9,
+            373.8,
+            352.6,
+            394.1,
+            360.1,
+            390.1,
+            373.1,
+            388.4,
+            370.3,
+            394.7,
+            363.7
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -5944,6 +6361,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 360.157,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -6100,7 +6519,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 136.2,
       "meta_model_load_sec": 72.4,
       "meta_start_time": "2026-04-14T17:57:43.940531+00:00",
-      "meta_notes": "Partial run: ['offline', 'interactive', 'sustained', 'online'] succeeded, ['speculative'] failed."
+      "meta_notes": "Partial run: ['offline', 'interactive', 'sustained', 'online'] succeeded, ['speculative'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -6116,6 +6536,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -6124,7 +6548,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 3476.02,
         "tpot_p50": 30.66,
         "tpot_p90": 31.15,
-        "tpot_p99": 31.5
+        "tpot_p99": 31.5,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -6258,6 +6683,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.784,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -321.6,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 54.2,
+          "std": 3.8,
+          "cv_pct": 7.06,
+          "stability": "noisy",
+          "runs": [
+            46.9,
+            55.4,
+            55.5,
+            51.2,
+            59.7,
+            51.2,
+            55.5,
+            55.5,
+            51.2,
+            59.7,
+            51.2,
+            55.4,
+            55.5,
+            51.2,
+            59.7,
+            51.2,
+            55.4,
+            55.5,
+            51.2,
+            59.7,
+            51.2,
+            55.5,
+            55.5,
+            46.9,
+            59.8,
+            51.2,
+            59.8,
+            51.2
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -6684,7 +7146,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 37.8,
       "meta_model_load_sec": 48.9,
       "meta_start_time": "2026-04-14T18:41:13.853447+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -6703,6 +7166,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -6726,7 +7194,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 26.97,
@@ -6734,7 +7206,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 42.9,
         "tpot_p50": 12.04,
         "tpot_p90": 12.29,
-        "tpot_p99": 12.47
+        "tpot_p99": 12.47,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -6808,6 +7281,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.94,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -217.5,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2217.9,
+          "std": 34.3,
+          "cv_pct": 1.54,
+          "stability": "stable",
+          "runs": [
+            2121.0,
+            2228.7,
+            2201.3,
+            2198.4,
+            2215.7,
+            2232.6,
+            2225.4,
+            2220.6,
+            2187.0,
+            2241.5,
+            2245.4,
+            2250.2,
+            2255.4,
+            2227.6
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -7085,7 +7581,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 96.3,
       "meta_model_load_sec": 67.5,
       "meta_start_time": "2026-04-15T14:53:34.311320+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -7104,6 +7601,11 @@ const LEADERBOARD_DATA = [
           33.52,
           33.52,
           33.52
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -7132,7 +7634,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 39.8,
@@ -7140,7 +7647,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 66.14,
         "tpot_p50": 14.27,
         "tpot_p90": 14.38,
-        "tpot_p99": 14.65
+        "tpot_p99": 14.65,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -7274,6 +7782,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.892,
         "throttle_onset_minute": 10.0,
         "ttft_p99_drift_ms": -13.4,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 484.0,
+          "std": 15.3,
+          "cv_pct": 3.16,
+          "stability": "noisy",
+          "runs": [
+            489.2,
+            480.6,
+            476.6,
+            474.6,
+            484.4,
+            490.8,
+            462.1,
+            485.0,
+            453.9,
+            462.0,
+            486.8,
+            454.3,
+            483.2,
+            467.2,
+            483.4,
+            480.4,
+            468.5,
+            501.4,
+            507.5,
+            482.9,
+            503.3,
+            498.0,
+            496.9,
+            494.1,
+            496.2,
+            479.2,
+            508.6,
+            501.7
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -7583,6 +8128,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 363.344,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -7739,7 +8286,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 142.9,
       "meta_model_load_sec": 56.5,
       "meta_start_time": "2026-04-15T16:41:09.586898+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -8364,7 +8912,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 123.3,
       "meta_model_load_sec": 57.6,
       "meta_start_time": "2026-04-15T19:31:24.959639+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -8380,6 +8929,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           35.46,
           35.46
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -8388,7 +8941,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 2981.58,
         "tpot_p50": 17.96,
         "tpot_p90": 18.15,
-        "tpot_p99": 18.25
+        "tpot_p99": 18.25,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -8522,6 +9076,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.705,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -451.2,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 57.0,
+          "std": 7.4,
+          "cv_pct": 13.07,
+          "stability": "high-variance",
+          "runs": [
+            51.2,
+            55.5,
+            68.2,
+            51.2,
+            51.2,
+            55.4,
+            72.5,
+            51.2,
+            55.5,
+            51.2,
+            55.5,
+            68.2,
+            55.5,
+            55.5,
+            51.1,
+            68.4,
+            55.4,
+            55.5,
+            51.2,
+            51.2,
+            72.5,
+            55.5,
+            51.2,
+            55.5,
+            51.2,
+            72.5,
+            51.2,
+            55.5
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -8948,7 +9539,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 23.1,
       "meta_model_load_sec": 49.8,
       "meta_start_time": "2026-04-15T21:49:01.081623+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -8967,6 +9559,11 @@ const LEADERBOARD_DATA = [
           33.24,
           33.24,
           33.24
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -8990,7 +9587,11 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 15.97,
@@ -8998,7 +9599,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 19.51,
         "tpot_p50": 3.15,
         "tpot_p90": 3.21,
-        "tpot_p99": 3.28
+        "tpot_p99": 3.28,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -9072,6 +9674,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.963,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -114.8,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 3972.5,
+          "std": 41.8,
+          "cv_pct": 1.05,
+          "stability": "stable",
+          "runs": [
+            3951.2,
+            3922.5,
+            4011.2,
+            4072.5,
+            3992.6,
+            3964.1,
+            4012.5,
+            3989.7,
+            3938.4,
+            3932.9,
+            3939.0,
+            3938.5,
+            3995.8,
+            3954.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -9348,7 +9973,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 78.5,
       "meta_model_load_sec": 88.2,
       "meta_start_time": "2026-04-17T21:38:41.566575+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -9372,6 +9998,11 @@ const LEADERBOARD_DATA = [
           30.57,
           30.57,
           30.57
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -9405,7 +10036,13 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 25
+        "max_valid_qps": 25,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -9539,6 +10176,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.806,
         "throttle_onset_minute": 6.0,
         "ttft_p99_drift_ms": 17.4,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 164.3,
+          "std": 8.5,
+          "cv_pct": 5.2,
+          "stability": "noisy",
+          "runs": [
+            167.7,
+            172.9,
+            181.0,
+            164.4,
+            162.7,
+            175.0,
+            174.0,
+            173.0,
+            174.6,
+            164.4,
+            171.3,
+            166.6,
+            157.8,
+            160.2,
+            155.9,
+            166.3,
+            149.8,
+            161.3,
+            157.5,
+            171.4,
+            150.8,
+            162.6,
+            157.2,
+            160.2,
+            156.9,
+            168.6,
+            145.8,
+            170.8
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -9843,6 +10517,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 279.986,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -10001,7 +10677,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 9.5,
       "meta_model_load_sec": 58.8,
       "meta_start_time": "2026-04-18T00:33:48.091170+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -10161,7 +10838,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 51.4,
       "meta_model_load_sec": 92.2,
       "meta_start_time": "2026-04-17T23:18:58.431532+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -10180,6 +10858,11 @@ const LEADERBOARD_DATA = [
           32.24,
           32.24,
           32.24
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -10208,7 +10891,12 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 50.45,
@@ -10216,7 +10904,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 1988.42,
         "tpot_p50": 7.12,
         "tpot_p90": 7.32,
-        "tpot_p99": 7.62
+        "tpot_p99": 7.62,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -10350,6 +11039,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.902,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -2.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 472.7,
+          "std": 11.2,
+          "cv_pct": 2.38,
+          "stability": "stable",
+          "runs": [
+            482.4,
+            470.0,
+            478.0,
+            464.6,
+            475.5,
+            474.1,
+            475.7,
+            467.2,
+            478.8,
+            476.8,
+            443.2,
+            477.3,
+            480.2,
+            459.0,
+            465.2,
+            486.8,
+            468.0,
+            466.5,
+            484.3,
+            454.4,
+            491.3,
+            483.4,
+            482.3,
+            454.0,
+            481.7,
+            470.6,
+            462.2,
+            482.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -10777,7 +11503,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 75.5,
       "meta_model_load_sec": 58.5,
       "meta_start_time": "2026-05-18T04:33:49.881300+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed."
+      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -10796,6 +11523,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -10824,7 +11556,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 27.78,
@@ -10832,7 +11569,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 59.38,
         "tpot_p50": 10.77,
         "tpot_p90": 10.84,
-        "tpot_p99": 10.86
+        "tpot_p99": 10.86,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -10966,6 +11704,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.947,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -0.2,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 712.3,
+          "std": 9.4,
+          "cv_pct": 1.32,
+          "stability": "stable",
+          "runs": [
+            707.4,
+            710.2,
+            728.3,
+            707.4,
+            711.2,
+            708.9,
+            701.6,
+            723.0,
+            702.0,
+            716.4,
+            718.5,
+            716.5,
+            708.7,
+            711.1,
+            715.6,
+            699.2,
+            721.0,
+            689.9,
+            718.4,
+            720.0,
+            726.1,
+            713.8,
+            694.3,
+            709.4,
+            720.1,
+            714.8,
+            705.6,
+            725.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -11271,6 +12046,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 217.605,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -11429,7 +12206,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 93.0,
       "meta_model_load_sec": 107.2,
       "meta_start_time": "2026-04-15T14:28:27.498578+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -11448,6 +12226,11 @@ const LEADERBOARD_DATA = [
           69.33,
           69.33,
           69.33
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -11476,7 +12259,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 46.45,
@@ -11484,7 +12272,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 68.35,
         "tpot_p50": 13.19,
         "tpot_p90": 13.32,
-        "tpot_p99": 13.41
+        "tpot_p99": 13.41,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -11618,6 +12407,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.868,
         "throttle_onset_minute": 18.0,
         "ttft_p99_drift_ms": 9.0,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 551.9,
+          "std": 25.7,
+          "cv_pct": 4.66,
+          "stability": "noisy",
+          "runs": [
+            566.9,
+            585.4,
+            575.4,
+            575.6,
+            584.1,
+            571.1,
+            568.6,
+            582.2,
+            558.0,
+            562.9,
+            581.4,
+            575.8,
+            578.3,
+            572.0,
+            568.3,
+            542.1,
+            526.1,
+            528.9,
+            541.5,
+            521.5,
+            513.8,
+            536.7,
+            510.0,
+            536.8,
+            527.1,
+            508.2,
+            521.6,
+            531.8
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -11927,6 +12753,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 384.035,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -12083,7 +12911,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 134.3,
       "meta_model_load_sec": 35.2,
       "meta_start_time": "2026-05-18T05:59:03.115858+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -12708,7 +13537,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 142.0,
       "meta_model_load_sec": 62.2,
       "meta_start_time": "2026-04-15T16:14:21.971604+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -13333,7 +14163,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 118.1,
       "meta_model_load_sec": 41.7,
       "meta_start_time": "2026-05-18T07:03:23.326807+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -13349,6 +14180,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -13357,7 +14192,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 3376.37,
         "tpot_p50": 13.1,
         "tpot_p90": 13.17,
-        "tpot_p99": 13.2
+        "tpot_p99": 13.2,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -13491,6 +14327,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.866,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 202.0,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 58.7,
+          "std": 3.2,
+          "cv_pct": 5.46,
+          "stability": "noisy",
+          "runs": [
+            55.4,
+            59.7,
+            55.5,
+            64.0,
+            55.5,
+            59.7,
+            59.8,
+            59.7,
+            59.7,
+            55.5,
+            64.0,
+            55.5,
+            55.5,
+            59.7,
+            64.0,
+            55.4,
+            55.5,
+            64.0,
+            55.5,
+            59.7,
+            55.5,
+            64.0,
+            55.4,
+            59.8,
+            59.7,
+            59.7,
+            59.7,
+            55.5
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -13917,7 +14790,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 116.2,
       "meta_model_load_sec": 58.3,
       "meta_start_time": "2026-04-15T19:06:19.962064+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -13933,6 +14807,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           71.21,
           71.21
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -13941,7 +14819,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 2996.33,
         "tpot_p50": 30.57,
         "tpot_p90": 30.98,
-        "tpot_p99": 31.17
+        "tpot_p99": 31.17,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -14075,6 +14954,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.501,
         "throttle_onset_minute": 21.0,
         "ttft_p99_drift_ms": -474.5,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 67.1,
+          "std": 6.4,
+          "cv_pct": 9.6,
+          "stability": "high-variance",
+          "runs": [
+            68.2,
+            68.3,
+            68.3,
+            68.3,
+            68.2,
+            68.3,
+            68.2,
+            68.3,
+            68.3,
+            68.3,
+            68.3,
+            68.3,
+            68.3,
+            68.3,
+            68.2,
+            68.3,
+            68.3,
+            68.3,
+            68.2,
+            34.2,
+            68.3,
+            68.3,
+            68.2,
+            68.3,
+            68.3,
+            68.3,
+            68.3,
+            68.2
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -14501,7 +15417,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 20.4,
       "meta_model_load_sec": 28.0,
       "meta_start_time": "2026-05-18T10:07:16.851531+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -14520,6 +15437,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -14543,7 +15465,11 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 11.24,
@@ -14551,7 +15477,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 14.74,
         "tpot_p50": 1.83,
         "tpot_p90": 1.83,
-        "tpot_p99": 1.87
+        "tpot_p99": 1.87,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -14625,6 +15552,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.958,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -15.4,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 11576.2,
+          "std": 139.5,
+          "cv_pct": 1.2,
+          "stability": "stable",
+          "runs": [
+            11541.5,
+            11672.6,
+            11721.9,
+            11526.8,
+            11228.1,
+            11380.9,
+            11711.7,
+            11643.5,
+            11662.7,
+            11612.6,
+            11623.8,
+            11639.3,
+            11651.4,
+            11450.2
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -14900,7 +15850,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 24.5,
       "meta_model_load_sec": 51.1,
       "meta_start_time": "2026-04-15T21:16:39.856479+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -14919,6 +15870,11 @@ const LEADERBOARD_DATA = [
           69.0,
           69.0,
           69.0
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -14942,7 +15898,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 28.88,
@@ -14950,7 +15910,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 32.38,
         "tpot_p50": 3.83,
         "tpot_p90": 3.89,
-        "tpot_p99": 3.92
+        "tpot_p99": 3.92,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -15024,6 +15985,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.746,
         "throttle_onset_minute": 3.0,
         "ttft_p99_drift_ms": -9.6,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2386.8,
+          "std": 225.6,
+          "cv_pct": 9.45,
+          "stability": "high-variance",
+          "runs": [
+            2796.4,
+            2979.6,
+            2296.3,
+            2250.9,
+            2332.1,
+            2333.1,
+            2362.3,
+            2258.5,
+            2439.4,
+            2412.5,
+            2221.4,
+            2241.1,
+            2268.2,
+            2223.8
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -15301,7 +16285,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 90.6,
       "meta_model_load_sec": 74.5,
       "meta_start_time": "2026-04-15T14:10:45.158593+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -15320,6 +16305,11 @@ const LEADERBOARD_DATA = [
           69.33,
           69.33,
           69.33
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -15348,7 +16338,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 37.83,
@@ -15356,7 +16351,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 63.2,
         "tpot_p50": 12.43,
         "tpot_p90": 12.8,
-        "tpot_p99": 13.11
+        "tpot_p99": 13.11,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -15490,6 +16486,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.881,
         "throttle_onset_minute": 23.0,
         "ttft_p99_drift_ms": -0.7,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 546.4,
+          "std": 17.4,
+          "cv_pct": 3.19,
+          "stability": "noisy",
+          "runs": [
+            566.8,
+            559.7,
+            544.8,
+            551.0,
+            525.8,
+            529.8,
+            531.9,
+            554.8,
+            584.0,
+            548.1,
+            572.2,
+            531.0,
+            546.0,
+            552.1,
+            545.3,
+            565.6,
+            535.0,
+            550.0,
+            552.7,
+            555.4,
+            540.9,
+            518.7,
+            514.7,
+            542.3,
+            546.4,
+            521.4,
+            578.2,
+            533.5
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -15799,6 +16832,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 371.508,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -15955,7 +16990,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 141.4,
       "meta_model_load_sec": 72.6,
       "meta_start_time": "2026-04-15T15:52:45.152844+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -16580,7 +17616,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 109.5,
       "meta_model_load_sec": 74.2,
       "meta_start_time": "2026-04-15T18:45:30.042873+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -16596,6 +17633,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           71.21,
           71.21
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -16604,7 +17645,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 2984.15,
         "tpot_p50": 16.06,
         "tpot_p90": 22.62,
-        "tpot_p99": 23.24
+        "tpot_p99": 23.24,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -16738,6 +17780,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.502,
         "throttle_onset_minute": 28.0,
         "ttft_p99_drift_ms": -397.5,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 67.0,
+          "std": 6.4,
+          "cv_pct": 9.57,
+          "stability": "high-variance",
+          "runs": [
+            68.2,
+            68.3,
+            68.3,
+            68.3,
+            68.3,
+            68.2,
+            68.3,
+            68.3,
+            68.2,
+            68.3,
+            68.3,
+            68.2,
+            68.3,
+            68.2,
+            68.3,
+            68.3,
+            68.3,
+            68.2,
+            68.3,
+            68.2,
+            68.3,
+            68.2,
+            68.3,
+            68.2,
+            68.3,
+            67.9,
+            34.3,
+            68.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -17164,7 +18243,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 24.1,
       "meta_model_load_sec": 55.8,
       "meta_start_time": "2026-04-15T20:50:21.824116+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -17183,6 +18263,11 @@ const LEADERBOARD_DATA = [
           69.0,
           69.0,
           69.0
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -17206,7 +18291,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 27.45,
@@ -17214,7 +18303,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 30.27,
         "tpot_p50": 3.71,
         "tpot_p90": 3.91,
-        "tpot_p99": 3.96
+        "tpot_p99": 3.96,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -17288,6 +18378,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.602,
         "throttle_onset_minute": 3.0,
         "ttft_p99_drift_ms": -11.5,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2804.8,
+          "std": 516.6,
+          "cv_pct": 18.42,
+          "stability": "high-variance",
+          "runs": [
+            3817.9,
+            4192.3,
+            2621.3,
+            2548.3,
+            2703.0,
+            2680.5,
+            2557.3,
+            2641.8,
+            2612.4,
+            2524.0,
+            2626.8,
+            2534.0,
+            2647.2,
+            2560.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -17564,7 +18677,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 75.1,
       "meta_model_load_sec": 82.3,
       "meta_start_time": "2026-04-17T02:43:44.695338+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -17588,6 +18702,11 @@ const LEADERBOARD_DATA = [
           67.58,
           67.58,
           67.58
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -17621,7 +18740,13 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 25
+        "max_valid_qps": 25,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -17755,6 +18880,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.816,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -7.8,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 184.0,
+          "std": 9.5,
+          "cv_pct": 5.15,
+          "stability": "noisy",
+          "runs": [
+            180.1,
+            187.5,
+            193.8,
+            183.5,
+            191.3,
+            175.4,
+            186.1,
+            181.5,
+            189.5,
+            170.3,
+            184.2,
+            178.7,
+            189.4,
+            173.7,
+            187.8,
+            187.0,
+            180.2,
+            188.7,
+            182.7,
+            173.0,
+            202.4,
+            172.3,
+            203.0,
+            174.7,
+            199.2,
+            178.3,
+            165.6,
+            192.4
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -18059,6 +19221,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 253.843,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -18217,7 +19381,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 8.9,
       "meta_model_load_sec": 51.6,
       "meta_start_time": "2026-04-17T05:22:26.019495+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -18377,7 +19542,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 50.1,
       "meta_model_load_sec": 74.6,
       "meta_start_time": "2026-04-17T04:11:51.249171+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -18396,6 +19562,11 @@ const LEADERBOARD_DATA = [
           69.21,
           69.21,
           69.21
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -18424,7 +19595,12 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 52.14,
@@ -18432,7 +19608,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 410.14,
         "tpot_p50": 6.85,
         "tpot_p90": 6.95,
-        "tpot_p99": 6.99
+        "tpot_p99": 6.99,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -18566,6 +19743,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.845,
         "throttle_onset_minute": 7.0,
         "ttft_p99_drift_ms": -27.8,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 569.1,
+          "std": 22.4,
+          "cv_pct": 3.93,
+          "stability": "noisy",
+          "runs": [
+            573.8,
+            571.7,
+            596.7,
+            594.4,
+            584.0,
+            552.0,
+            550.9,
+            538.9,
+            519.3,
+            542.0,
+            614.7,
+            587.1,
+            597.3,
+            593.2,
+            551.6,
+            581.8,
+            573.7,
+            550.5,
+            564.5,
+            571.8,
+            535.8,
+            589.0,
+            565.8,
+            585.7,
+            578.7,
+            564.8,
+            550.8,
+            553.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -18993,7 +20207,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 131.4,
       "meta_model_load_sec": 61.8,
       "meta_start_time": "2026-04-15T14:56:36.326978+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed."
+      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -19012,6 +20227,11 @@ const LEADERBOARD_DATA = [
           19.33,
           19.33,
           19.33
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -19040,7 +20260,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 89.3,
@@ -19048,7 +20273,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 167.45,
         "tpot_p50": 21.47,
         "tpot_p90": 21.5,
-        "tpot_p99": 21.52
+        "tpot_p99": 21.52,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -19182,6 +20408,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.887,
         "throttle_onset_minute": 8.0,
         "ttft_p99_drift_ms": 5.6,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 309.9,
+          "std": 9.6,
+          "cv_pct": 3.1,
+          "stability": "noisy",
+          "runs": [
+            316.9,
+            312.1,
+            306.3,
+            311.7,
+            323.5,
+            307.9,
+            290.3,
+            315.2,
+            308.3,
+            304.1,
+            316.4,
+            309.6,
+            296.7,
+            317.6,
+            311.5,
+            306.4,
+            312.3,
+            321.9,
+            308.5,
+            289.1,
+            323.1,
+            300.0,
+            312.4,
+            306.1,
+            322.1,
+            305.8,
+            296.1,
+            326.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -19487,6 +20750,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 2.931,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -19642,7 +20907,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 197.5,
       "meta_model_load_sec": 68.1,
       "meta_start_time": "2026-04-15T14:33:33.109513+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -20267,7 +21533,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 24.1,
       "meta_model_load_sec": 50.4,
       "meta_start_time": "2026-04-15T15:35:02.870460+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -20286,6 +21553,11 @@ const LEADERBOARD_DATA = [
           19.03,
           19.03,
           19.03
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -20309,7 +21581,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 19.16,
@@ -20317,7 +21593,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 22.39,
         "tpot_p50": 3.53,
         "tpot_p90": 3.54,
-        "tpot_p99": 3.64
+        "tpot_p99": 3.64,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -20391,6 +21668,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.821,
         "throttle_onset_minute": 3.0,
         "ttft_p99_drift_ms": -63.4,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2693.3,
+          "std": 140.0,
+          "cv_pct": 5.2,
+          "stability": "noisy",
+          "runs": [
+            3023.8,
+            2938.2,
+            2481.2,
+            2558.2,
+            2650.5,
+            2645.4,
+            2618.4,
+            2683.7,
+            2624.8,
+            2660.3,
+            2705.4,
+            2652.5,
+            2764.3,
+            2699.8
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -20667,7 +21967,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 23.1,
       "meta_model_load_sec": 58.6,
       "meta_start_time": "2026-04-15T18:35:19.051004+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -20824,7 +22125,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 105.4,
       "meta_model_load_sec": 38.1,
       "meta_start_time": "2026-04-15T18:23:59.129599+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed."
+      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -20843,6 +22145,11 @@ const LEADERBOARD_DATA = [
           19.17,
           19.17,
           19.17
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -20871,7 +22178,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 49.28,
@@ -20879,7 +22191,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 91.65,
         "tpot_p50": 17.62,
         "tpot_p90": 17.67,
-        "tpot_p99": 17.71
+        "tpot_p99": 17.71,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -21013,6 +22326,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.936,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -2.6,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 400.1,
+          "std": 6.3,
+          "cv_pct": 1.58,
+          "stability": "stable",
+          "runs": [
+            406.1,
+            399.7,
+            406.1,
+            387.3,
+            399.9,
+            393.1,
+            403.1,
+            407.1,
+            395.6,
+            399.7,
+            401.3,
+            393.3,
+            407.1,
+            406.0,
+            399.4,
+            402.4,
+            391.0,
+            399.7,
+            384.6,
+            410.9,
+            403.4,
+            398.5,
+            399.7,
+            400.9,
+            393.3,
+            407.0,
+            405.7,
+            399.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -21318,6 +22668,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 598.792,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -21474,7 +22826,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 154.2,
       "meta_model_load_sec": 346.5,
       "meta_start_time": "2026-04-15T16:35:04.105459+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -22099,7 +23452,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 21.4,
       "meta_model_load_sec": 34.4,
       "meta_start_time": "2026-04-15T17:31:07.106255+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -22118,6 +23472,11 @@ const LEADERBOARD_DATA = [
           18.86,
           18.86,
           18.86
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -22141,7 +23500,11 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 10.63,
@@ -22149,7 +23512,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 11.85,
         "tpot_p50": 2.32,
         "tpot_p90": 2.42,
-        "tpot_p99": 2.43
+        "tpot_p99": 2.43,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -22223,6 +23587,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.901,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -25.3,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 5995.2,
+          "std": 266.2,
+          "cv_pct": 4.44,
+          "stability": "noisy",
+          "runs": [
+            6220.0,
+            6244.2,
+            6209.5,
+            6276.3,
+            6214.1,
+            6252.7,
+            6249.8,
+            5974.5,
+            5679.0,
+            5654.4,
+            5674.7,
+            5677.9,
+            5730.7,
+            5874.6
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -22499,7 +23886,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 12.8,
       "meta_model_load_sec": 37.7,
       "meta_start_time": "2026-04-15T18:50:57.505588+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -22656,7 +24044,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 117.2,
       "meta_model_load_sec": 58.7,
       "meta_start_time": "2026-04-17T14:37:43.149426+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed."
+      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -22675,6 +24064,11 @@ const LEADERBOARD_DATA = [
           19.21,
           19.21,
           19.21
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -22703,7 +24097,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 67.76,
@@ -22711,7 +24110,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 97.33,
         "tpot_p50": 20.13,
         "tpot_p90": 20.45,
-        "tpot_p99": 20.72
+        "tpot_p99": 20.72,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -22845,6 +24245,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.91,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -3.1,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 339.8,
+          "std": 8.8,
+          "cv_pct": 2.58,
+          "stability": "stable",
+          "runs": [
+            334.4,
+            352.3,
+            338.5,
+            327.8,
+            339.6,
+            356.3,
+            339.2,
+            348.1,
+            339.9,
+            348.3,
+            339.3,
+            339.5,
+            334.5,
+            339.3,
+            336.5,
+            352.2,
+            329.1,
+            343.0,
+            332.5,
+            340.7,
+            324.4,
+            331.1,
+            356.6,
+            331.0,
+            331.0,
+            351.4,
+            332.6,
+            344.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -23150,6 +24587,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 5.602,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -23306,7 +24745,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 171.1,
       "meta_model_load_sec": 82.5,
       "meta_start_time": "2026-04-17T07:10:38.194017+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -23931,7 +25371,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 26.2,
       "meta_model_load_sec": 40.5,
       "meta_start_time": "2026-04-17T14:44:02.942532+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -23950,6 +25391,11 @@ const LEADERBOARD_DATA = [
           18.89,
           18.89,
           18.89
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -23973,7 +25419,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 35.13,
@@ -23981,7 +25431,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 46.2,
         "tpot_p50": 4.47,
         "tpot_p90": 4.84,
-        "tpot_p99": 5.15
+        "tpot_p99": 5.15,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -24055,6 +25506,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.922,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -105.2,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 1698.1,
+          "std": 39.2,
+          "cv_pct": 2.31,
+          "stability": "stable",
+          "runs": [
+            1715.3,
+            1751.9,
+            1713.1,
+            1671.7,
+            1724.1,
+            1660.5,
+            1687.0,
+            1622.5,
+            1658.9,
+            1760.4,
+            1680.1,
+            1676.2,
+            1735.0,
+            1716.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -24331,7 +25805,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 155.7,
       "meta_model_load_sec": 112.4,
       "meta_start_time": "2026-04-21T00:35:01.459265+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -24355,6 +25830,11 @@ const LEADERBOARD_DATA = [
           18.89,
           18.89,
           18.89
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -24388,7 +25868,13 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -24522,6 +26008,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.761,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 92.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 104.5,
+          "std": 7.2,
+          "cv_pct": 6.86,
+          "stability": "noisy",
+          "runs": [
+            96.8,
+            106.6,
+            106.6,
+            100.9,
+            109.9,
+            105.4,
+            98.3,
+            105.1,
+            103.0,
+            113.9,
+            101.1,
+            95.9,
+            108.9,
+            110.1,
+            94.4,
+            102.9,
+            111.3,
+            103.9,
+            118.0,
+            89.8,
+            114.0,
+            101.2,
+            95.2,
+            108.8,
+            115.3,
+            94.1,
+            109.8,
+            104.4
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -24826,6 +26349,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 1.344,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -24984,7 +26509,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 18.7,
       "meta_model_load_sec": 41.4,
       "meta_start_time": "2026-04-21T04:56:49.622634+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -25144,7 +26670,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 60.8,
       "meta_model_load_sec": 75.3,
       "meta_start_time": "2026-04-21T03:25:43.910482+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -25163,6 +26690,11 @@ const LEADERBOARD_DATA = [
           20.58,
           20.58,
           20.58
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -25191,7 +26723,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 2
+        "max_valid_qps": 2,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 108.91,
@@ -25199,7 +26736,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 794.58,
         "tpot_p50": 10.74,
         "tpot_p90": 10.86,
-        "tpot_p99": 11.06
+        "tpot_p99": 11.06,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -25333,6 +26871,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.886,
         "throttle_onset_minute": 5.0,
         "ttft_p99_drift_ms": -19.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 325.5,
+          "std": 9.7,
+          "cv_pct": 2.99,
+          "stability": "stable",
+          "runs": [
+            348.2,
+            317.8,
+            340.5,
+            312.2,
+            342.5,
+            323.8,
+            311.0,
+            329.7,
+            314.2,
+            308.6,
+            338.2,
+            323.2,
+            326.9,
+            326.3,
+            324.1,
+            329.2,
+            329.8,
+            323.9,
+            333.7,
+            318.7,
+            329.3,
+            316.3,
+            317.7,
+            334.9,
+            329.4,
+            322.7,
+            321.0,
+            319.0
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -25760,7 +27335,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 76.6,
       "meta_model_load_sec": 89.0,
       "meta_start_time": "2026-04-16T17:49:46.016662+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed."
+      "meta_notes": "Partial run: ['offline', 'online', 'interactive', 'sustained', 'burst'] succeeded, ['speculative'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -25779,6 +27355,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -25807,7 +27388,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 30.3,
@@ -25815,7 +27401,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 74.59,
         "tpot_p50": 10.22,
         "tpot_p90": 10.24,
-        "tpot_p99": 10.34
+        "tpot_p99": 10.34,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -25949,6 +27536,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.948,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -33.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 707.5,
+          "std": 9.9,
+          "cv_pct": 1.4,
+          "stability": "stable",
+          "runs": [
+            700.3,
+            705.2,
+            720.8,
+            690.5,
+            705.3,
+            718.8,
+            706.6,
+            711.1,
+            700.4,
+            708.3,
+            720.0,
+            710.9,
+            691.8,
+            699.3,
+            726.0,
+            702.1,
+            708.6,
+            701.3,
+            722.9,
+            700.6,
+            714.3,
+            701.7,
+            695.2,
+            728.2,
+            699.1,
+            705.2,
+            708.6,
+            707.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -26254,6 +27878,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 1.101,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -26409,7 +28035,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 76.9,
       "meta_model_load_sec": 126.2,
       "meta_start_time": "2026-04-16T17:10:00.301480+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -26848,7 +28475,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 128.6,
       "meta_model_load_sec": 106.4,
       "meta_start_time": "2026-04-16T17:09:24.380542+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -26864,6 +28492,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -26872,7 +28504,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 3704.8,
         "tpot_p50": 12.34,
         "tpot_p90": 12.39,
-        "tpot_p99": 12.47
+        "tpot_p99": 12.47,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -27006,6 +28639,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.845,
         "throttle_onset_minute": 11.0,
         "ttft_p99_drift_ms": -35433.6,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 51.5,
+          "std": 2.0,
+          "cv_pct": 3.83,
+          "stability": "noisy",
+          "runs": [
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            55.4,
+            51.3,
+            51.2,
+            46.9,
+            55.4,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            55.4,
+            47.0,
+            55.5,
+            51.2,
+            51.2,
+            51.2,
+            51.2,
+            51.2
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -27432,7 +29102,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 27.0,
       "meta_model_load_sec": 95.1,
       "meta_start_time": "2026-04-16T17:54:05.911533+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -27451,6 +29122,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -27474,7 +29150,11 @@ const LEADERBOARD_DATA = [
           false,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 22.5,
@@ -27482,7 +29162,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 35.07,
         "tpot_p50": 5.11,
         "tpot_p90": 5.3,
-        "tpot_p99": 6.09
+        "tpot_p99": 6.09,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -27556,6 +29237,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.137,
         "throttle_onset_minute": 1.0,
         "ttft_p99_drift_ms": -49045.0,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 3941.2,
+          "std": 974.0,
+          "cv_pct": 24.71,
+          "stability": "high-variance",
+          "runs": [
+            683.0,
+            4100.0,
+            4041.5,
+            4995.0,
+            4429.7,
+            4028.5,
+            4021.4,
+            4158.3,
+            3928.9,
+            4175.5,
+            4112.6,
+            4274.6,
+            4203.8,
+            4024.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -27833,7 +29537,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 69.7,
       "meta_model_load_sec": 68.9,
       "meta_start_time": "2026-04-18T06:49:59.246637+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -27852,6 +29557,11 @@ const LEADERBOARD_DATA = [
           69.2,
           69.2,
           69.2
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -27880,7 +29590,12 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 25
+        "max_valid_qps": 25,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 20.08,
@@ -27888,7 +29603,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 29.6,
         "tpot_p50": 7.74,
         "tpot_p90": 7.81,
-        "tpot_p99": 7.88
+        "tpot_p99": 7.88,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -28022,6 +29738,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.948,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -1.0,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 907.1,
+          "std": 11.3,
+          "cv_pct": 1.25,
+          "stability": "stable",
+          "runs": [
+            932.2,
+            905.7,
+            909.4,
+            893.4,
+            919.9,
+            906.1,
+            904.7,
+            913.0,
+            911.6,
+            910.9,
+            894.4,
+            912.3,
+            910.6,
+            905.7,
+            910.2,
+            903.0,
+            898.6,
+            911.5,
+            888.3,
+            911.6,
+            900.5,
+            903.7,
+            924.4,
+            883.7,
+            911.4,
+            914.1,
+            922.4,
+            884.7
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -28331,6 +30084,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 143.906,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -28485,7 +30240,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 9.9,
       "meta_model_load_sec": 75.9,
       "meta_start_time": "2026-04-18T07:01:53.483762+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -28688,7 +30444,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 69.5,
       "meta_model_load_sec": 71.5,
       "meta_start_time": "2026-04-18T07:30:34.149610+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -28704,6 +30461,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           71.13,
           71.13
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -28712,7 +30473,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 1149.03,
         "tpot_p50": 11.88,
         "tpot_p90": 12.05,
-        "tpot_p99": 12.13
+        "tpot_p99": 12.13,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -28846,6 +30608,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.8,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 327.4,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 142.6,
+          "std": 13.3,
+          "cv_pct": 9.33,
+          "stability": "high-variance",
+          "runs": [
+            136.5,
+            136.6,
+            136.5,
+            136.5,
+            170.7,
+            136.5,
+            136.5,
+            136.5,
+            136.5,
+            170.7,
+            136.5,
+            136.6,
+            136.6,
+            136.5,
+            170.5,
+            136.5,
+            136.6,
+            136.6,
+            136.5,
+            136.6,
+            170.7,
+            136.5,
+            136.5,
+            136.6,
+            136.5,
+            170.7,
+            136.5,
+            136.6
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -29272,7 +31071,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 21.1,
       "meta_model_load_sec": 69.8,
       "meta_start_time": "2026-04-18T07:41:46.352260+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -29291,6 +31091,11 @@ const LEADERBOARD_DATA = [
           68.91,
           68.91,
           68.91
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -29314,7 +31119,11 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 11.52,
@@ -29322,7 +31131,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 12.86,
         "tpot_p50": 2.21,
         "tpot_p90": 2.28,
-        "tpot_p99": 2.32
+        "tpot_p99": 2.32,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -29396,6 +31206,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.96,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -19.0,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 6144.7,
+          "std": 64.6,
+          "cv_pct": 1.05,
+          "stability": "stable",
+          "runs": [
+            6336.2,
+            6162.6,
+            6134.7,
+            6123.2,
+            6087.1,
+            6131.9,
+            6123.4,
+            6204.8,
+            6085.4,
+            6082.5,
+            6153.4,
+            6160.7,
+            6110.4,
+            6129.6
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -29673,7 +31506,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 73.2,
       "meta_model_load_sec": 104.1,
       "meta_start_time": "2026-04-15T10:15:40.803524+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -29692,6 +31526,11 @@ const LEADERBOARD_DATA = [
           123.76,
           123.76,
           123.76
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -29720,7 +31559,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 27.89,
@@ -29728,7 +31572,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 36.48,
         "tpot_p50": 7.62,
         "tpot_p90": 7.73,
-        "tpot_p99": 7.96
+        "tpot_p99": 7.96,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -29862,6 +31707,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.791,
         "throttle_onset_minute": 4.0,
         "ttft_p99_drift_ms": 45.9,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 709.2,
+          "std": 40.9,
+          "cv_pct": 5.77,
+          "stability": "noisy",
+          "runs": [
+            851.5,
+            842.9,
+            677.1,
+            719.3,
+            673.5,
+            699.1,
+            702.7,
+            686.1,
+            706.4,
+            676.1,
+            719.9,
+            690.8,
+            711.4,
+            703.6,
+            704.7,
+            700.4,
+            699.5,
+            694.9,
+            707.4,
+            674.7,
+            705.4,
+            705.4,
+            713.4,
+            690.6,
+            696.4,
+            701.8,
+            696.1,
+            705.6
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -30171,6 +32053,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 472.28,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -30327,7 +32211,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 136.6,
       "meta_model_load_sec": 108.5,
       "meta_start_time": "2026-04-14T13:31:27.543833+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -30953,7 +32838,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 87.9,
       "meta_model_load_sec": 92.2,
       "meta_start_time": "2026-04-15T11:51:12.230490+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -30969,6 +32855,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           125.69,
           125.69
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -30977,7 +32867,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 1246.31,
         "tpot_p50": 16.06,
         "tpot_p90": 37.77,
-        "tpot_p99": 38.28
+        "tpot_p99": 38.28,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -31111,6 +33002,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.6,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -55.8,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 132.9,
+          "std": 14.2,
+          "cv_pct": 10.69,
+          "stability": "high-variance",
+          "runs": [
+            136.5,
+            136.6,
+            136.4,
+            136.5,
+            136.6,
+            136.6,
+            136.4,
+            136.5,
+            136.5,
+            136.6,
+            136.6,
+            136.5,
+            170.7,
+            136.5,
+            136.6,
+            136.5,
+            136.5,
+            136.5,
+            136.6,
+            136.5,
+            136.6,
+            136.5,
+            136.5,
+            136.5,
+            102.4,
+            102.4,
+            102.4,
+            102.4
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -31541,7 +33469,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 28.0,
       "meta_model_load_sec": 81.6,
       "meta_start_time": "2026-04-09T06:29:41.271125+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -31560,6 +33489,11 @@ const LEADERBOARD_DATA = [
           123.42,
           123.42,
           123.42
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -31583,7 +33517,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 36.01,
@@ -31591,7 +33529,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 44.76,
         "tpot_p50": 5.17,
         "tpot_p90": 5.75,
-        "tpot_p99": 5.94
+        "tpot_p99": 5.94,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -31665,6 +33604,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.826,
         "throttle_onset_minute": 1.0,
         "ttft_p99_drift_ms": -364.2,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 1425.4,
+          "std": 66.2,
+          "cv_pct": 4.65,
+          "stability": "noisy",
+          "runs": [
+            1306.2,
+            1417.0,
+            1440.4,
+            1411.2,
+            1413.3,
+            1581.2,
+            1523.2,
+            1435.7,
+            1342.6,
+            1396.7,
+            1408.2,
+            1415.5,
+            1436.7,
+            1427.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -31941,7 +33903,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 66.6,
       "meta_model_load_sec": 225.9,
       "meta_start_time": "2026-04-09T05:15:57.669560+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -31965,6 +33928,11 @@ const LEADERBOARD_DATA = [
           116.69,
           116.69,
           116.69
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -31998,7 +33966,13 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -32132,6 +34106,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.807,
         "throttle_onset_minute": 4.0,
         "ttft_p99_drift_ms": -1.5,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 241.2,
+          "std": 12.7,
+          "cv_pct": 5.28,
+          "stability": "noisy",
+          "runs": [
+            283.6,
+            281.0,
+            237.6,
+            240.6,
+            232.5,
+            236.4,
+            238.2,
+            242.7,
+            241.5,
+            231.0,
+            244.4,
+            236.3,
+            242.5,
+            235.3,
+            230.9,
+            237.7,
+            243.4,
+            235.9,
+            240.4,
+            232.4,
+            240.7,
+            246.4,
+            232.5,
+            239.3,
+            233.9,
+            235.6,
+            252.2,
+            228.8
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -32436,6 +34447,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 134.102,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -32594,7 +34607,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 5.8,
       "meta_model_load_sec": 80.4,
       "meta_start_time": "2026-04-09T10:51:23.776481+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -32754,7 +34768,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 49.5,
       "meta_model_load_sec": 224.0,
       "meta_start_time": "2026-04-14T17:13:27.356114+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -32773,6 +34788,11 @@ const LEADERBOARD_DATA = [
           118.32,
           118.32,
           118.32
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -32801,7 +34821,12 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 53.26,
@@ -32809,7 +34834,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 995.5,
         "tpot_p50": 6.63,
         "tpot_p90": 6.79,
-        "tpot_p99": 7.56
+        "tpot_p99": 7.56,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -32943,6 +34969,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.939,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": 12.0,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 591.5,
+          "std": 9.7,
+          "cv_pct": 1.64,
+          "stability": "stable",
+          "runs": [
+            576.8,
+            613.1,
+            587.8,
+            582.0,
+            595.7,
+            591.5,
+            589.9,
+            585.6,
+            599.3,
+            594.4,
+            596.9,
+            576.0,
+            608.9,
+            579.4,
+            599.9,
+            588.2,
+            607.2,
+            576.5,
+            586.3,
+            582.1,
+            593.9,
+            599.3,
+            597.4,
+            588.5,
+            583.3,
+            598.1,
+            588.0,
+            596.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -33371,7 +35434,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 100.4,
       "meta_model_load_sec": 40.8,
       "meta_start_time": "2026-04-16T11:51:19.316278+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -33390,6 +35454,11 @@ const LEADERBOARD_DATA = [
           123.81,
           123.81,
           123.81
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -33418,7 +35487,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 55.3,
@@ -33426,7 +35500,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 103.39,
         "tpot_p50": 12.81,
         "tpot_p90": 12.93,
-        "tpot_p99": 13.15
+        "tpot_p99": 13.15,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -33560,6 +35635,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.918,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": 1.0,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 486.6,
+          "std": 9.5,
+          "cv_pct": 1.95,
+          "stability": "stable",
+          "runs": [
+            473.5,
+            493.5,
+            488.1,
+            510.3,
+            497.4,
+            487.5,
+            499.5,
+            485.3,
+            478.4,
+            480.3,
+            493.7,
+            476.1,
+            490.1,
+            479.3,
+            490.6,
+            489.5,
+            479.2,
+            488.8,
+            477.4,
+            473.5,
+            493.7,
+            488.2,
+            476.5,
+            495.9,
+            468.6,
+            496.5,
+            484.2,
+            489.8
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -33869,6 +35981,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 325.619,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -34025,7 +36139,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 158.3,
       "meta_model_load_sec": 49.6,
       "meta_start_time": "2026-04-16T10:38:52.071508+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -34650,7 +36765,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 157.6,
       "meta_model_load_sec": 44.8,
       "meta_start_time": "2026-04-16T11:06:16.275397+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -34666,6 +36782,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           125.72,
           125.72
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -34674,7 +36794,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 4940.53,
         "tpot_p50": 35.31,
         "tpot_p90": 36.05,
-        "tpot_p99": 37.05
+        "tpot_p99": 37.05,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -34808,6 +36929,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.499,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 516.2,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 41.4,
+          "std": 14.3,
+          "cv_pct": 34.47,
+          "stability": "high-variance",
+          "runs": [
+            34.1,
+            34.2,
+            34.1,
+            68.3,
+            34.1,
+            34.1,
+            34.1,
+            34.1,
+            68.3,
+            34.2,
+            34.1,
+            34.1,
+            34.1,
+            68.3,
+            34.1,
+            34.1,
+            34.1,
+            68.3,
+            34.1,
+            34.1,
+            34.1,
+            34.1,
+            68.3,
+            34.1,
+            34.1,
+            34.1,
+            34.2,
+            68.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -35234,7 +37392,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 25.6,
       "meta_model_load_sec": 36.0,
       "meta_start_time": "2026-04-16T11:14:28.243114+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -35253,6 +37412,11 @@ const LEADERBOARD_DATA = [
           123.52,
           123.52,
           123.52
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -35276,7 +37440,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 34.23,
@@ -35284,7 +37452,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 43.46,
         "tpot_p50": 4.17,
         "tpot_p90": 4.28,
-        "tpot_p99": 4.55
+        "tpot_p99": 4.55,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -35358,6 +37527,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.953,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -71.8,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 1771.6,
+          "std": 28.4,
+          "cv_pct": 1.6,
+          "stability": "stable",
+          "runs": [
+            1749.4,
+            1781.1,
+            1757.1,
+            1808.9,
+            1813.9,
+            1728.8,
+            1761.8,
+            1737.5,
+            1774.0,
+            1778.9,
+            1786.9,
+            1794.3,
+            1729.1,
+            1800.2
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -35634,7 +37826,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 82.9,
       "meta_model_load_sec": 86.1,
       "meta_start_time": "2026-04-17T16:43:39.334550+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -35658,6 +37851,11 @@ const LEADERBOARD_DATA = [
           116.75,
           116.75,
           116.75
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -35691,7 +37889,13 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -35825,6 +38029,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.847,
         "throttle_onset_minute": 5.0,
         "ttft_p99_drift_ms": -9.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 176.0,
+          "std": 6.5,
+          "cv_pct": 3.69,
+          "stability": "noisy",
+          "runs": [
+            174.4,
+            171.1,
+            181.0,
+            169.7,
+            177.7,
+            181.8,
+            176.6,
+            177.2,
+            177.7,
+            176.4,
+            177.1,
+            168.1,
+            175.3,
+            176.6,
+            179.5,
+            173.6,
+            185.1,
+            160.2,
+            186.4,
+            161.8,
+            189.2,
+            175.3,
+            176.9,
+            171.9,
+            179.6,
+            178.8,
+            180.0,
+            168.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -36129,6 +38370,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 7.543,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -36287,7 +38530,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 10.6,
       "meta_model_load_sec": 43.8,
       "meta_start_time": "2026-04-17T19:35:23.596104+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -36447,7 +38691,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 52.2,
       "meta_model_load_sec": 77.5,
       "meta_start_time": "2026-04-17T18:21:04.764393+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -36466,6 +38711,11 @@ const LEADERBOARD_DATA = [
           118.44,
           118.44,
           118.44
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -36494,7 +38744,12 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 82.02,
@@ -36502,7 +38757,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 666.43,
         "tpot_p50": 7.78,
         "tpot_p90": 7.86,
-        "tpot_p99": 8.08
+        "tpot_p99": 8.08,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -36636,6 +38892,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.936,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -45.4,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 561.2,
+          "std": 9.6,
+          "cv_pct": 1.71,
+          "stability": "stable",
+          "runs": [
+            561.4,
+            545.8,
+            565.7,
+            583.2,
+            554.6,
+            567.3,
+            556.8,
+            555.3,
+            571.4,
+            549.8,
+            561.4,
+            549.8,
+            565.6,
+            568.0,
+            563.2,
+            561.4,
+            562.6,
+            570.8,
+            546.6,
+            561.1,
+            576.4,
+            549.6,
+            550.5,
+            573.5,
+            556.8,
+            555.4,
+            555.4,
+            573.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -37063,7 +39356,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 272.0,
       "meta_model_load_sec": 97.1,
       "meta_start_time": "2026-04-18T06:25:43.934153+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -37082,6 +39376,11 @@ const LEADERBOARD_DATA = [
           17.85,
           17.85,
           17.85
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -37110,7 +39409,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 161.63,
@@ -37118,7 +39422,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 271.4,
         "tpot_p50": 61.2,
         "tpot_p90": 61.43,
-        "tpot_p99": 61.64
+        "tpot_p99": 61.64,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -37252,6 +39557,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.748,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 11.6,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 116.6,
+          "std": 10.5,
+          "cv_pct": 8.99,
+          "stability": "high-variance",
+          "runs": [
+            98.7,
+            132.0,
+            105.3,
+            132.0,
+            117.6,
+            99.5,
+            128.9,
+            106.2,
+            126.7,
+            126.2,
+            108.1,
+            120.4,
+            105.7,
+            126.7,
+            117.5,
+            107.6,
+            120.4,
+            113.0,
+            126.8,
+            124.2,
+            103.4,
+            110.6,
+            121.4,
+            118.3,
+            125.2,
+            102.6,
+            110.5,
+            130.0
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -37683,7 +40025,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 28.4,
       "meta_model_load_sec": 77.9,
       "meta_start_time": "2026-04-18T05:47:37.815717+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -37702,6 +40045,11 @@ const LEADERBOARD_DATA = [
           17.55,
           17.55,
           17.55
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -37725,7 +40073,11 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 23.38,
@@ -37733,7 +40085,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 26.65,
         "tpot_p50": 6.03,
         "tpot_p90": 6.09,
-        "tpot_p99": 6.13
+        "tpot_p99": 6.13,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -37807,6 +40160,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.983,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -51.3,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2837.3,
+          "std": 16.9,
+          "cv_pct": 0.6,
+          "stability": "stable",
+          "runs": [
+            2816.1,
+            2841.7,
+            2863.3,
+            2824.1,
+            2815.9,
+            2862.6,
+            2858.2,
+            2813.6,
+            2848.7,
+            2828.0,
+            2844.6,
+            2837.7,
+            2830.5,
+            2836.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -38082,7 +40458,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 26.1,
       "meta_model_load_sec": 27.7,
       "meta_start_time": "2026-04-21T01:28:56.223984+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -38101,6 +40478,11 @@ const LEADERBOARD_DATA = [
           15.33,
           15.33,
           15.33
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -38124,7 +40506,11 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 15.74,
@@ -38132,7 +40518,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 16.55,
         "tpot_p50": 5.0,
         "tpot_p90": 5.01,
-        "tpot_p99": 5.03
+        "tpot_p99": 5.03,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -38206,6 +40593,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.982,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -48.2,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 3880.8,
+          "std": 20.4,
+          "cv_pct": 0.52,
+          "stability": "stable",
+          "runs": [
+            3838.2,
+            3867.3,
+            3892.6,
+            3896.5,
+            3882.7,
+            3870.2,
+            3904.8,
+            3845.2,
+            3891.9,
+            3873.4,
+            3888.0,
+            3885.3,
+            3886.2,
+            3908.5
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -38483,7 +40893,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 113.6,
       "meta_model_load_sec": 40.4,
       "meta_start_time": "2026-04-19T03:58:15.453511+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -38502,6 +40913,11 @@ const LEADERBOARD_DATA = [
           40.64,
           40.64,
           40.64
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -38530,7 +40946,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 48.67,
@@ -38538,7 +40959,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 102.33,
         "tpot_p50": 19.21,
         "tpot_p90": 19.3,
-        "tpot_p99": 20.4
+        "tpot_p99": 20.4,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -38672,6 +41094,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.901,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": 18.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 376.2,
+          "std": 8.1,
+          "cv_pct": 2.15,
+          "stability": "stable",
+          "runs": [
+            375.9,
+            376.2,
+            374.4,
+            394.4,
+            373.0,
+            365.6,
+            382.7,
+            363.9,
+            386.3,
+            375.6,
+            389.9,
+            355.4,
+            386.0,
+            372.6,
+            381.9,
+            376.1,
+            374.5,
+            370.4,
+            373.1,
+            380.1,
+            367.5,
+            384.4,
+            373.7,
+            376.4,
+            377.7,
+            376.4,
+            370.6,
+            379.9
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -38981,6 +41440,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 282.058,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -39137,7 +41598,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 149.1,
       "meta_model_load_sec": 40.6,
       "meta_start_time": "2026-04-19T04:13:23.330886+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -39762,7 +42224,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 186.6,
       "meta_model_load_sec": 36.9,
       "meta_start_time": "2026-04-19T04:49:05.549513+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -39778,6 +42241,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           42.53,
           42.53
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -39786,7 +42253,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 6197.29,
         "tpot_p50": 24.1,
         "tpot_p90": 24.39,
-        "tpot_p99": 24.68
+        "tpot_p99": 24.68,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -39920,6 +42388,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.461,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 2424.7,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 32.3,
+          "std": 11.7,
+          "cv_pct": 36.18,
+          "stability": "high-variance",
+          "runs": [
+            25.6,
+            25.6,
+            25.6,
+            55.4,
+            25.6,
+            29.9,
+            25.6,
+            51.2,
+            25.6,
+            29.9,
+            25.6,
+            55.5,
+            25.6,
+            25.6,
+            25.6,
+            25.6,
+            55.5,
+            25.6,
+            29.9,
+            51.1,
+            25.7,
+            25.6,
+            29.9,
+            25.6,
+            55.5,
+            25.6,
+            25.6,
+            25.6
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -40346,7 +42851,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 29.0,
       "meta_model_load_sec": 40.6,
       "meta_start_time": "2026-04-19T03:40:05.477352+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -40365,6 +42871,11 @@ const LEADERBOARD_DATA = [
           40.31,
           40.31,
           40.31
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -40388,7 +42899,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 39.83,
@@ -40396,7 +42911,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 54.58,
         "tpot_p50": 5.13,
         "tpot_p90": 5.42,
-        "tpot_p99": 5.54
+        "tpot_p99": 5.54,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -40470,6 +42986,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.773,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -18.1,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2895.0,
+          "std": 197.6,
+          "cv_pct": 6.83,
+          "stability": "noisy",
+          "runs": [
+            3526.2,
+            3053.6,
+            2843.1,
+            2823.8,
+            2814.7,
+            2834.9,
+            2805.7,
+            2814.8,
+            2790.3,
+            2824.4,
+            2862.5,
+            2960.7,
+            2848.3,
+            2726.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -40747,7 +43286,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 139.4,
       "meta_model_load_sec": 49.0,
       "meta_start_time": "2026-04-17T01:36:22.434355+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -40766,6 +43306,11 @@ const LEADERBOARD_DATA = [
           40.71,
           40.71,
           40.71
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -40794,7 +43339,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 76.75,
@@ -40802,7 +43352,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 126.44,
         "tpot_p50": 25.94,
         "tpot_p90": 26.01,
-        "tpot_p99": 26.2
+        "tpot_p99": 26.2,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -40936,6 +43487,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.877,
         "throttle_onset_minute": 8.0,
         "ttft_p99_drift_ms": -18.4,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 265.3,
+          "std": 8.6,
+          "cv_pct": 3.25,
+          "stability": "noisy",
+          "runs": [
+            259.8,
+            264.2,
+            272.7,
+            273.7,
+            262.9,
+            270.4,
+            247.2,
+            262.5,
+            273.3,
+            262.8,
+            272.8,
+            270.2,
+            252.1,
+            266.8,
+            263.8,
+            272.9,
+            258.3,
+            278.3,
+            270.2,
+            248.1,
+            262.5,
+            281.9,
+            254.3,
+            272.9,
+            270.5,
+            260.2,
+            259.2,
+            264.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -41245,6 +43833,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 302.734,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -41400,7 +43990,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 184.2,
       "meta_model_load_sec": 63.8,
       "meta_start_time": "2026-04-16T09:29:22.824337+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -42025,7 +44616,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 203.6,
       "meta_model_load_sec": 60.0,
       "meta_start_time": "2026-04-17T01:10:30.302187+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -42041,6 +44633,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           42.6,
           42.6
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -42049,7 +44645,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 6172.43,
         "tpot_p50": 30.62,
         "tpot_p90": 30.91,
-        "tpot_p99": 31.11
+        "tpot_p99": 31.11,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -42183,6 +44780,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.461,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -34.2,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 30.5,
+          "std": 10.5,
+          "cv_pct": 34.45,
+          "stability": "high-variance",
+          "runs": [
+            25.6,
+            25.6,
+            25.6,
+            29.9,
+            25.6,
+            25.6,
+            55.5,
+            25.6,
+            25.6,
+            25.6,
+            29.9,
+            25.6,
+            25.6,
+            55.4,
+            25.6,
+            25.6,
+            25.6,
+            29.9,
+            25.6,
+            25.6,
+            55.5,
+            25.6,
+            25.6,
+            25.6,
+            29.9,
+            25.6,
+            25.6,
+            55.5
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -42609,7 +45243,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 26.2,
       "meta_model_load_sec": 42.7,
       "meta_start_time": "2026-04-17T01:41:44.263924+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -42628,6 +45263,11 @@ const LEADERBOARD_DATA = [
           40.41,
           40.41,
           40.41
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -42651,7 +45291,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 35.75,
@@ -42659,7 +45303,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 40.66,
         "tpot_p50": 5.12,
         "tpot_p90": 5.22,
-        "tpot_p99": 5.38
+        "tpot_p99": 5.38,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -42733,6 +45378,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.728,
         "throttle_onset_minute": 7.0,
         "ttft_p99_drift_ms": -21.5,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 1917.3,
+          "std": 286.8,
+          "cv_pct": 14.96,
+          "stability": "high-variance",
+          "runs": [
+            2197.7,
+            2238.6,
+            2282.9,
+            2213.9,
+            2247.4,
+            2232.2,
+            1661.7,
+            1675.0,
+            1663.0,
+            1705.4,
+            1668.5,
+            1678.5,
+            1709.0,
+            1668.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -43009,7 +45677,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 111.8,
       "meta_model_load_sec": 88.4,
       "meta_start_time": "2026-04-16T23:10:21.127800+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -43033,6 +45702,11 @@ const LEADERBOARD_DATA = [
           40.12,
           40.12,
           40.12
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -43066,7 +45740,13 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -43200,6 +45880,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.764,
         "throttle_onset_minute": 4.0,
         "ttft_p99_drift_ms": -30.2,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 105.3,
+          "std": 6.8,
+          "cv_pct": 6.47,
+          "stability": "noisy",
+          "runs": [
+            108.7,
+            106.6,
+            102.3,
+            97.9,
+            111.4,
+            102.8,
+            101.8,
+            105.3,
+            113.3,
+            110.1,
+            100.9,
+            96.0,
+            108.5,
+            116.2,
+            88.8,
+            110.6,
+            111.3,
+            104.4,
+            107.8,
+            93.2,
+            109.5,
+            110.7,
+            101.6,
+            106.6,
+            103.9,
+            112.4,
+            93.3,
+            112.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -43504,6 +46221,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 2.951,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -43662,7 +46381,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 15.6,
       "meta_model_load_sec": 49.7,
       "meta_start_time": "2026-04-17T08:57:43.962130+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -43822,7 +46542,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 56.7,
       "meta_model_load_sec": 70.4,
       "meta_start_time": "2026-04-17T07:33:45.856880+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -43841,6 +46562,11 @@ const LEADERBOARD_DATA = [
           41.83,
           41.83,
           41.83
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -43869,7 +46595,12 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 88.17,
@@ -43877,7 +46608,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 561.13,
         "tpot_p50": 9.45,
         "tpot_p90": 9.58,
-        "tpot_p99": 9.72
+        "tpot_p99": 9.72,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -44011,6 +46743,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.893,
         "throttle_onset_minute": 4.0,
         "ttft_p99_drift_ms": -70.2,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 343.0,
+          "std": 10.9,
+          "cv_pct": 3.17,
+          "stability": "noisy",
+          "runs": [
+            341.7,
+            342.6,
+            326.1,
+            337.2,
+            353.4,
+            349.3,
+            330.5,
+            364.8,
+            341.4,
+            339.1,
+            352.7,
+            340.2,
+            328.8,
+            350.5,
+            342.9,
+            340.7,
+            332.5,
+            336.4,
+            357.0,
+            331.2,
+            364.2,
+            331.5,
+            349.5,
+            338.7,
+            350.9,
+            325.7,
+            356.4,
+            349.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -44437,7 +47206,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 31.3,
       "meta_model_load_sec": 86.7,
       "meta_start_time": "2026-04-18T05:02:33.508225+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -44456,6 +47226,11 @@ const LEADERBOARD_DATA = [
           10.83,
           10.83,
           10.83
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -44479,7 +47254,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 37.19,
@@ -44487,7 +47266,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 42.84,
         "tpot_p50": 7.23,
         "tpot_p90": 7.34,
-        "tpot_p99": 7.42
+        "tpot_p99": 7.42,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -44561,6 +47341,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.982,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -156.7,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2006.9,
+          "std": 10.1,
+          "cv_pct": 0.5,
+          "stability": "stable",
+          "runs": [
+            1999.4,
+            2004.0,
+            1998.1,
+            2014.0,
+            2013.6,
+            2003.3,
+            2015.3,
+            2006.1,
+            1997.0,
+            1997.9,
+            2013.0,
+            1999.4,
+            2033.6,
+            2002.5
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -44838,7 +47641,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 146.2,
       "meta_model_load_sec": 74.1,
       "meta_start_time": "2026-04-15T14:31:30.170546+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -44857,6 +47661,11 @@ const LEADERBOARD_DATA = [
           26.54,
           26.54,
           26.54
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -44885,7 +47694,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 102.89,
@@ -44893,7 +47707,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 158.38,
         "tpot_p50": 22.55,
         "tpot_p90": 22.73,
-        "tpot_p99": 23.65
+        "tpot_p99": 23.65,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -45027,6 +47842,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.853,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": -12.5,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 268.3,
+          "std": 11.1,
+          "cv_pct": 4.12,
+          "stability": "noisy",
+          "runs": [
+            265.0,
+            294.4,
+            276.4,
+            269.7,
+            295.7,
+            281.2,
+            281.4,
+            271.3,
+            263.5,
+            265.3,
+            255.6,
+            262.4,
+            276.5,
+            255.3,
+            263.9,
+            254.9,
+            282.2,
+            262.4,
+            271.5,
+            252.3,
+            262.6,
+            268.9,
+            261.8,
+            269.2,
+            260.4,
+            262.4,
+            269.1,
+            257.7
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -45336,6 +48188,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 5.494,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -45492,7 +48346,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 92.8,
       "meta_model_load_sec": 74.4,
       "meta_start_time": "2026-04-15T17:09:51.283338+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -45838,7 +48693,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 359.7,
       "meta_model_load_sec": 80.0,
       "meta_start_time": "2026-04-15T19:02:14.429622+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -45854,6 +48710,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           28.46,
           28.46
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -45862,7 +48722,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 13539.98,
         "tpot_p50": 34.33,
         "tpot_p90": 34.7,
-        "tpot_p99": 35.46
+        "tpot_p99": 35.46,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -45996,6 +48857,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.399,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 34216.0,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 14.9,
+          "std": 4.4,
+          "cv_pct": 29.72,
+          "stability": "high-variance",
+          "runs": [
+            17.1,
+            17.1,
+            8.5,
+            17.1,
+            17.1,
+            8.5,
+            17.1,
+            21.3,
+            8.5,
+            17.1,
+            17.1,
+            8.5,
+            21.3,
+            17.1,
+            8.5,
+            17.1,
+            17.1,
+            17.1,
+            8.5,
+            17.1,
+            17.1,
+            8.5,
+            21.3,
+            17.1,
+            8.5,
+            17.1,
+            12.8,
+            17.1
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -46422,7 +49320,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 24.9,
       "meta_model_load_sec": 56.4,
       "meta_start_time": "2026-04-15T13:57:42.722119+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -46441,6 +49340,11 @@ const LEADERBOARD_DATA = [
           26.25,
           26.25,
           26.25
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -46464,7 +49368,11 @@ const LEADERBOARD_DATA = [
           true,
           false
         ],
-        "max_valid_qps": 10
+        "max_valid_qps": 10,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 29.71,
@@ -46472,7 +49380,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 41.79,
         "tpot_p50": 3.79,
         "tpot_p90": 4.12,
-        "tpot_p99": 4.37
+        "tpot_p99": 4.37,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -46546,6 +49455,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.927,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -83.9,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 2789.7,
+          "std": 50.6,
+          "cv_pct": 1.81,
+          "stability": "stable",
+          "runs": [
+            2797.6,
+            2649.7,
+            2789.6,
+            2783.6,
+            2742.5,
+            2781.3,
+            2791.3,
+            2763.1,
+            2817.4,
+            2817.8,
+            2842.1,
+            2857.4,
+            2830.4,
+            2792.3
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -46822,7 +49754,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 139.3,
       "meta_model_load_sec": 123.7,
       "meta_start_time": "2026-04-16T01:37:13.296164+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_B",
@@ -46846,6 +49779,11 @@ const LEADERBOARD_DATA = [
           26.16,
           26.16,
           26.16
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -46879,7 +49817,13 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {},
+          {}
+        ]
       },
       "sustained": {
         "minutes": [
@@ -47013,6 +49957,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.749,
         "throttle_onset_minute": 2.0,
         "ttft_p99_drift_ms": 34.6,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 92.8,
+          "std": 8.0,
+          "cv_pct": 8.63,
+          "stability": "high-variance",
+          "runs": [
+            86.6,
+            95.9,
+            92.6,
+            103.3,
+            80.9,
+            93.4,
+            92.7,
+            84.7,
+            102.0,
+            89.7,
+            88.6,
+            94.3,
+            92.8,
+            106.5,
+            81.9,
+            92.7,
+            100.4,
+            83.5,
+            99.3,
+            86.1,
+            97.7,
+            82.1,
+            97.0,
+            102.8,
+            79.8,
+            106.2,
+            84.7,
+            99.2
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -47317,6 +50298,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": false,
         "burst_degradation_ratio": 2.04,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -47475,7 +50458,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 24.6,
       "meta_model_load_sec": 63.0,
       "meta_start_time": "2026-04-16T07:30:10.040922+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_E",
@@ -47635,7 +50619,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 64.7,
       "meta_model_load_sec": 91.8,
       "meta_start_time": "2026-04-18T00:57:52.503863+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_G",
@@ -47654,6 +50639,11 @@ const LEADERBOARD_DATA = [
           27.83,
           27.83,
           27.83
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -47682,7 +50672,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 2
+        "max_valid_qps": 2,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 109.38,
@@ -47690,7 +50685,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 709.42,
         "tpot_p50": 12.94,
         "tpot_p90": 13.06,
-        "tpot_p99": 13.1
+        "tpot_p99": 13.1,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -47824,6 +50820,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.811,
         "throttle_onset_minute": 8.0,
         "ttft_p99_drift_ms": 22.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 293.9,
+          "std": 15.7,
+          "cv_pct": 5.35,
+          "stability": "noisy",
+          "runs": [
+            311.7,
+            301.1,
+            301.5,
+            293.5,
+            300.5,
+            320.6,
+            285.0,
+            308.8,
+            297.6,
+            290.8,
+            304.3,
+            316.8,
+            293.8,
+            287.4,
+            316.6,
+            305.1,
+            296.0,
+            298.7,
+            260.1,
+            298.2,
+            284.7,
+            274.4,
+            293.2,
+            267.2,
+            271.3,
+            297.0,
+            262.9,
+            291.0
+          ]
+        },
         "samples": [
           {
             "minute": 1.0,
@@ -48248,7 +51281,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 25.1,
       "meta_model_load_sec": 116.8,
       "meta_start_time": "2026-05-18T09:26:10.676960+00:00",
-      "meta_notes": "Partial run: ['offline', 'online'] succeeded, ['accuracy'] failed."
+      "meta_notes": "Partial run: ['offline', 'online'] succeeded, ['accuracy'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -48267,6 +51301,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -48295,7 +51334,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 5
+        "max_valid_qps": 5,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": null,
@@ -48303,7 +51347,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": null,
         "tpot_p50": null,
         "tpot_p90": null,
-        "tpot_p99": null
+        "tpot_p99": null,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null,
       "speculative": null,
@@ -48439,7 +51484,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 29.8,
       "meta_model_load_sec": 146.8,
       "meta_start_time": "2026-05-18T08:45:57.373367+00:00",
-      "meta_notes": "Partial run: ['offline', 'online', 'interactive'] succeeded, ['accuracy'] failed."
+      "meta_notes": "Partial run: ['offline', 'online', 'interactive'] succeeded, ['accuracy'] failed.",
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -48458,6 +51504,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -48481,7 +51532,11 @@ const LEADERBOARD_DATA = [
           false,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 25.89,
@@ -48489,7 +51544,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 28.51,
         "tpot_p50": 14.85,
         "tpot_p90": 15.17,
-        "tpot_p99": 15.5
+        "tpot_p99": 15.5,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null
     },
@@ -48626,7 +51682,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 74.2,
       "meta_model_load_sec": 50,
       "meta_start_time": "2026-05-06T11:19:15.947406+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -48645,6 +51702,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -48673,7 +51735,12 @@ const LEADERBOARD_DATA = [
           true,
           true
         ],
-        "max_valid_qps": 100
+        "max_valid_qps": 100,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 32.52,
@@ -48681,7 +51748,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 61.84,
         "tpot_p50": 12.93,
         "tpot_p90": 12.98,
-        "tpot_p99": 13.03
+        "tpot_p99": 13.03,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -48815,6 +51883,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.966,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -0.3,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 562.5,
+          "std": 4.9,
+          "cv_pct": 0.86,
+          "stability": "stable",
+          "runs": [
+            566.2,
+            560.8,
+            565.3,
+            561.4,
+            561.9,
+            570.0,
+            558.3,
+            563.3,
+            552.7,
+            569.3,
+            558.9,
+            568.4,
+            557.2,
+            565.5,
+            554.1,
+            563.7,
+            563.3,
+            565.0,
+            563.3,
+            564.7,
+            564.3,
+            562.3,
+            569.5,
+            550.8,
+            562.5,
+            561.7,
+            566.5,
+            558.2
+          ]
+        },
         "samples": [
           {
             "minute": 1,
@@ -49124,6 +52229,8 @@ const LEADERBOARD_DATA = [
         "burst_requests_total": 2245,
         "sla_met_during_burst": true,
         "burst_degradation_ratio": 0.025,
+        "recovery_time_seconds": null,
+        "recovery_time_seconds_per_cycle": [],
         "results_by_cycle": [
           {
             "cycle": 1,
@@ -49280,7 +52387,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 76.2,
       "meta_model_load_sec": 65.9,
       "meta_start_time": "2026-04-30T08:26:37.946702+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_C",
@@ -49720,7 +52828,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 150.5,
       "meta_model_load_sec": 52.9,
       "meta_start_time": "2026-05-07T07:00:40.025406+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_D",
@@ -49736,6 +52845,10 @@ const LEADERBOARD_DATA = [
         "memory_gb": [
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {}
         ]
       },
       "interactive": {
@@ -49744,7 +52857,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 3185.98,
         "tpot_p50": 15.65,
         "tpot_p90": 15.72,
-        "tpot_p99": 15.76
+        "tpot_p99": 15.76,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -49878,6 +52992,43 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.666,
         "throttle_onset_minute": 11,
         "ttft_p99_drift_ms": 66,
+        "throughput_post_warmup_reliability": {
+          "n": 28,
+          "mean": 54.9,
+          "std": 4.9,
+          "cv_pct": 8.95,
+          "stability": "high-variance",
+          "runs": [
+            56.2,
+            56.3,
+            56.2,
+            56.3,
+            56.3,
+            56.2,
+            56.2,
+            56.2,
+            56.3,
+            37.5,
+            56.3,
+            56.2,
+            56.3,
+            56.2,
+            56.3,
+            56.2,
+            56.3,
+            56.2,
+            56.3,
+            56.2,
+            37.5,
+            56.3,
+            56.2,
+            56.2,
+            56.3,
+            56.3,
+            56.2,
+            56.2
+          ]
+        },
         "samples": [
           {
             "minute": 1,
@@ -50308,7 +53459,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 20.7,
       "meta_model_load_sec": 33.4,
       "meta_start_time": "2026-05-07T10:55:44.424768+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -50327,6 +53479,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -50350,7 +53507,11 @@ const LEADERBOARD_DATA = [
           false,
           true
         ],
-        "max_valid_qps": 40
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 16.46,
@@ -50358,7 +53519,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 18.42,
         "tpot_p50": 1.89,
         "tpot_p90": 1.91,
-        "tpot_p99": 1.99
+        "tpot_p99": 1.99,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": {
         "minutes": [
@@ -50432,6 +53594,29 @@ const LEADERBOARD_DATA = [
         "throttle_ratio": 0.92,
         "throttle_onset_minute": null,
         "ttft_p99_drift_ms": -4707.7,
+        "throughput_post_warmup_reliability": {
+          "n": 14,
+          "mean": 7095.4,
+          "std": 147.1,
+          "cv_pct": 2.07,
+          "stability": "stable",
+          "runs": [
+            6616.4,
+            7181.7,
+            7188.9,
+            7110.2,
+            7106.5,
+            7144.4,
+            7158.3,
+            7020.0,
+            7160.7,
+            7183.9,
+            7180.8,
+            7127.9,
+            7111.1,
+            7044.6
+          ]
+        },
         "samples": [
           {
             "minute": 1,
@@ -50705,7 +53890,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 151.2,
       "meta_model_load_sec": 47.8,
       "meta_start_time": "2026-05-18T09:53:19.928949+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_A",
@@ -50724,6 +53910,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -50752,7 +53943,12 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": null,
@@ -50760,7 +53956,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": null,
         "tpot_p50": null,
         "tpot_p90": null,
-        "tpot_p99": null
+        "tpot_p99": null,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null,
       "speculative": null,
@@ -50899,7 +54096,8 @@ const LEADERBOARD_DATA = [
       "meta_elapsed_min": 16.4,
       "meta_model_load_sec": 31.7,
       "meta_start_time": "2026-05-18T12:27:34.502139+00:00",
-      "meta_notes": null
+      "meta_notes": null,
+      "env_vendor_details": {}
     },
     "viz": {
       "type": "suite_F",
@@ -50918,6 +54116,11 @@ const LEADERBOARD_DATA = [
           null,
           null,
           null
+        ],
+        "throughput_reliability": [
+          {},
+          {},
+          {}
         ]
       },
       "online": {
@@ -50941,7 +54144,11 @@ const LEADERBOARD_DATA = [
           false,
           false
         ],
-        "max_valid_qps": 0.0
+        "max_valid_qps": 0.0,
+        "ttft_ms_p99_reliability": [
+          {},
+          {}
+        ]
       },
       "interactive": {
         "ttft_p50": 26.76,
@@ -50949,7 +54156,8 @@ const LEADERBOARD_DATA = [
         "ttft_p99": 40.69,
         "tpot_p50": 3.51,
         "tpot_p90": 3.76,
-        "tpot_p99": 3.81
+        "tpot_p99": 3.81,
+        "ttft_ms_p99_reliability": {}
       },
       "sustained": null
     },
