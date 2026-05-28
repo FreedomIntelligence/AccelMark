@@ -1,0 +1,118 @@
+{
+  "collected_at": "2026-05-09T01:37:37.031654+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 4,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 5,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 6,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 7,
+      "name": "NVIDIA A100-SXM4-40GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 40.0,
+      "driver_version": "580.65.06",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tGPU4\tGPU5\tGPU6\tGPU7\tNIC0\tNIC1\tNIC2\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV12\tNV12\tNV12\tNV12\tNV12\tNV12\tNV12\tPXB\tPXB\tNODE\t0-31,64-95\t0\t\tN/A\nGPU1\tNV12\t X \tNV12\tNV12\tNV12\tNV12\tNV12\tNV12\tPXB\tPXB\tNODE\t0-31,64-95\t0\t\tN/A\nGPU2\tNV12\tNV12\t X \tNV12\tNV12\tNV12\tNV12\tNV12\tNODE\tNODE\tPXB\t0-31,64-95\t0\t\tN/A\nGPU3\tNV12\tNV12\tNV12\t X \tNV12\tNV12\tNV12\tNV12\tNODE\tNODE\tPXB\t0-31,64-95\t0\t\tN/A\nGPU4\tNV12\tNV12\tNV12\tNV12\t X \tNV12\tNV12\tNV12\tSYS\tSYS\tSYS\t32-63,96-127\t1\t\tN/A\nGPU5\tNV12\tNV12\tNV12\tNV12\tNV12\t X \tNV12\tNV12\tSYS\tSYS\tSYS\t32-63,96-127\t1\t\tN/A\nGPU6\tNV12\tNV12\tNV12\tNV12\tNV12\tNV12\t X \tNV12\tSYS\tSYS\tSYS\t32-63,96-127\t1\t\tN/A\nGPU7\tNV12\tNV12\tNV12\tNV12\tNV12\tNV12\tNV12\t X \tSYS\tSYS\tSYS\t32-63,96-127\t1\t\tN/A\nNIC0\tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t X \tPIX\tNODE\t\t\t\t\nNIC1\tPXB\tPXB\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\tPIX\t X \tNODE\t\t\t\t\nNIC2\tNODE\tNODE\tPXB\tPXB\tSYS\tSYS\tSYS\tSYS\tNODE\tNODE\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n\n",
+  "intra_node_interconnect": "NVLink",
+  "cpu": {
+    "model": "AMD EPYC 7532 32-Core Processor",
+    "physical_cores": 64,
+    "logical_cores": 128,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 1007.7,
+  "pcie_generation": "PCIe Gen 4",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_1",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.4 LTS",
+  "python_version": "3.10.20",
+  "kernel_version": "5.15.0-60-generic",
+  "runtime_version": "CUDA 12.8",
+  "pytorch_version": "2.9.1+cu128"
+}

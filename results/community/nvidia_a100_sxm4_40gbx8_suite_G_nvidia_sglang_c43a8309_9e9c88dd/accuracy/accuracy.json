@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.66,
+  "baseline_delta": 0.04,
+  "valid": true,
+  "framework": "SGLang",
+  "precision": "BF16",
+  "notes": "Integrated accuracy check \u2014 used same SGLang instance as benchmark."
+}

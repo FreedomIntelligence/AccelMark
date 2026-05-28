@@ -1,0 +1,374 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_sglang_c43a8309",
+  "chip": {
+    "name": "NVIDIA GeForce RTX 4090",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 24.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-27T13:14:17.420434+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 4090",
+        "vendor": "NVIDIA",
+        "memory_gb": 24.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.9",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t0-31,64-95\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "INTEL(R) XEON(R) GOLD 6530",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.6,
+    "pcie_generation": "PCIe Gen 1",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": null,
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.20",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.8",
+    "pytorch_version": "2.9.1+cu128"
+  },
+  "software": {
+    "framework": "SGLang",
+    "framework_version": "0.5.6",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.8",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.20"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online",
+      "sustained"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": null
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 1,
+          "throughput_tokens_per_sec": 1986.44,
+          "throughput_tokens_per_sec_per_chip": 1986.44,
+          "elapsed_seconds_median": 18.1,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 4,
+          "throughput_tokens_per_sec": 1966.2,
+          "throughput_tokens_per_sec_per_chip": 1966.2,
+          "elapsed_seconds_median": 18.5,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 16,
+          "throughput_tokens_per_sec": 1933.26,
+          "throughput_tokens_per_sec_per_chip": 1933.26,
+          "elapsed_seconds_median": 18.9,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 64,
+          "throughput_tokens_per_sec": 1965.04,
+          "throughput_tokens_per_sec_per_chip": 1965.04,
+          "elapsed_seconds_median": 18.3,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    },
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 10,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 68.99,
+          "ttft_ms_p90": 101.54,
+          "ttft_ms_p99": 1975.21,
+          "tpot_ms_p50": 23.2,
+          "tpot_ms_p90": 25.96,
+          "tpot_ms_p99": 29.33,
+          "elapsed_seconds_median": 67.1,
+          "sla_met": false
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 77.79,
+          "ttft_ms_p90": 120.18,
+          "ttft_ms_p99": 155.35,
+          "tpot_ms_p50": 34.33,
+          "tpot_ms_p90": 37.28,
+          "tpot_ms_p99": 48.36,
+          "elapsed_seconds_median": 34.2,
+          "sla_met": true
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 4302.15,
+          "ttft_ms_p90": 8634.91,
+          "ttft_ms_p99": 9469.27,
+          "tpot_ms_p50": 40.74,
+          "tpot_ms_p90": 44.2,
+          "tpot_ms_p99": 115.81,
+          "elapsed_seconds_median": 25.9,
+          "sla_met": false
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 7003.83,
+          "ttft_ms_p90": 13096.96,
+          "ttft_ms_p99": 14256.05,
+          "tpot_ms_p50": 35.52,
+          "tpot_ms_p90": 45.45,
+          "tpot_ms_p99": 831.83,
+          "elapsed_seconds_median": 24.8,
+          "sla_met": false
+        }
+      ]
+    },
+    "sustained": {
+      "sustained_concurrency": 8,
+      "duration_minutes": 15,
+      "warmup_minutes": 1,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 393.4,
+          "tokens_out": 23625,
+          "tokens_in": 0,
+          "requests_completed": 131,
+          "ttft_ms_p50": 60.8,
+          "ttft_ms_p99": 3031.4
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 433.1,
+          "tokens_out": 25985,
+          "tokens_in": 0,
+          "requests_completed": 140,
+          "ttft_ms_p50": 50.1,
+          "ttft_ms_p99": 61.2
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 436.6,
+          "tokens_out": 26191,
+          "tokens_in": 0,
+          "requests_completed": 140,
+          "ttft_ms_p50": 50.2,
+          "ttft_ms_p99": 62.6
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 446.9,
+          "tokens_out": 26811,
+          "tokens_in": 0,
+          "requests_completed": 148,
+          "ttft_ms_p50": 50.3,
+          "ttft_ms_p99": 59.6
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 440.6,
+          "tokens_out": 26429,
+          "tokens_in": 0,
+          "requests_completed": 140,
+          "ttft_ms_p50": 50.1,
+          "ttft_ms_p99": 62.1
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 436.3,
+          "tokens_out": 26190,
+          "tokens_in": 0,
+          "requests_completed": 144,
+          "ttft_ms_p50": 50.3,
+          "ttft_ms_p99": 61.5
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 436.4,
+          "tokens_out": 26187,
+          "tokens_in": 0,
+          "requests_completed": 140,
+          "ttft_ms_p50": 50.2,
+          "ttft_ms_p99": 71.8
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 436.7,
+          "tokens_out": 26197,
+          "tokens_in": 0,
+          "requests_completed": 141,
+          "ttft_ms_p50": 50.3,
+          "ttft_ms_p99": 64.3
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 440.8,
+          "tokens_out": 26436,
+          "tokens_in": 0,
+          "requests_completed": 143,
+          "ttft_ms_p50": 50.3,
+          "ttft_ms_p99": 63.2
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 437.4,
+          "tokens_out": 26252,
+          "tokens_in": 0,
+          "requests_completed": 141,
+          "ttft_ms_p50": 50.5,
+          "ttft_ms_p99": 62.4
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 437.6,
+          "tokens_out": 26250,
+          "tokens_in": 0,
+          "requests_completed": 144,
+          "ttft_ms_p50": 50.1,
+          "ttft_ms_p99": 62.2
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 436.1,
+          "tokens_out": 26162,
+          "tokens_in": 0,
+          "requests_completed": 140,
+          "ttft_ms_p50": 50.3,
+          "ttft_ms_p99": 58.0
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 435.8,
+          "tokens_out": 26158,
+          "tokens_in": 0,
+          "requests_completed": 145,
+          "ttft_ms_p50": 50.3,
+          "ttft_ms_p99": 62.4
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 438.7,
+          "tokens_out": 26320,
+          "tokens_in": 0,
+          "requests_completed": 139,
+          "ttft_ms_p50": 50.4,
+          "ttft_ms_p99": 62.8
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 434.7,
+      "throttle_ratio": 0.88,
+      "throttle_onset_minute": 1.0,
+      "ttft_p99_drift_ms": -2968.6
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.55,
+    "baseline_delta": -0.01,
+    "valid": true,
+    "framework": "SGLang",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check — used same SGLang instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "Gong-K",
+    "submission_type": "individual",
+    "date": "2026-04-27",
+    "time": "13:25:04",
+    "run_id": "4ce353c2",
+    "run_name": "nvidia_geforce_rtx_4090x1_suite_C_nvidia_sglang_c43a8309_4ce353c2",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_sglang_c43a8309/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-27T13:20:07.690461+00:00",
+    "benchmark_end_time": "2026-04-27T13:25:04.187964+00:00",
+    "benchmark_elapsed_minutes": 27.6,
+    "model_load_seconds": 81.4,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'sustained'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/community/nvidia_geforce_rtx_4090x1_suite_C_nvidia_sglang_c43a8309_4ce353c2/bf16/offline",
+      "online": "results/community/nvidia_geforce_rtx_4090x1_suite_C_nvidia_sglang_c43a8309_4ce353c2/bf16/online",
+      "sustained": "results/community/nvidia_geforce_rtx_4090x1_suite_C_nvidia_sglang_c43a8309_4ce353c2/bf16/sustained"
+    }
+  }
+}
