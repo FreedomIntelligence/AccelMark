@@ -48,7 +48,7 @@ _REPO_ROOT = _RUNNERS_DIR.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from runners.platforms import discover_plugins  # noqa: E402
+from runners.platforms import discover_plugins, get_active_plugin  # noqa: E402
 
 
 def _print_warning(message: str) -> None:
@@ -82,13 +82,17 @@ def _call_optional(mod: ModuleType, name: str, *args, default=None):
         return default
 
 
-def _collect_accelerators(plugins: Iterable[ModuleType]) -> tuple[list[dict], ModuleType | None]:
-    """Try each plug-in's ``collect()`` and return the first non-empty result."""
-    for mod in plugins:
-        result = _call_optional(mod, "collect", default=[]) or []
-        if result:
-            return list(result), mod
-    return [], None
+def _collect_accelerators() -> tuple[list[dict], ModuleType | None]:
+    """Return accelerators from the active platform plug-in.
+
+    Delegates to ``get_active_plugin()`` for vendor resolution so the
+    single-source-of-truth logic lives in ``runners/platforms/__init__.py``.
+    """
+    mod = get_active_plugin()
+    if mod is None:
+        return [], None
+    result = _call_optional(mod, "collect", default=[]) or []
+    return list(result), mod
 
 
 def _detect_first(plugins: Iterable[ModuleType], fn_name: str, active: ModuleType | None) -> str | None:
@@ -311,7 +315,7 @@ def main() -> None:
     print("Collecting environment info...")
 
     plugins = discover_plugins()
-    accelerators, active = _collect_accelerators(plugins)
+    accelerators, active = _collect_accelerators()
     if not accelerators:
         _print_warning("No accelerators detected. Collecting CPU-only info.")
 

@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+import hashlib
 import json
 import math
 import sys
@@ -225,6 +226,22 @@ class _NullContext:
         pass
 
 
+def _build_env_ref(env_file: str | None, chip: str) -> dict:
+    """Build an ``env_ref`` provenance record.
+
+    If ``--env-file`` is provided, stores the path and SHA-256 of its content.
+    Otherwise records the chip name with a note that full env info was not supplied.
+    """
+    if env_file:
+        try:
+            content = Path(env_file).read_bytes()
+            digest = hashlib.sha256(content).hexdigest()
+            return {"file": env_file, "sha256": digest}
+        except Exception as e:
+            return {"file": env_file, "error": str(e)}
+    return {"chip": chip, "note": "env_info.json not provided; run collect_env.py first"}
+
+
 # ── Main profiler ────────────────────────────────────────────────────────────
 
 def profile(args) -> dict:
@@ -402,7 +419,7 @@ def profile(args) -> dict:
             "prefill": prefill_class,
             "decode": decode_class,
         },
-        "env_ref": chip,
+        "env_ref": _build_env_ref(args.env_file, chip),
     }
 
 
@@ -448,6 +465,8 @@ def main():
                         help="Chip peak HBM bandwidth in GB/s")
     parser.add_argument("--out", default=None,
                         help="Output JSON path")
+    parser.add_argument("--env-file", default=None,
+                        help="Path to env_info.json for provenance tracking")
     args = parser.parse_args()
 
     # Apply suite defaults for unspecified arguments

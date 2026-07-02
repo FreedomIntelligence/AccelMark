@@ -137,7 +137,8 @@ def detect_intra_node_interconnect() -> str | None:
 
 def sample_power_watts() -> float | None:
     """Return instantaneous total board power (watts) summed across all
-    visible NVIDIA GPUs, or None if unavailable. Respects CUDA_VISIBLE_DEVICES."""
+    visible NVIDIA GPUs, or None if unavailable. Respects CUDA_VISIBLE_DEVICES
+    in both integer-index and UUID formats."""
     import os
 
     try:
@@ -154,14 +155,8 @@ def sample_power_watts() -> float | None:
     except Exception:
         return None
 
-    # Respect CUDA_VISIBLE_DEVICES — only sum power for visible GPUs
     visible = os.environ.get("CUDA_VISIBLE_DEVICES", "")
-    visible_indices: set[int] | None = None
-    if visible:
-        try:
-            visible_indices = {int(x.strip()) for x in visible.split(",") if x.strip()}
-        except ValueError:
-            pass
+    visible_indices = _resolve_visible_indices(visible) if visible else None
 
     total = 0.0
     found = 0
@@ -188,6 +183,68 @@ def sample_power_watts() -> float | None:
             continue
 
     return round(total, 1) if found > 0 else None
+
+
+def _resolve_visible_indices(visible: str) -> set[int] | None:
+    """Parse CUDA_VISIBLE_DEVICES into a set of GPU indices.
+
+    Handles both integer indices (``"0,1,2"``) and GPU UUIDs
+    (``"GPU-abc123-def,..."``) by cross-referencing nvidia-smi.
+    Returns None if the value is empty or cannot be resolved.
+    """
+    tokens = [x.strip() for x in visible.split(",") if x.strip()]
+    if not tokens:
+        return None
+
+    # Integer indices — common case
+    try:
+        return {int(t) for t in tokens}
+    except ValueError:
+        pass
+
+    # UUID form — cross-reference nvidia-smi for index mapping
+    try:
+        mapping = subprocess.check_output(
+            [
+                "nvidia-smi",
+                "--query-gpu=uuid,index",
+                "--format=csv,noheader",
+            ],
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
+    except Exception:
+        print(
+            "WARNING: CUDA_VISIBLE_DEVICES contains non-integer values but "
+            "nvidia-smi is unavailable for UUID→index resolution. "
+            "Power sampling will include all GPUs — may over-count on "
+            "shared nodes."
+        )
+        return None
+
+    uuid_to_index: dict[str, int] = {}
+    for line in mapping.strip().splitlines():
+        parts = [x.strip() for x in line.split(",")]
+        if len(parts) >= 2 and parts[1].isdigit():
+            uuid_to_index[parts[0]] = int(parts[1])
+
+    indices: set[int] = set()
+    unresolved: list[str] = []
+    for token in tokens:
+        if token in uuid_to_index:
+            indices.add(uuid_to_index[token])
+        elif token.startswith("GPU-"):
+            unresolved.append(token)
+
+    if unresolved:
+        print(
+            f"WARNING: CUDA_VISIBLE_DEVICES contains UUIDs not found in "
+            f"nvidia-smi output: {unresolved}. These devices may not exist "
+            f"or may be inaccessible."
+        )
+
+    return indices if indices else None
 
 
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
