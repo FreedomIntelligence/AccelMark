@@ -109,6 +109,15 @@ def detect_runtime_version() -> str | None:
         return None
 
 
+def sample_power_watts() -> float | None:
+    """Return instantaneous total board power (watts) for TPU devices.
+    TODO: TPU power sampling is not yet wired — Cloud TPU does not expose
+    a user-accessible SMI tool for per-VM power draw. Future work could
+    integrate with Cloud Monitoring API for this data.
+    """
+    return None
+
+
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     notes: list[str] = []
     if not accelerators and (

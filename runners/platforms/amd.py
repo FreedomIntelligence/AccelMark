@@ -124,6 +124,82 @@ def detect_topology() -> str | None:
         return None
 
 
+def sample_power_watts() -> float | None:
+    """Return instantaneous total board power (watts) summed across all
+    visible AMD GPUs, or None if unavailable. Respects ROCR_VISIBLE_DEVICES."""
+    import os
+
+    try:
+        out = subprocess.check_output(
+            ["rocm-smi", "--showpower", "--json"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
+    except Exception:
+        return None
+
+    # Respect ROCR_VISIBLE_DEVICES — only sum power for visible GPUs
+    visible = os.environ.get("ROCR_VISIBLE_DEVICES", os.environ.get("HIP_VISIBLE_DEVICES", ""))
+    visible_indices: set[int] | None = None
+    if visible:
+        try:
+            visible_indices = {int(x.strip()) for x in visible.split(",") if x.strip()}
+        except ValueError:
+            pass
+
+    try:
+        data = json.loads(out)
+    except Exception:
+        # Fallback: try text parsing (some ROCm versions have different output)
+        return _sample_power_amd_text(out)
+
+    total = 0.0
+    found = 0
+    for card_id, info in data.items():
+        if not isinstance(info, dict):
+            continue
+        # Extract index from card_id like "card0"
+        try:
+            idx = int(re.sub(r"[^0-9]", "", card_id))
+        except ValueError:
+            idx = found  # fallback
+        if visible_indices is not None and idx not in visible_indices:
+            continue
+        power = None
+        for key in ("Average Graphics Package Power (W)", "Current Socket Graphics Package Power (W)",
+                     "GPU Power Draw (W)", "average_graphics_package_power_w",
+                     "current_socket_power_w", "gpu_power_draw_w"):
+            val = info.get(key)
+            if isinstance(val, (int, float)) and val > 0:
+                power = float(val)
+                break
+            if isinstance(val, str):
+                try:
+                    power = float(val.replace(" W", "").strip())
+                    if power > 0:
+                        break
+                except ValueError:
+                    continue
+        if power is not None:
+            total += power
+            found += 1
+
+    return round(total, 1) if found > 0 else None
+
+
+def _sample_power_amd_text(out: str) -> float | None:
+    """Fallback parser for rocm-smi --showpower plain-text output."""
+    total = 0.0
+    found = 0
+    for line in out.splitlines():
+        m = re.search(r"(\d+\.?\d*)\s*W", line)
+        if m:
+            total += float(m.group(1))
+            found += 1
+    return round(total, 1) if found > 0 else None
+
+
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     notes: list[str] = []
     if (env.get("pytorch_version") or "") == "unknown":
@@ -139,5 +215,10 @@ def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     if env.get("accelerator_topology") is None and accelerators:
         notes.append(
             "accelerator_topology is null — rocm-smi --showtopo did not return data."
+        )
+    if accelerators and sample_power_watts() is None:
+        notes.append(
+            "Power sampling returned None — rocm-smi --showpower is unavailable. "
+            "tokens_per_sec_per_watt will not be computed."
         )
     return notes

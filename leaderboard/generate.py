@@ -875,6 +875,9 @@ def extract_row(result: dict) -> dict:
         "min_price_usd_per_hr":               min_price,
         "cost_efficiency_toks_per_dollar_hr": cost_efficiency,
         "tokens_per_watt":                    derived.get("tokens_per_sec_per_watt"),
+        "tokens_per_joule":                  derived.get("tokens_per_joule"),
+        "energy_joules":                     derived.get("energy_joules"),
+        # Metadata
         "accuracy_valid":   accuracy.get("valid"),
         "accuracy_score":   accuracy.get("subset_score"),
         "date":             meta.get("date"),

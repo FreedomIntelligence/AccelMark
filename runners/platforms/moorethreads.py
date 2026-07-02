@@ -245,6 +245,82 @@ def detect_intra_node_interconnect() -> str | None:
     return None
 
 
+def sample_power_watts() -> float | None:
+    """Return instantaneous total board power (watts) summed across all
+    visible Moore Threads GPUs, or None if unavailable.
+    Attempts pymtml first, then mthreads-gmi. Respects MUSA_VISIBLE_DEVICES."""
+    import os
+
+    # Try pymtml first
+    try:
+        import pymtml
+        pymtml.mtmlInit()
+        count = pymtml.mtmlDeviceGetCount()
+        visible = os.environ.get("MUSA_VISIBLE_DEVICES", "")
+        visible_indices: set[int] | None = None
+        if visible:
+            try:
+                visible_indices = {int(x.strip()) for x in visible.split(",") if x.strip()}
+            except ValueError:
+                pass
+
+        total = 0.0
+        found = 0
+        for idx in range(int(count)):
+            if visible_indices is not None and idx not in visible_indices:
+                continue
+            try:
+                dev = pymtml.mtmlDeviceGetByIndex(idx)
+                power = pymtml.mtmlDeviceGetPowerUsage(dev)
+                if power and power > 0:
+                    total += float(power)
+                    found += 1
+            except Exception:
+                continue
+        try:
+            pymtml.mtmlShutdown()
+        except Exception:
+            pass
+        return round(total, 1) if found > 0 else None
+    except Exception:
+        pass
+
+    # Fallback: try mthreads-gmi
+    try:
+        out = subprocess.check_output(
+            ["mthreads-gmi"], text=True, stderr=subprocess.DEVNULL, timeout=5
+        )
+    except Exception:
+        return None
+
+    visible = os.environ.get("MUSA_VISIBLE_DEVICES", "")
+    visible_indices = None
+    if visible:
+        try:
+            visible_indices = {int(x.strip()) for x in visible.split(",") if x.strip()}
+        except ValueError:
+            pass
+
+    total = 0.0
+    found = 0
+    for match in re.finditer(
+        r"^(\d+)\s+(MTT\s+\S+)\s+\|",
+        out,
+        re.MULTILINE,
+    ):
+        idx = int(match.group(1))
+        if visible_indices is not None and idx not in visible_indices:
+            continue
+        # Look for power in the row's tail: e.g. "150W"
+        tail = out[match.end(): match.end() + 256]
+        power_match = re.search(r"(\d+\.?\d*)\s*W", tail)
+        if power_match:
+            total += float(power_match.group(1))
+            found += 1
+
+    return round(total, 1) if found > 0 else None
+
+
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     notes: list[str] = []
     if not accelerators:
@@ -262,5 +338,10 @@ def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
         notes.append(
             "Could not detect MUSA runtime (tried torch.version.musa and "
             "mthreads-gmi). runtime_version is unknown."
+        )
+    if accelerators and sample_power_watts() is None:
+        notes.append(
+            "Power sampling returned None — pymtml / mthreads-gmi power is unavailable. "
+            "tokens_per_sec_per_watt will not be computed."
         )
     return notes

@@ -226,6 +226,56 @@ def detect_runtime_version() -> str | None:
     return None
 
 
+def sample_power_watts() -> float | None:
+    """Return instantaneous total board power (watts) summed across all
+    visible Ascend NPUs, or None if unavailable. Respects ASCEND_RT_VISIBLE_DEVICES."""
+    import os
+
+    try:
+        out = subprocess.check_output(
+            ["npu-smi", "info"], text=True, stderr=subprocess.DEVNULL, timeout=5
+        )
+    except Exception:
+        return None
+
+    # Respect ASCEND_RT_VISIBLE_DEVICES
+    visible = os.environ.get("ASCEND_RT_VISIBLE_DEVICES", "")
+    visible_indices: set[int] | None = None
+    if visible:
+        try:
+            visible_indices = {int(x.strip()) for x in visible.split(",") if x.strip()}
+        except ValueError:
+            pass
+
+    total = 0.0
+    found = 0
+    # Parse npu-smi info tabular output: each device row has power as the
+    # 4th pipe-delimited field after NPU ID and ChipName and Health.
+    # Example: | 7     910B2               | OK            | 96.5  49  ... |
+    lines = out.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        row_match = re.match(r"\|\s*(\d+)\s+\S+\s*\|", line)
+        if row_match:
+            npu_id = int(row_match.group(1))
+            if visible_indices is not None and npu_id not in visible_indices:
+                i += 1
+                continue
+            # Power field is after Health field in the same row
+            # Format: | NPU ChipName | Health | Power(W) Temp(C) ... |
+            power_match = re.search(r"\|\s*\S+\s*\|\s*(\d+\.?\d*)\s", line)
+            if power_match:
+                try:
+                    total += float(power_match.group(1))
+                    found += 1
+                except ValueError:
+                    pass
+        i += 1
+
+    return round(total, 1) if found > 0 else None
+
+
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     notes: list[str] = []
     if (env.get("pytorch_version") or "") == "unknown":
@@ -253,4 +303,9 @@ def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
                     "check ASCEND_VISIBLE_DEVICES, driver, and npu-smi output."
                 )
             break
+    if accelerators and sample_power_watts() is None:
+        notes.append(
+            "Power sampling returned None — npu-smi power field is unavailable. "
+            "tokens_per_sec_per_watt will not be computed."
+        )
     return notes

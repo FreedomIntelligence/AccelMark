@@ -243,7 +243,8 @@ def compute_derived(result: dict) -> dict:
     metrics = result.setdefault("metrics", {})
     derived = metrics.setdefault("derived", {})
 
-    # tokens_per_sec_per_watt from offline metrics
+    # tokens_per_sec_per_watt and tokens_per_joule from offline metrics
+    # (mathematically equivalent: tok/s ÷ W = tok/J)
     # Suite E stores per-chip offline results under metrics.scaling
     offline = metrics.get("offline")
     if not offline:
@@ -258,8 +259,12 @@ def compute_derived(result: dict) -> dict:
             best = max(valid_rows, key=lambda r: r.get("throughput_tokens_per_sec", 0))
             thr = best.get("throughput_tokens_per_sec", 0)
             pwr = best.get("power_watts_avg", 0)
+            elapsed = best.get("elapsed_seconds_median", 0)
             if pwr > 0:
                 derived["tokens_per_sec_per_watt"] = round(thr / pwr, 4)
+                derived["tokens_per_joule"] = round(thr / pwr, 4)
+                if elapsed > 0:
+                    derived["energy_joules"] = round(pwr * elapsed, 2)
 
     # tokens_per_sec_per_chip
     chip_count = result.get("chip", {}).get("count", 1)

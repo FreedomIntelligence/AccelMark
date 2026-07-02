@@ -63,3 +63,4 @@ backup/
 
 # ── Local-only design QA screenshots ────────────────────────────────────────
 .screenshots/
+workspace/
