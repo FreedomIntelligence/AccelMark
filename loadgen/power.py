@@ -24,6 +24,11 @@ _REPO_ROOT = _Path(__file__).resolve().parent.parent
 # Default sampling interval in seconds
 DEFAULT_SAMPLE_INTERVAL_S = 0.1
 
+# Module-level cache for the resolved sample function — the active vendor
+# does not change during a benchmark run, so we resolve it once and reuse.
+_cached_sample_fn: Optional[callable] = None
+_cached_sample_fn_resolved: bool = False
+
 
 @dataclass
 class PowerStats:
@@ -56,45 +61,11 @@ class PowerSampler:
 
     def __init__(self, interval_s: float = DEFAULT_SAMPLE_INTERVAL_S):
         self._interval_s = interval_s
-        self._sample_fn = None  # callable returning float | None
+        self._sample_fn = _get_sample_fn()
         self._thread: Optional[threading.Thread] = None
         self._samples: list[float] = []
         self._running = False
         self._lock = threading.Lock()
-
-        # Resolve the active vendor's sample_power_watts() once.
-        self._sample_fn = self._resolve_sample_fn()
-
-    @staticmethod
-    def _resolve_sample_fn():
-        """Return the active plug-in's ``sample_power_watts`` callable,
-        or None if no vendor plug-in provides one."""
-        # Ensure the runners package is importable
-        if str(_REPO_ROOT) not in sys.path:
-            sys.path.insert(0, str(_REPO_ROOT))
-
-        try:
-            from runners.platforms import get_active_plugin
-
-            plugin = get_active_plugin()
-            if plugin is None:
-                return None
-            fn = getattr(plugin, "sample_power_watts", None)
-            if fn is None:
-                return None
-            # Verify the function actually returns something on a test call
-            try:
-                test_val = fn()
-                if test_val is None:
-                    # Not an error — the function exists but reports no power
-                    pass
-            except Exception:
-                # Function exists but fails at runtime — still use it;
-                # the sampling thread handles per-call exceptions
-                pass
-            return fn
-        except Exception:
-            return None
 
     def start(self) -> None:
         """Begin sampling power in the background. No-op if no source is available."""
@@ -137,7 +108,38 @@ class PowerSampler:
                     with self._lock:
                         self._samples.append(float(val))
             except Exception:
-                # Per-sample failures are silently dropped — a single bad
-                # reading must not perturb the aggregate
                 pass
             time.sleep(self._interval_s)
+
+
+# ── Module-level resolution (cached — called once per process) ──────────────
+
+def _get_sample_fn():
+    """Return the active plug-in's ``sample_power_watts`` callable,
+    or None if no vendor plug-in provides one. Result is cached at
+    module level — vendor detection subprocesses run at most once."""
+    global _cached_sample_fn, _cached_sample_fn_resolved
+    if _cached_sample_fn_resolved:
+        return _cached_sample_fn
+
+    _cached_sample_fn_resolved = True
+
+    if str(_REPO_ROOT) not in sys.path:
+        sys.path.insert(0, str(_REPO_ROOT))
+
+    try:
+        from runners.platforms import get_active_plugin
+
+        plugin = get_active_plugin()
+        if plugin is None:
+            _cached_sample_fn = None
+            return None
+        fn = getattr(plugin, "sample_power_watts", None)
+        if fn is None:
+            _cached_sample_fn = None
+            return None
+        _cached_sample_fn = fn
+        return fn
+    except Exception:
+        _cached_sample_fn = None
+        return None

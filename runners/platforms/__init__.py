@@ -65,14 +65,24 @@ def discover_plugins() -> List[ModuleType]:
     return plugins
 
 
+_active_plugin_cache: Optional[ModuleType] = None
+"""Module-level cache — the active platform does not change during a run."""
+
+
 def get_active_plugin() -> Optional[ModuleType]:
     """
     Return the first platform plug-in whose ``collect()`` returns a
     non-empty accelerator list, or None if no platform is detected.
+    Result is cached at module level — ``collect()`` is called at most once
+    per plug-in across the lifetime of the process.
 
     Shared helper used by both ``collect_env.py`` and ``loadgen/power.py``
     so that vendor resolution logic is defined in one place.
     """
+    global _active_plugin_cache
+    if _active_plugin_cache is not None:
+        return _active_plugin_cache
+
     for mod in discover_plugins():
         try:
             fn = getattr(mod, "collect", None)
@@ -80,9 +90,11 @@ def get_active_plugin() -> Optional[ModuleType]:
                 continue
             result = fn()
             if result:
+                _active_plugin_cache = mod
                 return mod
         except Exception:
             continue
+    _active_plugin_cache = None  # sentinel: no platform found
     return None
 
 
