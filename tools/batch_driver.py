@@ -163,7 +163,7 @@ CARD_CONFIGS: dict[str, CardConfig] = {
     "a100_40g": CardConfig(
         name="A100-SXM4-40GB",
         description="P1.1 — anchor pair: SGLang vs vLLM on A100-40G",
-        phases=_single_chip_bundle(),
+        phases=_single_chip_bundle(sglang_env="sglang"),
     ),
     "a100_80g": CardConfig(
         name="A100-SXM4-80GB",
@@ -311,6 +311,7 @@ def run_benchmark_phase(
     # Check if already done
     existing = _find_existing_result(runner_id, suite_id, chip_slug=chip_slug)
     already_done = any(_is_suite_complete(d) for d in existing)
+    existing_but_stale = bool(existing) and not already_done
 
     if already_done and not force:
         print(f"  ⏭  SKIP: {runner_id} / {suite_id} — already completed")
@@ -320,11 +321,19 @@ def run_benchmark_phase(
         return True
 
     if dry_run:
-        status = "FORCE re-run" if (already_done and force) else "will run"
+        if existing_but_stale:
+            status = "will run (existing results lack power data → auto --force)"
+        elif existing and force:
+            status = "FORCE re-run"
+        else:
+            status = "will run"
         print(f"  📋 {status}: {runner_id} / {suite_id} / {scenario}")
         return True
 
-    if already_done and force:
+    if existing_but_stale:
+        print(f"  🔄 Re-run (existing results lack power/energy data): {runner_id} / {suite_id}")
+        force = True  # auto-enable --force to overwrite stale results
+    elif already_done and force:
         print(f"  🔄 FORCE re-run: {runner_id} / {suite_id}")
 
     # Build command
