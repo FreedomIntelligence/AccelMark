@@ -1141,6 +1141,10 @@ class AccelMarkLoadGen:
         run_elapsed_times: list[float] = []
         ttft_p99_per_run: list[float] = []
 
+        # Start power sampling across the full interactive window
+        power_sampler = PowerSampler()
+        power_sampler.start()
+
         total_runs = self.warmup_runs + self.suite["num_runs"]
 
         for run_idx in range(total_runs):
@@ -1201,6 +1205,9 @@ class AccelMarkLoadGen:
                     f"({run_elapsed:.0f}s)"
                 )
 
+        # Stop power sampling after all interactive runs complete
+        power_stats = power_sampler.stop()
+
         sampled = self._rng.sample(all_samples, min(MAX_SAMPLES_PER_CONFIG, len(all_samples)))
         self._write_samples(sampled)
 
@@ -1215,6 +1222,8 @@ class AccelMarkLoadGen:
             "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1) if run_elapsed_times else None,
             "ttft_ms_p99_reliability":
                 _reliability_block(ttft_p99_per_run, decimals=2),
+            "power_watts_avg": power_stats.avg,
+            "power_watts_peak": power_stats.peak,
         }}
 
     # ------------------------------------------------------------------

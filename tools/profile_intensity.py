@@ -47,6 +47,7 @@ sys.path.insert(0, str(_REPO_ROOT))
 # passed on the CLI. Contributions for new chips welcome.
 
 _CHIP_PEAK_SPECS: dict[str, dict[str, float]] = {
+    "NVIDIA A800-SXM4-80GB":      {"tflops": 312.0, "bw_gbps": 2039.0},
     "NVIDIA A100-SXM4-80GB":      {"tflops": 312.0, "bw_gbps": 2039.0},
     "NVIDIA A100-SXM4-40GB":      {"tflops": 312.0, "bw_gbps": 1555.0},
     "NVIDIA A100-PCIe-80GB":      {"tflops": 312.0, "bw_gbps": 1935.0},
@@ -182,19 +183,42 @@ def _cuda_timed_block(model_fn, warmup: int = 5, trials: int = 5):
     times_ms = []
     last_flops = None
 
+    flop_ok = FlopCounterMode is not None
     for i in range(warmup + trials):
         gc.collect()
         if device == "cuda":
             torch.cuda.empty_cache()
             torch.cuda.synchronize()
 
-        flop_ctx = FlopCounterMode(display=False) if FlopCounterMode else None
+        use_flops = FlopCounterMode is not None and flop_ok
+        flop_ctx = FlopCounterMode(display=False) if use_flops else None
+
         if device == "cuda":
             start_ev = torch.cuda.Event(enable_timing=True)
             end_ev = torch.cuda.Event(enable_timing=True)
 
-        with (flop_ctx if flop_ctx else _NullContext()):
+        try:
+            with (flop_ctx if flop_ctx else _NullContext()):
+                if device == "cuda":
+                    start_ev.record()
+                with torch.no_grad():
+                    model_fn()
+                if device == "cuda":
+                    end_ev.record()
+                    torch.cuda.synchronize()
+        except AssertionError:
+            # FlopCounterMode can fail on GQA models (e.g. Llama-3.1, Qwen2.5)
+            # due to sdpa_flop_count head-dimension mismatch assertions.
+            # Disable FLOP counting and re-run this iteration cleanly.
+            flop_ok = False
+            flop_ctx = None
+            gc.collect()
             if device == "cuda":
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+            if device == "cuda":
+                start_ev = torch.cuda.Event(enable_timing=True)
+                end_ev = torch.cuda.Event(enable_timing=True)
                 start_ev.record()
             with torch.no_grad():
                 model_fn()
