@@ -119,9 +119,9 @@ export function render({ el, query }) {
 
   el.innerHTML = `
     <section class="rk-hero" data-suite="${esc(meta.letter)}">
-      <span class="eyebrow">Rankings · Suite ${esc(meta.letter)}</span>
+      <span class="eyebrow">Results · Suite ${esc(meta.letter)}</span>
       <h1 class="rk-hero-title">${esc(meta.title)}</h1>
-      <p class="rk-hero-sub">${esc(meta.tagline)}</p>
+      <p class="rk-hero-sub">${esc(meta.tagline)} Compare configurations across frameworks and hardware.</p>
     </section>
 
     <section class="rk-toolbar">
@@ -159,7 +159,7 @@ export function render({ el, query }) {
         </span>
         <span class="rk-chip-focus-actions">
           <a class="btn ghost small" href="#/chip/${esc(chipFilter)}">View chip overview</a>
-          <a class="btn ghost small" href="${esc(buildHash("/rankings", { ...query, chip: undefined }))}">Show all chips</a>
+          <a class="btn ghost small" href="${esc(buildHash("/rankings", { ...query, chip: undefined }))}">Show all results</a>
         </span>
       </div>
     ` : ""}
@@ -301,9 +301,8 @@ function renderTable(suiteId, rows, cols, sortKey, sortDir) {
           <tr>
             <th class="col-compare" scope="col"><span class="visually-hidden">Compare</span></th>
             <th class="col-rank" scope="col">#</th>
-            <th class="col-chip" scope="col">Chip</th>
+            <th class="col-chip" scope="col">Recipe</th>
             <th class="col-vendor" scope="col">Vendor</th>
-            <th class="col-fw" scope="col">Framework</th>
             <th class="col-precision" scope="col">Precision</th>
             ${cols.map((c) => `
               <th class="col-metric sortable${c.primary ? " col-primary" : ""}${sortKey === c.key ? " is-sort" : ""}"
@@ -362,7 +361,7 @@ function renderRow(suiteId, row, cols, sortKey, rank) {
       <td class="col-rank tnum">${rank}</td>
       <td class="col-chip">
         <a class="rk-chip-link" href="${chipHref(row)}">
-          <span class="rk-chip-name">${esc(row._chip_label)}</span>
+          <span class="rk-chip-name">${esc(row._chip_label)}${fw ? ` · <span class="rk-chip-fw">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>` : ""}</span>
           ${row.memory_gb
             ? `<span class="rk-chip-meta">${esc(fmtNum(row.memory_gb))} GB</span>`
             : ""}
@@ -371,9 +370,6 @@ function renderRow(suiteId, row, cols, sortKey, rank) {
       <td class="col-vendor">
         <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
         <span class="vendor-name">${esc(row.vendor || "-")}</span>
-      </td>
-      <td class="col-fw">
-        ${esc(fw)}${ver ? ` <span class="fw-ver tnum">${esc(ver)}</span>` : ""}
       </td>
       <td class="col-precision">${esc(row.precision || "-")}</td>
       ${cols.map((c) => {

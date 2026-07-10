@@ -19,7 +19,7 @@ from pathlib import Path
 _pricing_cache: dict = {}
 _pricing_path = Path("schema/cloud_pricing.json")
 if _pricing_path.exists():
-    with open(_pricing_path) as _f:
+    with open(_pricing_path, encoding='utf-8') as _f:
         _pricing_cache = json.load(_f)
 
 RESULTS_DIR = Path("results")
@@ -45,26 +45,14 @@ def _get_suite_precision_required(suite_id: str) -> str:
     """Read precision_required from suite.json. Returns 'BF16' if not found."""
     path = Path("suites") / suite_id / "suite.json"
     try:
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             return json.load(f).get("precision_required", "BF16")
     except Exception:
         return "BF16"
 
 
 def _collect_suite_specs() -> dict:
-    """Collect UI-relevant per-suite spec from suites/suite_*/suite.json.
-
-    Baked into the generated leaderboard.js as ``window.SUITE_SPECS`` so
-    the static leaderboard UI auto-syncs whenever a maintainer edits a
-    suite contract — model id, dataset, prompt distribution, scenarios
-    default/extra split, online SLA, etc.  Editorial UI content (titles,
-    taglines, descriptions) stays in assets/js/data.js since it isn't a
-    property of the suite contract.
-
-    Returns a ``{ suite_id: spec }`` mapping with only the fields the UI
-    consumes.  Missing fields are omitted (the JS-side merge keeps the
-    hardcoded fallback when a key is absent).
-    """
+    """Collect UI-relevant per-suite spec from suites/suite_*/suite.json."""
     out: dict = {}
     suites_dir = Path("suites")
     if not suites_dir.exists():
@@ -76,7 +64,7 @@ def _collect_suite_specs() -> dict:
         if not sf.exists():
             continue
         try:
-            with open(sf) as f:
+            with open(sf, encoding='utf-8') as f:
                 data = json.load(f)
         except Exception:
             continue
@@ -84,7 +72,6 @@ def _collect_suite_specs() -> dict:
         rd = data.get("request_distribution") or {}
         scn = data.get("scenarios") or {}
         spec: dict = {}
-        # Fields the UI displays in suite cards / specs / compare headers.
         for k in (
             "model_id",
             "model_revision",
@@ -110,6 +97,95 @@ def _collect_suite_specs() -> dict:
     return out
 
 
+# ── Scenario metric extraction ────────────────────────────────────────────────
+
+def _extract_scenario_metric(result: dict, scenario_name: str) -> dict:
+    """Extract the best-throughput info for a single scenario from a result.
+
+    Returns a dict with keys:
+        throughput, metric_label, concurrency, peak_memory_gb, is_valid
+    """
+    metrics = result.get("metrics") or {}
+    out = {
+        "throughput": None,
+        "metric_label": "",
+        "concurrency": None,
+        "peak_memory_gb": None,
+        "is_valid": False,
+    }
+
+    if scenario_name == "offline":
+        offline = metrics.get("offline")
+        if offline:
+            rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size") or []
+            valid = [r for r in rows if not r.get("oom") and r.get("throughput_tokens_per_sec")]
+            if valid:
+                best = max(valid, key=lambda r: r["throughput_tokens_per_sec"])
+                out["throughput"] = best["throughput_tokens_per_sec"]
+                out["metric_label"] = "tokens/sec"
+                out["concurrency"] = best.get("client_concurrency") or best.get("concurrency")
+                out["peak_memory_gb"] = best.get("peak_memory_gb")
+                out["is_valid"] = True
+
+    elif scenario_name == "online":
+        online = metrics.get("online")
+        if online:
+            qps = online.get("max_valid_qps")
+            if qps is not None:
+                out["throughput"] = qps
+                out["metric_label"] = "max valid QPS"
+                out["is_valid"] = True
+
+    elif scenario_name == "interactive":
+        # interactive uses the same inference path as offline — reuse offline metric
+        offline = metrics.get("offline")
+        if offline:
+            rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size") or []
+            valid = [r for r in rows if not r.get("oom") and r.get("throughput_tokens_per_sec")]
+            if valid:
+                best = max(valid, key=lambda r: r["throughput_tokens_per_sec"])
+                out["throughput"] = best["throughput_tokens_per_sec"]
+                out["metric_label"] = "tokens/sec"
+                out["concurrency"] = best.get("client_concurrency") or best.get("concurrency")
+                out["peak_memory_gb"] = best.get("peak_memory_gb")
+                out["is_valid"] = True
+
+    elif scenario_name == "sustained":
+        sustained = metrics.get("sustained")
+        if sustained:
+            thr = sustained.get("sustained_throughput_tokens_per_sec")
+            if thr is not None:
+                out["throughput"] = thr
+                out["metric_label"] = "tok/s (sustained mean)"
+                out["concurrency"] = sustained.get("sustained_concurrency")
+                out["is_valid"] = True
+
+    elif scenario_name == "speculative":
+        speculative = metrics.get("speculative")
+        if speculative:
+            rows = speculative.get("results_by_concurrency") or speculative.get("results_by_batch_size") or []
+            valid = [r for r in rows if not r.get("oom") and r.get("throughput_tokens_per_sec")]
+            if valid:
+                best = max(valid, key=lambda r: r["throughput_tokens_per_sec"])
+                out["throughput"] = best["throughput_tokens_per_sec"]
+                out["metric_label"] = "tok/s (speculative)"
+                out["concurrency"] = best.get("client_concurrency") or best.get("concurrency")
+                out["peak_memory_gb"] = best.get("peak_memory_gb")
+                out["is_valid"] = True
+
+    elif scenario_name == "burst":
+        burst = metrics.get("burst")
+        if burst:
+            ratio = burst.get("burst_degradation_ratio")
+            if ratio is not None:
+                # Invert: higher = better, same polarity as throughput
+                out["throughput"] = round(1.0 - ratio, 4) if ratio <= 1.0 else 0.0
+                out["metric_label"] = "1 − degradation_ratio"
+                out["is_valid"] = True
+
+    return out
+
+
 # ── Data loading ──────────────────────────────────────────────────────────────
 
 def load_results() -> list[dict]:
@@ -125,7 +201,7 @@ def load_results() -> list[dict]:
             if not result_path.exists():
                 continue
             try:
-                with open(result_path) as f:
+                with open(result_path, encoding='utf-8') as f:
                     data = json.load(f)
                 data["_tier"]            = tier
                 data["_submission_name"] = submission_dir.name
@@ -133,11 +209,10 @@ def load_results() -> list[dict]:
                     "scenarios_run"   in data.get("task", {}) or
                     "chip_counts_run" in data.get("task", {})
                 )
-                # Load env_info.json alongside result.json (optional, best-effort)
                 env_path = submission_dir / "env_info.json"
                 if env_path.exists():
                     try:
-                        with open(env_path) as ef:
+                        with open(env_path, encoding='utf-8') as ef:
                             data["_env_info"] = json.load(ef)
                     except Exception as ee:
                         print(f"Warning: could not load {env_path}: {ee}")
@@ -163,14 +238,12 @@ def extract_detail(result: dict) -> dict:
     parallelism = task.get("parallelism") or {}
     env         = result.get("_env_info") or {}
 
-    # CPU string
     cpu_info = env.get("cpu", {})
     cpu_str  = None
     if cpu_info.get("model"):
         cores   = cpu_info.get("physical_cores")
         cpu_str = cpu_info["model"] + (f", {cores} cores" if cores else "")
 
-    # NIC string
     nics    = env.get("network_interfaces", [])
     nic_str = None
     if nics:
@@ -180,7 +253,6 @@ def extract_detail(result: dict) -> dict:
         names_str = ", ".join(nic_names) if nic_names else ""
         nic_str   = f"{len(nics)}x {type_str}" + (f" ({names_str})" if names_str else "")
 
-    # Intra-node interconnect: prefer result.json, fall back to topology parse
     intra = chip.get("interconnect_intra_node")
     if not intra and env.get("accelerator_topology"):
         nv_matches = re.findall(r'NV(\d+)', env["accelerator_topology"])
@@ -188,7 +260,6 @@ def extract_detail(result: dict) -> dict:
             intra = f"NVLink {max(int(x) for x in nv_matches)} (full mesh)"
 
     return {
-        # Hardware
         "hw_chip":               chip.get("name"),
         "hw_vendor":             chip.get("vendor"),
         "hw_count":              chip.get("count"),
@@ -199,7 +270,6 @@ def extract_detail(result: dict) -> dict:
         "hw_system_memory_gb":   env.get("system_memory_gb"),
         "hw_pcie":               env.get("pcie_generation"),
         "hw_network":            nic_str,
-        # Software
         "sw_framework":         software.get("framework"),
         "sw_framework_version": software.get("framework_version"),
         "sw_driver":            software.get("driver_version"),
@@ -207,43 +277,36 @@ def extract_detail(result: dict) -> dict:
         "sw_os":                software.get("os"),
         "sw_python":            software.get("python_version"),
         "sw_pytorch":           env.get("pytorch_version"),
-        # Model
         "model_id":              model.get("model_id"),
         "model_revision":        model.get("model_revision"),
-        "model_name":            model.get("model_name"),        # ← new
-        "model_note":            model.get("model_note"),        # ← new
-        "model_source":          model.get("model_source"),      # ← new
+        "model_name":            model.get("model_name"),
+        "model_note":            model.get("model_note"),
+        "model_source":          model.get("model_source"),
         "model_arch":            model.get("architecture"),
         "model_params_b":        model.get("parameter_count_b"),
         "model_precision":       model.get("precision"),
         "model_effective_dtype": model.get("effective_dtype"),
         "model_quant_method":    model.get("quantization_method"),
         "model_format":          model.get("model_format"),
-        # Run settings
         "run_scenarios":   task.get("scenarios_run"),
         "run_chip_counts": task.get("chip_counts_run"),
         "run_num_runs":    task.get("num_runs"),
         "run_tp":          parallelism.get("tensor_parallel_size"),
         "run_pp":          parallelism.get("pipeline_parallel_size"),
         "run_dp":          parallelism.get("data_parallel_size"),
-        # Accuracy
         "acc_score":          accuracy.get("subset_score"),
         "acc_baseline_delta": accuracy.get("baseline_delta"),
         "acc_valid":          accuracy.get("valid"),
         "acc_notes":          accuracy.get("notes"),
-        # Metadata
         "meta_submitted_by":     meta.get("submitted_by"),
         "meta_submission_type":  meta.get("submission_type"),
+        "meta_reproduces_run_id": meta.get("reproduces_run_id"),
         "meta_date":             meta.get("date"),
         "meta_reproduce_script": meta.get("reproduce_script"),
         "meta_elapsed_min":      meta.get("benchmark_elapsed_minutes"),
         "meta_model_load_sec":   meta.get("model_load_seconds"),
         "meta_start_time":       meta.get("benchmark_start_time"),
         "meta_notes":            meta.get("notes"),
-        # Vendor-specific environment fields collected by platforms/<vendor>.py
-        # (e.g. ROCm-SMI link health, NVML clock telemetry). The modal flattens
-        # this dict and shows only non-null entries — different vendors record
-        # different keys by design and no UI tries to unify them.
         "env_vendor_details":    env.get("vendor_details") or {},
     }
 
@@ -251,11 +314,6 @@ def extract_detail(result: dict) -> dict:
 # ── Implementation extraction (modal impl tab) ───────────────────────────────
 
 def extract_impl(result: dict) -> dict | None:
-    """
-    Load runner meta.json for the implementation_id referenced in result.json.
-    Returns None if implementation_id is absent or the runner folder is not found.
-    Fields returned match meta.json schema plus a GitHub link.
-    """
     impl_id = result.get("implementation_id")
     if not impl_id:
         return None
@@ -265,7 +323,8 @@ def extract_impl(result: dict) -> dict | None:
         return None
 
     try:
-        meta = json.loads(meta_path.read_text())
+        with open(meta_path, encoding='utf-8') as f:
+            meta = json.load(f)
     except Exception:
         return None
 
@@ -285,7 +344,7 @@ def extract_impl(result: dict) -> dict | None:
     }
 
 
-# ── Visualization data extraction (modal viz tab) ─────────────────────────────
+# ── Visualization data extraction ─────────────────────────────────────────────
 
 def extract_viz(result: dict, metrics: dict) -> dict:
     """Chart-ready data for the per-suite visualization panel."""
@@ -304,9 +363,6 @@ def extract_viz(result: dict, metrics: dict) -> dict:
     def _online_block():
         online   = metrics.get("online", {})
         qps_rows = online.get("results_by_qps", [])
-        # Per-QPS reliability blocks. Emitted as a parallel array so the
-        # frontend can render a badge next to each QPS row without joining
-        # by index from a separate object.
         return {
             "labels":        [str(r.get("target_qps", "")) for r in qps_rows],
             "ttft_p50":      [r.get("ttft_ms_p50") for r in qps_rows],
@@ -388,8 +444,6 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "mean_accepted_tokens": rm.get("mean_accepted_tokens"),
         }
 
-    # Per-concurrency-level offline reliability blocks. Parallel array to
-    # `throughput` and `memory_gb` so the frontend can join by row index.
     def _offline_reliability(rows):
         return [r.get("throughput_tokens_per_sec_reliability") or {} for r in rows]
 
@@ -463,7 +517,6 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             None
         )
 
-        # ── Online cross-format data ──────────────────────────────────────
         online_by_precision = None
         q_online = metrics.get("quantization_online", {})
         if q_online:
@@ -479,7 +532,6 @@ def extract_viz(result: dict, metrics: dict) -> dict:
                     "sla_met":       [r.get("sla_met") for r in qps_rows],
                 })
 
-        # ── Sustained cross-format data ───────────────────────────────────
         sustained_by_precision = None
         q_sus = metrics.get("quantization_sustained", {})
         if q_sus:
@@ -601,7 +653,6 @@ def extract_row(result: dict) -> dict:
     is_suite_level = result.get("_is_suite_level", False)
     suite_id       = result.get("suite_id", "")
 
-    # ── Offline ───────────────────────────────────────────────────────────────
     offline_throughput      = None
     tokens_per_sec_per_chip = None
     peak_memory_gb          = None
@@ -620,15 +671,12 @@ def extract_row(result: dict) -> dict:
                 valid_mem, key=lambda r: r.get("throughput_tokens_per_sec", 0)
             ).get("peak_memory_gb")
 
-    # ── Online ────────────────────────────────────────────────────────────────
     online         = metrics.get("online")
     online_max_qps = online.get("max_valid_qps") if online else None
 
-    # ── Interactive ───────────────────────────────────────────────────────────
     interactive          = metrics.get("interactive")
     interactive_ttft_p99 = interactive.get("ttft_ms_p99") if interactive else None
 
-    # ── Sustained ─────────────────────────────────────────────────────────────
     sustained_throughput   = None
     throttle_ratio         = None
     throttle_onset_minute  = None
@@ -643,7 +691,6 @@ def extract_row(result: dict) -> dict:
         ttft_p99_drift_ms     = sustained.get("ttft_p99_drift_ms")
         sustained_concurrency = sustained.get("sustained_concurrency")
 
-    # ── Speculative ─────────────────────────────────────────────────────────
     speculative_throughput = None
     speculative_speedup    = None
     speculative_acceptance = None
@@ -659,7 +706,6 @@ def extract_row(result: dict) -> dict:
         if speculative_throughput and offline_throughput and offline_throughput > 0:
             speculative_speedup = round(speculative_throughput / offline_throughput, 3)
 
-    # ── Burst ────────────────────────────────────────────────────────────────
     burst_degradation      = None
     burst_steady_p99       = None
     burst_p99              = None
@@ -672,7 +718,6 @@ def extract_row(result: dict) -> dict:
         burst_p99         = burst.get("burst_ttft_p99_ms")
         burst_sla_met     = burst.get("sla_met_during_burst")
 
-    # ── Primary metric ────────────────────────────────────────────────────────
     scenario = task.get("scenario", "offline")
     if is_suite_level and suite_id not in ("suite_E", "suite_C", "suite_F"):
         primary_metric       = offline_throughput
@@ -700,7 +745,6 @@ def extract_row(result: dict) -> dict:
         primary_metric       = None
         primary_metric_label = None
 
-    # ── Suite E scaling ───────────────────────────────────────────────────────
     scaling_efficiency_2x  = None
     scaling_efficiency_4x  = None
     scaling_base_throughput = None
@@ -726,13 +770,12 @@ def extract_row(result: dict) -> dict:
             primary_metric       = scaling_base_throughput
             primary_metric_label = "tokens/sec (1x baseline)"
 
-    # ── Suite C quantization ──────────────────────────────────────────────────
     quant_bf16_throughput  = None
     quant_best_throughput  = None
     quant_best_precision   = None
-    quant_int8_speedup     = None   # W8A16 tier (best of W8A8/W8A16)
-    quant_int4_speedup     = None   # W4A16 tier
-    quant_quality_eff      = None   # best quality_efficiency across all formats
+    quant_int8_speedup     = None
+    quant_int4_speedup     = None
+    quant_quality_eff      = None
 
     quantization = metrics.get("quantization")
     if quantization:
@@ -746,23 +789,19 @@ def extract_row(result: dict) -> dict:
             if p == "BF16":
                 quant_bf16_throughput = thr
             elif p in ("W8A8", "W8A16"):
-                # Use W8A16 as "int8-tier" speedup if available, fall back to W8A8
                 if quant_int8_speedup is None or p == "W8A16":
                     quant_int8_speedup = spd
             elif p == "W4A16":
                 quant_int4_speedup = spd
 
-            # Track best throughput across all precision formats
             if thr and (quant_best_throughput is None or thr > quant_best_throughput):
                 quant_best_throughput = thr
                 quant_best_precision  = p
 
-            # Track best quality_efficiency across all formats
             if qe and (best_qe is None or qe > best_qe):
                 best_qe           = qe
                 quant_quality_eff = qe
 
-        # Primary metric for Suite C: best throughput across all precision formats
         if quant_best_throughput:
             primary_metric       = quant_best_throughput
             primary_metric_label = f"tokens/sec ({quant_best_precision})"
@@ -770,7 +809,6 @@ def extract_row(result: dict) -> dict:
             primary_metric       = quant_bf16_throughput
             primary_metric_label = "tokens/sec (BF16 baseline)"
 
-    # ── Efficiency ────────────────────────────────────────────────────────────
     memory_gb_per_chip     = chip.get("memory_gb", 0)
     memory_efficiency      = (
         round(offline_throughput / peak_memory_gb, 1)
@@ -790,7 +828,6 @@ def extract_row(result: dict) -> dict:
         if offline_throughput and min_price and min_price > 0 else None
     )
 
-    # ── Precision fallback detection ──────────────────────────────────────────
     precision           = model.get("precision", "BF16")
     effective_dtype     = model.get("effective_dtype")
     quantization_method = model.get("quantization_method")
@@ -799,7 +836,6 @@ def extract_row(result: dict) -> dict:
         precision.upper() != suite_required.upper()
         if precision and suite_required else False
     )
-    # Emulated flag: precision was requested but compute was in a different dtype
     precision_emulated = (
         effective_dtype is not None
         and effective_dtype.replace("torch.", "") != _precision_to_dtype(precision)
@@ -827,22 +863,18 @@ def extract_row(result: dict) -> dict:
         "architecture":  model.get("architecture"),
         "suite":              suite_id,
         "scenario":           "all" if is_suite_level else scenario,
-        # Primary
         "primary_metric":          primary_metric,
         "primary_metric_label":    primary_metric_label,
         "tokens_per_sec_per_chip": tokens_per_sec_per_chip,
-        # Scenario metrics
         "offline_throughput":   offline_throughput,
         "online_max_qps":       online_max_qps,
         "interactive_ttft_p99": interactive_ttft_p99,
-        # Efficiency
         "peak_memory_gb":                     peak_memory_gb,
         "memory_utilization_pct":             memory_utilization_pct,
         "memory_efficiency_toks_per_gb":      memory_efficiency,
         "min_price_usd_per_hr":               min_price,
         "cost_efficiency_toks_per_dollar_hr": cost_efficiency,
         "tokens_per_watt":                    derived.get("tokens_per_sec_per_watt"),
-        # Metadata
         "accuracy_valid":   accuracy.get("valid"),
         "accuracy_score":   accuracy.get("subset_score"),
         "date":             meta.get("date"),
@@ -851,38 +883,32 @@ def extract_row(result: dict) -> dict:
         "notes":            meta.get("notes"),
         "run_id":           meta.get("run_id"),
         "run_name":         meta.get("run_name"),
+        "reproduces_run_id": meta.get("reproduces_run_id"),
         "flagged":          meta.get("flagged"),
-        # Suite E
         "scaling_efficiency_2x":   scaling_efficiency_2x,
         "scaling_efficiency_4x":   scaling_efficiency_4x,
         "scaling_base_throughput": scaling_base_throughput,
-        # Suite C
         "quant_bf16_throughput":  quant_bf16_throughput,
         "quant_best_throughput":  quant_best_throughput,
         "quant_best_precision":   quant_best_precision,
         "quant_int8_speedup":     quant_int8_speedup,
         "quant_int4_speedup":     quant_int4_speedup,
         "quant_quality_eff":      quant_quality_eff,
-        # Sustained
         "sustained_throughput":    sustained_throughput,
         "throttle_ratio":          throttle_ratio,
         "throttle_onset_minute":   throttle_onset_minute,
         "ttft_p99_drift_ms":       ttft_p99_drift_ms,
         "sustained_concurrency":   sustained_concurrency,
-        # Speculative
         "speculative_throughput":   speculative_throughput,
         "speculative_speedup":     speculative_speedup,
         "speculative_acceptance":  speculative_acceptance,
-        # Burst
         "burst_degradation":       burst_degradation,
         "burst_steady_p99":        burst_steady_p99,
         "burst_p99":               burst_p99,
         "burst_sla_met":           burst_sla_met,
-        # Panel data
         "detail": extract_detail(result),
         "viz":    extract_viz(result, metrics),
         "impl":   extract_impl(result),
-        # Implementation ID (flat, for filtering/display without loading impl)
         "implementation_id": result.get("implementation_id"),
     }
 
@@ -890,20 +916,11 @@ def extract_row(result: dict) -> dict:
 # ── API generation ────────────────────────────────────────────────────────────
 
 def generate_api(results: list[dict], output_dir: Path) -> None:
-    """
-    Generate static JSON API for external tooling (OpenClaw Skill etc.).
-
-      api/rank.json   — per-submission ranking within chip+suite group
-      api/chips.json  — chip summary list (best offline throughput)
-      api/index.json  — chip lookup with per-suite best metrics
-      api/suites.json — suite metadata for discovery
-    """
+    """Generate static JSON API for external tooling (OpenClaw Skill etc.)."""
     api_dir = output_dir / "api"
     api_dir.mkdir(exist_ok=True)
 
-    # Group by chip+suite for fair per-suite ranking
     by_chip_suite: dict[tuple, list] = defaultdict(list)
-    # Also track chip-level best across all suites for chips.json
     by_chip: dict[str, list] = defaultdict(list)
 
     for r in results:
@@ -912,7 +929,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
         submission_name = r.get("_submission_name", "unknown")
         tier            = r.get("_tier", "community")
 
-        # Primary metric per result
         offline = r.get("metrics", {}).get("offline")
         best_thr = None
         if offline:
@@ -923,7 +939,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
             if valid:
                 best_thr = max(row["throughput_tokens_per_sec"] for row in valid)
 
-        # Suite E fallback
         if best_thr is None:
             scaling = r.get("metrics", {}).get("scaling", {})
             if scaling:
@@ -934,7 +949,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
                             best_thr = entry.get("best_throughput_tokens_per_sec")
                             break
 
-        # Suite C: use best quality_efficiency as primary
         if best_thr is None:
             quant = r.get("metrics", {}).get("quantization", {})
             if quant:
@@ -950,7 +964,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
         by_chip_suite[(chip_name, suite_id)].append((submission_name, best_thr, tier))
         by_chip[chip_name].append((submission_name, best_thr, suite_id, tier))
 
-    # ── rank.json ─────────────────────────────────────────────────────────────
     rank_data: dict[str, dict] = {}
     for (chip_name, suite_id), entries in by_chip_suite.items():
         sorted_entries = sorted(entries, key=lambda x: x[1], reverse=True)
@@ -970,7 +983,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
     with open(api_dir / "rank.json", "w") as f:
         json.dump(rank_data, f, indent=2)
 
-    # ── chips.json ────────────────────────────────────────────────────────────
     chips = []
     chip_bests: dict[str, float] = {}
     for chip_name, entries in by_chip.items():
@@ -987,8 +999,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
     with open(api_dir / "chips.json", "w") as f:
         json.dump(chips, f, indent=2)
 
-    # ── index.json ────────────────────────────────────────────────────────────
-    # Per-chip lookup with best metric per suite
     chip_index: dict[str, dict] = {}
     for chip_name in by_chip:
         chip_index[chip_name] = {
@@ -1010,7 +1020,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
 
         suite_entry = chip_index[chip_name]["suites"].setdefault(suite_id, {})
 
-        # Offline throughput
         offline = metrics.get("offline")
         if offline:
             rows  = offline.get("results_by_concurrency") or \
@@ -1023,7 +1032,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
                 if cur is None or thr > cur:
                     suite_entry["best_throughput_tokens_per_sec"] = round(thr, 1)
 
-        # Online
         if online:
             qps = online.get("max_valid_qps")
             if qps is not None:
@@ -1031,7 +1039,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
                 if cur is None or qps > cur:
                     suite_entry["best_online_max_qps"] = qps
 
-        # Interactive
         if iv:
             ttft = iv.get("ttft_ms_p99")
             if ttft is not None:
@@ -1039,7 +1046,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
                 if cur is None or ttft < cur:
                     suite_entry["best_interactive_ttft_p99_ms"] = round(ttft, 1)
 
-        # Scaling (Suite E)
         if scaling:
             base_thr = (
                 scaling.get("base_throughput_tokens_per_sec") or
@@ -1062,7 +1068,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
                 elif count == 4 and eff:
                     suite_entry["best_scaling_efficiency_4x"] = eff
 
-        # Sustained
         if sustained:
             s_thr    = sustained.get("sustained_throughput_tokens_per_sec")
             throttle = sustained.get("throttle_ratio")
@@ -1073,7 +1078,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
             if throttle is not None:
                 suite_entry["throttle_ratio"] = throttle
 
-        # Suite C quality efficiency
         quant = metrics.get("quantization")
         if quant:
             qes = [(e.get("precision"), e.get("quality_efficiency"))
@@ -1087,8 +1091,6 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
     with open(api_dir / "index.json", "w") as f:
         json.dump(chip_index, f, indent=2)
 
-    # ── suites.json ───────────────────────────────────────────────────────────
-    # Static metadata about each suite for discovery
     suites_meta = {}
     for suite_dir in sorted(Path("suites").iterdir()):
         if not suite_dir.is_dir():
@@ -1097,7 +1099,7 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
         if not suite_json.exists():
             continue
         try:
-            with open(suite_json) as f:
+            with open(suite_json, encoding='utf-8') as f:
                 s = json.load(f)
             suite_id = s.get("suite_id", suite_dir.name)
             scenarios_cfg = s.get("scenarios", {})
@@ -1129,6 +1131,355 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
     print(f"  suites.json: {len(suites_meta)} suites documented")
 
 
+# ── Distribution data generation (新增) ───────────────────────────────────────
+
+def generate_distribution_data(results: list[dict], output_dir: Path) -> None:
+    """生成性能分布数据，用于分布图视图。
+
+    为每个去重后的提交生成完整元信息（包含所有 scenario 的指标），
+    支持前端按 suite / vendor / framework / model / scenario 筛选，
+    并按 (chip, suite) 聚合生成分组统计数据。
+    """
+
+    # ── 1. 先去重（与 main() 相同的逻辑）─────────────────────────────────
+    _seen: dict = {}
+    for r in results:
+        meta = r.get("meta") or {}
+        rid = meta.get("run_id")
+        if not rid:
+            continue
+        suite_id = r.get("suite_id", "")
+        # 计算去重用的指标值
+        if suite_id == "suite_C":
+            quant = (r.get("metrics") or {}).get("quantization", {})
+            qes = [e.get("quality_efficiency") for e in quant.get("results_by_precision", [])
+                   if e.get("quality_efficiency")]
+            metric = max(qes) if qes else 0
+        elif suite_id == "suite_E":
+            scaling = (r.get("metrics") or {}).get("scaling", {})
+            metric = 0
+            for e in scaling.get("results_by_chip_count", []):
+                if e.get("chip_count") == 4:
+                    metric = e.get("scaling_efficiency") or 0
+            if not metric:
+                for e in scaling.get("results_by_chip_count", []):
+                    if e.get("chip_count") == 2:
+                        metric = e.get("scaling_efficiency") or 0
+            if not metric:
+                metric = scaling.get("base_throughput_tokens_per_sec") or 0
+        else:
+            offline = (r.get("metrics") or {}).get("offline", {})
+            rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size") or []
+            valid_rows = [row for row in rows
+                          if not row.get("oom") and row.get("throughput_tokens_per_sec")]
+            metric = max((row["throughput_tokens_per_sec"] for row in valid_rows), default=0)
+        if rid not in _seen or metric > _seen[rid]["metric"]:
+            _seen[rid] = {"result": r, "metric": metric}
+    deduped = [entry["result"] for entry in _seen.values()]
+    print(f"  distribution: {len(results)} raw → {len(deduped)} deduplicated results")
+
+    # ── 2. 构建每个提交的详细数据 ─────────────────────────────────────────
+    all_submissions = []
+
+    for r in deduped:
+        chip_obj    = r.get("chip") or {}
+        chip        = chip_obj.get("name", "Unknown")
+        chip_vendor = chip_obj.get("vendor", "")
+        chip_count  = chip_obj.get("count", 1)
+        memory_gb   = chip_obj.get("memory_gb", 0)
+        suite       = r.get("suite_id", "")
+
+        model_obj       = r.get("model") or {}
+        model_full      = model_obj.get("model_id", "")
+        model_short     = model_full.split("/")[-1] if model_full else ""
+        model_params_b  = model_obj.get("parameter_count_b")
+        precision       = model_obj.get("precision", "BF16")
+        effective_dtype = model_obj.get("effective_dtype")
+
+        software          = r.get("software") or {}
+        framework         = software.get("framework", "")
+        framework_version = software.get("framework_version", "")
+
+        meta             = r.get("meta") or {}
+        submission_name  = r.get("_submission_name", "")
+        tier             = r.get("_tier", "community")
+        submitted_by     = meta.get("submitted_by", "")
+        date             = meta.get("date", "")
+        reproduce_script = meta.get("reproduce_script", "")
+        run_id           = meta.get("run_id", "")
+        impl_id          = r.get("implementation_id", "")
+
+        # 收集该提交跑了哪些 scenario（从 task.scenarios_run 读取）
+        task           = r.get("task") or {}
+        scenarios_run  = task.get("scenarios_run") or []
+        is_suite_level = "scenarios_run" in task or "chip_counts_run" in task
+
+        # 为每个 scenario 提取指标
+        scenarios = {}
+        for sc_name in scenarios_run:
+            scenarios[sc_name] = _extract_scenario_metric(r, sc_name)
+
+        # 如果 scenarios_run 为空（旧格式），至少从 offline 提取
+        if not scenarios_run:
+            offline_metric = _extract_scenario_metric(r, "offline")
+            if offline_metric["is_valid"]:
+                scenarios["offline"] = offline_metric
+            online_metric = _extract_scenario_metric(r, "online")
+            if online_metric["is_valid"]:
+                scenarios["online"] = online_metric
+
+        # 处理 Suite E（scaling）：从 metrics.scaling 提取
+        suite_primary_thr = None
+        suite_primary_label = None
+        suite_primary_scenario = "offline"
+
+        if suite == "suite_E":
+            scaling = (r.get("metrics") or {}).get("scaling", {})
+            for entry in scaling.get("results_by_chip_count", []):
+                if entry.get("chip_count") == 1:
+                    suite_primary_thr = entry.get("best_throughput_tokens_per_sec")
+                    suite_primary_label = "tokens/sec (1x baseline)"
+                    suite_primary_scenario = "scaling"
+                    break
+            if not suite_primary_thr:
+                suite_primary_thr = scaling.get("base_throughput_tokens_per_sec")
+                suite_primary_label = "tokens/sec (1x baseline)"
+                suite_primary_scenario = "scaling"
+
+        # ── Suite C：按精度爆炸，每种精度一条独立提交 ─────────────────
+        if suite == "suite_C":
+            quant         = (r.get("metrics") or {}).get("quantization", {})
+            quant_online  = (r.get("metrics") or {}).get("quantization_online", {})
+            quant_sus     = (r.get("metrics") or {}).get("quantization_sustained", {})
+            prec_online   = {e.get("precision",""): e.get("max_valid_qps")
+                             for e in quant_online.get("results_by_precision", [])}
+            prec_sustained = {e.get("precision",""): e.get("sustained_throughput_tokens_per_sec")
+                              for e in quant_sus.get("results_by_precision", [])}
+            tp = (task.get("parallelism") or {}).get("tensor_parallel_size")
+
+            for entry in quant.get("results_by_precision", []):
+                prec = entry.get("precision", "")
+                thr  = entry.get("best_throughput_tokens_per_sec")
+                if not thr:
+                    continue
+                prec_sc = {}
+                prec_sc["offline"] = {"throughput": thr, "metric_label": f"tokens/sec ({prec})",
+                                      "concurrency": None, "peak_memory_gb": None, "is_valid": True}
+                qps = prec_online.get(prec)
+                if qps is not None:
+                    prec_sc["online"] = {"throughput": qps, "metric_label": "max valid QPS",
+                                         "concurrency": None, "peak_memory_gb": None, "is_valid": True}
+                sus = prec_sustained.get(prec)
+                if sus is not None:
+                    prec_sc["sustained"] = {"throughput": sus, "metric_label": "tok/s (sustained mean)",
+                                            "concurrency": None, "peak_memory_gb": None, "is_valid": True}
+                for sc_name in scenarios_run:
+                    if sc_name not in prec_sc and sc_name != "accuracy":
+                        m = _extract_scenario_metric(r, sc_name)
+                        if m["is_valid"]:
+                            prec_sc[sc_name] = m
+
+                config = {"concurrency": None, "batch_size": None,
+                          "tensor_parallel": tp, "peak_memory_gb": None}
+                sub = {
+                    "id": f"{run_id or submission_name}_{prec}",
+                    "chip": chip, "chip_vendor": chip_vendor,
+                    "chip_count": chip_count, "memory_gb": memory_gb,
+                    "suite": suite, "model": model_short, "model_full": model_full,
+                    "model_params_b": model_params_b,
+                    "precision": prec, "effective_dtype": effective_dtype,
+                    "framework": framework, "framework_version": framework_version,
+                    "tier": tier, "submitted_by": submitted_by,
+                    "date": date, "reproduce_script": reproduce_script,
+                    "runner_id": impl_id,
+                    "scenarios": prec_sc,
+                    "primary_scenario": "quantization",
+                    "primary_throughput": thr,
+                    "primary_metric_label": f"tokens/sec ({prec})",
+                    "config": config,
+                }
+                all_submissions.append(sub)
+
+        else:
+            # ── 非 Suite C：标准单条提交 ────────────────────────────
+
+            # 确定 primary_throughput 和 primary_scenario
+            primary_throughput = suite_primary_thr
+            primary_scenario   = suite_primary_scenario
+            primary_label      = suite_primary_label
+
+            if primary_throughput is None:
+                _SCENARIO_PRIORITY = ["offline", "online", "sustained", "speculative", "burst"]
+                for sc in _SCENARIO_PRIORITY:
+                    if sc in scenarios and scenarios[sc]["is_valid"]:
+                        primary_throughput = scenarios[sc]["throughput"]
+                        primary_scenario   = sc
+                        primary_label      = scenarios[sc]["metric_label"]
+                        break
+
+            if primary_throughput is None:
+                continue
+
+            # 构建最佳配置信息
+            best_sc = scenarios.get(primary_scenario) if primary_scenario in scenarios else None
+            config = {}
+            if best_sc:
+                tp = (task.get("parallelism") or {}).get("tensor_parallel_size")
+                config = {
+                    "concurrency":    best_sc.get("concurrency"),
+                    "batch_size":     None,
+                    "tensor_parallel": tp,
+                    "peak_memory_gb": best_sc.get("peak_memory_gb"),
+                }
+            else:
+                offline = (r.get("metrics") or {}).get("offline", {})
+                rows = offline.get("results_by_concurrency") or offline.get("results_by_batch_size") or []
+                valid_rows = [row for row in rows
+                              if not row.get("oom") and row.get("throughput_tokens_per_sec")]
+                if valid_rows:
+                    best_row = max(valid_rows, key=lambda row: row["throughput_tokens_per_sec"])
+                    tp = (task.get("parallelism") or {}).get("tensor_parallel_size")
+                    config = {
+                        "concurrency":    best_row.get("client_concurrency") or best_row.get("concurrency"),
+                        "batch_size":     best_row.get("batch_size"),
+                        "tensor_parallel": tp,
+                        "peak_memory_gb": best_row.get("peak_memory_gb"),
+                    }
+
+            sub = {
+                "id":                  run_id or submission_name,
+                "chip":                chip,
+                "chip_vendor":         chip_vendor,
+                "chip_count":          chip_count,
+                "memory_gb":           memory_gb,
+                "suite":               suite,
+                "model":               model_short,
+                "model_full":          model_full,
+                "model_params_b":      model_params_b,
+                "precision":           precision,
+                "effective_dtype":     effective_dtype,
+                "framework":           framework,
+                "framework_version":   framework_version,
+                "tier":                tier,
+                "submitted_by":        submitted_by,
+                "date":                date,
+                "reproduce_script":    reproduce_script,
+                "runner_id":           impl_id,
+                "scenarios":           scenarios,
+                "primary_scenario":    primary_scenario,
+                "primary_throughput":  primary_throughput,
+                "primary_metric_label": primary_label,
+                "config":              config,
+            }
+            all_submissions.append(sub)
+
+    # ── 3. 按 (chip, suite) 分组聚合 ──────────────────────────────────────
+    groups: dict[tuple, dict] = defaultdict(lambda: {
+        "submissions": [],
+        "throughputs": [],
+    })
+    for sub in all_submissions:
+        key = (sub["chip"], sub["suite"])
+        groups[key]["submissions"].append(sub)
+        groups[key]["throughputs"].append(sub["primary_throughput"])
+
+    group_list = []
+    for (chip, suite), data in groups.items():
+        thr_list = sorted(data["throughputs"])
+        n = len(thr_list)
+        median = thr_list[n // 2]
+        best_sub = max(data["submissions"], key=lambda s: s["primary_throughput"])
+
+        # 各 scenario 汇总
+        scenario_summary = {}
+        for sub in data["submissions"]:
+            for sc_name, sc_info in sub["scenarios"].items():
+                if sc_name not in scenario_summary:
+                    scenario_summary[sc_name] = {
+                        "count": 0,
+                        "best_throughput": None,
+                        "best_framework": "",
+                    }
+                sm = scenario_summary[sc_name]
+                sm["count"] += 1
+                if sc_info["is_valid"] and sc_info["throughput"]:
+                    if sm["best_throughput"] is None or sc_info["throughput"] > sm["best_throughput"]:
+                        sm["best_throughput"] = sc_info["throughput"]
+                        sm["best_framework"] = sub["framework"]
+
+        # 标准差
+        stddev = None
+        if n >= 2:
+            stddev = round(statistics.stdev(thr_list), 2)
+
+        group_list.append({
+            "chip":               chip,
+            "chip_vendor":        best_sub["chip_vendor"],
+            "suite":              suite,
+            "model":              best_sub["model"],
+            "submission_count":   n,
+            "best_throughput":    thr_list[-1],
+            "median_throughput":  median,
+            "min_throughput":     thr_list[0],
+            "max_throughput":     thr_list[-1],
+            "stddev_throughput":  stddev,
+            "scenario_summary":   scenario_summary,
+            "best_submission_id": best_sub["id"],
+            "best_framework":     best_sub["framework"],
+            "best_submitted_by":  best_sub["submitted_by"],
+        })
+
+    # 按厂商优先级排序，再按中位数吞吐量降序
+    vendor_priority = {"NVIDIA": 1, "Nvidia": 1, "nvidia": 1,
+                       "Huawei": 2, "华为": 2,
+                       "AMD": 3, "amd": 3,
+                       "Google": 4, "Apple": 5,
+                       "Moore Threads": 6, "Iluvatar": 6, "Intel": 6}
+    group_list.sort(key=lambda g: (
+        vendor_priority.get(g["chip_vendor"], 99),
+        -(g["median_throughput"] or 0)
+    ))
+
+    # ── 4. Suite 元数据 ───────────────────────────────────────────────────
+    suite_meta = _collect_suite_specs()
+
+    # ── 5. 写入 distribution.js ───────────────────────────────────────────
+    out_path = output_dir / "distribution.js"
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("// Auto-generated by leaderboard/generate.py. Do not edit manually.\n\n")
+        f.write(f"const DISTRIBUTION_SUBMISSIONS = {json.dumps(all_submissions, indent=2, ensure_ascii=False)};\n")
+        f.write("window.DISTRIBUTION_SUBMISSIONS = DISTRIBUTION_SUBMISSIONS;\n\n")
+        f.write(f"const DISTRIBUTION_GROUPS = {json.dumps(group_list, indent=2, ensure_ascii=False)};\n")
+        f.write("window.DISTRIBUTION_GROUPS = DISTRIBUTION_GROUPS;\n\n")
+        f.write(f"const DISTRIBUTION_SUITE_META = {json.dumps(suite_meta, indent=2, ensure_ascii=False)};\n")
+        f.write("window.DISTRIBUTION_SUITE_META = DISTRIBUTION_SUITE_META;\n")
+
+    group_count      = len(group_list)
+    submission_count = len(all_submissions)
+    print(f"Distribution data written to {out_path} "
+          f"({group_count} groups, {submission_count} submissions).")
+
+
+def _bust_script_cache(data_path: Path, html_path: Path, script_name: str) -> None:
+    """Rewrite <script src="NAME.js?v=<sha8>"> in html_path to match data file hash."""
+    if not html_path.exists() or not data_path.exists():
+        return
+    sha8 = hashlib.sha256(data_path.read_bytes()).hexdigest()[:8]
+    html = html_path.read_text(encoding='utf-8')
+    pattern = re.compile(
+        rf'(<script\s+src="{re.escape(script_name)})(?:\?v=[0-9a-f]+)?(")',
+        re.IGNORECASE,
+    )
+    new_html, n = pattern.subn(rf'\1?v={sha8}\2', html)
+    if n and new_html != html:
+        html_path.write_text(new_html, encoding='utf-8')
+        print(f"  cache-busted {script_name} → ?v={sha8}")
+
+
+def _bust_index_cache(data_path: Path, index_path: Path) -> None:
+    _bust_script_cache(data_path, index_path, "leaderboard.js")
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main():
@@ -1137,8 +1488,7 @@ def main():
 
     rows = [extract_row(r) for r in results]
 
-    # Deduplicate: for each run_id keep only the best result (highest primary metric).
-    # Results without run_id (older submissions) are always included as-is.
+    # Deduplicate: for each run_id keep only the best result
     _seen: dict = {}
     _deduped: list = []
 
@@ -1172,50 +1522,27 @@ def main():
 
     SITE_DIR.mkdir(parents=True, exist_ok=True)
     out_path = SITE_DIR / "leaderboard.js"
-    with open(out_path, "w") as f:
+    with open(out_path, "w", encoding='utf-8') as f:
         f.write("// Auto-generated by leaderboard/generate.py. Do not edit manually.\n")
-        # window.LEADERBOARD_DATA so ES modules (assets/js/data.js) can read it.
-        # Also exposed as bare LEADERBOARD_DATA for any legacy classic-script consumers.
         f.write(f"const LEADERBOARD_DATA = {json.dumps(rows, indent=2)};\n")
         f.write("window.LEADERBOARD_DATA = LEADERBOARD_DATA;\n")
-        # window.SUITE_SPECS — canonical per-suite spec from suites/suite_*/suite.json.
-        # data.js merges these into SUITE_META at init() so UI facts auto-sync
-        # with a suite contract edit (no JS to keep in step manually).
         f.write(f"const SUITE_SPECS = {json.dumps(suite_specs, indent=2)};\n")
         f.write("window.SUITE_SPECS = SUITE_SPECS;\n")
 
     print(f"Leaderboard data written to {out_path} "
           f"({len(rows)} rows, {len(suite_specs)} suite specs).")
 
-    # Cache-bust leaderboard.js in index.html so a stale CDN / browser
-    # cached copy never out-survives the data refresh.  GitHub Pages
-    # serves the static files with a 10-minute Cache-Control by default
-    # and *no* ETag-aware revalidation on cross-domain `<script src>`
-    # loads, so without a versioned query users routinely see "old"
-    # submissions for hours after a merge.  We hash the bytes we just
-    # wrote and rewrite the existing `?v=…` (or insert one) in place.
     _bust_index_cache(out_path, SITE_DIR / "index.html")
 
     generate_api(results, SITE_DIR)
+    
+    # 生成分布数据
+    generate_distribution_data(results, SITE_DIR)
 
-
-def _bust_index_cache(data_path: Path, index_path: Path) -> None:
-    """Rewrite ``<script src="leaderboard.js?v=<sha8>">`` to match the
-    short SHA-256 of the file we just wrote.  No-op if the index file
-    is missing (e.g. someone is running the generator outside the
-    repo)."""
-    if not index_path.exists():
-        return
-    sha8 = hashlib.sha256(data_path.read_bytes()).hexdigest()[:8]
-    html = index_path.read_text()
-    pattern = re.compile(
-        r'(<script\s+src="leaderboard\.js)(?:\?v=[0-9a-f]+)?(")',
-        re.IGNORECASE,
-    )
-    new_html, n = pattern.subn(rf'\1?v={sha8}\2', html)
-    if n and new_html != html:
-        index_path.write_text(new_html)
-        print(f"  cache-busted leaderboard.js → ?v={sha8}")
+    dist_js = SITE_DIR / "distribution.js"
+    index_html = SITE_DIR / "index.html"
+    if dist_js.exists():
+        _bust_script_cache(dist_js, index_html, "distribution.js")
 
 
 if __name__ == "__main__":
