@@ -147,83 +147,83 @@
         "throttle_ratio": 0.92
       },
       "suite_B": {
-        "best_throughput_tokens_per_sec": 1704.7,
+        "best_throughput_tokens_per_sec": 2236.0,
         "best_online_max_qps": 25,
         "best_interactive_ttft_p99_ms": 120.8,
-        "best_sustained_throughput_tokens_per_sec": 164.3,
-        "throttle_ratio": 0.806
+        "best_sustained_throughput_tokens_per_sec": 182.0,
+        "throttle_ratio": 0.947
       },
       "suite_E": {
-        "best_throughput_tokens_per_sec": 3000.6,
-        "best_scaling_efficiency_2x": 0.725,
-        "best_scaling_efficiency_4x": 0.47
+        "best_throughput_tokens_per_sec": 4200.8,
+        "best_scaling_efficiency_2x": 0.608,
+        "best_scaling_efficiency_4x": 0.624
       },
       "suite_G": {
-        "best_throughput_tokens_per_sec": 3217.8,
-        "best_online_max_qps": 10,
-        "best_interactive_ttft_p99_ms": 1988.4,
-        "best_sustained_throughput_tokens_per_sec": 472.7,
-        "throttle_ratio": 0.902
+        "best_throughput_tokens_per_sec": 4346.6,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 942.5,
+        "best_sustained_throughput_tokens_per_sec": 632.1,
+        "throttle_ratio": 0.967
       }
     }
   },
   "NVIDIA A100-SXM4-80GB": {
-    "best_throughput_tokens_per_sec": 22884.92,
+    "best_throughput_tokens_per_sec": 35341.25,
     "suites": {
       "suite_A": {
         "best_throughput_tokens_per_sec": 3916.7,
-        "best_online_max_qps": 5,
+        "best_online_max_qps": 100,
         "best_interactive_ttft_p99_ms": 59.4,
         "best_sustained_throughput_tokens_per_sec": 712.3,
-        "throttle_ratio": 0.868
+        "throttle_ratio": 0.979
       },
       "suite_C": {
-        "best_quality_efficiency": 2077.4,
-        "best_quality_efficiency_format": "W8A8"
+        "best_quality_efficiency": 2357.3,
+        "best_quality_efficiency_format": "W8A16"
       },
       "suite_D": {
         "best_throughput_tokens_per_sec": 70.2,
         "best_online_max_qps": 0.0,
         "best_interactive_ttft_p99_ms": 2996.3,
         "best_sustained_throughput_tokens_per_sec": 67.1,
-        "throttle_ratio": 0.501
+        "throttle_ratio": 0.671
       },
       "suite_F": {
-        "best_throughput_tokens_per_sec": 22884.9,
+        "best_throughput_tokens_per_sec": 35341.2,
         "best_online_max_qps": 40,
         "best_interactive_ttft_p99_ms": 14.7,
         "best_sustained_throughput_tokens_per_sec": 11576.2,
-        "throttle_ratio": 0.746
+        "throttle_ratio": 0.936
       }
     }
   },
   "NVIDIA A800-SXM4-80GB": {
-    "best_throughput_tokens_per_sec": 11972.12,
+    "best_throughput_tokens_per_sec": 36713.29,
     "suites": {
       "suite_A": {
-        "best_throughput_tokens_per_sec": 2723.5,
-        "best_online_max_qps": 5,
-        "best_interactive_ttft_p99_ms": 63.2,
-        "best_sustained_throughput_tokens_per_sec": 546.4,
-        "throttle_ratio": 0.881
+        "best_throughput_tokens_per_sec": 3850.3,
+        "best_online_max_qps": 100,
+        "best_interactive_ttft_p99_ms": 58.7,
+        "best_sustained_throughput_tokens_per_sec": 664.1,
+        "throttle_ratio": 0.982
       },
       "suite_C": {
-        "best_quality_efficiency": 2106.5,
-        "best_quality_efficiency_format": "W8A8"
+        "best_quality_efficiency": 2374.2,
+        "best_quality_efficiency_format": "W8A16"
       },
       "suite_D": {
         "best_throughput_tokens_per_sec": 70.3,
         "best_online_max_qps": 0.0,
         "best_interactive_ttft_p99_ms": 2984.2,
         "best_sustained_throughput_tokens_per_sec": 67.0,
-        "throttle_ratio": 0.502
+        "throttle_ratio": 0.67
       },
       "suite_F": {
-        "best_throughput_tokens_per_sec": 11972.1,
-        "best_online_max_qps": 10,
-        "best_interactive_ttft_p99_ms": 30.3,
-        "best_sustained_throughput_tokens_per_sec": 2804.8,
-        "throttle_ratio": 0.602
+        "best_throughput_tokens_per_sec": 36713.3,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 19.3,
+        "best_sustained_throughput_tokens_per_sec": 7323.3,
+        "throttle_ratio": 0.925
       },
       "suite_B": {
         "best_throughput_tokens_per_sec": 1803.6,
@@ -300,25 +300,25 @@
     }
   },
   "NVIDIA GeForce RTX 4090": {
-    "best_throughput_tokens_per_sec": 11440.55,
+    "best_throughput_tokens_per_sec": 14832.92,
     "suites": {
       "suite_A": {
-        "best_throughput_tokens_per_sec": 1452.3,
+        "best_throughput_tokens_per_sec": 2026.8,
         "best_online_max_qps": 0.0,
-        "best_interactive_ttft_p99_ms": 97.3,
-        "best_sustained_throughput_tokens_per_sec": 339.8,
-        "throttle_ratio": 0.91
+        "best_interactive_ttft_p99_ms": 80.6,
+        "best_sustained_throughput_tokens_per_sec": 439.0,
+        "throttle_ratio": 0.957
       },
       "suite_C": {
-        "best_quality_efficiency": 1675.2,
-        "best_quality_efficiency_format": "FP8"
+        "best_quality_efficiency": 2426.7,
+        "best_quality_efficiency_format": "W8A8"
       },
       "suite_F": {
-        "best_throughput_tokens_per_sec": 11440.5,
-        "best_online_max_qps": 10,
-        "best_interactive_ttft_p99_ms": 46.2,
-        "best_sustained_throughput_tokens_per_sec": 1698.1,
-        "throttle_ratio": 0.922
+        "best_throughput_tokens_per_sec": 14832.9,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 22.4,
+        "best_sustained_throughput_tokens_per_sec": 3090.0,
+        "throttle_ratio": 0.931
       },
       "suite_B": {
         "best_throughput_tokens_per_sec": 442.9,
@@ -338,6 +338,13 @@
         "best_interactive_ttft_p99_ms": 794.6,
         "best_sustained_throughput_tokens_per_sec": 325.5,
         "throttle_ratio": 0.886
+      },
+      "suite_D": {
+        "best_throughput_tokens_per_sec": 27.1,
+        "best_online_max_qps": 0.0,
+        "best_interactive_ttft_p99_ms": 4587.2,
+        "best_sustained_throughput_tokens_per_sec": 25.4,
+        "throttle_ratio": 0.856
       }
     }
   },
@@ -451,11 +458,11 @@
     "best_throughput_tokens_per_sec": 11716.68,
     "suites": {
       "suite_A": {
-        "best_throughput_tokens_per_sec": 2297.7,
-        "best_online_max_qps": 5,
-        "best_interactive_ttft_p99_ms": 103.4,
-        "best_sustained_throughput_tokens_per_sec": 486.6,
-        "throttle_ratio": 0.918
+        "best_throughput_tokens_per_sec": 4342.2,
+        "best_online_max_qps": 100,
+        "best_interactive_ttft_p99_ms": 74.6,
+        "best_sustained_throughput_tokens_per_sec": 1272.2,
+        "throttle_ratio": 0.978
       },
       "suite_C": {
         "best_quality_efficiency": 896.5,
@@ -558,29 +565,32 @@
     }
   },
   "NVIDIA RTX A6000": {
-    "best_throughput_tokens_per_sec": 10433.7,
+    "best_throughput_tokens_per_sec": 11554.68,
     "suites": {
       "suite_A": {
-        "best_throughput_tokens_per_sec": 1567.3,
-        "best_online_max_qps": 5,
-        "best_interactive_ttft_p99_ms": 126.4,
-        "best_sustained_throughput_tokens_per_sec": 265.3,
-        "throttle_ratio": 0.877
+        "best_throughput_tokens_per_sec": 2039.1,
+        "best_online_max_qps": 100,
+        "best_interactive_ttft_p99_ms": 111.3,
+        "best_sustained_throughput_tokens_per_sec": 315.5,
+        "throttle_ratio": 0.969
       },
-      "suite_C": {},
+      "suite_C": {
+        "best_quality_efficiency": 1294.0,
+        "best_quality_efficiency_format": "W8A16"
+      },
       "suite_D": {
-        "best_throughput_tokens_per_sec": 31.1,
+        "best_throughput_tokens_per_sec": 31.4,
         "best_online_max_qps": 0.0,
         "best_interactive_ttft_p99_ms": 6172.4,
         "best_sustained_throughput_tokens_per_sec": 30.5,
-        "throttle_ratio": 0.461
+        "throttle_ratio": 0.499
       },
       "suite_F": {
-        "best_throughput_tokens_per_sec": 10433.7,
-        "best_online_max_qps": 10,
-        "best_interactive_ttft_p99_ms": 40.7,
-        "best_sustained_throughput_tokens_per_sec": 1917.3,
-        "throttle_ratio": 0.728
+        "best_throughput_tokens_per_sec": 11554.7,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 25.2,
+        "best_sustained_throughput_tokens_per_sec": 6299.2,
+        "throttle_ratio": 0.941
       },
       "suite_B": {
         "best_throughput_tokens_per_sec": 798.2,
@@ -675,6 +685,78 @@
         "best_throughput_tokens_per_sec": 2004.0,
         "best_online_max_qps": 40,
         "best_interactive_ttft_p99_ms": 28.5
+      }
+    }
+  },
+  "MTT S5000": {
+    "best_throughput_tokens_per_sec": 2301.02,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 1498.7,
+        "best_online_max_qps": 5,
+        "best_interactive_ttft_p99_ms": 101.4,
+        "best_sustained_throughput_tokens_per_sec": 172.8,
+        "throttle_ratio": 0.802
+      },
+      "suite_C": {
+        "best_quality_efficiency": 839.5,
+        "best_quality_efficiency_format": "BF16"
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 2301.0,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 72.5,
+        "best_sustained_throughput_tokens_per_sec": 885.7,
+        "throttle_ratio": 0.823
+      }
+    }
+  },
+  "NVIDIA B200": {
+    "best_throughput_tokens_per_sec": 88401.98,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 14716.7,
+        "best_online_max_qps": 100,
+        "best_interactive_ttft_p99_ms": 16.4,
+        "best_sustained_throughput_tokens_per_sec": 2178.8,
+        "throttle_ratio": 0.977
+      },
+      "suite_C": {
+        "best_quality_efficiency": 10928.6,
+        "best_quality_efficiency_format": "FP8"
+      },
+      "suite_D": {
+        "best_throughput_tokens_per_sec": 392.6,
+        "best_online_max_qps": 1,
+        "best_interactive_ttft_p99_ms": 589.3,
+        "best_sustained_throughput_tokens_per_sec": 340.3,
+        "throttle_ratio": 0.987
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 88402.0,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 7.8,
+        "best_sustained_throughput_tokens_per_sec": 17457.2,
+        "throttle_ratio": 0.979
+      },
+      "suite_B": {
+        "best_throughput_tokens_per_sec": 7176.3,
+        "best_online_max_qps": 25,
+        "best_interactive_ttft_p99_ms": 32.2,
+        "best_sustained_throughput_tokens_per_sec": 594.5,
+        "throttle_ratio": 0.946
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 19709.1,
+        "best_scaling_efficiency_2x": 0.726,
+        "best_scaling_efficiency_4x": 0.439
+      },
+      "suite_G": {
+        "best_throughput_tokens_per_sec": 9473.2,
+        "best_online_max_qps": 40,
+        "best_interactive_ttft_p99_ms": 37.2,
+        "best_sustained_throughput_tokens_per_sec": 1597.8,
+        "throttle_ratio": 0.924
       }
     }
   },

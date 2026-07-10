@@ -1,9 +1,21 @@
 [
   {
+    "name": "NVIDIA B200",
+    "submission_count": 14,
+    "best_throughput_tokens_per_sec": 88401.98,
+    "median_throughput_tokens_per_sec": 10346.9
+  },
+  {
+    "name": "NVIDIA A800-SXM4-80GB",
+    "submission_count": 11,
+    "best_throughput_tokens_per_sec": 36713.29,
+    "median_throughput_tokens_per_sec": 2723.5
+  },
+  {
     "name": "NVIDIA A100-SXM4-80GB",
-    "submission_count": 8,
-    "best_throughput_tokens_per_sec": 22884.92,
-    "median_throughput_tokens_per_sec": 2439.2
+    "submission_count": 12,
+    "best_throughput_tokens_per_sec": 35341.25,
+    "median_throughput_tokens_per_sec": 2529.0
   },
   {
     "name": "NVIDIA H100 80GB HBM3",
@@ -18,6 +30,12 @@
     "median_throughput_tokens_per_sec": 3487.5
   },
   {
+    "name": "NVIDIA GeForce RTX 4090",
+    "submission_count": 10,
+    "best_throughput_tokens_per_sec": 14832.92,
+    "median_throughput_tokens_per_sec": 1642.5
+  },
+  {
     "name": "NVIDIA GeForce RTX 4090 D",
     "submission_count": 4,
     "best_throughput_tokens_per_sec": 14273.14,
@@ -30,34 +48,22 @@
     "median_throughput_tokens_per_sec": 5334.3
   },
   {
-    "name": "NVIDIA A800-SXM4-80GB",
-    "submission_count": 7,
-    "best_throughput_tokens_per_sec": 11972.12,
-    "median_throughput_tokens_per_sec": 2723.5
-  },
-  {
     "name": "NVIDIA H20-3e",
-    "submission_count": 7,
+    "submission_count": 8,
     "best_throughput_tokens_per_sec": 11716.68,
-    "median_throughput_tokens_per_sec": 2297.7
-  },
-  {
-    "name": "NVIDIA A100-SXM4-40GB",
-    "submission_count": 11,
-    "best_throughput_tokens_per_sec": 11509.2,
-    "median_throughput_tokens_per_sec": 2416.0
-  },
-  {
-    "name": "NVIDIA GeForce RTX 4090",
-    "submission_count": 6,
-    "best_throughput_tokens_per_sec": 11440.55,
-    "median_throughput_tokens_per_sec": 1531.1
+    "median_throughput_tokens_per_sec": 2391.6
   },
   {
     "name": "NVIDIA RTX A6000",
-    "submission_count": 6,
-    "best_throughput_tokens_per_sec": 10433.7,
+    "submission_count": 10,
+    "best_throughput_tokens_per_sec": 11554.68,
     "median_throughput_tokens_per_sec": 1624.3
+  },
+  {
+    "name": "NVIDIA A100-SXM4-40GB",
+    "submission_count": 14,
+    "best_throughput_tokens_per_sec": 11509.2,
+    "median_throughput_tokens_per_sec": 2708.3
   },
   {
     "name": "NVIDIA RTX 4000 Ada Generation",
@@ -124,6 +130,12 @@
     "submission_count": 6,
     "best_throughput_tokens_per_sec": 4941.13,
     "median_throughput_tokens_per_sec": 1665.5
+  },
+  {
+    "name": "MTT S5000",
+    "submission_count": 3,
+    "best_throughput_tokens_per_sec": 2301.02,
+    "median_throughput_tokens_per_sec": 1498.7
   },
   {
     "name": "MTT S4000",

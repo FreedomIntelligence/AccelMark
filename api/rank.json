@@ -224,31 +224,58 @@
     "percentile": 0.0,
     "primary_metric": 10805.85
   },
+  "nvidia_a100_sxm4_40gbx8_suite_B_nvidia_sglang_c43a8309_40a62dd1": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_B",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 2236.02
+  },
   "nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_14410aea": {
     "chip_name": "NVIDIA A100-SXM4-40GB",
     "suite_id": "suite_B",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 1704.71
+  },
+  "nvidia_a100_sxm4_40gbx8_suite_E_nvidia_sglang_c43a8309_67683413": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_E",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 4200.78
   },
   "nvidia_a100_sxm4_40gbx8_suite_E_nvidia_vllm_47f5d58e_e76a4402": {
     "chip_name": "NVIDIA A100-SXM4-40GB",
     "suite_id": "suite_E",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 3000.59
+  },
+  "nvidia_a100_sxm4_40gbx8_suite_G_nvidia_sglang_c43a8309_9e9c88dd": {
+    "chip_name": "NVIDIA A100-SXM4-40GB",
+    "suite_id": "suite_G",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 4346.6
   },
   "nvidia_a100_sxm4_40gbx8_suite_G_nvidia_vllm_47f5d58e_08de2dc2": {
     "chip_name": "NVIDIA A100-SXM4-40GB",
     "suite_id": "suite_G",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 3217.83
   },
   "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm020_0f6c56e4_8f83bfab": {
@@ -256,34 +283,52 @@
     "suite_id": "suite_A",
     "tier": "verified",
     "rank": 1,
-    "total": 2,
-    "percentile": 50.0,
+    "total": 3,
+    "percentile": 66.7,
     "primary_metric": 3916.69
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_sglang_c43a8309_b14c1ebc": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 2,
+    "total": 3,
+    "percentile": 33.3,
+    "primary_metric": 3826.14
   },
   "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_A",
     "tier": "verified",
-    "rank": 2,
-    "total": 2,
+    "rank": 3,
+    "total": 3,
     "percentile": 0.0,
     "primary_metric": 2700.61
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_sglang_c43a8309_29a32aea": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 1,
+    "total": 3,
+    "percentile": 66.7,
+    "primary_metric": 2357.3
   },
   "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm020_0f6c56e4_ffd81462": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_C",
     "tier": "verified",
-    "rank": 1,
-    "total": 2,
-    "percentile": 50.0,
+    "rank": 2,
+    "total": 3,
+    "percentile": 33.3,
     "primary_metric": 2177.8
   },
   "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_47f5d58e_6940965a": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_C",
     "tier": "verified",
-    "rank": 2,
-    "total": 2,
+    "rank": 3,
+    "total": 3,
     "percentile": 0.0,
     "primary_metric": 2077.4
   },
@@ -292,53 +337,89 @@
     "suite_id": "suite_D",
     "tier": "verified",
     "rank": 1,
-    "total": 2,
-    "percentile": 50.0,
+    "total": 3,
+    "percentile": 66.7,
     "primary_metric": 70.21
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_sglang_c43a8309_4f45791f": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 2,
+    "total": 3,
+    "percentile": 33.3,
+    "primary_metric": 69.6
   },
   "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm020_0f6c56e4_43e96189": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_D",
     "tier": "verified",
-    "rank": 2,
-    "total": 2,
+    "rank": 3,
+    "total": 3,
     "percentile": 0.0,
     "primary_metric": 65.15
+  },
+  "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_sglang_c43a8309_280f3db2": {
+    "chip_name": "NVIDIA A100-SXM4-80GB",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 3,
+    "percentile": 66.7,
+    "primary_metric": 35341.25
   },
   "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_vllm020_0f6c56e4_a4e6a6e4": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_F",
     "tier": "verified",
-    "rank": 1,
-    "total": 2,
-    "percentile": 50.0,
+    "rank": 2,
+    "total": 3,
+    "percentile": 33.3,
     "primary_metric": 22884.92
   },
   "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_vllm_47f5d58e_52ad2fe3": {
     "chip_name": "NVIDIA A100-SXM4-80GB",
     "suite_id": "suite_F",
     "tier": "verified",
-    "rank": 2,
-    "total": 2,
+    "rank": 3,
+    "total": 3,
     "percentile": 0.0,
     "primary_metric": 11011.89
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_sglang_c43a8309_93928a91": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 3850.31
   },
   "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_298e6500": {
     "chip_name": "NVIDIA A800-SXM4-80GB",
     "suite_id": "suite_A",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 2723.49
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_C_nvidia_sglang_c43a8309_8eb86278": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 2374.2
   },
   "nvidia_a800_sxm4_80gbx1_suite_C_nvidia_vllm_47f5d58e_944773aa": {
     "chip_name": "NVIDIA A800-SXM4-80GB",
     "suite_id": "suite_C",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 2106.5
   },
   "nvidia_a800_sxm4_80gbx1_suite_D_nvidia_vllm_47f5d58e_4d0e7990": {
@@ -346,17 +427,35 @@
     "suite_id": "suite_D",
     "tier": "verified",
     "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "total": 2,
+    "percentile": 50.0,
     "primary_metric": 70.34
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_D_nvidia_sglang_c43a8309_1992bcc0": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 69.83
+  },
+  "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_sglang_c43a8309_088cfa14": {
+    "chip_name": "NVIDIA A800-SXM4-80GB",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 36713.29
   },
   "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_vllm_47f5d58e_54d0e7aa": {
     "chip_name": "NVIDIA A800-SXM4-80GB",
     "suite_id": "suite_F",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 11972.12
   },
   "nvidia_a800_sxm4_80gbx8_suite_B_nvidia_vllm_47f5d58e_de0853fa": {
@@ -449,31 +548,58 @@
     "percentile": 100.0,
     "primary_metric": 1633.89
   },
+  "nvidia_geforce_rtx_4090x1_suite_A_nvidia_sglang_c43a8309_9b2b01fd": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 2026.75
+  },
   "nvidia_geforce_rtx_4090x1_suite_A_nvidia_vllm_47f5d58e_675e325e": {
     "chip_name": "NVIDIA GeForce RTX 4090",
     "suite_id": "suite_A",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 1452.3
+  },
+  "nvidia_geforce_rtx_4090x1_suite_C_nvidia_sglang_c43a8309_4ce353c2": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 2426.7
   },
   "nvidia_geforce_rtx_4090x1_suite_C_nvidia_vllm_47f5d58e_6d7e1d48": {
     "chip_name": "NVIDIA GeForce RTX 4090",
     "suite_id": "suite_C",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 1675.2
+  },
+  "nvidia_geforce_rtx_4090x1_suite_F_nvidia_sglang_c43a8309_12d28697": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 14832.92
   },
   "nvidia_geforce_rtx_4090x1_suite_F_nvidia_vllm_47f5d58e_b228454f": {
     "chip_name": "NVIDIA GeForce RTX 4090",
     "suite_id": "suite_F",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 11440.55
   },
   "nvidia_geforce_rtx_4090x8_suite_B_nvidia_vllm_47f5d58e_cfd0bdc8": {
@@ -629,13 +755,22 @@
     "percentile": 100.0,
     "primary_metric": 5334.28
   },
+  "nvidia_h20_3ex1_suite_A_nvidia_sglang_c43a8309_83e3ec26": {
+    "chip_name": "NVIDIA H20-3e",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 4342.21
+  },
   "nvidia_h20_3ex1_suite_A_nvidia_vllm_47f5d58e_3f6269bb": {
     "chip_name": "NVIDIA H20-3e",
     "suite_id": "suite_A",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 2297.65
   },
   "nvidia_h20_3ex1_suite_C_nvidia_vllm_47f5d58e_1bcdc710": {
@@ -755,31 +890,58 @@
     "percentile": 100.0,
     "primary_metric": 8248.35
   },
+  "nvidia_rtx_a6000x1_suite_A_nvidia_sglang_c43a8309_9c6920b5": {
+    "chip_name": "NVIDIA RTX A6000",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 2039.11
+  },
   "nvidia_rtx_a6000x1_suite_A_nvidia_vllm_47f5d58e_7cd0b745": {
     "chip_name": "NVIDIA RTX A6000",
     "suite_id": "suite_A",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 1567.35
+  },
+  "nvidia_rtx_a6000x1_suite_D_nvidia_sglang_c43a8309_4974e840": {
+    "chip_name": "NVIDIA RTX A6000",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 31.41
   },
   "nvidia_rtx_a6000x1_suite_D_nvidia_vllm_47f5d58e_f2197473": {
     "chip_name": "NVIDIA RTX A6000",
     "suite_id": "suite_D",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 31.11
+  },
+  "nvidia_rtx_a6000x1_suite_F_nvidia_sglang_c43a8309_68ab5b50": {
+    "chip_name": "NVIDIA RTX A6000",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 11554.68
   },
   "nvidia_rtx_a6000x1_suite_F_nvidia_vllm_47f5d58e_a33d6eb3": {
     "chip_name": "NVIDIA RTX A6000",
     "suite_id": "suite_F",
     "tier": "verified",
-    "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
     "primary_metric": 10433.7
   },
   "nvidia_rtx_a6000x8_suite_B_nvidia_vllm_47f5d58e_0981ecf7": {
@@ -898,6 +1060,177 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 2004.02
+  },
+  "mtt_s5000x1_suite_A_moorethreads_vllm_musa_f2f6f965_3c0a9e7d": {
+    "chip_name": "MTT S5000",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1498.7
+  },
+  "mtt_s5000x1_suite_C_moorethreads_vllm_musa_f2f6f965_184c9276": {
+    "chip_name": "MTT S5000",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 839.5
+  },
+  "mtt_s5000x1_suite_F_moorethreads_vllm_musa_f2f6f965_78e08b8f": {
+    "chip_name": "MTT S5000",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 2301.02
+  },
+  "nvidia_b200x1_suite_A_nvidia_vllm020_0f6c56e4_2c345026": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 14716.67
+  },
+  "nvidia_b200x1_suite_A_nvidia_sglang_c43a8309_d60b952a": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 13503.59
+  },
+  "nvidia_b200x1_suite_C_nvidia_vllm020_0f6c56e4_ea976bca": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 10928.6
+  },
+  "nvidia_b200x1_suite_C_nvidia_sglang_c43a8309_f7318214": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 9765.2
+  },
+  "nvidia_b200x1_suite_D_nvidia_vllm020_0f6c56e4_c35cf907": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 392.64
+  },
+  "nvidia_b200x1_suite_D_nvidia_sglang_c43a8309_79163e2a": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 368.58
+  },
+  "nvidia_b200x1_suite_F_nvidia_sglang_c43a8309_e593b394": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 88401.98
+  },
+  "nvidia_b200x1_suite_F_nvidia_vllm020_0f6c56e4_ef7c9362": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 40406.2
+  },
+  "nvidia_b200x8_suite_B_nvidia_vllm020_0f6c56e4_caaded72": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_B",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 7176.29
+  },
+  "nvidia_b200x8_suite_B_nvidia_sglang_c43a8309_d261c6b9": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_B",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 5764.13
+  },
+  "nvidia_b200x8_suite_E_nvidia_vllm020_0f6c56e4_1a5bff37": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_E",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 19709.07
+  },
+  "nvidia_b200x8_suite_E_nvidia_sglang_c43a8309_056018b1": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_E",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 18640.12
+  },
+  "nvidia_b200x8_suite_G_nvidia_sglang_c43a8309_5fffeaca": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_G",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 9473.19
+  },
+  "nvidia_b200x8_suite_G_nvidia_vllm020_0f6c56e4_8f2a84de": {
+    "chip_name": "NVIDIA B200",
+    "suite_id": "suite_G",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 4221.06
+  },
+  "nvidia_geforce_rtx_4090x1_suite_D_nvidia_sglang_c43a8309_3f838de7": {
+    "chip_name": "NVIDIA GeForce RTX 4090",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 27.14
+  },
+  "nvidia_rtx_a6000x1_suite_C_nvidia_sglang_c43a8309_4c65fcfb": {
+    "chip_name": "NVIDIA RTX A6000",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1294.0
   },
   "tesla_v100_pcie_32gbx1_suite_A_nvidia_onecat_vllm_12a253c2_4e0e6eba": {
     "chip_name": "Tesla V100-PCIE-32GB",
