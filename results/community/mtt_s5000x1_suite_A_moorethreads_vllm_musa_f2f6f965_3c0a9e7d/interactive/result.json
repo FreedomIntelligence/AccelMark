@@ -1,0 +1,246 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "implementation_id": "moorethreads_vllm_musa_f2f6f965",
+  "chip": {
+    "name": "MTT S5000",
+    "vendor": "Moore Threads",
+    "count": 1,
+    "memory_gb": 80.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-05-28T08:07:06.209889+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "MTT S5000",
+        "vendor": "Moore Threads",
+        "memory_gb": 80.0,
+        "driver_version": "3.3.6-server",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "moorethreads",
+    "accelerator_topology": null,
+    "intra_node_interconnect": "MCCL/PCIe",
+    "cpu": {
+      "model": "INTEL(R) XEON(R) GOLD 6530",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 2015.4,
+    "pcie_generation": "PCIe 16x/16x",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_10",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_11",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_3",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_4",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_5",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_6",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_7",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_8",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_9",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_bond_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.10.12",
+    "kernel_version": "5.15.0-105-generic",
+    "runtime_version": "MUSA 40305",
+    "pytorch_version": "2.7.1a0+gite2d141d"
+  },
+  "software": {
+    "framework": "vllm-musa",
+    "framework_version": "0.16.1rc1.dev185+g2c5c0e372.d20260323",
+    "driver_version": "3.3.6-server",
+    "runtime_version": "MUSA 40305",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.10.12"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "interactive",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "interactive": {
+      "ttft_ms_p50": 85.8,
+      "ttft_ms_p90": 88.32,
+      "ttft_ms_p99": 101.42,
+      "tpot_ms_p50": 40.05,
+      "tpot_ms_p90": 40.86,
+      "tpot_ms_p99": 42.26,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 2115.9,
+      "ttft_ms_p99_reliability": {
+        "n": 3,
+        "mean": 99.1,
+        "std": 4.48,
+        "cv_pct": 4.52,
+        "stability": "noisy",
+        "runs": [
+          93.96,
+          101.1,
+          102.23
+        ]
+      }
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Gong-K",
+    "submission_type": "individual",
+    "date": "2026-05-28",
+    "time": "18:16:41",
+    "run_id": "3c0a9e7d",
+    "run_name": "mtt_s5000x1_suite_A_moorethreads_vllm_musa_f2f6f965_3c0a9e7d",
+    "flagged": null,
+    "reproduce_script": "runners/moorethreads_vllm_musa_f2f6f965/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-05-28T08:30:44.467040+00:00",
+    "benchmark_end_time": "2026-05-28T10:16:40.998870+00:00",
+    "benchmark_elapsed_minutes": 105.9,
+    "model_load_seconds": 36.3
+  }
+}

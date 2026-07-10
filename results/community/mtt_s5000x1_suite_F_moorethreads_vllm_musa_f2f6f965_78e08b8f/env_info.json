@@ -1,0 +1,151 @@
+{
+  "collected_at": "2026-05-28T13:59:37.360827+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 4,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 5,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 6,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 7,
+      "name": "MTT S5000",
+      "vendor": "Moore Threads",
+      "memory_gb": 80.0,
+      "driver_version": "3.3.6-server",
+      "firmware_version": null,
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_platform": "moorethreads",
+  "accelerator_topology": null,
+  "intra_node_interconnect": "MCCL/PCIe",
+  "cpu": {
+    "model": "INTEL(R) XEON(R) GOLD 6530",
+    "physical_cores": 64,
+    "logical_cores": 128,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 2015.4,
+  "pcie_generation": "PCIe 16x/16x",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_10",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_11",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_3",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_4",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_5",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_6",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_7",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_8",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_9",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_bond_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.5 LTS",
+  "python_version": "3.10.12",
+  "kernel_version": "5.15.0-105-generic",
+  "runtime_version": "MUSA 40305",
+  "pytorch_version": "2.7.1a0+gite2d141d"
+}

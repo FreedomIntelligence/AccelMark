@@ -1,0 +1,179 @@
+{
+  "collected_at": "2026-06-04T16:50:57.466989+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 4,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 5,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 6,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 7,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "590.48.01",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_platform": "nvidia",
+  "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tGPU4\tGPU5\tGPU6\tGPU7\tNIC0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU1\tNV18\t X \tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU2\tNV18\tNV18\t X \tNV18\tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU3\tNV18\tNV18\tNV18\t X \tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU4\tNV18\tNV18\tNV18\tNV18\t X \tNV18\tNV18\tNV18\tSYS\t64-127,192-255\t1\t\tN/A\nGPU5\tNV18\tNV18\tNV18\tNV18\tNV18\t X \tNV18\tNV18\tSYS\t64-127,192-255\t1\t\tN/A\nGPU6\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\t X \tNV18\tSYS\t64-127,192-255\t1\t\tN/A\nGPU7\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\t X \tSYS\t64-127,192-255\t1\t\tN/A\nNIC0\tNODE\tNODE\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_bond_0\n\n",
+  "intra_node_interconnect": "NVLink",
+  "cpu": {
+    "model": "AMD EPYC 9575F 64-Core Processor",
+    "physical_cores": 128,
+    "logical_cores": 256,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 2267.4,
+  "pcie_generation": "PCIe Gen 5",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_1",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_10",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_11",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_12",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_13",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_14",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_15",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_5",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_6",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_7",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_8",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_9",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_bond_0",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 24.04.4 LTS",
+  "python_version": "3.10.20",
+  "kernel_version": "5.15.0-173-generic",
+  "runtime_version": "CUDA 12.8",
+  "pytorch_version": "2.9.1+cu128"
+}

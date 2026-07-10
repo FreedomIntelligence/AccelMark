@@ -1,0 +1,359 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_B",
+  "implementation_id": "nvidia_vllm020_0f6c56e4",
+  "chip": {
+    "name": "NVIDIA B200",
+    "vendor": "NVIDIA",
+    "count": 8,
+    "memory_gb": 179.1,
+    "interconnect_intra_node": "NVLink",
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-06-03T10:31:12.136781+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "590.48.01",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "nvidia",
+    "accelerator_topology": "\tGPU0\tGPU1\tGPU2\tGPU3\tGPU4\tGPU5\tGPU6\tGPU7\tNIC0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU1\tNV18\t X \tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU2\tNV18\tNV18\t X \tNV18\tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU3\tNV18\tNV18\tNV18\t X \tNV18\tNV18\tNV18\tNV18\tNODE\t0-63,128-191\t0\t\tN/A\nGPU4\tNV18\tNV18\tNV18\tNV18\t X \tNV18\tNV18\tNV18\tSYS\t64-127,192-255\t1\t\tN/A\nGPU5\tNV18\tNV18\tNV18\tNV18\tNV18\t X \tNV18\tNV18\tSYS\t64-127,192-255\t1\t\tN/A\nGPU6\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\t X \tNV18\tSYS\t64-127,192-255\t1\t\tN/A\nGPU7\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\tNV18\t X \tSYS\t64-127,192-255\t1\t\tN/A\nNIC0\tNODE\tNODE\tNODE\tNODE\tSYS\tSYS\tSYS\tSYS\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_bond_0\n\n",
+    "intra_node_interconnect": "NVLink",
+    "cpu": {
+      "model": "AMD EPYC 9575F 64-Core Processor",
+      "physical_cores": 128,
+      "logical_cores": 256,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 2267.4,
+    "pcie_generation": "PCIe Gen 5",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_10",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_11",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_12",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_13",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_14",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_15",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_5",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_6",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_7",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_8",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_9",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_bond_0",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.13",
+    "kernel_version": "5.15.0-173-generic",
+    "runtime_version": "CUDA 13.0",
+    "pytorch_version": "2.11.0+cu130"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.20.1+transformers-5.9.0",
+    "driver_version": "590.48.01",
+    "runtime_version": "CUDA 13.0",
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.13"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 70.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 8,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "tensor_parallel_size": 1,
+      "enforce_eager": false,
+      "max_num_seqs": 512,
+      "gpu_memory_utilization": 0.9
+    },
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "online": {
+      "sla_ttft_ms": 1000,
+      "max_valid_qps": 25,
+      "results_by_qps": [
+        {
+          "target_qps": 2,
+          "achieved_qps": 2.0,
+          "ttft_ms_p50": 21.77,
+          "ttft_ms_p90": 28.19,
+          "ttft_ms_p99": 36.19,
+          "tpot_ms_p50": 7.13,
+          "tpot_ms_p90": 7.36,
+          "tpot_ms_p99": 7.51,
+          "elapsed_seconds_median": 102.4,
+          "sla_met": true,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 30.07,
+            "std": 6.86,
+            "cv_pct": 22.82,
+            "stability": "high-variance",
+            "runs": [
+              37.98,
+              25.89,
+              26.33
+            ]
+          }
+        },
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 21.67,
+          "ttft_ms_p90": 24.93,
+          "ttft_ms_p99": 26.77,
+          "tpot_ms_p50": 7.48,
+          "tpot_ms_p90": 7.95,
+          "tpot_ms_p99": 8.11,
+          "elapsed_seconds_median": 45.4,
+          "sla_met": true,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 26.55,
+            "std": 0.81,
+            "cv_pct": 3.05,
+            "stability": "noisy",
+            "runs": [
+              26.35,
+              25.86,
+              27.44
+            ]
+          }
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 22.9,
+          "ttft_ms_p90": 26.86,
+          "ttft_ms_p99": 28.4,
+          "tpot_ms_p50": 8.08,
+          "tpot_ms_p90": 8.32,
+          "tpot_ms_p99": 8.52,
+          "elapsed_seconds_median": 23.5,
+          "sla_met": true,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 28.63,
+            "std": 0.48,
+            "cv_pct": 1.69,
+            "stability": "stable",
+            "runs": [
+              29.19,
+              28.36,
+              28.33
+            ]
+          }
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 26.48,
+          "ttft_ms_p90": 31.76,
+          "ttft_ms_p99": 34.09,
+          "tpot_ms_p50": 9.72,
+          "tpot_ms_p90": 9.98,
+          "tpot_ms_p99": 10.29,
+          "elapsed_seconds_median": 12.4,
+          "sla_met": true,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 33.94,
+            "std": 0.66,
+            "cv_pct": 1.94,
+            "stability": "stable",
+            "runs": [
+              34.69,
+              33.6,
+              33.51
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Gong-K",
+    "submission_type": "individual",
+    "date": "2026-06-03",
+    "time": "12:06:26",
+    "run_id": "caaded72",
+    "run_name": "nvidia_b200x8_suite_B_nvidia_vllm020_0f6c56e4_caaded72",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm020_0f6c56e4/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-06-03T11:56:47.320969+00:00",
+    "benchmark_end_time": "2026-06-03T12:06:26.750894+00:00",
+    "benchmark_elapsed_minutes": 9.7,
+    "model_load_seconds": 75.8
+  }
+}

@@ -1,0 +1,395 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "nvidia_sglang_c43a8309",
+  "chip": {
+    "name": "NVIDIA RTX A6000",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 48.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-04-29T10:07:24.359391+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA RTX A6000",
+        "vendor": "NVIDIA",
+        "memory_gb": 48.0,
+        "driver_version": "565.57.01",
+        "firmware_version": null,
+        "compute_capability": "8.6",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_topology": "\tGPU0\tNIC0\tNIC1\tNIC2\tNIC3\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \tNODE\tPXB\tSYS\tSYS\t0-37,76-113\t0\t\tN/A\nNIC0\tNODE\t X \tNODE\tSYS\tSYS\t\t\t\t\nNIC1\tPXB\tNODE\t X \tSYS\tSYS\t\t\t\t\nNIC2\tSYS\tSYS\tSYS\t X \tPIX\t\t\t\t\nNIC3\tSYS\tSYS\tSYS\tPIX\t X \t\t\t\t\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n\nNIC Legend:\n\n  NIC0: mlx5_0\n  NIC1: mlx5_1\n  NIC2: mlx5_2\n  NIC3: mlx5_3\n\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8368 CPU @ 2.40GHz",
+      "physical_cores": 76,
+      "logical_cores": 152,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.5,
+    "pcie_generation": "PCIe Gen 1",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_3",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.20",
+    "kernel_version": "5.15.0-60-generic",
+    "runtime_version": "CUDA 12.8",
+    "pytorch_version": "2.9.1+cu128"
+  },
+  "software": {
+    "framework": "SGLang",
+    "framework_version": "0.5.6",
+    "driver_version": "565.57.01",
+    "runtime_version": "CUDA 12.8",
+    "os": "Ubuntu 22.04.4 LTS",
+    "python_version": "3.10.20"
+  },
+  "model": {
+    "model_id": "RedHatAI/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
+    "model_revision": "70371b1b0ea0d4eacfe1ee9056ee805629921c6e",
+    "model_name": null,
+    "model_note": "INT4 weight-only quantization by RedHatAI using AWQ. Weights INT4, activations FP16.",
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "W4A16",
+    "effective_dtype": "auto",
+    "quantization_method": "gptq",
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online",
+      "sustained"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": null
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 1,
+          "throughput_tokens_per_sec": 1116.9,
+          "throughput_tokens_per_sec_per_chip": 1116.9,
+          "elapsed_seconds_median": 31.0,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 4,
+          "throughput_tokens_per_sec": 1115.69,
+          "throughput_tokens_per_sec_per_chip": 1115.69,
+          "elapsed_seconds_median": 31.1,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 16,
+          "throughput_tokens_per_sec": 1120.82,
+          "throughput_tokens_per_sec_per_chip": 1120.82,
+          "elapsed_seconds_median": 31.1,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 64,
+          "throughput_tokens_per_sec": 1117.8,
+          "throughput_tokens_per_sec_per_chip": 1117.8,
+          "elapsed_seconds_median": 31.0,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    },
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 50,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 92.08,
+          "ttft_ms_p90": 210.3,
+          "ttft_ms_p99": 1668.21,
+          "tpot_ms_p50": 53.34,
+          "tpot_ms_p90": 82.0,
+          "tpot_ms_p99": 90.25,
+          "elapsed_seconds_median": 69.4,
+          "sla_met": false
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 91.46,
+          "ttft_ms_p90": 135.97,
+          "ttft_ms_p99": 154.85,
+          "tpot_ms_p50": 71.91,
+          "tpot_ms_p90": 77.39,
+          "tpot_ms_p99": 87.33,
+          "elapsed_seconds_median": 41.6,
+          "sla_met": true
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 83.34,
+          "ttft_ms_p90": 140.37,
+          "ttft_ms_p99": 190.61,
+          "tpot_ms_p50": 85.26,
+          "tpot_ms_p90": 91.49,
+          "tpot_ms_p99": 109.69,
+          "elapsed_seconds_median": 28.4,
+          "sla_met": true
+        },
+        {
+          "target_qps": 50,
+          "achieved_qps": 50.0,
+          "ttft_ms_p50": 75.89,
+          "ttft_ms_p90": 132.81,
+          "ttft_ms_p99": 204.46,
+          "tpot_ms_p50": 89.48,
+          "tpot_ms_p90": 98.79,
+          "tpot_ms_p99": 119.35,
+          "elapsed_seconds_median": 24.4,
+          "sla_met": true
+        }
+      ]
+    },
+    "sustained": {
+      "sustained_concurrency": 8,
+      "duration_minutes": 15,
+      "warmup_minutes": 1,
+      "sample_interval_seconds": 60,
+      "samples": [
+        {
+          "minute": 1.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 564.4,
+          "tokens_out": 33886,
+          "tokens_in": 0,
+          "requests_completed": 192,
+          "ttft_ms_p50": 75.0,
+          "ttft_ms_p99": 2609.7
+        },
+        {
+          "minute": 2.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 660.3,
+          "tokens_out": 39619,
+          "tokens_in": 0,
+          "requests_completed": 220,
+          "ttft_ms_p50": 36.6,
+          "ttft_ms_p99": 49.9
+        },
+        {
+          "minute": 3.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 661.9,
+          "tokens_out": 39693,
+          "tokens_in": 0,
+          "requests_completed": 227,
+          "ttft_ms_p50": 37.1,
+          "ttft_ms_p99": 53.5
+        },
+        {
+          "minute": 4.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 660.9,
+          "tokens_out": 39668,
+          "tokens_in": 0,
+          "requests_completed": 221,
+          "ttft_ms_p50": 36.6,
+          "ttft_ms_p99": 52.1
+        },
+        {
+          "minute": 5.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 655.8,
+          "tokens_out": 39353,
+          "tokens_in": 0,
+          "requests_completed": 220,
+          "ttft_ms_p50": 37.1,
+          "ttft_ms_p99": 54.3
+        },
+        {
+          "minute": 6.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 659.7,
+          "tokens_out": 39582,
+          "tokens_in": 0,
+          "requests_completed": 220,
+          "ttft_ms_p50": 37.0,
+          "ttft_ms_p99": 51.8
+        },
+        {
+          "minute": 7.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 662.5,
+          "tokens_out": 39746,
+          "tokens_in": 0,
+          "requests_completed": 223,
+          "ttft_ms_p50": 36.6,
+          "ttft_ms_p99": 51.8
+        },
+        {
+          "minute": 8.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 662.2,
+          "tokens_out": 39737,
+          "tokens_in": 0,
+          "requests_completed": 225,
+          "ttft_ms_p50": 36.7,
+          "ttft_ms_p99": 52.9
+        },
+        {
+          "minute": 9.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 660.2,
+          "tokens_out": 39589,
+          "tokens_in": 0,
+          "requests_completed": 219,
+          "ttft_ms_p50": 36.7,
+          "ttft_ms_p99": 54.6
+        },
+        {
+          "minute": 10.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 655.2,
+          "tokens_out": 39332,
+          "tokens_in": 0,
+          "requests_completed": 222,
+          "ttft_ms_p50": 36.6,
+          "ttft_ms_p99": 50.8
+        },
+        {
+          "minute": 11.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 660.2,
+          "tokens_out": 39602,
+          "tokens_in": 0,
+          "requests_completed": 220,
+          "ttft_ms_p50": 36.5,
+          "ttft_ms_p99": 52.5
+        },
+        {
+          "minute": 12.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 662.3,
+          "tokens_out": 39733,
+          "tokens_in": 0,
+          "requests_completed": 228,
+          "ttft_ms_p50": 36.6,
+          "ttft_ms_p99": 48.4
+        },
+        {
+          "minute": 13.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 663.9,
+          "tokens_out": 39837,
+          "tokens_in": 0,
+          "requests_completed": 220,
+          "ttft_ms_p50": 37.0,
+          "ttft_ms_p99": 52.1
+        },
+        {
+          "minute": 14.0,
+          "is_warmup": false,
+          "throughput_tokens_per_sec": 662.6,
+          "tokens_out": 39752,
+          "tokens_in": 0,
+          "requests_completed": 223,
+          "ttft_ms_p50": 36.5,
+          "ttft_ms_p99": 53.4
+        }
+      ],
+      "sustained_throughput_tokens_per_sec": 653.7,
+      "throttle_ratio": 0.85,
+      "throttle_onset_minute": 1.0,
+      "ttft_p99_drift_ms": -2556.3
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.57,
+    "baseline_delta": 0.0,
+    "valid": true,
+    "framework": "SGLang",
+    "precision": "W4A16",
+    "notes": "Integrated accuracy check — used same SGLang instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "Gong-K",
+    "submission_type": "individual",
+    "date": "2026-04-29",
+    "time": "11:39:27",
+    "run_id": "5daf2609",
+    "run_name": "nvidia_rtx_a6000x1_suite_C_nvidia_sglang_c43a8309_5daf2609",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_sglang_c43a8309/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-04-29T11:31:05.380698+00:00",
+    "benchmark_end_time": "2026-04-29T11:39:27.782384+00:00",
+    "benchmark_elapsed_minutes": 31.7,
+    "model_load_seconds": 47.3,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online', 'sustained'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/community/nvidia_rtx_a6000x1_suite_C_nvidia_sglang_c43a8309_4c65fcfb/w4a16/offline",
+      "online": "results/community/nvidia_rtx_a6000x1_suite_C_nvidia_sglang_c43a8309_4c65fcfb/w4a16/online",
+      "sustained": "results/community/nvidia_rtx_a6000x1_suite_C_nvidia_sglang_c43a8309_4c65fcfb/w4a16/sustained"
+    }
+  }
+}

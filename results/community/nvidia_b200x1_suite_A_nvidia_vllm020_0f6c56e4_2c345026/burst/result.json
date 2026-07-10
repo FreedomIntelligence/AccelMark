@@ -1,0 +1,161 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "implementation_id": "nvidia_vllm020_0f6c56e4",
+  "chip": {
+    "name": "NVIDIA B200",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 179.1,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-05-22T10:08:28.757340+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA B200",
+        "vendor": "NVIDIA",
+        "memory_gb": 179.1,
+        "driver_version": "595.71.05",
+        "firmware_version": null,
+        "compute_capability": "10.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "nvidia",
+    "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t0-47,96-143\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8559C",
+      "physical_cores": 96,
+      "logical_cores": 192,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1996.0,
+    "pcie_generation": "PCIe Gen 5",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13",
+    "kernel_version": "6.17.0-1013-aws",
+    "runtime_version": "CUDA 13.0",
+    "pytorch_version": "2.11.0+cu130"
+  },
+  "software": {
+    "framework": "vLLM",
+    "framework_version": "0.20.1+transformers-5.9.0",
+    "driver_version": "595.71.05",
+    "runtime_version": "CUDA 13.0",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.13"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "burst",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "burst": {
+      "sla_ttft_ms": 500,
+      "burst_steady_qps": 5,
+      "burst_peak_qps": 25,
+      "burst_duration_seconds": 30,
+      "burst_interval_seconds": 120,
+      "steady_requests_total": 1812,
+      "burst_requests_total": 2245,
+      "steady_ttft_p50_ms": 14.03,
+      "steady_ttft_p99_ms": 26.7,
+      "burst_ttft_p50_ms": 15.6,
+      "burst_ttft_p99_ms": 22.99,
+      "sla_met_during_burst": true,
+      "burst_degradation_ratio": 0.861,
+      "recovery_time_seconds": 1.0,
+      "recovery_time_seconds_per_cycle": [
+        1.54,
+        0.47
+      ],
+      "_recovery_definition": "Median seconds within the post-burst steady window before rolling TTFT p99 drops below 1.5x the long-term steady baseline. Lower is better; None means it never recovered within the window.",
+      "results_by_cycle": [
+        {
+          "cycle": 1,
+          "steady_requests": 581,
+          "burst_requests": 760,
+          "steady_ttft_p99_ms": 33.62,
+          "burst_ttft_p99_ms": 22.98
+        },
+        {
+          "cycle": 2,
+          "steady_requests": 595,
+          "burst_requests": 734,
+          "steady_ttft_p99_ms": 19.28,
+          "burst_ttft_p99_ms": 22.86
+        },
+        {
+          "cycle": 3,
+          "steady_requests": 636,
+          "burst_requests": 751,
+          "steady_ttft_p99_ms": 19.65,
+          "burst_ttft_p99_ms": 23.15
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Gong-K",
+    "submission_type": "individual",
+    "date": "2026-05-22",
+    "time": "12:15:49",
+    "run_id": "2c345026",
+    "run_name": "nvidia_b200x1_suite_A_nvidia_vllm020_0f6c56e4_2c345026",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_vllm020_0f6c56e4/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-05-22T12:07:57.193442+00:00",
+    "benchmark_end_time": "2026-05-22T12:15:49.102951+00:00",
+    "benchmark_elapsed_minutes": 7.9,
+    "model_load_seconds": 14.6
+  }
+}
