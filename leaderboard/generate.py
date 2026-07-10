@@ -300,6 +300,7 @@ def extract_detail(result: dict) -> dict:
         "acc_notes":          accuracy.get("notes"),
         "meta_submitted_by":     meta.get("submitted_by"),
         "meta_submission_type":  meta.get("submission_type"),
+        "meta_reproduces_run_id": meta.get("reproduces_run_id"),
         "meta_date":             meta.get("date"),
         "meta_reproduce_script": meta.get("reproduce_script"),
         "meta_elapsed_min":      meta.get("benchmark_elapsed_minutes"),
@@ -882,6 +883,7 @@ def extract_row(result: dict) -> dict:
         "notes":            meta.get("notes"),
         "run_id":           meta.get("run_id"),
         "run_name":         meta.get("run_name"),
+        "reproduces_run_id": meta.get("reproduces_run_id"),
         "flagged":          meta.get("flagged"),
         "scaling_efficiency_2x":   scaling_efficiency_2x,
         "scaling_efficiency_4x":   scaling_efficiency_4x,
@@ -1458,36 +1460,24 @@ def generate_distribution_data(results: list[dict], output_dir: Path) -> None:
           f"({group_count} groups, {submission_count} submissions).")
 
 
-def _bust_index_cache(data_path: Path, index_path: Path) -> None:
-    """Rewrite <script src="leaderboard.js?v=<sha8>"> to match the short SHA-256."""
-    if not index_path.exists():
-        return
-    sha8 = hashlib.sha256(data_path.read_bytes()).hexdigest()[:8]
-    html = index_path.read_text(encoding='utf-8')
-    pattern = re.compile(
-        r'(<script\s+src="leaderboard\.js)(?:\?v=[0-9a-f]+)?(")',
-        re.IGNORECASE,
-    )
-    new_html, n = pattern.subn(rf'\1?v={sha8}\2', html)
-    if n and new_html != html:
-        index_path.write_text(new_html, encoding='utf-8')
-        print(f"  cache-busted leaderboard.js → ?v={sha8}")
-
-
-def _bust_distribution_cache(data_path: Path, html_path: Path) -> None:
-    """为 distribution.html 添加缓存破坏版本号"""
+def _bust_script_cache(data_path: Path, html_path: Path, script_name: str) -> None:
+    """Rewrite <script src="NAME.js?v=<sha8>"> in html_path to match data file hash."""
     if not html_path.exists() or not data_path.exists():
         return
     sha8 = hashlib.sha256(data_path.read_bytes()).hexdigest()[:8]
     html = html_path.read_text(encoding='utf-8')
     pattern = re.compile(
-        r'(<script\s+src="distribution\.js)(?:\?v=[0-9a-f]+)?(")',
+        rf'(<script\s+src="{re.escape(script_name)})(?:\?v=[0-9a-f]+)?(")',
         re.IGNORECASE,
     )
     new_html, n = pattern.subn(rf'\1?v={sha8}\2', html)
     if n and new_html != html:
         html_path.write_text(new_html, encoding='utf-8')
-        print(f"  cache-busted distribution.js → ?v={sha8}")
+        print(f"  cache-busted {script_name} → ?v={sha8}")
+
+
+def _bust_index_cache(data_path: Path, index_path: Path) -> None:
+    _bust_script_cache(data_path, index_path, "leaderboard.js")
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
@@ -1548,15 +1538,11 @@ def main():
     
     # 生成分布数据
     generate_distribution_data(results, SITE_DIR)
-    
-    # 为 distribution.html 做缓存破坏
+
     dist_js = SITE_DIR / "distribution.js"
-    dist_html = SITE_DIR / "distribution.html"
-    if dist_js.exists() and dist_html.exists():
-        _bust_distribution_cache(dist_js, dist_html)
-        print("  distribution.html cache-busted")
-    else:
-        print(f"  distribution.html or distribution.js not found, skip cache bust")
+    index_html = SITE_DIR / "index.html"
+    if dist_js.exists():
+        _bust_script_cache(dist_js, index_html, "distribution.js")
 
 
 if __name__ == "__main__":

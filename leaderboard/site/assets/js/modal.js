@@ -20,8 +20,13 @@
 import { rowByRunId, SUITE_META } from "./data.js";
 import {
   esc, shortVersion, fmtDate, submitterHandle, chipSlug,
-  downloadCanvasAsPng, flashButtonLabel,
+  downloadCanvasAsPng, flashButtonLabel, copyToClipboard,
 } from "./utils.js";
+import {
+  runCanonicalUrl, runMarkdownCard, runBibTeX, discussResultUrl,
+  DISCUSS_TEMPLATES,
+} from "./cite.js";
+import { downloadResultShareCard } from "./share-card.js";
 
 // ── Module state ──
 let _modalEl = null;
@@ -88,8 +93,23 @@ export function initModal() {
         <section class="modal-panel" data-panel="impl"    role="tabpanel" id="run-modal-panel-impl"    aria-labelledby="run-modal-tab-impl"    tabindex="0"></section>
       </div>
       <footer class="modal-footer">
-        <span class="modal-submission">—</span>
-        <a class="modal-script-link" target="_blank" rel="noopener">View reproduce script ↗</a>
+        <div class="modal-share">
+          <span class="modal-share-label">Share &amp; cite</span>
+          <button class="btn small copy-btn" type="button" data-share="link">Copy link</button>
+          <button class="btn small copy-btn" type="button" data-share="markdown">Copy Markdown</button>
+          <button class="btn small copy-btn" type="button" data-share="bibtex">Copy BibTeX</button>
+          <button class="btn small copy-btn" type="button" data-share="png">Download PNG</button>
+        </div>
+        <div class="modal-discuss">
+          <span class="modal-share-label">Discuss</span>
+          ${DISCUSS_TEMPLATES.map((t) => `
+            <a class="btn small discuss-btn" data-discuss="${esc(t.id)}" target="_blank" rel="noopener" title="${esc(t.label)}">${esc(t.short)} ↗</a>
+          `).join("")}
+        </div>
+        <div class="modal-footer-meta">
+          <span class="modal-submission">—</span>
+          <a class="modal-script-link" target="_blank" rel="noopener">View reproduce script ↗</a>
+        </div>
       </footer>
     </div>
   `;
@@ -112,6 +132,16 @@ export function initModal() {
     if (dlBtn && _modalEl.contains(dlBtn)) {
       ev.preventDefault();
       _downloadVizChart(dlBtn);
+      return;
+    }
+    const shareBtn = ev.target.closest("[data-share]");
+    if (shareBtn && _currentRow && shareBtn.dataset.share !== "discuss") {
+      ev.preventDefault();
+      if (shareBtn.dataset.share === "png") {
+        _downloadSharePng(shareBtn, _currentRow);
+      } else {
+        _copyShare(shareBtn, _currentRow);
+      }
       return;
     }
     // Pills / buttons that ask the modal to scroll to a named section
@@ -263,6 +293,25 @@ function _setHashRunParam(runId) {
   }
 }
 
+// ── Share / cite ──
+
+async function _copyShare(btn, row) {
+  const kind = btn.dataset.share;
+  let text = "";
+  if (kind === "link") text = runCanonicalUrl(row.run_id);
+  else if (kind === "markdown") text = runMarkdownCard(row);
+  else if (kind === "bibtex") text = runBibTeX(row);
+  else return;
+  const ok = await copyToClipboard(text);
+  flashButtonLabel(btn, ok ? "Copied!" : "Failed", 1400, ok ? "is-copied" : "is-copy-failed");
+}
+
+async function _downloadSharePng(btn, row) {
+  flashButtonLabel(btn, "Rendering…", 800);
+  const ok = await downloadResultShareCard(row);
+  flashButtonLabel(btn, ok ? "Saved!" : "Failed", 1400, ok ? "is-copied" : "is-copy-failed");
+}
+
 // ── Header / footer ──
 
 function _fillModal(row) {
@@ -310,9 +359,11 @@ function _fillModal(row) {
   // Footer: submission + script link.
   const subInfo = _modalEl.querySelector(".modal-submission");
   const handle = submitterHandle(row.submitted_by);
-  subInfo.textContent =
-    `Submission: ${row.submission || row.run_id || "—"}` +
-    (handle ? ` · by @${handle}` : "");
+  subInfo.innerHTML =
+    `Submission: ${esc(row.submission || row.run_id || "—")}` +
+    (handle
+      ? ` · by <a class="modal-contrib-link" href="#/contributor/${esc(handle)}">@${esc(handle)}</a>`
+      : "");
 
   const scriptLink = _modalEl.querySelector(".modal-script-link");
   const impl = row.impl || {};
@@ -335,6 +386,10 @@ function _fillModal(row) {
   } else {
     scriptLink.removeAttribute("href");
     scriptLink.style.display = "none";
+  }
+
+  for (const link of _modalEl.querySelectorAll("[data-discuss]")) {
+    link.href = discussResultUrl(row, link.dataset.discuss);
   }
 
   // Hide tabs whose data is missing.

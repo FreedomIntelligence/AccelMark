@@ -158,6 +158,42 @@
   flex-direction: column;
 }
 
+/* Suite cards: tighter recipe line so chip · framework fits more often */
+.suite-card .lb-row {
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  padding: 0.48rem 0.5rem;
+}
+.suite-card .lb-row-name {
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.28;
+}
+.suite-card .lb-row-chip {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.suite-card .lb-row-chip .lb-row-fw {
+  font-weight: 500;
+  font-size: 0.94em;
+  color: var(--fg-muted);
+}
+.suite-card .lb-row-chip .lb-row-fw .fw-ver {
+  font-size: 0.88em;
+}
+.suite-card .lb-row-sub {
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+.suite-card .lb-row.lb-row--featured .lb-row-name { font-size: 0.88rem; }
+.suite-card .lb-row-score .score-val { font-size: 0.88rem; }
+.suite-card .lb-row.lb-row--featured .lb-row-score .score-val { font-size: 0.92rem; }
+.suite-card .lb-row-score .score-unit { font-size: 0.62rem; }
+
 .suite-card-foot {
   padding: 0.55rem 1.15rem 1rem;
   text-align: center;
@@ -267,23 +303,34 @@
   font-weight: 600;
   color: var(--fg-strong);
   line-height: 1.2;
+  min-width: 0;
+  text-decoration: none;
+  display: block;
+  position: relative;
+  transition: color 100ms ease;
+}
+.lb-row-chip {
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  /* Renders as an <a> so the chip name navigates to /chip/<slug> while
-     the rest of the row opens the run modal.  Suppress the default
-     underline and surface it only on hover to keep the row visually
-     quiet. */
-  text-decoration: none;
-  display: inline-block;
-  max-width: 100%;
-  transition: color 100ms ease;
+}
+.lb-row-chip .lb-row-fw {
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+.lb-row-chip .lb-row-fw .fw-ver {
+  font-size: 0.85em;
+  color: var(--fg-faint);
 }
 .lb-row-name:hover {
   color: var(--accent-2);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
+}
+.lb-row-name:hover .lb-row-chip {
+  text-decoration: inherit;
 }
 .lb-row-sub {
   display: flex;
@@ -294,12 +341,6 @@
   line-height: 1.25;
   flex-wrap: nowrap;
   min-width: 0;
-}
-.lb-row-sub .fw-line {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .lb-row-byline {
   display: block;
@@ -322,6 +363,18 @@
 
 .lb-row-sub .sub-sep { color: var(--fg-faint); flex: 0 0 auto; }
 .lb-row-sub .vendor-name { color: var(--fg-muted); flex: 0 0 auto; }
+.lb-row-sub .fw-line {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.lb-row-sub .prec-tag {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg-muted);
+}
 .lb-row-sub .fw-ver {
   color: var(--fg-faint);
   font-size: 0.7rem;
@@ -347,6 +400,9 @@
   flex-direction: column;
   align-items: flex-end;
   line-height: 1.1;
+  flex-shrink: 0;
+  min-width: 4.25rem;
+  padding-left: 0.35rem;
 }
 .lb-row-score .score-val {
   font-size: 1rem;
@@ -508,23 +564,73 @@
 .submit-card .eyebrow { justify-content: center; }
 .submit-card .eyebrow::before { display: none; }
 .submit-title {
-  font-size: 2.85rem;
+  font-size: 2.35rem;
   font-weight: 700;
-  margin: 0.6rem 0 0.95rem;
+  margin: 0.6rem 0 0.85rem;
   color: var(--fg-strong);
   letter-spacing: -0.025em;
-  line-height: 1.05;
+  line-height: 1.08;
 }
 .submit-body {
-  margin: 0 auto 1.75rem;
+  margin: 0 auto 1.15rem;
   color: var(--fg-muted);
-  font-size: 1.08rem;
-  line-height: 1.65;
-  max-width: 58ch;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.submit-body-foot {
+  margin: 0 auto 1.35rem;
+  font-size: 0.88rem;
+  max-width: 52ch;
+}
+.submit-body-foot a { color: var(--accent-2); font-weight: 500; }
+.submit-quickstart {
+  margin: 0 auto 1.1rem;
+  padding: 0;
+  max-width: 42rem;
+  list-style: none;
+  text-align: left;
+  counter-reset: submit-step;
+}
+.submit-quickstart li {
+  position: relative;
+  margin: 0 0 0.65rem;
+  padding: 0.65rem 0.85rem 0.65rem 2.35rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  background: var(--bg-elev);
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--fg-muted);
+  counter-increment: submit-step;
+}
+.submit-quickstart li::before {
+  content: counter(submit-step);
+  position: absolute;
+  left: 0.75rem;
+  top: 0.72rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  background: color-mix(in srgb, var(--accent-2) 12%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--accent-2) 25%, var(--border-soft));
+}
+.submit-quickstart li strong { color: var(--fg-strong); font-weight: 600; }
+.submit-quickstart code {
+  font-size: 0.88em;
+  padding: 0.08em 0.3em;
+  border-radius: 3px;
+  background: var(--bg);
 }
 @media (max-width: 720px) {
-  .submit-title { font-size: 2.2rem; }
-  .submit-body { font-size: 1rem; }
+  .submit-title { font-size: 1.85rem; }
+  .submit-body { font-size: 0.92rem; }
 }
 .submit-cta {
   display: flex;

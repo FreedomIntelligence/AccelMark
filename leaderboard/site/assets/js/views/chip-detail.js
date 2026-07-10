@@ -44,7 +44,7 @@ export function render({ el, params }) {
         <p class="chip-empty-sub">It may have been removed, or the link is from an older revision of the dataset.</p>
         <div class="hero-cta" style="justify-content:center;margin-top:1rem">
           <a class="btn primary" href="#/">Back to home</a>
-          <a class="btn" href="#/rankings">Browse rankings</a>
+        <a class="btn" href="#/rankings">Browse results</a>
         </div>
       </section>
     `;
@@ -102,9 +102,9 @@ export function render({ el, params }) {
       <p class="hero-sub">${factPills.map(esc).join(" · ")}</p>
       <div class="hero-cta">
         ${latestRid
-          ? `<a class="btn primary" href="#/compare?runs=${encodeURIComponent(latestRid)}">Compare this chip</a>`
+          ? `<a class="btn primary" href="#/compare?runs=${encodeURIComponent(latestRid)}">Compare configurations</a>`
           : ""}
-        <a class="btn" href="#/rankings?vendor=${encodeURIComponent(sample.vendor)}">Browse ${esc(sample.vendor)} rankings</a>
+        <a class="btn" href="#/rankings?vendor=${encodeURIComponent(sample.vendor)}">Browse ${esc(sample.vendor)} results</a>
         <button class="btn copy-btn chip-share-btn"
                 type="button"
                 data-chip-share="1"
@@ -119,7 +119,7 @@ export function render({ el, params }) {
       <div class="section-header section-header--stacked">
         <div class="section-title">
           <span class="eyebrow">01 · Best per suite</span>
-          <h2>Where this chip lands</h2>
+          <h2>Best result per suite</h2>
         </div>
         <p class="section-sub">Top primary-metric run in each suite. Click a card to open its details.</p>
       </div>
@@ -724,7 +724,7 @@ function renderSuiteCard(sid, row, chipSlug) {
         <span class="chip-suite-title">${esc(meta.title)}</span>
         ${rank ? `
           <span class="chip-suite-rank${medal}"
-                title="Ranked #${rank.rank} of ${rank.total} chips in Suite ${esc(meta.letter)}">
+                title="Ranked #${rank.rank} of ${rank.total} in Suite ${esc(meta.letter)}">
             #${rank.rank}<span class="chip-suite-rank-total"> / ${rank.total}</span>
           </span>
         ` : ""}

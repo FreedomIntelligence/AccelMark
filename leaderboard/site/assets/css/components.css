@@ -198,8 +198,12 @@
   font-weight: 700;
   color: var(--fg-strong);
   letter-spacing: -0.025em;
-  line-height: 1.05;
-  max-width: 22ch;
+  line-height: 1.12;
+  max-width: none;
+}
+.hero-title-phrase {
+  display: block;
+  white-space: nowrap;
 }
 .hero .hero-sub {
   margin: 0 auto 1.4rem;
@@ -300,6 +304,7 @@
 @media (max-width: 640px) {
   .hero { padding: 1.75rem 0.5rem 2rem; }
   .hero h1 { font-size: 1.85rem; }
+  .hero-title-phrase { white-space: normal; }
   .hero .tagline { font-size: 0.92rem; }
   .hero-stats { padding: 0.9rem 0; }
   .kpi { padding: 0 0.85rem; min-width: 4rem; }

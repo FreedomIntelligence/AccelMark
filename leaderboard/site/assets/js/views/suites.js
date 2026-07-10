@@ -318,7 +318,7 @@ export function render({ el }) {
         the full inference workload spectrum.
       </p>
       <div class="hero-cta">
-        <a class="btn primary" href="#/rankings">Browse rankings →</a>
+        <a class="btn primary" href="#/rankings">Browse results →</a>
         <a class="btn" href="${GH_BASE}/tree/main/suites" target="_blank" rel="noopener">Suite spec on GitHub</a>
       </div>
     </section>
@@ -662,7 +662,7 @@ function renderSuiteSpec(suiteId) {
         <div class="suite-spec-cta">
           <a class="btn primary small"
              href="${esc(buildHash("/rankings", { suite: suiteId }))}">
-            Open ranking →
+            Open results →
           </a>
           <a class="btn small"
              href="${GH_BASE}/blob/main/suites/${esc(suiteId)}/suite.json"
@@ -692,7 +692,7 @@ function renderLeaderRow(suiteId, scn) {
       <span class="scn-pill ${pillClass}">${esc(scn.name)}</span>
       <a class="leader-chip"
          href="${esc(buildHash("/rankings", { suite: suiteId }))}"
-         title="View ${esc(scn.name)} ranking">
+         title="View ${esc(scn.name)} results">
         <span class="leader-vendor" data-vendor="${esc(row.vendor)}"></span>
         <span class="leader-chip-name">${esc(row._chip_label)}</span>
       </a>
