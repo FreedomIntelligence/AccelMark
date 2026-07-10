@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.61,
+  "baseline_delta": null,
+  "valid": true,
+  "framework": "1Cat-vLLM",
+  "precision": "FP16",
+  "notes": "Integrated accuracy check \u2014 used same 1Cat-vLLM instance as benchmark."
+}

@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.07,
+  "baseline_delta": -0.53,
+  "valid": false,
+  "framework": "vllm-musa",
+  "precision": "BF16",
+  "notes": "Integrated accuracy check \u2014 used same vllm-musa instance as benchmark."
+}
