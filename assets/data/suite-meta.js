@@ -14,6 +14,7 @@
 export const SUITE_META = {
   suite_A: {
     letter: "A",
+    chartPurpose: "Single-chip inference",
     title: "Single-chip throughput",
     tagline: "How fast can one accelerator serve an 8B model?",
     description:
@@ -50,6 +51,7 @@ export const SUITE_META = {
   },
   suite_B: {
     letter: "B",
+    chartPurpose: "Large-model multi-chip inference",
     title: "Multi-chip throughput",
     tagline: "Large-model serving across multiple chips.",
     description:
@@ -83,6 +85,7 @@ export const SUITE_META = {
   },
   suite_C: {
     letter: "C",
+    chartPurpose: "Quantization efficiency",
     title: "Quantization efficiency",
     tagline: "Quality-adjusted throughput across precision formats.",
     description:
@@ -110,6 +113,7 @@ export const SUITE_META = {
   },
   suite_D: {
     letter: "D",
+    chartPurpose: "Long-context inference",
     title: "Long-context inference",
     tagline: "28K-token prefill, compute-bound regime.",
     description:
@@ -141,6 +145,7 @@ export const SUITE_META = {
   },
   suite_E: {
     letter: "E",
+    chartPurpose: "Multi-chip scaling",
     title: "Multi-chip scaling efficiency",
     tagline: "How well does 8B throughput scale to 2 / 4 / 8 chips?",
     description:
@@ -167,6 +172,7 @@ export const SUITE_META = {
   },
   suite_F: {
     letter: "F",
+    chartPurpose: "Edge / consumer GPU",
     title: "Edge / consumer hardware",
     tagline: "Small models on single-GPU edge hardware.",
     description:
@@ -198,6 +204,7 @@ export const SUITE_META = {
   },
   suite_G: {
     letter: "G",
+    chartPurpose: "MoE multi-chip inference",
     title: "Mixture-of-Experts (MoE)",
     tagline: "Sparse routing; bandwidth-bound multi-chip serving.",
     description:

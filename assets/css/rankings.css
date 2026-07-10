@@ -464,6 +464,14 @@
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
+.data-table td.col-chip .rk-chip-fw {
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+.data-table td.col-chip .rk-chip-fw .fw-ver {
+  font-size: 0.85em;
+  color: var(--fg-faint);
+}
 .data-table td.col-chip .rk-chip-meta {
   display: block;
   margin-top: 0.1rem;

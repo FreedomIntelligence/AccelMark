@@ -78,15 +78,15 @@ export function render({ el, query }) {
         <span class="eyebrow">Compare</span>
         <h1 class="cmp-hero-title">Side-by-Side Comparison</h1>
         <p class="cmp-hero-sub">
-          Pick chips below to start a head-to-head across every metric.
+          Pick platforms below to start a head-to-head across every metric.
           You can also tick runs from
-          <a class="cmp-hero-link" href="#/rankings">any rankings page</a>
-          to compare specific framework / precision configurations.
+          <a class="cmp-hero-link" href="#/rankings">any results page</a>
+          to compare specific framework and precision configurations.
         </p>
       </section>
       ${renderChipCloudBlock({
-        title: "Pick chips to compare",
-        hint: "Each click adds that chip's most recent run.  Choose any two or more.",
+        title: "Quick-add by platform",
+        hint: "Each click adds that platform's most recent run. Choose any two or more.",
         compact: false,
       })}
     `;
@@ -114,7 +114,7 @@ export function render({ el, query }) {
         <p class="cmp-hero-sub">
           This comparison link refers to ${runIds.length === 1 ? "a run" : `${runIds.length} runs`}
           that ${runIds.length === 1 ? "is" : "are"} no longer in the dataset
-          (re-uploaded or pruned). Pick chips below to start a new comparison.
+          (re-uploaded or pruned). Pick platforms below to start a new comparison.
         </p>
       </section>
       <div class="cmp-basket cmp-basket--empty">
@@ -125,8 +125,8 @@ export function render({ el, query }) {
         </div>
       </div>
       ${renderChipCloudBlock({
-        title: "Pick chips to compare",
-        hint: "Each click adds that chip's most recent run.  Choose any two or more.",
+        title: "Quick-add by platform",
+        hint: "Each click adds that platform's most recent run. Choose any two or more.",
         compact: false,
       })}
     `;
@@ -178,8 +178,8 @@ export function render({ el, query }) {
     </section>
 
     ${renderChipCloudBlock({
-      title: "Pick chips to compare",
-      hint: "Click a chip to add or remove its most recent run.  Already-selected chips are highlighted.",
+      title: "Quick-add by platform",
+      hint: "Click a platform to add or remove its most recent run. Already-selected platforms are highlighted.",
       compact: true,
     })}
 
@@ -208,7 +208,7 @@ export function render({ el, query }) {
     ${suiteEmpty ? `
       <div class="cmp-suite-empty">
         <span class="state-icon" aria-hidden="true">∅</span>
-        <p>None of the selected chips have <strong>Suite ${esc(meta.letter)} · ${esc(meta.title)}</strong> data.</p>
+        <p>None of the selected configurations have <strong>Suite ${esc(meta.letter)} · ${esc(meta.title)}</strong> data.</p>
         ${suitesWithData.length ? `
           <p class="cmp-suite-empty-sub">Try
             ${suitesWithData.map((sid) => `
@@ -218,7 +218,7 @@ export function render({ el, query }) {
             `).join(" · ")}
             instead.
           </p>
-        ` : `<p class="cmp-suite-empty-sub">The chips you picked have no submissions on file.</p>`}
+        ` : `<p class="cmp-suite-empty-sub">The platforms you picked have no submissions on file.</p>`}
       </div>
     ` : `
       <div class="cmp-table-wrap">
@@ -672,7 +672,7 @@ function _scalingCurves(chips) {
   }
   if (!countSet.size) return [];
   const counts = Array.from(countSet).sort((a, b) => a - b);
-  const labels = counts.map((n) => n + "× GPU");
+  const labels = counts.map((n) => n + "× chips");
   const throughputDs = chips.map((c, i) => {
     const v = c.suiteRow.viz;
     let data = [];
