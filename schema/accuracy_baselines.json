@@ -44,5 +44,10 @@
     "revision": "eba92302a2861cdc0098cc54bc9f17cb2c47eb61",
     "bf16_baseline_score": 0.62,
     "notes": "Measured on A100 SXM4 40GBx2, vLLM 0.7.3, CUDA 12.1"
+  },
+  "mistralai/Mistral-7B-Instruct-v0.1": {
+    "revision": "26bca36bde8333b5d7f72e9ed20ccda6a618af24",
+    "bf16_baseline_score": null,
+    "_note": "Baseline pending — establish on first successful BF16 run. Expected ~0.55–0.60 on MMLU (4-shot)."
   }
 }

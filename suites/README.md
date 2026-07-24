@@ -16,6 +16,7 @@ AI accelerators apples-to-apples.
 | [Suite E](#suite-e) | Llama-3-8B-Instruct | 1×/2×/4×/8× | offline | Multi-chip scaling efficiency |
 | [Suite F](#suite-f) | Qwen2.5-0.5B-Instruct | 1 (recommended) | offline, online, interactive | Consumer/edge single-GPU inference |
 | [Suite G](#suite-g) | Mixtral-8x7B-Instruct-v0.1 | ≥2 (auto) | offline, online (+ interactive, sustained extra) | MoE multi-chip inference |
+| [Suite H](#suite-h) | Mistral-7B-Instruct-v0.1 | 1 | offline, online (+ interactive, sustained, burst extra) | SWA architecture diversity — isolates sliding window attention effect on roofline intensity |
 
 ---
 
@@ -711,6 +712,110 @@ The MMLU accuracy baseline for Mixtral-8x7B is pending — `bf16_baseline_score`
 is set to `null` in `schema/accuracy_baselines.json`. Run the accuracy scenario
 on 2×A100-80GB BF16 to establish the baseline before accepting community
 submissions.
+
+---
+
+## Suite H
+
+**SWA architecture diversity — isolates sliding window attention effect on roofline intensity**
+
+```
+Model:     mistralai/Mistral-7B-Instruct-v0.1
+Chips:     1
+Precision: BF16 (FP16 allowed)
+```
+
+Suite H is the **architecture-diversity companion to Suite A**. Both suites share
+identical operating points (same dataset, prompt lengths, concurrency levels,
+context cap) — the only variable is the model's attention mechanism:
+
+| | Suite A | Suite H |
+|---|---|---|
+| Model | Llama-3-8B-Instruct | Mistral-7B-Instruct-v0.1 |
+| Attention | Full (GQA) | **Sliding Window Attention (w=4096)** (GQA) |
+| Layers | 32 | 32 |
+| Heads (Q/KV) | 32 / 8 | 32 / 8 |
+| Hidden dim | 4096 | 4096 |
+| model_type | llama | mistral |
+
+Mistral-7B-v0.1 is the canonical SWA model — the first production LLM to use
+sliding window attention with GQA. All layers use SWA with a 4096-token window
+(no hybrid interleaving like Gemma 3/4). At ≤4096 context, the window covers
+the full sequence, so the attention *compute* is identical to full attention.
+The architectural difference manifests in **KV-cache memory pressure** —
+SWA caps per-layer KV storage at `window_size × heads` regardless of sequence
+length, while full attention grows with `sequence_length × heads`.
+
+### Why Mistral-7B and not a newer SWA model?
+
+| Model | Architecture | Cross-platform? | Rationale |
+|-------|-------------|----------------|-----------|
+| Gemma 4 12B | Hybrid 5:1 SWA (w=1024) | ❌ needs vLLM 0.15+ → breaks V100/Ascend/TPU | Too new for multi-vendor eval |
+| Gemma 3 12B | Hybrid 5:1 SWA (w=1024) | ❌ needs vLLM 0.11+ | Same as above |
+| Qwen3-8B | SWA disabled by default | ❌ vLLM forces full attention | SWA is not functional in practice |
+| Mistral-7B-v0.1 | Pure SWA (w=4096) | ✅ vLLM 0.5+ / all platforms | **Reference SWA implementation, universally supported** |
+
+AccelMark's multi-vendor evaluation requires models that work on **all**
+platforms: NVIDIA (V100 through H200), Ascend 910-series, Google TPU v5/v6,
+AMD MI300X, and Moore Threads S-series. Mistral's standard architecture is
+supported by every inference framework since 2023.
+
+### Scenarios
+
+```
+concurrency_levels:    [8, 32, 128]     — identical to Suite A
+online_qps_levels:     [5, 25, 100]
+online_sla_ttft_ms:    500
+request_count:         100 (offline)
+online_request_count:  300
+interactive_request_count: 150
+num_runs:              3 + 1 warmup
+```
+
+Default scenarios match Suite A: **accuracy → offline → online**.
+Extra scenarios: interactive, sustained, burst.
+
+### Expected intensity profile
+
+Using AccelMark's empirical profiling module (`profiling/`), we can directly
+measure the arithmetic intensity difference between Suite A and Suite H:
+
+- **Prefill** (≤4096 tokens): Both models attend to all tokens (window ≥ context).
+  FLOPs are nearly identical (~7.3B vs 8.0B params). Intensity should be similar.
+  → Both are **compute-bound** on datacenter GPUs.
+
+- **Decode**: SWA caps KV-cache reads at the window size rather than growing with
+  context. At high batch sizes or long contexts, this reduces DRAM traffic per step.
+  → Suite H decode should show **higher BW utilization** than Suite A at scale.
+
+- **Scaling with concurrency**: As batch size grows, Suite A's KV-cache reads
+  increase linearly with batch × context_length, while Suite H's are bounded by
+  batch × window_size. → **Ranking reversals (Type I)** are possible:
+  a bandwidth-constrained chip may rank higher on Suite H than Suite A.
+
+### Running Suite H
+
+```bash
+# Standard run (same as Suite A)
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_H
+
+# Profile arithmetic intensity
+python tools/profile_intensity.py --suite suite_H --out results/profiling/<chip>_suite_H_intensity.json
+```
+
+A `models_local.yaml` entry is required:
+
+```yaml
+models:
+  mistralai/Mistral-7B-Instruct-v0.1:
+    local_path: /path/to/Mistral-7B-Instruct-v0.1
+```
+
+### Accuracy baseline
+
+The MMLU accuracy baseline for Mistral-7B-Instruct-v0.1 is pending —
+`bf16_baseline_score` is set to `null` in `schema/accuracy_baselines.json`.
+Run the accuracy scenario on a reference chip to establish the baseline.
 
 ---
 

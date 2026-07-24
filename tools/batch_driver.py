@@ -78,7 +78,7 @@ class CardConfig:
     phases: list[dict] = field(default_factory=list)
 
 
-# Standard single-chip bundle: SGLang suites A/C/D/F → vLLM suites A/C/D/F → profiling A/D
+# Standard single-chip bundle: SGLang suites A/C/D/F/H → vLLM suites A/C/D/F/H → profiling A/D/H
 def _single_chip_bundle(
     sglang_env: str | None = None,
     vllm_env: str | None = None,
@@ -88,7 +88,7 @@ def _single_chip_bundle(
     vllm_runner: str = "nvidia_vllm_47f5d58e",
 ) -> list[dict]:
     """Build the standard single-chip bundle phases."""
-    suites = ["suite_A", "suite_C", "suite_D", "suite_F"]
+    suites = ["suite_A", "suite_C", "suite_D", "suite_F", "suite_H"]
     phases: list[dict] = []
 
     # ── SGLang ──
@@ -114,7 +114,7 @@ def _single_chip_bundle(
         phases.append({"type": "cooldown", "minutes": 2.0})
 
     # ── Profiling ──
-    for suite in ["suite_A", "suite_D"]:
+    for suite in ["suite_A", "suite_D", "suite_H"]:
         phases.append({
             "type": "profiling",
             "suite": suite,
