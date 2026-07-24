@@ -1,0 +1,20 @@
+{
+  "id": "nvidia_sglang_inference_opt_5fe06410",
+  "platform": "nvidia",
+  "name": "SGLang offline inference fast path",
+  "framework": "SGLang",
+  "submitted_by": "ChiangYuhsin",
+  "description": "Scenario-aware SGLang runner with batched prompt formatting, verified token accounting, and throughput-oriented offline scheduling.",
+  "notes": "Optimized and validated on NVIDIA A100-SXM4-80GB with SGLang 0.5.6.",
+  "created": "2026-07-24",
+  "hardware_label": "NVIDIA A100-SXM4-80GB",
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "validated",
+    "G": "pending"
+  }
+}
