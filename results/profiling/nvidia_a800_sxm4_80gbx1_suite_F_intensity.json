@@ -1,7 +1,7 @@
 {
   "suite": "suite_F",
   "chip": "NVIDIA A800-SXM4-80GB",
-  "model": "/F00120250029/lixiang_share/liangjuhao_share/models/Qwen2.5-0.5B-Instruct",
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
   "operating_point": {
     "batch": 32,
     "prompt_len": 95,
@@ -15,10 +15,10 @@
       "bytes_read": 988065536,
       "bytes_written": 37355520,
       "arithmetic_intensity": 2941.07,
-      "achieved_tflops": 53.39,
-      "achieved_bw_gbps": 18.15,
-      "time_ms_median": 56.48,
-      "time_frac": 0.628,
+      "achieved_tflops": 54.14,
+      "achieved_bw_gbps": 18.41,
+      "time_ms_median": 55.71,
+      "time_frac": 0.6282,
       "flops_method": "measured",
       "bytes_method": "analytical"
     },
@@ -28,10 +28,10 @@
       "bytes_read": 988065536,
       "bytes_written": 37355520,
       "arithmetic_intensity": 31.18,
-      "achieved_tflops": 0.96,
-      "achieved_bw_gbps": 30.65,
-      "time_ms_median": 33.46,
-      "time_frac": 0.372,
+      "achieved_tflops": 0.97,
+      "achieved_bw_gbps": 31.1,
+      "time_ms_median": 32.97,
+      "time_frac": 0.3718,
       "flops_method": "measured",
       "bytes_method": "analytical"
     }
@@ -54,5 +54,6 @@
   "env_ref": {
     "chip": "NVIDIA A800-SXM4-80GB",
     "note": "env_info.json not provided; run collect_env.py first"
-  }
+  },
+  "runtime_note": "FLOPs: measured via torch.utils.FlopCounterMode (GQA-patched, causal-corrected) on HuggingFace transformers.AutoModelForCausalLM. Bytes: analytical from model geometry (weight footprint + KV cache). The analytical byte model is runtime-agnostic \u2014 I values depend on model architecture and batch dimensions, not the inference framework. The paper's throughput data is from vLLM; ncu validation on live vLLM processes is planned for mid-term cross-validation. See workspace/nips26_rebuttal/coauthor_response/profiling_\u4fee\u6539\u53cd\u9988.md item P1-1 for details."
 }

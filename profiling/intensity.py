@@ -67,9 +67,11 @@ class IntensityProfiler:
         peak_bw_gbps: Optional[float] = None,
         env_file: Optional[str] = None,
         output_tokens_p50: Optional[int] = None,
+        model_label: Optional[str] = None,
     ):
         self.suite = suite
         self.model_id = model_id
+        self.model_label = model_label or model_id
         self.batch = batch
         self.prompt_len = prompt_len
         self.gen_len = gen_len
@@ -198,7 +200,7 @@ class IntensityProfiler:
             return IntensityResult(
                 suite=self.suite,
                 chip=self._chip_name,
-                model=self.model_id,
+                model=self.model_label,
                 operating_point={
                     "batch": self.batch,
                     "prompt_len": self.prompt_len,

@@ -183,6 +183,10 @@ def main():
                          f"Use --list-backends to see available backends.")
 
     # ── Profile ───────────────────────────────────────────────────────────
+    # Use the canonical HF model ID from suite.json as the output label
+    # (--model may be a local path for loading; the output should be portable).
+    canonical_model_id = _resolve_model_id(args.suite) or args.model
+
     profiler = IntensityProfiler(
         suite=args.suite,
         model_id=args.model,
@@ -195,6 +199,7 @@ def main():
         peak_bw_gbps=args.peak_bw_gbps,
         env_file=args.env_file,
         output_tokens_p50=getattr(args, "output_tokens_p50", None),
+        model_label=canonical_model_id,
     )
 
     result = profiler.run()
