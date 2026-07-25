@@ -78,14 +78,16 @@ class CardConfig:
     phases: list[dict] = field(default_factory=list)
 
 
-# Standard single-chip bundle: SGLang suites A/C/D/F/H → vLLM suites A/C/D/F/H → profiling A/D/H
+# Standard single-chip bundle: SGLang → vLLM → TensorRT-LLM → profiling A/D/H
 def _single_chip_bundle(
     sglang_env: str | None = None,
     vllm_env: str | None = None,
+    trtllm_env: str | None = None,
     profiling_env: str | None = None,
     *,
     sglang_runner: str = "nvidia_sglang_c43a8309",
     vllm_runner: str = "nvidia_vllm_47f5d58e",
+    trtllm_runner: str = "nvidia_tensorrt_llm_",
 ) -> list[dict]:
     """Build the standard single-chip bundle phases."""
     suites = ["suite_A", "suite_C", "suite_D", "suite_F", "suite_H"]
@@ -112,6 +114,18 @@ def _single_chip_bundle(
             "conda_env": vllm_env,
         })
         phases.append({"type": "cooldown", "minutes": 2.0})
+
+    # ── TensorRT-LLM ──
+    if trtllm_env:
+        for suite in suites:
+            phases.append({
+                "type": "benchmark",
+                "runner": trtllm_runner,
+                "suite": suite,
+                "scenario": "all",
+                "conda_env": trtllm_env,
+            })
+            phases.append({"type": "cooldown", "minutes": 2.0})
 
     # ── Profiling ──
     for suite in ["suite_A", "suite_D", "suite_H"]:

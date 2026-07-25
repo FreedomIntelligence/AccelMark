@@ -1,0 +1,51 @@
+# AccelMark -- NVIDIA TensorRT-LLM runner dependencies
+# TensorRT-LLM PyTorch backend (torch.export + torch.compile)
+#
+# Installation:
+#   Option A (recommended): Use NGC container
+#     docker pull nvcr.io/nvidia/tensorrt-llm/release:1.2.0
+#
+#   Option B: pip install in a fresh conda env with CUDA 12.6+
+#     conda create -n trtllm python=3.10
+#     conda activate trtllm
+#     pip install -r requirements.txt
+#
+# Current machine CUDA driver: 565.57.01 (supports CUDA ≤ 12.6)
+
+# Core
+torch>=2.6.0
+torchvision>=0.21.0
+torchaudio>=2.6.0
+
+# LLM inference — TensorRT-LLM PyTorch backend
+tensorrt_llm>=1.2.0
+
+# Transformers stack (minimum required by TRT-LLM 1.2.0)
+transformers>=4.57.3
+tokenizers>=0.20.0
+huggingface-hub>=0.28.0
+accelerate>=1.0.0
+safetensors>=0.4.0
+
+# AccelMark dependencies
+numpy>=1.26.0
+jsonschema>=4.20.0
+psutil>=5.9.0
+tqdm>=4.66.0
+
+# NVIDIA monitoring (for power and GPU stats)
+nvidia-ml-py>=12.0.0
+
+# Async support
+aiohttp>=3.9.0
+
+# Config file parsing
+PyYAML>=6.0.0
+
+# ── Notes ───────────────────────────────────────────────────────────────────
+# - TRT-LLM requires CUDA toolkit ≥ 12.4. NVIDIA driver 565.x supports this.
+# - The PyTorch backend defaults to torch.compile — first load includes JIT
+#   overhead (~1-3 min for an 8B model). Subsequent calls use cached graphs.
+# - If TRT-LLM pip install fails, use the NGC container instead:
+#     docker pull nvcr.io/nvidia/tensorrt-llm/release:1.2.0
+# - For FP8 quantization: requires H100+ (SM90). Ampere GPUs fall back to BF16.
