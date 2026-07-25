@@ -1,0 +1,58 @@
+{
+  "suite": "suite_F",
+  "chip": "NVIDIA A800-SXM4-80GB",
+  "model": "/F00120250029/lixiang_share/liangjuhao_share/models/Qwen2.5-0.5B-Instruct",
+  "operating_point": {
+    "batch": 32,
+    "prompt_len": 95,
+    "gen_len": 150,
+    "dtype": "bfloat16"
+  },
+  "phases": {
+    "prefill": {
+      "flops": 3015835654080,
+      "bytes": 1025421056,
+      "bytes_read": 988065536,
+      "bytes_written": 37355520,
+      "arithmetic_intensity": 2941.07,
+      "achieved_tflops": 53.39,
+      "achieved_bw_gbps": 18.15,
+      "time_ms_median": 56.48,
+      "time_frac": 0.628,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    },
+    "decode": {
+      "flops": 31968591936,
+      "bytes": 1025421056,
+      "bytes_read": 988065536,
+      "bytes_written": 37355520,
+      "arithmetic_intensity": 31.18,
+      "achieved_tflops": 0.96,
+      "achieved_bw_gbps": 30.65,
+      "time_ms_median": 33.46,
+      "time_frac": 0.372,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    }
+  },
+  "blended": {
+    "ai": 50.45,
+    "weighting": "token-weighted: 1x prefill (S=95) + 150x decode (1 token each), batch=32 (weight reads amortised)",
+    "classification": "bandwidth-bound"
+  },
+  "chip_peak": {
+    "tflops": 312.0,
+    "bw_gbps": 2039.0,
+    "ridge_point_i_star": 153.02,
+    "source": "builtin:NVIDIA A800-SXM4-80GB"
+  },
+  "classification": {
+    "prefill": "compute-bound",
+    "decode": "bandwidth-bound"
+  },
+  "env_ref": {
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "note": "env_info.json not provided; run collect_env.py first"
+  }
+}
