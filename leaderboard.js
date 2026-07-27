@@ -59038,6 +59038,269 @@ const LEADERBOARD_DATA = [
     "implementation_id": "nvidia_sglang_c43a8309"
   },
   {
+    "submission": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_sglang_inference_opt_5fe06410_7d8fa669",
+    "tier": "community",
+    "is_suite_level": true,
+    "chip": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 80.0,
+    "framework": "SGLang",
+    "framework_version": "0.5.6",
+    "model": "Qwen2.5-0.5B-Instruct",
+    "precision": "BF16",
+    "precision_fallback": false,
+    "precision_emulated": false,
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_source": "local",
+    "model_name": null,
+    "model_format": "HuggingFace original",
+    "architecture": "dense",
+    "suite": "suite_F",
+    "scenario": "all",
+    "primary_metric": 43718.16,
+    "primary_metric_label": "tokens/sec (offline)",
+    "tokens_per_sec_per_chip": 43718.2,
+    "offline_throughput": 43718.16,
+    "online_max_qps": 40,
+    "interactive_ttft_p99": 20.35,
+    "peak_memory_gb": null,
+    "memory_utilization_pct": null,
+    "memory_efficiency_toks_per_gb": null,
+    "min_price_usd_per_hr": 1.5,
+    "cost_efficiency_toks_per_dollar_hr": 29145.0,
+    "tokens_per_watt": null,
+    "accuracy_valid": true,
+    "accuracy_score": 0.39,
+    "date": "2026-07-24",
+    "submitted_by": "ChiangYuhsin",
+    "reproduce_script": "runners/nvidia_sglang_inference_opt_5fe06410/runner.py",
+    "notes": null,
+    "run_id": "7d8fa669",
+    "run_name": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_sglang_inference_opt_5fe06410_7d8fa669",
+    "reproduces_run_id": null,
+    "flagged": null,
+    "scaling_efficiency_2x": null,
+    "scaling_efficiency_4x": null,
+    "scaling_base_throughput": null,
+    "quant_bf16_throughput": null,
+    "quant_best_throughput": null,
+    "quant_best_precision": null,
+    "quant_int8_speedup": null,
+    "quant_int4_speedup": null,
+    "quant_quality_eff": null,
+    "sustained_throughput": null,
+    "throttle_ratio": null,
+    "throttle_onset_minute": null,
+    "ttft_p99_drift_ms": null,
+    "sustained_concurrency": null,
+    "speculative_throughput": null,
+    "speculative_speedup": null,
+    "speculative_acceptance": null,
+    "burst_degradation": null,
+    "burst_steady_p99": null,
+    "burst_p99": null,
+    "burst_sla_met": null,
+    "detail": {
+      "hw_chip": "NVIDIA A100-SXM4-80GB",
+      "hw_vendor": "NVIDIA",
+      "hw_count": 1,
+      "hw_memory_gb": 80.0,
+      "hw_interconnect_intra": null,
+      "hw_interconnect_inter": null,
+      "hw_cpu": "Intel(R) Xeon(R) Processor @ 2.90GHz, 96 cores",
+      "hw_system_memory_gb": 1000.0,
+      "hw_pcie": "PCIe Gen 4",
+      "hw_network": "4x InfiniBand/RoCE (mlx5_0, mlx5_1, mlx5_2, mlx5_3)",
+      "sw_framework": "SGLang",
+      "sw_framework_version": "0.5.6",
+      "sw_driver": "570.133.20",
+      "sw_runtime": "CUDA 12.1",
+      "sw_os": "Ubuntu 22.04.5 LTS",
+      "sw_python": "3.11.11",
+      "sw_pytorch": "2.3.1+cu121",
+      "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "model_name": null,
+      "model_note": "Pinned local ModelScope snapshot for the controlled agent run",
+      "model_source": "local",
+      "model_arch": "dense",
+      "model_params_b": 0.5,
+      "model_precision": "BF16",
+      "model_effective_dtype": "bfloat16",
+      "model_quant_method": null,
+      "model_format": "HuggingFace original",
+      "run_scenarios": [
+        "offline",
+        "online",
+        "interactive"
+      ],
+      "run_chip_counts": null,
+      "run_num_runs": 3,
+      "run_tp": 1,
+      "run_pp": 1,
+      "run_dp": 1,
+      "acc_score": 0.39,
+      "acc_baseline_delta": 0.01,
+      "acc_valid": true,
+      "acc_notes": "Integrated accuracy check \u2014 used same SGLang instance as benchmark.",
+      "meta_submitted_by": "ChiangYuhsin",
+      "meta_submission_type": "individual",
+      "meta_reproduces_run_id": null,
+      "meta_date": "2026-07-24",
+      "meta_reproduce_script": "runners/nvidia_sglang_inference_opt_5fe06410/runner.py",
+      "meta_elapsed_min": 4.9,
+      "meta_model_load_sec": 29.9,
+      "meta_start_time": "2026-07-24T13:13:44.098502+00:00",
+      "meta_notes": null,
+      "env_vendor_details": {}
+    },
+    "viz": {
+      "type": "suite_F",
+      "offline": {
+        "labels": [
+          "4",
+          "16",
+          "64"
+        ],
+        "throughput": [
+          43207.4,
+          43476.59,
+          43718.16
+        ],
+        "memory_gb": [
+          null,
+          null,
+          null
+        ],
+        "throughput_reliability": [
+          {
+            "n": 3,
+            "mean": 43309.35,
+            "std": 506.39,
+            "cv_pct": 1.17,
+            "stability": "stable",
+            "runs": [
+              42861.69,
+              43858.96,
+              43207.4
+            ]
+          },
+          {
+            "n": 3,
+            "mean": 43560.83,
+            "std": 404.26,
+            "cv_pct": 0.93,
+            "stability": "stable",
+            "runs": [
+              43205.33,
+              43476.59,
+              44000.58
+            ]
+          },
+          {
+            "n": 3,
+            "mean": 43826.48,
+            "std": 193.43,
+            "cv_pct": 0.44,
+            "stability": "stable",
+            "runs": [
+              43718.16,
+              43711.48,
+              44049.79
+            ]
+          }
+        ]
+      },
+      "online": {
+        "labels": [
+          "10",
+          "40"
+        ],
+        "ttft_p50": [
+          16.76,
+          20.0
+        ],
+        "ttft_p90": [
+          26.59,
+          29.86
+        ],
+        "tpot_p50": [
+          2.35,
+          3.97
+        ],
+        "sla_met": [
+          true,
+          true
+        ],
+        "max_valid_qps": 40,
+        "ttft_ms_p99_reliability": [
+          {
+            "n": 3,
+            "mean": 37.33,
+            "std": 13.63,
+            "cv_pct": 36.52,
+            "stability": "high-variance",
+            "runs": [
+              52.93,
+              31.38,
+              27.68
+            ]
+          },
+          {
+            "n": 3,
+            "mean": 37.36,
+            "std": 0.62,
+            "cv_pct": 1.65,
+            "stability": "stable",
+            "runs": [
+              37.93,
+              36.71,
+              37.46
+            ]
+          }
+        ]
+      },
+      "interactive": {
+        "ttft_p50": 14.39,
+        "ttft_p90": 15.94,
+        "ttft_p99": 20.35,
+        "tpot_p50": 1.77,
+        "tpot_p90": 1.79,
+        "tpot_p99": 1.85,
+        "ttft_ms_p99_reliability": {
+          "n": 3,
+          "mean": 25.41,
+          "std": 16.78,
+          "cv_pct": 66.03,
+          "stability": "high-variance",
+          "runs": [
+            44.78,
+            15.42,
+            16.02
+          ]
+        }
+      },
+      "sustained": null
+    },
+    "impl": {
+      "id": "nvidia_sglang_inference_opt_5fe06410",
+      "platform": "nvidia",
+      "name": "SGLang offline inference fast path",
+      "framework": "SGLang",
+      "submitted_by": "ChiangYuhsin",
+      "description": "Scenario-aware SGLang runner with batched prompt formatting, verified token accounting, and throughput-oriented offline scheduling.",
+      "notes": "Optimized and validated on NVIDIA A100-SXM4-80GB with SGLang 0.5.6.",
+      "created": "2026-07-24",
+      "supersedes_chain": null,
+      "deprecated_by": null,
+      "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_inference_opt_5fe06410",
+      "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_inference_opt_5fe06410/runner.py"
+    },
+    "implementation_id": "nvidia_sglang_inference_opt_5fe06410"
+  },
+  {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_sglang_c43a8309_93928a91",
     "tier": "community",
     "is_suite_level": true,
