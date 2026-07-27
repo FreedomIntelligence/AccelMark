@@ -1,0 +1,211 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_F",
+  "implementation_id": "nvidia_sglang_inference_opt_5fe06410",
+  "chip": {
+    "name": "NVIDIA A100-SXM4-80GB",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "memory_gb": 80.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-07-24T13:12:10.858580+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "570.133.20",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "570.133.20",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "570.133.20",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "570.133.20",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "570.133.20",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "570.133.20",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "NVIDIA A100-SXM4-80GB",
+        "vendor": "NVIDIA",
+        "memory_gb": 80.0,
+        "driver_version": "570.133.20",
+        "firmware_version": null,
+        "compute_capability": "8.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "nvidia",
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Processor @ 2.90GHz",
+      "physical_cores": 96,
+      "logical_cores": 96,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1000.0,
+    "pcie_generation": "PCIe Gen 4",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_2",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_3",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.11",
+    "kernel_version": "5.10.134-013.5.kangaroo.al8.x86_64",
+    "runtime_version": "CUDA 12.1",
+    "pytorch_version": "2.3.1+cu121"
+  },
+  "software": {
+    "framework": "SGLang",
+    "framework_version": "0.5.6",
+    "driver_version": "570.133.20",
+    "runtime_version": "CUDA 12.1",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.11.11"
+  },
+  "model": {
+    "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "model_name": null,
+    "model_note": "Pinned local ModelScope snapshot for the controlled agent run",
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 0.5,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "interactive",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "engine_kwargs": {}
+    },
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "interactive": {
+      "ttft_ms_p50": 14.39,
+      "ttft_ms_p90": 15.94,
+      "ttft_ms_p99": 20.35,
+      "tpot_ms_p50": 1.77,
+      "tpot_ms_p90": 1.79,
+      "tpot_ms_p99": 1.85,
+      "peak_memory_gb": null,
+      "elapsed_seconds_median": 52.4,
+      "ttft_ms_p99_reliability": {
+        "n": 3,
+        "mean": 25.41,
+        "std": 16.78,
+        "cv_pct": 66.03,
+        "stability": "high-variance",
+        "runs": [
+          44.78,
+          15.42,
+          16.02
+        ]
+      }
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "ChiangYuhsin",
+    "submission_type": "individual",
+    "date": "2026-07-24",
+    "time": "21:20:25",
+    "run_id": "7d8fa669",
+    "run_name": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_sglang_inference_opt_5fe06410_7d8fa669",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_sglang_inference_opt_5fe06410/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-07-24T13:17:47.267416+00:00",
+    "benchmark_end_time": "2026-07-24T13:20:25.026102+00:00",
+    "benchmark_elapsed_minutes": 2.6,
+    "model_load_seconds": 29.4
+  }
+}
