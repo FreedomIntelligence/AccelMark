@@ -216,13 +216,15 @@ class IntensityProfiler:
                 runtime_note=(
                     "FLOPs: measured via torch.utils.FlopCounterMode (GQA-patched, "
                     "causal-corrected) on HuggingFace transformers.AutoModelForCausalLM. "
-                    "Bytes: analytical from model geometry (weight footprint + KV cache). "
-                    "The analytical byte model is runtime-agnostic — I values depend on "
-                    "model architecture and batch dimensions, not the inference framework. "
-                    "The paper's throughput data is from vLLM; ncu validation on live "
-                    "vLLM processes is planned for mid-term cross-validation. "
-                    "See workspace/nips26_rebuttal/coauthor_response/profiling_修改反馈.md "
-                    "item P1-1 for details."
+                    "Bytes: analytical from model geometry (weight reads + KV-cache "
+                    "traffic + activation tensor traffic). Activation model follows "
+                    "FlashAttention HBM traffic: O(B*S*(4d+2*d_ff)) per layer, "
+                    "assuming Q/K/V intermediates and scores stay in SRAM. "
+                    "I-values are architecture-invariant by construction (same on any "
+                    "chip at the same batch/dtype). Decode I scales with batch: "
+                    "I(B=1) ≈ 1, I(B=32) ≈ 28. "
+                    "ncu validation pending: GPU perf counters require admin "
+                    "privileges unavailable in this environment."
                 ),
             )
         finally:
@@ -282,6 +284,7 @@ class IntensityProfiler:
                 batch=self.batch,
                 seq_len=self.prompt_len,
                 dtype_str=self.dtype_str,
+                phase="prefill",
             )
 
         else:  # decode
@@ -339,8 +342,9 @@ class IntensityProfiler:
                 param_count=self._param_count,
                 model_config=model_config,
                 batch=self.batch,
-                seq_len=self.prompt_len,  # decode uses full KV cache
+                seq_len=self.prompt_len,  # decode reads full existing KV cache
                 dtype_str=self.dtype_str,
+                phase="decode",
             )
 
         # ── Compute derived metrics ──────────────────────────────────

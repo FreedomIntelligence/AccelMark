@@ -221,8 +221,18 @@ class ProfilerBackend(ABC):
         batch: int,
         seq_len: int,
         dtype_str: str,
+        phase: str = "prefill",
     ) -> tuple[int, int, str]:
         """Measure DRAM traffic for one forward pass of *model_fn*.
+
+        Parameters
+        ----------
+        phase : ``"prefill"`` or ``"decode"``
+            Which phase is being profiled.  Prefill reads weights and writes
+            the full KV cache; decode reads weights + full KV cache and
+            writes one new token's KV.  The default (``"prefill"``) is
+            provided for backward compatibility with backends that do not
+            distinguish phases.
 
         Returns
         -------
@@ -230,6 +240,20 @@ class ProfilerBackend(ABC):
             *bytes_read* and *bytes_written* are the measured or
             modelled DRAM traffic.  *method* is a provenance tag —
             ``"profiler"``, ``"profiler+modelled"``, or ``"modelled"``.
+
+        .. note::
+
+            The NVIDIA backend's analytical bytes model counts three
+            components: **weight reads**, **KV-cache traffic**, and
+            **activation tensor traffic** (attention + MLP projection
+            inputs/outputs).  The activation model assumes FlashAttention
+            tiling (Q/K/V intermediates and attention scores stay in
+            SRAM).  Per-layer formula: O(B·S·(4d + 2·d_ff)).
+
+            I-values are architecture-invariant by construction (identical
+            on any chip running the same model at the same batch/dtype).
+            Decode I scales with batch size: I(B=1) ≈ 1, I(B=32) ≈ 28.
+            ncu validation pending (GPU perf counter permissions).
         """
         ...
 

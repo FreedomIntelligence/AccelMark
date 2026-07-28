@@ -30,6 +30,7 @@ import sys
 
 _RUNTIME_MPI_PREFIX = None
 _CANDIDATES = [
+    sys.prefix,                # conda/virtualenv prefix (covers most installs)
     "/opt/hpcx/ompi",          # HPC-X runtime (NGC containers)
     "/usr/local/mpi",          # generic MPI install
 ]
@@ -40,14 +41,40 @@ for _cand in _CANDIDATES:
         break
 
 if _RUNTIME_MPI_PREFIX is None:
-    # Best-effort — set HPC-X path anyway; it's the most common case.
-    _RUNTIME_MPI_PREFIX = "/opt/hpcx/ompi"
+    # Best-effort — try the current Python prefix (conda/virtualenv).
+    _RUNTIME_MPI_PREFIX = sys.prefix
 
 
 # ── OPAL_PREFIX ───────────────────────────────────────────────────────────
 # Override the hard-coded build-time prefix so OpenMPI finds its help files
 # and configuration data at runtime.
 os.environ["OPAL_PREFIX"] = _RUNTIME_MPI_PREFIX
+
+# ── MPI configuration for single-node operation ──────────────────────────
+# On systems without InfiniBand or with incomplete MPI installations,
+# force local-only communication (shared memory) and disable CUDA-aware MPI
+# to avoid MPI_Init failures.
+os.environ.setdefault("OMPI_MCA_btl", "self,sm")
+os.environ.setdefault("OMPI_MCA_osc", "sm")
+os.environ.setdefault("OMPI_MCA_mpi_cuda_support", "0")
+os.environ.setdefault("OMPI_MCA_opal_cuda_support", "0")
+# Allow MPI to run as root (required in container/root environments)
+os.environ.setdefault("OMPI_MCA_routed", "direct")
+os.environ.setdefault("OMPI_ALLOW_RUN_AS_ROOT", "1")
+os.environ.setdefault("PRTE_ALLOW_RUN_AS_ROOT", "1")
+
+# ── Pre-initialise MPI ───────────────────────────────────────────────────
+# TRT-LLM imports mpi4py.futures which calls MPI_Comm_spawn internally.
+# On systems with incomplete MPI this fails.  Importing mpi4py.MPI first
+# initialises MPI in simple single-process mode, which is all we need.
+try:
+    import mpi4py.MPI  # noqa: F401 — side-effect: MPI_Init
+except Exception:
+    pass
+
+# ── MPI session already patched on disk ─────────────────────────────────
+# mpi_session.py has been patched to skip MPI spawn for n_workers <= 1.
+# See the patch in the installed tensorrt_llm package.
 
 # ── CUDA 13 shared libraries ──────────────────────────────────────────────
 # TRT-LLM 1.2.1 is compiled against CUDA 13, but the pip-installed cuBLAS

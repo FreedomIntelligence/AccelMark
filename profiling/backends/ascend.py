@@ -39,7 +39,7 @@ class AscendProfilerBackend(ProfilerBackend):
         return 0, "analytical"
 
     def measure_dram_bytes(
-        self, model_fn, *, param_count, model_config, batch, seq_len, dtype_str
+        self, model_fn, *, param_count, model_config, batch, seq_len, dtype_str, phase="prefill", **kwargs
     ) -> tuple[int, int, str]:
         # TODO: integrate CANN msprof HBM bandwidth counters
         from profiling.backends.nvidia import (

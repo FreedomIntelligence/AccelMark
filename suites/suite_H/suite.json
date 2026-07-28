@@ -1,33 +1,50 @@
 {
   "suite_id": "suite_H",
-  "description": "Sliding Window Attention (SWA) single-chip inference, Mistral-7B-Instruct-v0.1. Companion to Suite A — isolates the effect of SWA architecture (sliding_window=4096) vs full attention on the roofline intensity spectrum. Mistral-7B shares the same structural parameters as Llama-3-8B (32 layers, 32 heads, 8 KV heads, 4096 hidden) — the only architectural variable is the attention mechanism. Chosen over newer SWA models (Gemma 4, etc.) because the standard Mistral architecture ensures cross-platform compatibility (V100, T4, Ascend, TPU, AMD). All operating points match Suite A so architecture is the sole variable.",
+  "description": "Sliding Window Attention (SWA) single-chip inference, Mistral-7B-Instruct-v0.1. Uses 10K-token prompts (> sliding_window=4096) to trigger SWA-specific attention computation and KV cache behavior. Mistral-7B shares structural parameters with Llama-3-8B (32 layers, 32 heads, 8 KV heads, 4096 hidden, GQA) — the only architectural variable is Sliding Window Attention on every layer. Dense baseline for comparison: Suite A (Llama-3-8B at same operating point) or run Suite H with a dense model at the same prompt length. Framework support for SWA-aware KV cache allocation is version-dependent: vLLM 0.7.3 applies the sliding window in attention computation (via Flash Attention) but does not reduce KV cache memory allocation (verified via KV block count comparison). Newer framework versions with explicit SWA support are expected to show additional memory capacity benefits not captured in vLLM 0.7.3 / SGLang 0.4.10 results.",
   "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
   "model_revision": "26bca36bde8333b5d7f72e9ed20ccda6a618af24",
-  "_model_revision_note": "Pinned to the canonical v0.1 instruct checkpoint. This is the reference SWA implementation — the first production LLM to use sliding window attention with GQA.",
-  "dataset": "sharegpt_standard_v1",
-  "_architecture_note": "Mistral-7B-v0.1 uses pure Sliding Window Attention (w=4096) on ALL layers (no hybrid pattern like Gemma 3/4's 5:1 interleaving). This makes it a cleaner SWA signal than hybrid models — the entire attention mechanism is SWA, with no full-attention layers to confound the measurement. KV-cache size at context length L is bounded by O(window × layers) rather than O(L × layers), which directly shifts the model's position on the roofline curve.",
+  "dataset": "sharegpt_swa_v1",
+  "_dataset_note": "Prompts truncated to 10K tail tokens from sharegpt_longctx_v1. 10K > sliding_window=4096 ensures SWA is triggered in attention computation.",
   "scenarios": {
-    "default": ["accuracy", "offline", "online"],
-    "extra": ["interactive", "sustained", "burst"]
+    "default": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "extra": [
+      "interactive",
+      "sustained",
+      "burst"
+    ]
   },
-  "_speculative_note": "Suite H does not configure speculative decoding. Mistral-7B has no official draft model in the EAGLE family. Omitted from extra scenarios.",
   "precision_required": "BF16",
-  "allowed_precisions": ["BF16", "FP16"],
+  "allowed_precisions": [
+    "BF16",
+    "FP16"
+  ],
   "request_distribution": {
-    "input_tokens_p25": 120,
-    "input_tokens_p50": 280,
-    "input_tokens_p75": 580,
-    "input_tokens_p99": 2100,
-    "output_tokens_p50": 310,
-    "output_tokens_p99": 1200,
-    "source": "shibing624/sharegpt_gpt4"
+    "input_tokens_p25": 10000,
+    "input_tokens_p50": 10000,
+    "input_tokens_p75": 10000,
+    "input_tokens_p99": 10000,
+    "output_tokens_p50": 256,
+    "output_tokens_p99": 256,
+    "source": "sharegpt_swa_v1 (tail 10K tokens from sharegpt_longctx_v1)"
   },
-  "max_model_len": 4096,
-  "_max_model_len_note": "Matches Suite A for apples-to-apples architecture comparison. Mistral-7B's SWA (w=4096) means at 4096 context, each token attends to all previous tokens (window ≥ context) — the SWA effect on compute is neutral here. The architectural difference manifests in KV-cache memory pressure and the intensity profile when concurrency scales up (more KV caches = more memory bandwidth pressure, which SWA mitigates).",
-  "output_tokens_max": 512,
-  "concurrency_levels": [8, 32, 128],
-  "_concurrency_levels_note": "Matches Suite A. Mistral-7B (~14 GB BF16) leaves ~66 GB for KV cache on an 80 GB GPU. At 4096 context, SWA caps per-request KV cache at window_size=4096 (same as full attention at this context length), so the memory profile is similar. The SWA advantage shows at higher context lengths and batch sizes where full-attention KV cache would OOM.",
-  "online_qps_levels": [5, 25, 100],
+  "max_model_len": 32768,
+  "_max_model_len_note": "Mistral-7B's maximum context is 32,768 tokens. Suite D (30K context) uses Llama-3.1-8B with dense attention as the long-context baseline; Suite H uses Mistral-7B with SWA at 10K context to test the architecture variable.",
+  "output_tokens_max": 256,
+  "concurrency_levels": [
+    8,
+    32,
+    128
+  ],
+  "_concurrency_levels_note": "Matches Suite A for comparison. At 10K context with SWA, the KV cache per sequence is bounded by window=4096 rather than context=10000 — this should allow higher concurrency on memory-constrained GPUs when the framework supports SWA-aware KV allocation.",
+  "online_qps_levels": [
+    5,
+    25,
+    100
+  ],
   "online_sla_ttft_ms": 500,
   "online_sla_ttft_ms_relaxed": 2000,
   "num_runs": 3,
@@ -37,11 +54,11 @@
   "burst_warmup_requests": 10,
   "interactive_warmup_runs": 0,
   "accuracy_threshold_delta": 0.1,
-  "_accuracy_note": "Mistral-7B-Instruct-v0.1 scores ~60% on MMLU (vs Llama-3-8B ~65%). The 0.1 delta threshold is adequate for detecting broken precision/quantization. Baseline score must be established on first successful BF16 run.",
-  "request_count": 100,
-  "_request_count_note": "offline uses request_count (100), online uses online_request_count (300, minimum for robust p99), interactive uses interactive_request_count (150, minimum for robust p95)",
-  "online_request_count": 300,
-  "interactive_request_count": 150,
+  "request_count": 50,
+  "_request_count_note": "50 requests (reduced from Suite A's 100 due to long context prefill cost).",
+  "online_request_count": 150,
+  "_online_request_count_note": "150 requests (reduced from 300 due to long context).",
+  "interactive_request_count": 50,
   "sustained_concurrency": 8,
   "duration_minutes": 30,
   "sample_interval_seconds": 60,

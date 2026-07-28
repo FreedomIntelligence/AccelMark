@@ -132,28 +132,44 @@ class NvidiaProfilerBackend(ProfilerBackend):
         batch: int,
         seq_len: int,
         dtype_str: str,
+        phase: str = "prefill",
     ) -> tuple[int, int, str]:
-        """Estimate DRAM traffic analytically.
+        """Estimate DRAM traffic analytically from model geometry.
 
-        For decoder-only transformers the bytes transferred in one forward
-        pass are closed-form from the model geometry and batch dimensions:
+        Counts three components:
+        1. **Weight reads** — full model weights, read once per forward pass.
+        2. **KV-cache traffic** — reads/writes to the per-layer key-value store.
+        3. **Activation traffic** — input/output tensors of attention and MLP
+           projections (FlashAttention tiling assumed: Q/K/V intermediates
+           and attention scores stay in SRAM, not HBM).
 
-        **Prefill**: reads all weights, writes the full KV cache.
-        **Decode**:  reads all weights + full KV cache, writes 1 token.
+        Intermediate activation tensors are included here because they scale
+        predictably with model geometry, unlike the previous model which
+        excluded them as "implementation-dependent".  The per-layer formula
+        follows the FlashAttention HBM traffic model: O(B·S·(4d + 2·d_ff)).
 
-        Returns ``(bytes_read, bytes_written, method)`` with
-        ``method = "analytical"``.
+        **Prefill**: reads weights + writes new KV + full activation traffic.
+        **Decode**:  reads weights + existing KV + single-token activation.
+
+        Returns ``(bytes_read, bytes_written, "analytical")``.
         """
         weight_bytes = _compute_weight_bytes(param_count, dtype_str)
         kv_bytes_per_token = _kv_bytes_per_token(model_config, dtype_str)
+        act_bytes = _compute_activation_bytes(
+            model_config, batch, seq_len, dtype_str, phase=phase
+        )
 
-        if seq_len <= 1:
-            # Decode phase: each step reads all weights + full KV cache.
-            bytes_read = weight_bytes + kv_bytes_per_token * seq_len * batch
-            bytes_written = kv_bytes_per_token * batch
+        if phase == "decode":
+            # Decode: reads weights + full existing KV cache,
+            #         writes 1 new token's KV.
+            kv_read = kv_bytes_per_token * seq_len * batch
+            kv_write = kv_bytes_per_token * batch
+            bytes_read = weight_bytes + kv_read + act_bytes
+            bytes_written = kv_write
         else:
-            # Prefill phase: reads weights, writes full KV cache.
-            bytes_read = weight_bytes
+            # Prefill: reads weights (amortised over batch),
+            #          writes full KV cache for all tokens.
+            bytes_read = weight_bytes + act_bytes
             bytes_written = kv_bytes_per_token * seq_len * batch
 
         return bytes_read, bytes_written, "analytical"
@@ -269,6 +285,38 @@ def _compute_weight_bytes(param_count: int, dtype_str: str) -> int:
     """Model weight footprint in bytes (one full read per forward pass)."""
     bytes_per_param = 1 if "int8" in dtype_str else (4 if "float32" in dtype_str else 2)
     return param_count * bytes_per_param
+
+
+def _compute_activation_bytes(
+    model_config, batch: int, seq_len: int, dtype_str: str, phase: str = "prefill"
+) -> int:
+    """Analytical activation HBM traffic for one forward pass.
+
+    Counts the input/output tensor traffic through attention and MLP
+    projections.  Assumes FlashAttention tiling (Q/K/V intermediates and
+    attention scores stay in SRAM, not HBM).
+
+    Per-layer HBM traffic (prefill):
+      - Read:  layer input (for QKV + gate/up projections, reused in L2)
+      - Write: attention output (d), MLP intermediate (d_ff), layer output (d)
+      - Read:  MLP intermediate (for down projection)
+      Total ≈ B × S × (4d + 2×d_ff) × dtype_size
+
+    Per-layer HBM traffic (decode, single new token):
+      Total ≈ B × (4d + 2×d_ff) × dtype_size
+    """
+    d = getattr(model_config, "hidden_size", 0)
+    d_ff = getattr(model_config, "intermediate_size", 0)
+    num_layers = getattr(model_config, "num_hidden_layers", 0)
+    bytes_per_elem = 1 if "int8" in dtype_str else (4 if "float32" in dtype_str else 2)
+
+    if phase == "decode":
+        # Single new token per sequence: S=1
+        per_layer = batch * (4 * d + 2 * d_ff)
+    else:
+        per_layer = batch * seq_len * (4 * d + 2 * d_ff)
+
+    return per_layer * num_layers * bytes_per_elem
 
 
 def _kv_bytes_per_token(model_config, dtype_str: str) -> int:
