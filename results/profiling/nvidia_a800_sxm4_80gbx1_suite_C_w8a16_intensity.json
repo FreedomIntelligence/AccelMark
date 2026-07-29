@@ -1,7 +1,7 @@
 {
   "suite": "suite_C",
   "chip": "NVIDIA A800-SXM4-80GB",
-  "model": "/F00120250029/lixiang_share/liangjuhao_share/models/Meta-Llama-3.1-8B-Instruct-quantized.w8a16",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
   "operating_point": {
     "batch": 16,
     "prompt_len": 280,
