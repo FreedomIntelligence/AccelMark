@@ -71,7 +71,8 @@
         "D": { "$ref": "#/definitions/suiteStatus" },
         "E": { "$ref": "#/definitions/suiteStatus" },
         "F": { "$ref": "#/definitions/suiteStatus" },
-        "G": { "$ref": "#/definitions/suiteStatus" }
+        "G": { "$ref": "#/definitions/suiteStatus" },
+        "H": { "$ref": "#/definitions/suiteStatus" }
       }
     }
   },
