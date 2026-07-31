@@ -1,0 +1,2 @@
+enable_tokenizer_batch_encode: true
+continuous_decode_steps: 4
