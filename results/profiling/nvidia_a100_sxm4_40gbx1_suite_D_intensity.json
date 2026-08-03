@@ -1,6 +1,6 @@
 {
   "suite": "suite_D",
-  "chip": "NVIDIA A800-SXM4-80GB",
+  "chip": "NVIDIA A100-SXM4-40GB",
   "model": "meta-llama/Llama-3.1-8B-Instruct",
   "operating_point": {
     "batch": 1,
@@ -13,9 +13,9 @@
       "flops": 460133969510400,
       "bytes": 19815735296,
       "arithmetic_intensity": 23220.64,
-      "achieved_tflops": 144.82,
-      "achieved_bw_gbps": 6.24,
-      "time_ms_median": 3177.2,
+      "achieved_tflops": 143.2,
+      "achieved_bw_gbps": 6.17,
+      "time_ms_median": 3213.26,
       "flops_method": "analytical",
       "bytes_method": "modelled"
     },
@@ -23,25 +23,25 @@
       "flops": 30041178240,
       "bytes": 19815735296,
       "arithmetic_intensity": 1.52,
-      "achieved_tflops": 0.28,
-      "achieved_bw_gbps": 186.12,
-      "time_ms_median": 106.46,
+      "achieved_tflops": 0.27,
+      "achieved_bw_gbps": 178.93,
+      "time_ms_median": 110.75,
       "flops_method": "analytical",
       "bytes_method": "modelled"
     }
   },
   "chip_peak": {
     "tflops": 312.0,
-    "bw_gbps": 2039.0,
-    "ridge_point_i_star": 153.02,
-    "source": "builtin:NVIDIA A800-SXM4-80GB"
+    "bw_gbps": 1555.0,
+    "ridge_point_i_star": 200.64,
+    "source": "builtin:NVIDIA A100-SXM4-40GB"
   },
   "classification": {
     "prefill": "compute-bound",
     "decode": "bandwidth-bound"
   },
   "env_ref": {
-    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip": "NVIDIA A100-SXM4-40GB",
     "note": "env_info.json not provided; run collect_env.py first"
   }
 }
