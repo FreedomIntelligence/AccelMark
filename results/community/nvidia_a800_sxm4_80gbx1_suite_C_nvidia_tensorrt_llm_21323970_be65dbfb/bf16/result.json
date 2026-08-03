@@ -222,10 +222,12 @@
     }
   },
   "accuracy": {
-    "subset_score": null,
-    "baseline_delta": null,
-    "valid": false,
-    "notes": "Run --scenario accuracy to populate."
+    "subset_score": 0.57,
+    "baseline_delta": 0.01,
+    "valid": true,
+    "framework": "TensorRT-LLM",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same TensorRT-LLM instance as benchmark."
   },
   "meta": {
     "submitted_by": "JuhaoLiang1997",

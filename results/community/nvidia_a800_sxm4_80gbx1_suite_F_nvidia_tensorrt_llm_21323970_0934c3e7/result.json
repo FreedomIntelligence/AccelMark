@@ -200,7 +200,14 @@
       ]
     }
   },
-  "accuracy": null,
+  "accuracy": {
+    "subset_score": 0.39,
+    "baseline_delta": 0.01,
+    "valid": true,
+    "framework": "TensorRT-LLM",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same TensorRT-LLM instance as benchmark."
+  },
   "meta": {
     "submitted_by": "JuhaoLiang1997",
     "submission_type": "individual",

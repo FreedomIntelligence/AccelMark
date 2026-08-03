@@ -34,6 +34,7 @@
   },
   "task": {
     "scenarios_run": [
+      "accuracy",
       "offline"
     ],
     "precision_levels_run": [
@@ -64,10 +65,10 @@
           "precision": "BF16",
           "model_id": "meta-llama/Llama-3.1-8B-Instruct",
           "best_throughput_tokens_per_sec": 2393.96,
-          "accuracy_score": null,
-          "accuracy_baseline_delta": null,
-          "accuracy_valid": null,
-          "quality_efficiency": null,
+          "accuracy_score": 0.57,
+          "accuracy_baseline_delta": 0.01,
+          "accuracy_valid": true,
+          "quality_efficiency": 1364.6,
           "speedup_vs_bf16": 1.0,
           "results_by_concurrency": [
             {
@@ -199,7 +200,7 @@
     "model_load_seconds": 41.1,
     "benchmark_elapsed_minutes_note": "Sum of per-precision benchmark_elapsed_minutes (excludes sleep gaps and orchestrator overhead).",
     "scenario_dirs": {
-      "bf16/offline": "results/community/nvidia_a800_sxm4_80gbx1_suite_C_nvidia_tensorrt_llm_21323970_be65dbfb/bf16/offline"
+      "bf16/offline": "/liangjuhao/AccelHub/AccelMark/results/community/nvidia_a800_sxm4_80gbx1_suite_C_nvidia_tensorrt_llm_21323970_be65dbfb/bf16/offline"
     },
     "precision_dirs": {
       "BF16": "bf16"
