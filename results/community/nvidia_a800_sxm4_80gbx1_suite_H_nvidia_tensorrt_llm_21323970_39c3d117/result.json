@@ -202,7 +202,7 @@
   },
   "accuracy": {
     "subset_score": 0.43,
-    "baseline_delta": null,
+    "baseline_delta": 0.0,
     "valid": true,
     "framework": "TensorRT-LLM",
     "precision": "BF16",

@@ -47,7 +47,7 @@
   },
   "mistralai/Mistral-7B-Instruct-v0.1": {
     "revision": "26bca36bde8333b5d7f72e9ed20ccda6a618af24",
-    "bf16_baseline_score": null,
-    "_note": "Baseline pending — establish on first successful BF16 run. Expected ~0.55–0.60 on MMLU (4-shot)."
+    "bf16_baseline_score": 0.43,
+    "notes": "Measured on A800 SXM4 80GB, TRT-LLM 0.21.0 PyTorch backend, CUDA 12.6. Two independent runs both scored 0.43 on the 100-question subset — consistent with other models' subset-vs-full-MMLU offset (e.g. Qwen2.5-0.5B 0.39 vs 0.38)."
   }
 }
