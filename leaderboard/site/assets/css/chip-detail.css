@@ -52,6 +52,7 @@
 .chip-suite-card[data-suite="E"] { --suite-color: var(--suite-E); }
 .chip-suite-card[data-suite="F"] { --suite-color: var(--suite-F); }
 .chip-suite-card[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-suite-card[data-suite="H"] { --suite-color: var(--suite-H); }
 
 a.chip-suite-card { cursor: pointer; }
 a.chip-suite-card:hover {
@@ -287,6 +288,7 @@ a.chip-suite-card:hover .chip-suite-hint {
 .chip-fp-row[data-suite="E"] { --suite-color: var(--suite-E); }
 .chip-fp-row[data-suite="F"] { --suite-color: var(--suite-F); }
 .chip-fp-row[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-fp-row[data-suite="H"] { --suite-color: var(--suite-H); }
 .chip-fp-letter {
   width: 22px;
   height: 22px;
@@ -404,6 +406,7 @@ a.chip-suite-card:hover .chip-suite-hint {
 .chip-scl-row[data-suite="E"] { --suite-color: var(--suite-E); }
 .chip-scl-row[data-suite="F"] { --suite-color: var(--suite-F); }
 .chip-scl-row[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-scl-row[data-suite="H"] { --suite-color: var(--suite-H); }
 .chip-scl-row-letter {
   width: 22px;
   height: 22px;
@@ -501,6 +504,7 @@ a.chip-suite-card:hover .chip-suite-hint {
 .chip-runs tbody tr[data-suite="E"] { --suite-color: var(--suite-E); }
 .chip-runs tbody tr[data-suite="F"] { --suite-color: var(--suite-F); }
 .chip-runs tbody tr[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-runs tbody tr[data-suite="H"] { --suite-color: var(--suite-H); }
 
 .chip-runs-suite {
   display: inline-flex;
@@ -645,6 +649,7 @@ a.chip-suite-card:hover .chip-suite-hint {
 .chip-peer-suite[data-suite="E"] { --suite-color: var(--suite-E); }
 .chip-peer-suite[data-suite="F"] { --suite-color: var(--suite-F); }
 .chip-peer-suite[data-suite="G"] { --suite-color: var(--suite-G); }
+.chip-peer-suite[data-suite="H"] { --suite-color: var(--suite-H); }
 .chip-peer-runs { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ── Responsive ───────────────────────────────────────────── */
