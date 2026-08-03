@@ -208,8 +208,8 @@
         "throttle_ratio": 0.982
       },
       "suite_C": {
-        "best_quality_efficiency": 2374.2,
-        "best_quality_efficiency_format": "W8A16"
+        "best_quality_efficiency": 1364.6,
+        "best_quality_efficiency_format": "BF16"
       },
       "suite_D": {
         "best_throughput_tokens_per_sec": 70.3,
@@ -243,6 +243,13 @@
         "best_interactive_ttft_p99_ms": 410.1,
         "best_sustained_throughput_tokens_per_sec": 569.1,
         "throttle_ratio": 0.845
+      },
+      "suite_H": {
+        "best_throughput_tokens_per_sec": 2315.6,
+        "best_online_max_qps": 5,
+        "best_interactive_ttft_p99_ms": 70.6,
+        "best_sustained_throughput_tokens_per_sec": 508.9,
+        "throttle_ratio": 0.909
       }
     }
   },

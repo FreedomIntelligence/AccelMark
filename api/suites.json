@@ -108,5 +108,22 @@
       "sustained"
     ],
     "dataset": "sharegpt_standard_v1"
+  },
+  "suite_H": {
+    "suite_id": "suite_H",
+    "description": "Sliding Window Attention (SWA) single-chip inference, Mistral-7B-Instruct-v0.1. Uses 10K-token prompts (> sliding_window=4096) to trigger SWA-specific attention computation and KV cache behavior. Mistral-7B shares structural parameters with Llama-3-8B (32 layers, 32 heads, 8 KV heads, 4096 hidden, GQA) \u2014 the only architectural variable is Sliding Window Attention on every layer. Dense baseline for comparison: Suite A (Llama-3-8B at same operating point) or run Suite H with a dense model at the same prompt length. Framework support for SWA-aware KV cache allocation is version-dependent: vLLM 0.7.3 applies the sliding window in attention computation (via Flash Attention) but does not reduce KV cache memory allocation (verified via KV block count comparison). Newer framework versions with explicit SWA support are expected to show additional memory capacity benefits not captured in vLLM 0.7.3 / SGLang 0.4.10 results.",
+    "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
+    "precision": "BF16",
+    "default_scenarios": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "extra_scenarios": [
+      "interactive",
+      "sustained",
+      "burst"
+    ],
+    "dataset": "sharegpt_swa_v1"
   }
 }

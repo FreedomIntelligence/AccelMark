@@ -9380,6 +9380,44 @@ const DISTRIBUTION_SUBMISSIONS = [
     }
   },
   {
+    "id": "941a7be7",
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 80.0,
+    "suite": "suite_A",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "model_full": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_params_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "framework": "TensorRT-LLM",
+    "framework_version": "0.21.0",
+    "tier": "community",
+    "submitted_by": "JuhaoLiang1997",
+    "date": "2026-07-25",
+    "reproduce_script": "runners/nvidia_tensorrt_llm_21323970/runner.py",
+    "runner_id": "nvidia_tensorrt_llm_21323970",
+    "scenarios": {
+      "offline": {
+        "throughput": 2360.28,
+        "metric_label": "tokens/sec",
+        "concurrency": 32,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 2360.28,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 32,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
     "id": "8eb86278_BF16",
     "chip": "NVIDIA A800-SXM4-80GB",
     "chip_vendor": "NVIDIA",
@@ -9536,6 +9574,44 @@ const DISTRIBUTION_SUBMISSIONS = [
     }
   },
   {
+    "id": "be65dbfb_BF16",
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 80.0,
+    "suite": "suite_C",
+    "model": "Llama-3.1-8B-Instruct",
+    "model_full": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_params_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "framework": "TensorRT-LLM",
+    "framework_version": "0.21.0",
+    "tier": "community",
+    "submitted_by": "JuhaoLiang1997",
+    "date": "2026-07-25",
+    "reproduce_script": "runners/nvidia_tensorrt_llm_21323970/runner.py",
+    "runner_id": "nvidia_tensorrt_llm_21323970",
+    "scenarios": {
+      "offline": {
+        "throughput": 2393.96,
+        "metric_label": "tokens/sec (BF16)",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "quantization",
+    "primary_throughput": 2393.96,
+    "primary_metric_label": "tokens/sec (BF16)",
+    "config": {
+      "concurrency": null,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
     "id": "1992bcc0",
     "chip": "NVIDIA A800-SXM4-80GB",
     "chip_vendor": "NVIDIA",
@@ -9658,6 +9734,148 @@ const DISTRIBUTION_SUBMISSIONS = [
       "batch_size": null,
       "tensor_parallel": 1,
       "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "0934c3e7",
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 80.0,
+    "suite": "suite_F",
+    "model": "Qwen2.5-0.5B-Instruct",
+    "model_full": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_params_b": 0.5,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "framework": "TensorRT-LLM",
+    "framework_version": "0.21.0",
+    "tier": "community",
+    "submitted_by": "JuhaoLiang1997",
+    "date": "2026-07-25",
+    "reproduce_script": "runners/nvidia_tensorrt_llm_21323970/runner.py",
+    "runner_id": "nvidia_tensorrt_llm_21323970",
+    "scenarios": {
+      "offline": {
+        "throughput": 4409.65,
+        "metric_label": "tokens/sec",
+        "concurrency": 16,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 4409.65,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 16,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "39c3d117",
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 80.0,
+    "suite": "suite_H",
+    "model": "Mistral-7B-Instruct-v0.1",
+    "model_full": "mistralai/Mistral-7B-Instruct-v0.1",
+    "model_params_b": 7.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "framework": "TensorRT-LLM",
+    "framework_version": "0.21.0",
+    "tier": "community",
+    "submitted_by": "JuhaoLiang1997",
+    "date": "2026-07-25",
+    "reproduce_script": "runners/nvidia_tensorrt_llm_21323970/runner.py",
+    "runner_id": "nvidia_tensorrt_llm_21323970",
+    "scenarios": {
+      "offline": {
+        "throughput": 2315.6,
+        "metric_label": "tokens/sec",
+        "concurrency": 8,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 2315.6,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 8,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "4528133f",
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 80.0,
+    "suite": "suite_H",
+    "model": "Mistral-7B-Instruct-v0.1",
+    "model_full": "mistralai/Mistral-7B-Instruct-v0.1",
+    "model_params_b": 7.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vLLM",
+    "framework_version": "0.7.3",
+    "tier": "community",
+    "submitted_by": "JuhaoLiang1997",
+    "date": "2026-07-25",
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "runner_id": "nvidia_vllm_47f5d58e",
+    "scenarios": {
+      "offline": {
+        "throughput": 2068.92,
+        "metric_label": "tokens/sec",
+        "concurrency": 32,
+        "peak_memory_gb": 71.05,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 5,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "interactive": {
+        "throughput": 2068.92,
+        "metric_label": "tokens/sec",
+        "concurrency": 32,
+        "peak_memory_gb": 71.05,
+        "is_valid": true
+      },
+      "sustained": {
+        "throughput": 508.9,
+        "metric_label": "tok/s (sustained mean)",
+        "concurrency": 8,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "burst": {
+        "throughput": 0.0,
+        "metric_label": "1 − degradation_ratio",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 2068.92,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 32,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": 71.05
     }
   },
   {
@@ -11728,43 +11946,6 @@ const DISTRIBUTION_GROUPS = [
     "best_submitted_by": "Gong-K"
   },
   {
-    "chip": "NVIDIA A800-SXM4-80GB",
-    "chip_vendor": "NVIDIA",
-    "suite": "suite_F",
-    "model": "Qwen2.5-0.5B-Instruct",
-    "submission_count": 2,
-    "best_throughput": 36713.29,
-    "median_throughput": 36713.29,
-    "min_throughput": 11972.12,
-    "max_throughput": 36713.29,
-    "stddev_throughput": 17494.65,
-    "scenario_summary": {
-      "offline": {
-        "count": 2,
-        "best_throughput": 36713.29,
-        "best_framework": "SGLang"
-      },
-      "online": {
-        "count": 2,
-        "best_throughput": 40,
-        "best_framework": "SGLang"
-      },
-      "interactive": {
-        "count": 2,
-        "best_throughput": 36713.29,
-        "best_framework": "SGLang"
-      },
-      "sustained": {
-        "count": 2,
-        "best_throughput": 7323.3,
-        "best_framework": "SGLang"
-      }
-    },
-    "best_submission_id": "088cfa14",
-    "best_framework": "SGLang",
-    "best_submitted_by": "Gong-K"
-  },
-  {
     "chip": "NVIDIA A100-SXM4-80GB",
     "chip_vendor": "NVIDIA",
     "suite": "suite_F",
@@ -12086,6 +12267,43 @@ const DISTRIBUTION_GROUPS = [
     "best_submission_id": "53471efa",
     "best_framework": "vLLM",
     "best_submitted_by": "JuhaoLiang1997"
+  },
+  {
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "suite": "suite_F",
+    "model": "Qwen2.5-0.5B-Instruct",
+    "submission_count": 3,
+    "best_throughput": 36713.29,
+    "median_throughput": 11972.12,
+    "min_throughput": 4409.65,
+    "max_throughput": 36713.29,
+    "stddev_throughput": 16895.96,
+    "scenario_summary": {
+      "offline": {
+        "count": 3,
+        "best_throughput": 36713.29,
+        "best_framework": "SGLang"
+      },
+      "online": {
+        "count": 2,
+        "best_throughput": 40,
+        "best_framework": "SGLang"
+      },
+      "interactive": {
+        "count": 2,
+        "best_throughput": 36713.29,
+        "best_framework": "SGLang"
+      },
+      "sustained": {
+        "count": 2,
+        "best_throughput": 7323.3,
+        "best_framework": "SGLang"
+      }
+    },
+    "best_submission_id": "088cfa14",
+    "best_framework": "SGLang",
+    "best_submitted_by": "Gong-K"
   },
   {
     "chip": "NVIDIA H20-3e",
@@ -12845,53 +13063,6 @@ const DISTRIBUTION_GROUPS = [
     "best_submitted_by": "Gong-K"
   },
   {
-    "chip": "NVIDIA A800-SXM4-80GB",
-    "chip_vendor": "NVIDIA",
-    "suite": "suite_A",
-    "model": "Meta-Llama-3-8B-Instruct",
-    "submission_count": 2,
-    "best_throughput": 3850.31,
-    "median_throughput": 3850.31,
-    "min_throughput": 2723.49,
-    "max_throughput": 3850.31,
-    "stddev_throughput": 796.78,
-    "scenario_summary": {
-      "offline": {
-        "count": 2,
-        "best_throughput": 3850.31,
-        "best_framework": "SGLang"
-      },
-      "online": {
-        "count": 2,
-        "best_throughput": 100,
-        "best_framework": "SGLang"
-      },
-      "interactive": {
-        "count": 2,
-        "best_throughput": 3850.31,
-        "best_framework": "SGLang"
-      },
-      "sustained": {
-        "count": 2,
-        "best_throughput": 664.1,
-        "best_framework": "SGLang"
-      },
-      "speculative": {
-        "count": 2,
-        "best_throughput": 1050.9,
-        "best_framework": "vLLM"
-      },
-      "burst": {
-        "count": 2,
-        "best_throughput": null,
-        "best_framework": ""
-      }
-    },
-    "best_submission_id": "93928a91",
-    "best_framework": "SGLang",
-    "best_submitted_by": "Gong-K"
-  },
-  {
     "chip": "NVIDIA A100-SXM4-80GB",
     "chip_vendor": "NVIDIA",
     "suite": "suite_A",
@@ -13232,17 +13403,64 @@ const DISTRIBUTION_GROUPS = [
   {
     "chip": "NVIDIA A800-SXM4-80GB",
     "chip_vendor": "NVIDIA",
-    "suite": "suite_C",
-    "model": "Llama-3.1-8B-Instruct",
-    "submission_count": 8,
-    "best_throughput": 4024.12,
-    "median_throughput": 2859.89,
-    "min_throughput": 1770.93,
-    "max_throughput": 4024.12,
-    "stddev_throughput": 793.56,
+    "suite": "suite_A",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "submission_count": 3,
+    "best_throughput": 3850.31,
+    "median_throughput": 2723.49,
+    "min_throughput": 2360.28,
+    "max_throughput": 3850.31,
+    "stddev_throughput": 776.94,
     "scenario_summary": {
       "offline": {
-        "count": 8,
+        "count": 3,
+        "best_throughput": 3850.31,
+        "best_framework": "SGLang"
+      },
+      "online": {
+        "count": 2,
+        "best_throughput": 100,
+        "best_framework": "SGLang"
+      },
+      "interactive": {
+        "count": 2,
+        "best_throughput": 3850.31,
+        "best_framework": "SGLang"
+      },
+      "sustained": {
+        "count": 2,
+        "best_throughput": 664.1,
+        "best_framework": "SGLang"
+      },
+      "speculative": {
+        "count": 2,
+        "best_throughput": 1050.9,
+        "best_framework": "vLLM"
+      },
+      "burst": {
+        "count": 2,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "93928a91",
+    "best_framework": "SGLang",
+    "best_submitted_by": "Gong-K"
+  },
+  {
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "suite": "suite_C",
+    "model": "Llama-3.1-8B-Instruct",
+    "submission_count": 9,
+    "best_throughput": 4024.12,
+    "median_throughput": 2710.52,
+    "min_throughput": 1770.93,
+    "max_throughput": 4024.12,
+    "stddev_throughput": 766.32,
+    "scenario_summary": {
+      "offline": {
+        "count": 9,
         "best_throughput": 4024.12,
         "best_framework": "SGLang"
       },
@@ -13345,6 +13563,48 @@ const DISTRIBUTION_GROUPS = [
     },
     "best_submission_id": "f0d031f5",
     "best_framework": "vLLM",
+    "best_submitted_by": "JuhaoLiang1997"
+  },
+  {
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "suite": "suite_H",
+    "model": "Mistral-7B-Instruct-v0.1",
+    "submission_count": 2,
+    "best_throughput": 2315.6,
+    "median_throughput": 2315.6,
+    "min_throughput": 2068.92,
+    "max_throughput": 2315.6,
+    "stddev_throughput": 174.43,
+    "scenario_summary": {
+      "offline": {
+        "count": 2,
+        "best_throughput": 2315.6,
+        "best_framework": "TensorRT-LLM"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": 5,
+        "best_framework": "vLLM"
+      },
+      "interactive": {
+        "count": 1,
+        "best_throughput": 2068.92,
+        "best_framework": "vLLM"
+      },
+      "sustained": {
+        "count": 1,
+        "best_throughput": 508.9,
+        "best_framework": "vLLM"
+      },
+      "burst": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "39c3d117",
+    "best_framework": "TensorRT-LLM",
     "best_submitted_by": "JuhaoLiang1997"
   },
   {
@@ -15764,6 +16024,40 @@ const DISTRIBUTION_SUITE_META = {
     "scenarios_extra": [
       "interactive",
       "sustained"
+    ]
+  },
+  "suite_H": {
+    "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
+    "model_revision": "26bca36bde8333b5d7f72e9ed20ccda6a618af24",
+    "dataset": "sharegpt_swa_v1",
+    "precision_required": "BF16",
+    "allowed_precisions": [
+      "BF16",
+      "FP16"
+    ],
+    "max_model_len": 32768,
+    "concurrency_levels": [
+      8,
+      32,
+      128
+    ],
+    "online_qps_levels": [
+      5,
+      25,
+      100
+    ],
+    "online_sla_ttft_ms": 500,
+    "input_tokens_p50": 10000,
+    "output_tokens_p50": 256,
+    "scenarios_default": [
+      "accuracy",
+      "offline",
+      "online"
+    ],
+    "scenarios_extra": [
+      "interactive",
+      "sustained",
+      "burst"
     ]
   }
 };
