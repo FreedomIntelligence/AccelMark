@@ -115,7 +115,11 @@
     }
   },
   "metrics": {
-    "derived": {},
+    "derived": {
+      "tokens_per_sec_per_watt": 6.4297,
+      "tokens_per_joule": 6.4297,
+      "energy_joules": 5432.93
+    },
     "offline": {
       "results_by_concurrency": [
         {
