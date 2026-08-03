@@ -70,6 +70,16 @@ const SUITE_FINDINGS = {
       "17% on Suite G; its 4,000 GB/s aggregate bandwidth pays off more " +
       "than its compute.",
   },
+  suite_H: {
+    headline: "SWA's memory win depends on the software stack",
+    body:
+      "Mistral-7B's 4,096-token sliding window caps KV-cache growth at 10K " +
+      "context, but only if the serving framework honors SWA-aware KV " +
+      "allocation. vLLM 0.7.3 applies the window in attention while sizing " +
+      "the KV cache as if it were full attention — the theoretical memory " +
+      "advantage never reaches the concurrency ceiling. Suite H makes the " +
+      "architecture-to-software gap measurable.",
+  },
 };
 
 // Three cross-suite ranking inversions distilled from the paper.
@@ -125,7 +135,7 @@ const SCENARIO_CATALOG = [
       { k: "Threshold", v: "Suite-specific baseline" },
       { k: "Cost",      v: "~5 min / chip" },
     ],
-    appliesTo: { default: ["A", "B", "C", "D", "F", "G"], extra: [] },
+    appliesTo: { default: ["A", "B", "C", "D", "F", "G", "H"], extra: [] },
   },
   {
     name: "offline",
@@ -139,7 +149,7 @@ const SCENARIO_CATALOG = [
       { k: "Concurrency", v: "Unbounded (vendor-tuned)" },
       { k: "Cost",      v: "~10 to 15 min / chip" },
     ],
-    appliesTo: { default: ["A", "B", "C", "D", "E", "F", "G"], extra: [] },
+    appliesTo: { default: ["A", "B", "C", "D", "E", "F", "G", "H"], extra: [] },
   },
   {
     name: "online",
@@ -153,7 +163,7 @@ const SCENARIO_CATALOG = [
       { k: "SLA",       v: "p99 TTFT ≤ 500 ms" },
       { k: "Arrivals",  v: "Poisson, vendor sweep" },
     ],
-    appliesTo: { default: ["A", "B", "F", "G"], extra: ["C", "D"] },
+    appliesTo: { default: ["A", "B", "F", "G", "H"], extra: ["C", "D"] },
   },
   {
     name: "interactive",
@@ -167,7 +177,7 @@ const SCENARIO_CATALOG = [
       { k: "Concurrency", v: "1 stream" },
       { k: "Streams",   v: "Many short conversations" },
     ],
-    appliesTo: { default: ["F"], extra: ["A", "B", "D", "G"] },
+    appliesTo: { default: ["F"], extra: ["A", "B", "D", "G", "H"] },
   },
   {
     name: "sustained",
@@ -181,7 +191,7 @@ const SCENARIO_CATALOG = [
       { k: "Duration",  v: "15 to 30 minutes" },
       { k: "Load",      v: "Fixed concurrency" },
     ],
-    appliesTo: { default: [], extra: ["A", "B", "C", "D", "F", "G"] },
+    appliesTo: { default: [], extra: ["A", "B", "C", "D", "F", "G", "H"] },
   },
   {
     name: "speculative",
@@ -209,7 +219,7 @@ const SCENARIO_CATALOG = [
       { k: "Burst",     v: "5× steady traffic" },
       { k: "Window",    v: "Short pulses + recovery" },
     ],
-    appliesTo: { default: [], extra: ["A", "B"] },
+    appliesTo: { default: [], extra: ["A", "B", "H"] },
   },
 ];
 
@@ -237,6 +247,14 @@ const DATASETS = [
     inputP50: "~95 tok",
     outputP50: "~150 tok",
     notes: "Short single-turn prompts; keeps the edge suite bandwidth-isolated.",
+  },
+  {
+    name: "sharegpt_swa_v1",
+    used: "H",
+    prompts: "100",
+    inputP50: "~10,000 tok",
+    outputP50: "≤256 tok",
+    notes: "Tail 10K tokens of long dialogues — long enough to exceed the 4,096-token SWA window and trigger windowed attention.",
   },
 ];
 
@@ -297,7 +315,7 @@ const SCN_ICONS = {
     </svg>`,
 };
 
-// Roofline mini-diagram.  Coordinates are hand-tuned so the seven dots
+// Roofline mini-diagram.  Coordinates are hand-tuned so the eight dots
 // land at roughly the right region of the spectrum for each suite.
 const ROOFLINE_POINTS = [
   { letter: "F", x:  68, y: 168, label: "right" },  // far left, bandwidth-bound, smallest model
@@ -306,6 +324,7 @@ const ROOFLINE_POINTS = [
   { letter: "B", x: 138, y:  96, label: "left"  },  // 70B multi-chip
   { letter: "C", x: 168, y:  68, label: "left"  },  // quantization, transition
   { letter: "E", x: 192, y:  56, label: "right" },  // scaling, near the knee
+  { letter: "H", x: 220, y:  62, label: "right" },  // SWA long-context, KV capped
   { letter: "D", x: 268, y:  56, label: "left"  },  // compute-bound long context
 ];
 

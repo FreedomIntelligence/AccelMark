@@ -21,6 +21,7 @@
 .modal-shell[data-suite="E"] { --suite-color: var(--suite-E); }
 .modal-shell[data-suite="F"] { --suite-color: var(--suite-F); }
 .modal-shell[data-suite="G"] { --suite-color: var(--suite-G); }
+.modal-shell[data-suite="H"] { --suite-color: var(--suite-H); }
 .modal-shell                  { --suite-color: var(--accent-2); }
 
 /* ── Backdrop ──────────────────────────────────────────────── */

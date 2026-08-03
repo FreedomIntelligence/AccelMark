@@ -3,7 +3,7 @@
 // Page anatomy:
 //   • Compact hero with the active suite's eyebrow + title + tagline.
 //   • Sticky toolbar:
-//       row 1 — 7 suite filter pills (color-bound to --suite-X).
+//       row 1 — 8 suite filter pills (color-bound to --suite-X).
 //       row 2 — multi-select vendor / precision / framework facet pills,
 //               populated from the rows in the active suite (filters that
 //               would empty the set get hidden, not greyed).

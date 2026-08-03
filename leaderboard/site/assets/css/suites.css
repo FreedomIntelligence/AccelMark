@@ -30,6 +30,10 @@
 .inversion-card[data-suite="G"],
 .scn-card .scn-suite-letter[data-suite="G"],
 .rfl-dot[data-suite="G"] { --suite-color: var(--suite-G); }
+.suite-spec[data-suite="H"],
+.inversion-card[data-suite="H"],
+.scn-card .scn-suite-letter[data-suite="H"],
+.rfl-dot[data-suite="H"] { --suite-color: var(--suite-H); }
 .suite-spec,
 .inversion-card,
 .scn-card .scn-suite-letter,

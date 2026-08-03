@@ -887,6 +887,7 @@ function _renderViz(row, panel) {
     case "suite_E": _renderSuiteE (panel, row, viz);          break;
     case "suite_F": _renderSuiteAB(panel, row, viz, "purple"); break;
     case "suite_G": _renderSuiteG (panel, row, viz);          break;
+    case "suite_H": _renderSuiteH (panel, row, viz);          break;
     case "sustained": _renderSustained(panel, row, viz); break;
     default:
       panel.innerHTML = `<div class="viz-empty">Visualization for type "${esc(viz.type || "unknown")}" is not yet supported.</div>`;
@@ -1035,7 +1036,9 @@ function _fmtKMs(v) {
 // Used for suite_A and suite_F (just changes the accent color).
 function _renderSuiteAB(el, row, viz, accent) {
   const C = chartColors();
-  const accentHex = accent === "purple" ? C.purple : C.blue;
+  const accentHex = accent === "purple" ? C.purple
+                  : accent === "amber"  ? C.amber
+                  : C.blue;
 
   if (viz.offline && viz.offline.labels && viz.offline.labels.length) {
     el.appendChild(_section("Offline — throughput by concurrency"));
@@ -1484,6 +1487,25 @@ function _renderSuiteG(el, row, viz) {
       el.appendChild(_statChips(items));
     }
   }
+}
+
+function _renderSuiteH(el, row, viz) {
+  // SWA long-context suite: reuse the single-chip AB layout
+  // (offline / online / interactive / burst), then surface the
+  // sliding-window angle explicitly.
+  _renderSuiteAB(el, row, viz, "amber");
+
+  el.appendChild(_section("Sliding Window Attention"));
+  el.appendChild(_statChips([
+    { label: "Window size", value: "4,096 tokens" },
+    { label: "Prompt length", value: row.offline_throughput != null ? "10K tokens" : null },
+    { label: "KV cache bound", value: "window, not context" },
+  ]));
+  el.appendChild(document.createElement("p").appendChild(
+    document.createTextNode(
+      "Mistral-7B applies a 4,096-token sliding window on every layer, so at 10K-context prompts the KV cache is capped by the window. Whether a framework actually honors SWA-aware KV allocation determines how much of that memory win shows up in the concurrency ceiling."
+    )
+  ).parentNode);
 }
 
 function _renderSustained(el, row, viz) {
