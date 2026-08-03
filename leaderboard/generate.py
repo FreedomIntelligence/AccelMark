@@ -617,6 +617,22 @@ def extract_viz(result: dict, metrics: dict) -> dict:
             "runtime_metrics": rm if rm else None,
         }
 
+    if suite == "suite_H":
+        rows = _offline_rows()
+        return {
+            "type": "suite_H",
+            "offline": {
+                "labels":     _concurrency_labels(rows),
+                "throughput": [r.get("throughput_tokens_per_sec") for r in rows],
+                "memory_gb":  [r.get("peak_memory_gb")            for r in rows],
+                "throughput_reliability": _offline_reliability(rows),
+            },
+            "online":      _online_block(),
+            "interactive": _interactive_block(),
+            "sustained":   _sustained_block(),
+            "burst":       _burst_block(),
+        }
+
     if metrics.get("sustained"):
         sustained = metrics.get("sustained", {})
         samples   = sustained.get("samples", [])
@@ -875,6 +891,9 @@ def extract_row(result: dict) -> dict:
         "min_price_usd_per_hr":               min_price,
         "cost_efficiency_toks_per_dollar_hr": cost_efficiency,
         "tokens_per_watt":                    derived.get("tokens_per_sec_per_watt"),
+        "tokens_per_joule":                  derived.get("tokens_per_joule"),
+        "energy_joules":                     derived.get("energy_joules"),
+        # Metadata
         "accuracy_valid":   accuracy.get("valid"),
         "accuracy_score":   accuracy.get("subset_score"),
         "date":             meta.get("date"),

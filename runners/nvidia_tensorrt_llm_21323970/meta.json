@@ -1,0 +1,20 @@
+{
+  "id": "nvidia_tensorrt_llm_21323970",
+  "platform": "nvidia",
+  "name": "TensorRT-LLM on NVIDIA (PyTorch backend)",
+  "framework": "TensorRT-LLM",
+  "submitted_by": "AccelMark Team",
+  "description": "NVIDIA TensorRT-LLM runner using the default PyTorch backend (torch.export + torch.compile). No explicit engine build step — loads models directly from HuggingFace. Compares against the vLLM runner on identical hardware to isolate framework-level (vLLM vs TensorRT-LLM) effects on benchmark results.",
+  "created": "2026-07-24",
+  "notes": "Requires tensorrt_llm >= 1.2.0 and PyTorch >= 2.6. The PyTorch backend performs automatic graph capture on first load — the first inference call includes JIT compilation overhead. All benchmarks include warmup runs before measurement to absorb this cost. Suite C: BF16 only — FP8/W8A8/W8A16/W4A16 unsupported in TRT-LLM 0.21 PyTorch backend. Suite D: torch.export graph capture hangs at 28K context length.",
+  "suite_support": {
+    "A": "validated",
+    "B": "pending",
+    "C": "validated",
+    "D": "unsupported",
+    "E": "pending",
+    "F": "validated",
+    "G": "pending",
+    "H": "pending"
+  }
+}

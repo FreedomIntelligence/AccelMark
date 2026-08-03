@@ -21,6 +21,7 @@
 .rk-hero[data-suite="E"],        .data-table[data-suite="E"],   .rk-chip-focus[data-suite="E"] { --suite-color: var(--suite-E); }
 .rk-hero[data-suite="F"],        .data-table[data-suite="F"],   .rk-chip-focus[data-suite="F"] { --suite-color: var(--suite-F); }
 .rk-hero[data-suite="G"],        .data-table[data-suite="G"],   .rk-chip-focus[data-suite="G"] { --suite-color: var(--suite-G); }
+.rk-hero[data-suite="H"],        .data-table[data-suite="H"],   .rk-chip-focus[data-suite="H"] { --suite-color: var(--suite-H); }
 
 .rk-suite-pill[data-suite="suite_A"] { --suite-color: var(--suite-A); }
 .rk-suite-pill[data-suite="suite_B"] { --suite-color: var(--suite-B); }
@@ -803,6 +804,7 @@
 .cmp-table[data-suite="E"] { --suite-color: var(--suite-E); }
 .cmp-table[data-suite="F"] { --suite-color: var(--suite-F); }
 .cmp-table[data-suite="G"] { --suite-color: var(--suite-G); }
+.cmp-table[data-suite="H"] { --suite-color: var(--suite-H); }
 
 .cmp-table thead th {
   background: var(--bg-elev);

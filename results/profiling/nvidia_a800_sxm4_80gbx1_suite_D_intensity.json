@@ -1,0 +1,59 @@
+{
+  "suite": "suite_D",
+  "chip": "NVIDIA A800-SXM4-80GB",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "operating_point": {
+    "batch": 1,
+    "prompt_len": 28650,
+    "gen_len": 256,
+    "dtype": "bfloat16"
+  },
+  "phases": {
+    "prefill": {
+      "flops": 645198135686400,
+      "bytes": 19815735296,
+      "bytes_read": 16060522496,
+      "bytes_written": 3755212800,
+      "arithmetic_intensity": 32559.89,
+      "achieved_tflops": 199.05,
+      "achieved_bw_gbps": 6.11,
+      "time_ms_median": 3241.46,
+      "time_frac": 0.965,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    },
+    "decode": {
+      "flops": 30047993984,
+      "bytes": 19815735296,
+      "bytes_read": 16060522496,
+      "bytes_written": 3755212800,
+      "arithmetic_intensity": 1.52,
+      "achieved_tflops": 0.26,
+      "achieved_bw_gbps": 168.67,
+      "time_ms_median": 117.48,
+      "time_frac": 0.035,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    }
+  },
+  "blended": {
+    "ai": 128.2,
+    "weighting": "token-weighted: 1x prefill (S=28650) + 256x decode (1 token each), batch=1 (weight reads amortised)",
+    "classification": "bandwidth-bound"
+  },
+  "chip_peak": {
+    "tflops": 312.0,
+    "bw_gbps": 2039.0,
+    "ridge_point_i_star": 153.02,
+    "source": "builtin:NVIDIA A800-SXM4-80GB"
+  },
+  "classification": {
+    "prefill": "compute-bound",
+    "decode": "bandwidth-bound"
+  },
+  "env_ref": {
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "note": "env_info.json not provided; run collect_env.py first"
+  },
+  "runtime_note": "FLOPs: measured via torch.utils.FlopCounterMode (GQA-patched, causal-corrected) on HuggingFace transformers.AutoModelForCausalLM. Bytes: analytical from model geometry (weight footprint + KV cache). The analytical byte model is runtime-agnostic \u2014 I values depend on model architecture and batch dimensions, not the inference framework. The paper's throughput data is from vLLM; ncu validation on live vLLM processes is planned for mid-term cross-validation. See workspace/nips26_rebuttal/coauthor_response/profiling_\u4fee\u6539\u53cd\u9988.md item P1-1 for details."
+}

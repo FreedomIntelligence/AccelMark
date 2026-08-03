@@ -1,0 +1,32 @@
+# TensorRT-LLM runner configuration — Example
+# Copy to: configs/runner_configs/runner_nvidia_tensorrt_llm_<hash8>.yaml
+#
+# All fields are optional — defaults are used when fields are absent.
+
+# ── Scheduler ──────────────────────────────────────────────────────────────
+
+# Maximum batch size (concurrent requests). TRT-LLM packs sequences into
+# micro-batches dynamically. For 24 GB GPUs (RTX 3090/4090), reduce to 128.
+# For 80 GB GPUs, 512 is a safe default. Increase to 1024+ for H200.
+max_batch_size: 512
+
+# Maximum tokens in a single forward pass iteration. Higher values improve
+# GPU utilization but increase memory pressure. For long-context workloads
+# (Suite D, ~28K tokens), consider raising to 32768.
+max_num_tokens: 8192
+
+# ── Engine ─────────────────────────────────────────────────────────────────
+
+# Additional keyword arguments passed directly to tensorrt_llm.LLM() and
+# AsyncLLM(). Refer to the TRT-LLM docs for the full list:
+#   https://nvidia.github.io/TensorRT-LLM/
+# Common options:
+#   backend: "pytorch"       — (default) torch.export graph capture
+#   enable_chunked_prefill   — improves long-context prefill throughput
+#   enable_context_fmha_fusion — fuse QKV projection with FlashAttention
+#   free_gpu_memory_fraction  — fraction of free GPU memory to use for KV cache
+engine_kwargs: {}
+  # Example:
+  # backend: "pytorch"
+  # enable_chunked_prefill: true
+  # free_gpu_memory_fraction: 0.90

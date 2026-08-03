@@ -154,6 +154,16 @@ def detect_intra_node_interconnect() -> str | None:
     return None
 
 
+def sample_power_watts() -> float | None:
+    """Return instantaneous total board power (watts) for Apple Silicon.
+    TODO: Apple Silicon power sampling is not yet wired. The system
+    `powermetrics` tool requires root privileges and cannot be run from a
+    standard benchmark process. Future work could sample via IOKit or a
+    privileged helper process.
+    """
+    return None
+
+
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     notes: list[str] = []
     runtime = env.get("runtime_version") or ""

@@ -1,0 +1,44 @@
+{
+  "collected_at": "2026-05-22T11:00:26.756229+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA B200",
+      "vendor": "NVIDIA",
+      "memory_gb": 179.1,
+      "driver_version": "595.71.05",
+      "firmware_version": null,
+      "compute_capability": "10.0",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_platform": "nvidia",
+  "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t0-47,96-143\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "Intel(R) Xeon(R) Platinum 8559C",
+    "physical_cores": 96,
+    "logical_cores": 192,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 1996.0,
+  "pcie_generation": "PCIe Gen 5",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_1",
+      "type": "InfiniBand",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.5 LTS",
+  "python_version": "3.12.13",
+  "kernel_version": "6.17.0-1013-aws",
+  "runtime_version": "CUDA 13.0",
+  "pytorch_version": "2.11.0+cu130"
+}

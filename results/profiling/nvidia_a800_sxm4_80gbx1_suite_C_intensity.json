@@ -1,0 +1,55 @@
+{
+  "suite": "suite_C",
+  "chip": "NVIDIA A800-SXM4-80GB",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "operating_point": {
+    "batch": 32,
+    "prompt_len": 280,
+    "gen_len": 128,
+    "dtype": "bfloat16"
+  },
+  "phases": {
+    "prefill": {
+      "flops": 135143494814720,
+      "bytes": 17234927616,
+      "bytes_read": 16060522496,
+      "bytes_written": 1174405120,
+      "arithmetic_intensity": 7841.26,
+      "achieved_tflops": 197.83,
+      "achieved_bw_gbps": 25.23,
+      "time_ms_median": 683.12,
+      "time_frac": 0.9353,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    },
+    "decode": {
+      "flops": 485566185600,
+      "bytes": 17234927616,
+      "bytes_read": 16060522496,
+      "bytes_written": 1174405120,
+      "arithmetic_intensity": 28.17,
+      "achieved_tflops": 10.28,
+      "achieved_bw_gbps": 364.76,
+      "time_ms_median": 47.25,
+      "time_frac": 0.0647,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    }
+  },
+  "blended": {},
+  "chip_peak": {
+    "tflops": 312.0,
+    "bw_gbps": 2039.0,
+    "ridge_point_i_star": 153.02,
+    "source": "builtin:NVIDIA A800-SXM4-80GB"
+  },
+  "classification": {
+    "prefill": "compute-bound",
+    "decode": "bandwidth-bound"
+  },
+  "env_ref": {
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "note": "env_info.json not provided; run collect_env.py first"
+  },
+  "runtime_note": "FLOPs: measured via torch.utils.FlopCounterMode (GQA-patched, causal-corrected) on HuggingFace transformers.AutoModelForCausalLM. Bytes: analytical from model geometry (weight footprint + KV cache). The analytical byte model is runtime-agnostic \u2014 I values depend on model architecture and batch dimensions, not the inference framework. The paper's throughput data is from vLLM; ncu validation on live vLLM processes is planned for mid-term cross-validation. See workspace/nips26_rebuttal/coauthor_response/profiling_\u4fee\u6539\u53cd\u9988.md item P1-1 for details."
+}

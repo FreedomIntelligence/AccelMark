@@ -55,7 +55,35 @@ export function formatPrimary(value, suiteId) {
   return p.unit ? `${num} ${p.unit}` : num;
 }
 
-export const SUITE_ORDER = ["suite_A", "suite_B", "suite_C", "suite_D", "suite_E", "suite_F", "suite_G"];
+export const SUITE_ORDER = ["suite_A", "suite_B", "suite_C", "suite_D", "suite_E", "suite_F", "suite_G", "suite_H"];
+
+/** Line 1 for charts: "Suite A" */
+export function suiteChartHead(suiteId) {
+  const meta = SUITE_META[suiteId];
+  if (!meta) return suiteId;
+  return meta.letter ? `Suite ${meta.letter}` : suiteId;
+}
+
+/** Line 2 for charts: short purpose string */
+export function suiteChartPurpose(suiteId) {
+  const meta = SUITE_META[suiteId];
+  if (!meta) return "";
+  return meta.chartPurpose || meta.title || "";
+}
+
+/** Chart axis / tooltip label. multiline → "Suite A\\nSingle-chip inference" */
+export function suiteChartAxisLabel(suiteId, multiline = false) {
+  const head = suiteChartHead(suiteId);
+  const purpose = suiteChartPurpose(suiteId);
+  if (multiline && purpose) return `${head}\n${purpose}`;
+  return purpose ? `${head} · ${purpose}` : head;
+}
+
+/** Hover blurb for chart tooltips — uses existing tagline. */
+export function suiteChartBlurb(suiteId) {
+  const meta = SUITE_META[suiteId];
+  return meta?.tagline || "";
+}
 
 /** Line 1 for charts: "Suite A" */
 export function suiteChartHead(suiteId) {
@@ -206,6 +234,11 @@ export const SUITE_COLUMNS = {
   suite_G: [
     { key: "sustained_throughput", label: "Sustained",      unit: "tok/s", direction: "desc", primary: true },
     { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc" },
+  ],
+  suite_H: [
+    { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
+    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+    { key: "interactive_ttft_p99", label: "TTFT p99",       unit: "ms",    direction: "asc", decimals: 0 },
   ],
 };
 

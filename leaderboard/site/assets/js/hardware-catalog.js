@@ -42,7 +42,7 @@ export const CHIPS_BY_VENDOR = {
     { name: "H800 80GB", memoryGb: 80, tier: "datacenter", suites: ["suite_A", "suite_B"] },
     { name: "A100 80GB", memoryGb: 80, tier: "datacenter", suites: ["suite_A", "suite_B"] },
     { name: "A100 40GB", memoryGb: 40, tier: "datacenter", suites: ["suite_A"] },
-    { name: "A800 80GB", memoryGb: 80, tier: "datacenter", suites: ["suite_A"] },
+    { name: "A800 80GB", memoryGb: 80, tier: "datacenter", suites: ["suite_A", "suite_H"] },
     { name: "L40S", memoryGb: 48, tier: "datacenter", badge: "Cost-efficient inference", suites: ["suite_A", "suite_F"] },
     { name: "L4", memoryGb: 24, tier: "datacenter", badge: "Edge inference", suites: ["suite_F"] },
     { name: "A10", memoryGb: 24, tier: "datacenter", suites: ["suite_F"] },

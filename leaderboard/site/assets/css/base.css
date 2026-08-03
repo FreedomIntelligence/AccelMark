@@ -46,6 +46,7 @@
   --suite-E: #16a34a;   /* emerald — Scaling efficiency */
   --suite-F: #db2777;   /* rose — Edge / low-power */
   --suite-G: #6366f1;   /* indigo — Sustained load */
+  --suite-H: #f59e0b;   /* amber — Sliding Window Attention */
 
   /* Vendor colour table now lives in data.js (`VENDOR_COLORS`) and is
    * injected at runtime as `[data-vendor="<name>"] { --vendor-color: ... }`
@@ -113,6 +114,7 @@
     --suite-E: #15803d;
     --suite-F: #be185d;
     --suite-G: #4338ca;
+    --suite-H: #d97706;
 
     --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
     --shadow-lift: 0 8px 24px -10px rgba(15, 23, 42, 0.14);
