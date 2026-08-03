@@ -8542,79 +8542,6 @@ const DISTRIBUTION_SUBMISSIONS = [
     }
   },
   {
-    "id": "83e3ec26",
-    "chip": "NVIDIA H20-3e",
-    "chip_vendor": "NVIDIA",
-    "chip_count": 1,
-    "memory_gb": 140.4,
-    "suite": "suite_A",
-    "model": "Meta-Llama-3-8B-Instruct",
-    "model_full": "meta-llama/Meta-Llama-3-8B-Instruct",
-    "model_params_b": 8.0,
-    "precision": "BF16",
-    "effective_dtype": "bfloat16",
-    "framework": "SGLang",
-    "framework_version": "0.5.6",
-    "tier": "community",
-    "submitted_by": "Gong-K",
-    "date": "2026-06-25",
-    "reproduce_script": "runners/nvidia_sglang_c43a8309/runner.py",
-    "runner_id": "nvidia_sglang_c43a8309",
-    "scenarios": {
-      "offline": {
-        "throughput": 4342.21,
-        "metric_label": "tokens/sec",
-        "concurrency": 128,
-        "peak_memory_gb": null,
-        "is_valid": true
-      },
-      "online": {
-        "throughput": 100,
-        "metric_label": "max valid QPS",
-        "concurrency": null,
-        "peak_memory_gb": null,
-        "is_valid": true
-      },
-      "interactive": {
-        "throughput": 4342.21,
-        "metric_label": "tokens/sec",
-        "concurrency": 128,
-        "peak_memory_gb": null,
-        "is_valid": true
-      },
-      "sustained": {
-        "throughput": 1272.2,
-        "metric_label": "tok/s (sustained mean)",
-        "concurrency": 8,
-        "peak_memory_gb": null,
-        "is_valid": true
-      },
-      "speculative": {
-        "throughput": 613.8,
-        "metric_label": "tok/s (speculative)",
-        "concurrency": 128,
-        "peak_memory_gb": null,
-        "is_valid": true
-      },
-      "burst": {
-        "throughput": 0.835,
-        "metric_label": "1 − degradation_ratio",
-        "concurrency": null,
-        "peak_memory_gb": null,
-        "is_valid": true
-      }
-    },
-    "primary_scenario": "offline",
-    "primary_throughput": 4342.21,
-    "primary_metric_label": "tokens/sec",
-    "config": {
-      "concurrency": 128,
-      "batch_size": null,
-      "tensor_parallel": 1,
-      "peak_memory_gb": null
-    }
-  },
-  {
     "id": "4e0e6eba",
     "chip": "Tesla V100-PCIE-32GB",
     "chip_vendor": "NVIDIA",
@@ -9547,53 +9474,6 @@ const DISTRIBUTION_GROUPS = [
     "best_submitted_by": "JuhaoLiang1997"
   },
   {
-    "chip": "NVIDIA H20-3e",
-    "chip_vendor": "NVIDIA",
-    "suite": "suite_A",
-    "model": "Meta-Llama-3-8B-Instruct",
-    "submission_count": 2,
-    "best_throughput": 4342.21,
-    "median_throughput": 4342.21,
-    "min_throughput": 2297.65,
-    "max_throughput": 4342.21,
-    "stddev_throughput": 1445.72,
-    "scenario_summary": {
-      "offline": {
-        "count": 2,
-        "best_throughput": 4342.21,
-        "best_framework": "SGLang"
-      },
-      "online": {
-        "count": 2,
-        "best_throughput": 100,
-        "best_framework": "SGLang"
-      },
-      "interactive": {
-        "count": 2,
-        "best_throughput": 4342.21,
-        "best_framework": "SGLang"
-      },
-      "sustained": {
-        "count": 2,
-        "best_throughput": 1272.2,
-        "best_framework": "SGLang"
-      },
-      "speculative": {
-        "count": 2,
-        "best_throughput": 783.62,
-        "best_framework": "vLLM"
-      },
-      "burst": {
-        "count": 2,
-        "best_throughput": 0.835,
-        "best_framework": "SGLang"
-      }
-    },
-    "best_submission_id": "83e3ec26",
-    "best_framework": "SGLang",
-    "best_submitted_by": "Gong-K"
-  },
-  {
     "chip": "NVIDIA A100-SXM4-80GB",
     "chip_vendor": "NVIDIA",
     "suite": "suite_A",
@@ -10120,6 +10000,53 @@ const DISTRIBUTION_GROUPS = [
       }
     },
     "best_submission_id": "f0d031f5",
+    "best_framework": "vLLM",
+    "best_submitted_by": "JuhaoLiang1997"
+  },
+  {
+    "chip": "NVIDIA H20-3e",
+    "chip_vendor": "NVIDIA",
+    "suite": "suite_A",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 2297.65,
+    "median_throughput": 2297.65,
+    "min_throughput": 2297.65,
+    "max_throughput": 2297.65,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 2297.65,
+        "best_framework": "vLLM"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": 5,
+        "best_framework": "vLLM"
+      },
+      "interactive": {
+        "count": 1,
+        "best_throughput": 2297.65,
+        "best_framework": "vLLM"
+      },
+      "sustained": {
+        "count": 1,
+        "best_throughput": 486.6,
+        "best_framework": "vLLM"
+      },
+      "speculative": {
+        "count": 1,
+        "best_throughput": 783.62,
+        "best_framework": "vLLM"
+      },
+      "burst": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "3f6269bb",
     "best_framework": "vLLM",
     "best_submitted_by": "JuhaoLiang1997"
   },

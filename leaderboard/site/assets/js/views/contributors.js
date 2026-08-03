@@ -1,16 +1,18 @@
 // contributors.js (view) — public contributor leaderboard.
-
 import { esc, fmtNum } from "../utils.js";
 import { contributorIndex, BADGE_DEFS } from "../contributors.js";
 import { summary } from "../data.js";
 import { communityHeader } from "../community-nav.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 function badgeHtml(ids) {
   if (!ids?.length) return "";
   return ids.map((id) => {
     const b = BADGE_DEFS[id];
     if (!b) return "";
-    return `<span class="contrib-badge" title="${esc(b.desc)}">${esc(b.label)}</span>`;
+    const labelKey = 'badge.' + id + '.label';
+    const descKey = 'badge.' + id + '.desc';
+    return `<span class="contrib-badge" title="${esc(_i(descKey, b.desc))}">${esc(_i(labelKey, b.label))}</span>`;
   }).join("");
 }
 
@@ -21,28 +23,27 @@ export function render({ el }) {
   el.innerHTML = `
     ${communityHeader(
       "contributors",
-      "Contributor index",
-      `${fmtNum(list.length)} contributors · ${fmtNum(s.total)} published runs · ${fmtNum(s.verified)} verified. ` +
-      `Profiles are derived from <code>submitted_by</code> in merged results (GitHub handle); no separate registration.`
+      _i('contributors.title'),
+      `${fmtNum(list.length)} ${_i('contributors.count')}`
     )}
 
     <section class="section community-section">
       <div class="section-header">
-        <div class="section-title"><h2>Ranking</h2></div>
-        <span class="section-sub">Score = runs + verified×3 + platforms×4 + first-result×12 + runner×5</span>
+        <div class="section-title"><h2>${_i('contributors.ranking')}</h2></div>
+        <span class="section-sub">${_i('contributors.scoreDesc')}</span>
       </div>
       ${list.length ? `
         <div class="contrib-table-wrap card">
           <table class="contrib-table community-data-table">
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Contributor</th>
-                <th>Runs</th>
-                <th>Verified</th>
-                <th>Platforms</th>
-                <th>Attributions</th>
-                <th>Score</th>
+                <th>${_i('contributors.rank')}</th>
+                <th>${_i('contributors.contributor')}</th>
+                <th>${_i('contributors.runs')}</th>
+                <th>${_i('contributors.verified')}</th>
+                <th>${_i('contributors.platforms')}</th>
+                <th>${_i('contributors.attribs')}</th>
+                <th>${_i('contributors.score')}</th>
               </tr>
             </thead>
             <tbody>
@@ -63,15 +64,16 @@ export function render({ el }) {
             </tbody>
           </table>
         </div>
-      ` : `<p class="state">No contributors yet — <a href="#/submit">submit the first result</a>.</p>`}
+      ` : `<p class="state">${_i('contributors.empty')} — <a href="#/submit">${_i('contributors.submitFirst')}</a>.</p>`}
 
       <aside class="community-note card">
-        <h2>Attribution definitions</h2>
+        <h2>${_i('contributors.attribDefs')}</h2>
         <dl class="badge-dl">
-          ${Object.values(BADGE_DEFS).map((b) => `
-            <dt>${esc(b.label)}</dt>
-            <dd>${esc(b.desc)}</dd>
-          `).join("")}
+          ${Object.values(BADGE_DEFS).map((b) => {
+            const lk = 'badge.' + b.id + '.label';
+            const dk = 'badge.' + b.id + '.desc';
+            return `<dt>${esc(_i(lk, b.label))}</dt><dd>${esc(_i(dk, b.desc))}</dd>`;
+          }).join("")}
         </dl>
       </aside>
     </section>

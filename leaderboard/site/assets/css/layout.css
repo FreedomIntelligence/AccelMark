@@ -108,7 +108,7 @@ footer a:hover { color: var(--fg); border-bottom-color: var(--fg); text-decorati
   color: var(--fg-muted);
   font-size: 0.92rem;
   line-height: 1.45;
-  text-align: right;
+  text-align: left;
   flex: 0 1 auto;
 }
 

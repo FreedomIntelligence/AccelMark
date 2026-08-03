@@ -27,8 +27,9 @@
 import {
   SUITE_ORDER, SUITE_META, VENDOR_ORDER,
   SUITE_COLUMNS, formatMetric,
-  rowsForSuite,
+  rowsForSuite, implOpsLabel,
 } from "../data.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 import {
   esc, fmtNum, fmtDate, chipHref, buildHash, parseHash,
   shortVersion,
@@ -119,9 +120,9 @@ export function render({ el, query }) {
 
   el.innerHTML = `
     <section class="rk-hero" data-suite="${esc(meta.letter)}">
-      <span class="eyebrow">Results · Suite ${esc(meta.letter)}</span>
-      <h1 class="rk-hero-title">${esc(meta.title)}</h1>
-      <p class="rk-hero-sub">${esc(meta.tagline)} Compare configurations across frameworks and hardware.</p>
+      <span class="eyebrow">${_i('rankings.eyebrow',{letter:esc(meta.letter)})}</span>
+      <h1 class="rk-hero-title">${esc(_i('suite.' + suiteId + '.title', meta.title))}</h1>
+      <p class="rk-hero-sub">${esc(_i('suite.' + suiteId + '.tagline', meta.tagline))} ${_i('rankings.subtitle')}</p>
     </section>
 
     <section class="rk-toolbar">
@@ -130,21 +131,21 @@ export function render({ el, query }) {
       </div>
 
       <div class="rk-filter-row">
-        ${renderFacetGroup("vendor",    "Vendor",    facets.vendor,    vendorFilter,    suiteId, query)}
-        ${renderFacetGroup("precision", "Precision", facets.precision, precisionFilter, suiteId, query)}
-        ${renderFacetGroup("framework", "Framework", facets.framework, frameworkFilter, suiteId, query)}
+        ${renderFacetGroup("vendor",    _i('rankings.table.vendor'),    facets.vendor,    vendorFilter,    suiteId, query)}
+        ${renderFacetGroup("precision", _i('rankings.table.precision'), facets.precision, precisionFilter, suiteId, query)}
+        ${renderFacetGroup("framework", _i('rankings.table.framework'), facets.framework, frameworkFilter, suiteId, query)}
         ${filtersActive
-          ? `<a class="rk-clear-all" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(suiteId)))}">Clear filters</a>`
+          ? `<a class="rk-clear-all" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(suiteId)))}">${_i('rankings.clear')}</a>`
           : ""}
       </div>
 
       <div class="rk-status">
         <span class="rk-count">
           <strong class="tnum">${fmtNum(sorted.length)}</strong>
-          of <span class="tnum">${fmtNum(allRows.length)}</span> results
+          ${_i('rankings.of')} <span class="tnum">${fmtNum(allRows.length)}</span> ${_i('rankings.results')}
         </span>
         <span class="rk-sortby">
-          Sorted by
+          ${_i('rankings.sorted')}
           <strong>${esc(colLabel(cols, sortKey))}</strong>
           <span class="rk-sort-arrow">${sortDir === "asc" ? "↑" : "↓"}</span>
         </span>
@@ -158,8 +159,8 @@ export function render({ el, query }) {
           Showing only <strong>${esc(chipFocusLabel)}</strong>${chipFocusVariants > 1 ? ` <span class="rk-chip-focus-variants">(across ${chipFocusVariants} chip-count variants)</span>` : ""} in Suite ${esc(meta.letter)}.
         </span>
         <span class="rk-chip-focus-actions">
-          <a class="btn ghost small" href="#/chip/${esc(chipFilter)}">View chip overview</a>
-          <a class="btn ghost small" href="${esc(buildHash("/rankings", { ...query, chip: undefined }))}">Show all results</a>
+          <a class="btn ghost small" href="#/chip/${esc(chipFilter)}">${_i('rankings.viewchip')}</a>
+          <a class="btn ghost small" href="${esc(buildHash("/rankings", { ...query, chip: undefined }))}">${_i('rankings.showall')}</a>
         </span>
       </div>
     ` : ""}
@@ -167,11 +168,11 @@ export function render({ el, query }) {
     <div class="rk-basket-bar ${basketGet().length ? "show" : ""}">
       <span class="rk-basket-msg">
         <strong class="tnum">${fmtNum(basketGet().length)}</strong>
-        ${basketGet().length === 1 ? "run" : "runs"} in your compare basket
+        ${basketGet().length === 1 ? _i('rankings.basket.run') : _i('rankings.basket.runs')} ${_i('rankings.basket.msg')}
       </span>
       <span class="rk-basket-actions">
-        <a class="btn primary small" href="#/compare">Open compare →</a>
-        <button class="btn ghost small" data-basket-clear="1" type="button">Clear basket</button>
+        <a class="btn primary small" href="#/compare">${_i('rankings.basket.compare')}</a>
+        <button class="btn ghost small" data-basket-clear="1" type="button">${_i('rankings.basket.clear')}</button>
       </span>
     </div>
 
@@ -319,10 +320,10 @@ function renderTable(suiteId, rows, cols, sortKey, sortDir) {
                 data-sort-key="date" data-sort-dir-default="desc"
                 aria-sort="${sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}"
                 scope="col">
-              <span class="th-label">Date</span>
+              <span class="th-label">${_i('rankings.table.date')}</span>
               <span class="th-sort-icon">${sortKey === "date" ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
             </th>
-            <th class="col-tier" scope="col">Tier</th>
+            <th class="col-tier" scope="col">${_i('rankings.table.tier')}</th>
           </tr>
         </thead>
         <tbody>
@@ -339,6 +340,7 @@ function renderRow(suiteId, row, cols, sortKey, rank) {
   const inBasket = basketHas(runId);
   const ver = shortVersion(row.framework_version);
   const fw = row.framework || "";
+  const ops = implOpsLabel(row);
   // a11y: tabindex on the row makes the run-detail trigger reachable
   // via keyboard.  We deliberately keep the native `<tr>` role so
   // assistive tech still announces row context (column → cell mapping
@@ -361,7 +363,7 @@ function renderRow(suiteId, row, cols, sortKey, rank) {
       <td class="col-rank tnum">${rank}</td>
       <td class="col-chip">
         <a class="rk-chip-link" href="${chipHref(row)}">
-          <span class="rk-chip-name">${esc(row._chip_label)}${fw ? ` · <span class="rk-chip-fw">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>` : ""}</span>
+          <span class="rk-chip-name">${esc(row._chip_label)}${fw ? ` · <span class="rk-chip-fw"><span style="white-space:nowrap">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>${ops ? ` <span class="fw-ops">${esc(ops)}</span>` : ""}</span>` : ""}</span>
           ${row.memory_gb
             ? `<span class="rk-chip-meta">${esc(fmtNum(row.memory_gb))} GB</span>`
             : ""}
@@ -396,12 +398,12 @@ function renderEmpty(meta, filtersActive) {
     return `
       <div class="rk-empty">
         <span class="rk-empty-icon" aria-hidden="true">∅</span>
-        <p>No submissions yet for <strong>Suite ${esc(meta.letter)} · ${esc(meta.title)}</strong>.</p>
-        <p class="rk-empty-sub">${esc(meta.tagline)}</p>
+        <p>${_i('rankings.noSubmissionsFor')} <strong>Suite ${esc(meta.letter)} · ${esc(_i('suite.' + suiteId + '.title', meta.title))}</strong>.</p>
+        <p class="rk-empty-sub">${esc(_i('suite.' + suiteId + '.tagline', meta.tagline))}</p>
       </div>
     `;
   }
-  // Resolve the active suite from the URL so the "Clear filters" href
+  // Resolve the active suite from the URL so the "${_i('rankings.clearFilters')}" href
   // strips facets while keeping the user on this same suite.
   const { params: q } = parseHash(location.hash);
   const sid = SUITE_ORDER.includes(q.suite) ? q.suite : SUITE_ORDER[0];
@@ -409,7 +411,7 @@ function renderEmpty(meta, filtersActive) {
     <div class="rk-empty">
       <span class="rk-empty-icon" aria-hidden="true">∅</span>
       <p>No submissions match the current filters in Suite ${esc(meta.letter)}.</p>
-      <a class="btn" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(sid)))}">Clear filters</a>
+      <a class="btn" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(sid)))}">${_i('rankings.clearFilters')}</a>
     </div>
   `;
 }

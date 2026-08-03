@@ -1,7 +1,5 @@
 // reproduce.js — Reproduction quests (community → verified), filterable table.
 
-
-
 import { esc, fmtNum, fmtDate, shortVersion } from "../utils.js";
 
 import { rowByRunId, SUITE_META } from "../data.js";
@@ -19,8 +17,7 @@ import {
 import { discussResultUrl } from "../cite.js";
 
 import { communityHeader, communityFilterRow, wireTableFilters } from "../community-nav.js";
-
-
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 function suiteLabel(id) {
 
@@ -29,8 +26,6 @@ function suiteLabel(id) {
   return m ? `Suite ${m.letter}` : id;
 
 }
-
-
 
 function recipeLabel(row) {
 
@@ -44,69 +39,55 @@ function recipeLabel(row) {
 
 }
 
-
-
 function searchKey(q) {
 
   return `${q.chip} ${q.vendor} ${q.suite} ${q.framework || ""} ${q.submitted_by} ${q.run_id}`.toLowerCase();
 
 }
 
-
-
 function renderCriteria(ex) {
 
-  const questWord = ex.openQuestCount === 1 ? "quest" : "quests";
+  const questWord = ex.openQuestCount === 1 ? _i("reproduce.quest") : _i("reproduce.quests");
 
-  const pairWord = ex.openPairCount === 1 ? "pair" : "pairs";
+  const pairWord = ex.openPairCount === 1 ? _i("reproduce.pair") : _i("reproduce.pairs");
 
-  const recordWord = ex.crossVerifiedRecordCount === 1 ? "record" : "records";
+  const recordWord = ex.crossVerifiedRecordCount === 1 ? _i("reproduce.record") : _i("reproduce.records");
 
   return `
 
     <aside class="community-note card repro-criteria">
 
-      <h2>Why these quests?</h2>
+      <h2>${_i("reproduce.whyTitle")}</h2>
 
       <p class="repro-criteria-lead">
 
-        The open list is <strong>automatic</strong> — nothing is hand-picked.
-
-        A row appears when <em>both</em> conditions hold:
+        ${_i('reproduce.criteriaLead')}
 
       </p>
 
       <ol class="repro-steps repro-criteria-rules">
 
-        <li>The submission is <span class="tier-pill community">community</span> tier (published, not yet independently verified).</li>
+        <li>${_i("reproduce.criteriaRule1")}</li>
 
-        <li>No <span class="tier-pill verified">verified</span> result exists for the <strong>same hardware platform + benchmark suite</strong> — same chip model and workload, regardless of framework or chip count.</li>
+        <li>${_i("reproduce.criteriaRule2")}</li>
 
       </ol>
 
       <p class="repro-criteria-example muted">
 
-        <strong>Cross-verified coverage</strong> (below) is separate: it only lists runs whose
-
-        <code>meta.reproduces_run_id</code> explicitly cites the original community
-
-        <code>run_id</code>. That link is set at submit time (runner flag
-
-        <code>--reproduces-run-id</code>) — never inferred from chip or suite alone.
-
-      </p>
+        <strong>${_i("reproduce.criteriaNote")}</p>
 
       <p class="repro-criteria-stats">
 
-        <span class="repro-stat"><strong>${fmtNum(ex.openQuestCount)}</strong> open ${questWord}</span>
+        <span class="repro-stat"><strong>${fmtNum(ex.openQuestCount)}</strong> ${_i('reproduce.statOpen', {n: fmtNum(ex.openQuestCount), w: questWord})}</span>
 
         <span class="repro-stat-sep">·</span>
 
-        <span class="repro-stat"><strong>${fmtNum(ex.crossVerifiedRecordCount)}</strong> linked verification ${recordWord}</span>
+        <span class="repro-stat"><strong>${fmtNum(ex.crossVerifiedRecordCount)}</strong>${_i("reproduce.statLinked", {n: fmtNum(ex.crossVerifiedRecordCount), w: recordWord})}</span>
 
         <span class="repro-stat-sep">·</span>
 
-        <span class="repro-stat muted">${fmtNum(ex.openPairCount)} platform–suite ${pairWord} awaiting any verified run · ${fmtNum(ex.verifiedPairs)} pairs with verified coverage</span>
+        <span class="repro-stat muted">${_i('reproduce.statPairs', {np: fmtNum(ex.openPairCount), pw: pairWord, nv: fmtNum(ex.verifiedPairs)})}</span>
 
       </p>
 
@@ -115,8 +96,6 @@ function renderCriteria(ex) {
   `;
 
 }
-
-
 
 function renderCrossVerified(records) {
 
@@ -130,9 +109,9 @@ function renderCrossVerified(records) {
 
           <div class="section-title">
 
-            <span class="eyebrow">Verified</span>
+            <span class="eyebrow">${_i("reproduce.verified")}</span>
 
-            <h2>Cross-verified coverage</h2>
+            <h2>${_i("reproduce.verifiedTitle")}</h2>
 
           </div>
 
@@ -142,9 +121,7 @@ function renderCrossVerified(records) {
 
           <p class="repro-verified-empty">
 
-            No linked verifications in this snapshot yet. When someone independently reruns a
-
-            community result, they set the original <code>run_id</code> on submit:
+            ${_i('reproduce.emptyVerified')}
 
           </p>
 
@@ -152,11 +129,7 @@ function renderCrossVerified(records) {
 
           <p class="repro-verified-empty muted">
 
-            The verifying run's <code>result.json</code> stores
-
-            <code>meta.reproduces_run_id</code>, and this table fills automatically after the
-
-            next <code>leaderboard/generate.py</code> refresh — no manual page edits.
+            ${_i('reproduce.emptyVerifiedNote')}
 
           </p>
 
@@ -168,8 +141,6 @@ function renderCrossVerified(records) {
 
   }
 
-
-
   return `
 
     <section class="section community-section repro-verified-section">
@@ -178,9 +149,9 @@ function renderCrossVerified(records) {
 
         <div class="section-title">
 
-          <span class="eyebrow">Verified</span>
+          <span class="eyebrow">${_i("reproduce.verified")}</span>
 
-          <h2>Cross-verified coverage</h2>
+          <h2>${_i("reproduce.verifiedTitle")}</h2>
 
         </div>
 
@@ -196,13 +167,13 @@ function renderCrossVerified(records) {
 
             <tr>
 
-              <th>Original (community)</th>
+              <th>${_i("reproduce.thOriginal")}</th>
 
-              <th>Verified rerun</th>
+              <th>${_i("reproduce.thVerified")}</th>
 
-              <th>Suite</th>
+              <th>${_i("reproduce.thSuite")}</th>
 
-              <th>Confirmed</th>
+              <th>${_i("reproduce.thConfirmed")}</th>
 
               <th></th>
 
@@ -252,9 +223,9 @@ function renderCrossVerified(records) {
 
                   <td class="repro-actions">
 
-                    ${orig.run_id ? `<button type="button" class="btn small" data-open-run="${esc(orig.run_id)}">Original</button>` : ""}
+                    ${orig.run_id ? `<button type="button" class="btn small" data-open-run="${esc(orig.run_id)}">${_i("reproduce.btnOriginal")}</button>` : ""}
 
-                    ${ver.run_id ? `<button type="button" class="btn small" data-open-run="${esc(ver.run_id)}">Verified</button>` : ""}
+                    ${ver.run_id ? `<button type="button" class="btn small" data-open-run="${esc(ver.run_id)}">${_i("reproduce.verified")}</button>` : ""}
 
                   </td>
 
@@ -276,8 +247,6 @@ function renderCrossVerified(records) {
 
 }
 
-
-
 export function render({ el }) {
 
   const ex = reproductionQuestExplain();
@@ -290,27 +259,21 @@ export function render({ el }) {
 
   const suites = [...new Set(quests.map((q) => q.suite).filter(Boolean))].sort();
 
-
-
   const vendorOptions = [
 
-    `<option value="">All vendors</option>`,
+    `<option value="">${_i("reproduce.allVendors")}</option>`,
 
     ...vendors.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`),
 
   ].join("");
 
-
-
   const suiteOptions = [
 
-    `<option value="">All suites</option>`,
+    `<option value="">${_i("reproduce.allSuites")}</option>`,
 
     ...suites.map((s) => `<option value="${esc(s)}">${esc(suiteLabel(s))}</option>`),
 
   ].join("");
-
-
 
   el.innerHTML = `
 
@@ -318,19 +281,11 @@ export function render({ el }) {
 
       "reproduce",
 
-      "Reproduction quests",
-
-      `Independent reruns that confirm a community submission within 5% earn <strong>verifier credit</strong> for both parties. ` +
-
-      `Reference the original <code>run_id</code> in your pull request and in <code>meta.reproduces_run_id</code>.`
-
+      _i('reproduce.title'),
+      _i('reproduce.desc')
     )}
 
-
-
     ${renderCriteria(ex)}
-
-
 
     <section class="section community-section">
 
@@ -338,23 +293,21 @@ export function render({ el }) {
 
         <div class="section-title">
 
-          <span class="eyebrow">Open</span>
+          <span class="eyebrow">${_i("reproduce.open")}</span>
 
-          <h2>Awaiting verification</h2>
+          <h2>${_i("reproduce.awaitingTitle")}</h2>
 
         </div>
 
-        ${quests.length ? `<span class="section-sub">${fmtNum(quests.length)} community ${quests.length === 1 ? "run" : "runs"} on platforms without verified coverage yet.</span>` : ""}
+        ${quests.length ? `<span class="section-sub">${fmtNum(quests.length)} ${_i('reproduce.countLine')}</span>` : ""}
 
       </div>
-
-
 
       ${quests.length ? communityFilterRow([
 
         {
 
-          label: "Vendor",
+          label: _i("reproduce.filterVendor"),
 
           html: `<select id="repro-vendor">${vendorOptions}</select>`,
 
@@ -364,7 +317,7 @@ export function render({ el }) {
 
         {
 
-          label: "Suite",
+          label: _i("reproduce.filterSuite"),
 
           html: `<select id="repro-suite">${suiteOptions}</select>`,
 
@@ -372,15 +325,13 @@ export function render({ el }) {
 
         {
 
-          label: "Search",
+          label: _i("reproduce.filterSearch"),
 
-          html: `<input type="search" id="repro-search" placeholder="Platform, recipe, submitter…" autocomplete="off">`,
+          html: `<input type="search" id="repro-search" placeholder="${_i("reproduce.searchPlaceholder")}" autocomplete="off">`,
 
         },
 
       ]) : ""}
-
-
 
       <div class="contrib-table-wrap card">
 
@@ -392,17 +343,17 @@ export function render({ el }) {
 
               <tr>
 
-                <th>Platform</th>
+                <th>${_i("reproduce.thPlatform")}</th>
 
-                <th>Recipe</th>
+                <th>${_i("reproduce.thRecipe")}</th>
 
-                <th>Suite</th>
+                <th>${_i("reproduce.thSuite")}</th>
 
-                <th>Submitter</th>
+                <th>${_i("reproduce.thSubmitter")}</th>
 
-                <th>Date</th>
+                <th>${_i("reproduce.thDate")}</th>
 
-                <th>Tier</th>
+                <th>${_i("reproduce.thTier")}</th>
 
                 <th></th>
 
@@ -444,7 +395,7 @@ export function render({ el }) {
 
                     <td class="repro-actions">
 
-                      ${q.run_id ? `<button type="button" class="btn small" data-open-run="${esc(q.run_id)}">Details</button>` : ""}
+                      ${q.run_id ? `<button type="button" class="btn small" data-open-run="${esc(q.run_id)}">${_i("reproduce.btnDetails")}</button>` : ""}
 
                       <a class="text-link" href="${esc(reproUrl)}" target="_blank" rel="noopener">Request</a>
 
@@ -468,21 +419,19 @@ export function render({ el }) {
 
       </div>
 
-
-
       <aside class="community-note card">
 
-        <h2>Procedure</h2>
+        <h2>${_i("reproduce.procedure")}</h2>
 
         <ol class="repro-steps">
 
-          <li>Select a quest above and note its <code>run_id</code> from the run details modal.</li>
+          <li>${_i("reproduce.procedure1")}</li>
 
-          <li>Rerun the same suite on matching hardware with <code>--reproduces-run-id &lt;run_id&gt;</code>.</li>
+          <li>${_i("reproduce.procedure2")}
 
-          <li>Open a pull request; after merge and data regen, the pair appears in Cross-verified coverage below.</li>
+          <li>${_i("reproduce.procedure3")}</li>
 
-          <li>Both submitters receive credit on the <a href="#/contributors">contributor index</a>.</li>
+          <li>${_i("reproduce.procedure4")}</li>
 
         </ol>
 
@@ -490,13 +439,9 @@ export function render({ el }) {
 
     </section>
 
-
-
     ${renderCrossVerified(crossVerified)}
 
   `;
-
-
 
   if (quests.length) {
 
@@ -515,5 +460,4 @@ export function render({ el }) {
   }
 
 }
-
 

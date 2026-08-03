@@ -1,11 +1,9 @@
-// views/suites.js — Suites explainer.  This is the "what is this
-// benchmark?" page: roofline argument + diagram, scenarios catalog
-// with per-scenario specs, per-suite specifications, datasets reference.
-
+// views/suites.js — Suites explainer.
 import {
   SUITE_ORDER, SUITE_META, suiteFacts, bestRowByMetric,
 } from "../data.js";
 import { esc, fmtNum, buildHash, shortModel } from "../utils.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 const GH_BASE = "https://github.com/FreedomIntelligence/AccelMark";
 
@@ -331,56 +329,35 @@ const ROOFLINE_POINTS = [
 export function render({ el }) {
   el.innerHTML = `
     <section class="hero suites-hero">
-      <h1>Workload Suites</h1>
-      <p class="hero-sub">
-        Each suite anchors a distinct bottleneck region, together sampling
-        the full inference workload spectrum.
-      </p>
+      <h1>${_i('suites.hero.title')}</h1>
+      <p class="hero-sub">${_i('suites.hero.sub')}</p>
       <div class="hero-cta">
-        <a class="btn primary" href="#/rankings">Browse results →</a>
-        <a class="btn" href="${GH_BASE}/tree/main/suites" target="_blank" rel="noopener">Suite spec on GitHub</a>
+        <a class="btn primary" href="#/rankings">${_i('suites.hero.cta1')}</a>
+        <a class="btn" href="${GH_BASE}/tree/main/suites" target="_blank" rel="noopener">${_i('suites.hero.cta2')}</a>
       </div>
     </section>
 
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">01 · Methodology</span>
-          <h2>Why per-suite, not a single score?</h2>
+          <span class="eyebrow">${_i('suites.s1.eyebrow')}</span>
+          <h2>${_i('suites.s1.title')}</h2>
         </div>
       </div>
 
       <div class="why-grid">
         <div class="why-prose">
-          <p>
-            AI inference workloads span a wide range of arithmetic intensity.
-            The roofline model makes the consequence concrete: a chip's
-            effective performance is set by whichever of memory bandwidth or
-            compute is binding for the workload. Because different workloads
-            occupy different regions of that spectrum, hardware rankings
-            <em>are not preserved</em> across them.
+          <p class="why-lead">
+            <strong>${_i('suites.s1.lead')}</strong>
           </p>
+          <p>${_i('suites.s1.body')}</p>
           <details class="why-prose-more">
             <summary>
-              <span class="why-more-show">Read the full argument</span>
-              <span class="why-more-hide">Show less</span>
+              <span class="why-more-show">${_i('suites.readMore')}</span>
+              <span class="why-more-hide">${_i('suites.showLess')}</span>
             </summary>
-            <p>
-              A chip optimized for one region, say bandwidth-bound 8B decode,
-              diverges from a chip optimized for another, say compute-bound
-              long-context prefill, as soon as the workload moves. Collapsing
-              heterogeneous workloads into a single composite score hides
-              exactly the trade-offs a buyer needs to see.
-            </p>
-            <p>
-              AccelMark operationalizes <strong>spectrum sampling</strong>: a
-              set of suites, each anchored to a qualitatively distinct
-              bottleneck region. Bandwidth-bound serving at 8B (A) and 0.5B
-              (F); capacity-then-stack-bound 70B multi-chip (B); the
-              bandwidth-to-compute transition via quantization (C);
-              compute-bound long-context prefill (D); multi-chip communication
-              overhead (E); and sparse MoE routing (G).
-            </p>
+            <p>${_i('suites.rooflineDetails1')}</p>
+            <p>${_i('suites.rooflineDetails2')}</p>
           </details>
         </div>
         ${renderRoofline()}
@@ -394,18 +371,11 @@ export function render({ el }) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">02 · Scenarios</span>
-          <h2>Seven protocols, one suite at a time</h2>
+          <span class="eyebrow">${_i('suites.s2.eyebrow')}</span>
+          <h2>${_i('suites.s2.title')}</h2>
         </div>
       </div>
-      <p class="section-lede">
-        Each suite picks a subset of these seven protocols. The metric,
-        direction, and setting are pinned here once; per-suite cards below
-        just say which apply.
-        <strong>Default</strong> scenarios are required for a valid
-        submission; <strong>extras</strong> are opt-in for vendors who want
-        to characterize a regime further.
-      </p>
+      <p class="section-lede">${_i('suites.s2.lede')}</p>
       <ul class="scn-catalog">
         ${SCENARIO_CATALOG.map(renderScenarioCard).join("")}
       </ul>
@@ -414,15 +384,12 @@ export function render({ el }) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">03 · Specifications</span>
-          <h2>Each suite, in detail</h2>
+          <span class="eyebrow">${_i('suites.s3.eyebrow')}</span>
+          <h2>${_i('suites.s3.title')}</h2>
         </div>
       </div>
       <p class="section-lede">
-        One self-contained card per suite. The header pins the primary
-        metric and direction; the workload strip pins the model, hardware
-        budget, precision, and dataset; the protocols row shows which
-        scenarios apply; current leaders surface the top chip per metric.
+        ${_i('suites.s3.lede')}
       </p>
       <div class="suite-spec-list">
         ${SUITE_ORDER.map(renderSuiteSpec).join("")}
@@ -432,24 +399,19 @@ export function render({ el }) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">04 · Datasets</span>
-          <h2>Three immutable prompt sets</h2>
+          <span class="eyebrow">${_i('suites.s4.eyebrow')}</span>
+          <h2>${_i('suites.s4.title')}</h2>
         </div>
       </div>
-      <p class="section-lede">
-        Datasets are content-hash-pinned: once a name is published, the
-        bytes never change. Revising a dataset means a new version
-        (<code>_v2</code>, etc.). Every result is tied to a dataset hash so
-        comparisons stay apples-to-apples across years.
-      </p>
+      <p class="section-lede">${_i('suites.s4.lede')}</p>
       <div class="dataset-table">
         <div class="dataset-row dataset-row--head">
-          <span>Dataset</span>
-          <span>Used by</span>
-          <span>Prompts</span>
-          <span>Input p50</span>
-          <span>Output p50</span>
-          <span class="dt-notes">Why</span>
+          <span>${_i('suites.dataset')}</span>
+          <span>${_i('suites.usedBy')}</span>
+          <span>${_i('suites.prompts')}</span>
+          <span>${_i('suites.inputP50')}</span>
+          <span>${_i('suites.outputP50')}</span>
+          <span class="dt-notes">${_i('suites.why')}</span>
         </div>
         ${DATASETS.map(renderDataset).join("")}
       </div>
@@ -457,20 +419,14 @@ export function render({ el }) {
 
     <section class="section submit-section">
       <div class="submit-card">
-        <span class="eyebrow">05 · Extend</span>
-        <h2 class="submit-title">Propose a new suite</h2>
-        <p class="submit-body">
-          Have a workload regime AccelMark doesn't cover yet: long-context
-          serving, speculative decoding economics, a domain-specific
-          fine-tune? Open a discussion with a one-page sketch of the
-          bottleneck region and reference SLAs. The contribution flow is
-          the same as a new result.
-        </p>
+        <span class="eyebrow">${_i('suites.s5.eyebrow')}</span>
+        <h2 class="submit-title">${_i('suites.s5.title')}</h2>
+        <p class="submit-body">${_i('suites.s5.body')}</p>
         <div class="submit-cta">
           <a class="btn primary" href="${GH_BASE}/discussions/new?category=ideas"
-             target="_blank" rel="noopener">Propose a suite →</a>
+             target="_blank" rel="noopener">${_i('suites.s5.cta')}</a>
           <a class="btn" href="${GH_BASE}/blob/main/CONTRIBUTING.md"
-             target="_blank" rel="noopener">Read the contributor guide</a>
+             target="_blank" rel="noopener">${_i('contribute.guide')}</a>
         </div>
       </div>
     </section>
@@ -504,7 +460,7 @@ export function render({ el }) {
     el.__suitesScrollAttached = true;
   }
 
-  // Default the methodology "Read the full argument" disclosure based
+  // Default the methodology "${_i('suites.readMore')}" disclosure based
   // on viewport width: desktop readers see the whole essay up front,
   // mobile readers see the opening paragraph + an opt-in expander so
   // the rest of the page stays reachable without a long scroll.  Pure
@@ -554,10 +510,7 @@ function renderRoofline() {
         <text x="320" y="208" class="rfl-axis-label" text-anchor="end">arithmetic intensity →</text>
       </svg>
       <p class="roofline-caption">
-        Each suite sits at a different point on the roofline. Bandwidth-bound
-        regimes (left of the knee) reward HBM throughput; compute-bound
-        regimes (right) reward raw FLOPS. A chip's ranking changes as the
-        workload moves.
+        ${_i('suites.rooflineCaption')}
       </p>
     </aside>
   `;
@@ -566,9 +519,9 @@ function renderRoofline() {
 function renderInversion(card) {
   return `
     <article class="inversion-card" data-suite="${esc(card.suite)}">
-      <span class="eyebrow">${esc(card.eyebrow)}</span>
-      <h3>${esc(card.title)}</h3>
-      <p>${esc(card.body)}</p>
+      <span class="eyebrow">${esc(_i('suites.inversion.' + card.suite + '.eyebrow'))}</span>
+      <h3>${esc(_i('suites.inversion.' + card.suite + '.title'))}</h3>
+      <p>${esc(_i('suites.inversion.' + card.suite + '.body'))}</p>
     </article>
   `;
 }
@@ -583,20 +536,20 @@ function renderScenarioCard(scn) {
         <span class="scn-icon" aria-hidden="true">${icon}</span>
         <div class="scn-card-id">
           <h3 class="scn-card-name">${esc(scn.name)}</h3>
-          <span class="scn-card-role">${esc(scn.role)}</span>
+          <span class="scn-card-role">${esc(_i('suites.scenario.' + scn.name + '.role', scn.role))}</span>
         </div>
       </header>
-      <p class="scn-card-desc">${esc(scn.description)}</p>
+      <p class="scn-card-desc">${esc(_i('suites.scenario.' + scn.name + '.desc'))}</p>
       <dl class="scn-card-spec">
         ${scn.spec.map((row) => `
           <div class="scn-spec-row">
-            <dt>${esc(row.k)}</dt>
-            <dd>${esc(row.v)}</dd>
+            <dt>${esc(_i('suites.spec.' + row.k, row.k))}</dt>
+            <dd>${esc(row.k === 'Direction' ? _i('suites.spec.Direction.' + row.v) : row.v)}</dd>
           </div>
         `).join("")}
       </dl>
       <div class="scn-card-applies">
-        <span class="scn-applies-label">Used by</span>
+        <span class="scn-applies-label">${_i('suites.usedBy')}</span>
         <span class="scn-applies-letters">
           ${defaults.map((l) => `<a class="scn-suite-letter" data-suite="${esc(l)}" href="#suite-${esc(l)}">${esc(l)}</a>`).join("")}
           ${extras.length && defaults.length ? `<span class="scn-applies-sep">·</span>` : ""}
@@ -628,8 +581,8 @@ function renderSuiteSpec(suiteId) {
         <span class="suite-spec-letter">${esc(meta.letter)}</span>
         <div class="suite-spec-title">
           <span class="eyebrow">Suite ${esc(meta.letter)}</span>
-          <h3>${esc(meta.title)}</h3>
-          <p class="suite-spec-tagline">${esc(meta.tagline)}</p>
+          <h3>${esc(_i('suite.' + suiteId + '.title', meta.title))}</h3>
+          <p class="suite-spec-tagline">${esc(_i('suite.' + suiteId + '.tagline', meta.tagline))}</p>
         </div>
         <span class="suite-spec-metric">
           <span class="metric-label">${esc(meta.primary.label)}</span>
@@ -639,31 +592,31 @@ function renderSuiteSpec(suiteId) {
 
       <div class="suite-spec-body">
         <div class="suite-intro-row">
-          ${meta.description ? `<p class="suite-spec-intro">${esc(meta.description)}</p>` : `<div></div>`}
+          ${meta.description ? `<p class="suite-spec-intro">${esc(_i('suite.' + suiteId + '.desc'))}</p>` : `<div></div>`}
           ${finding ? `
             <aside class="suite-finding suite-finding--side">
-              <span class="finding-eyebrow">Concrete finding</span>
-              <p class="finding-headline">${esc(finding.headline)}</p>
-              <p class="finding-body">${esc(finding.body)}</p>
+              <span class="finding-eyebrow">${_i('suites.concreteFinding')}</span>
+              <p class="finding-headline">${esc(_i('suite.' + suiteId + '.finding.headline', finding.headline))}</p>
+              <p class="finding-body">${esc(_i('suite.' + suiteId + '.finding', finding.body))}</p>
             </aside>
           ` : ""}
         </div>
 
         <ul class="spec-strip">
-          <li><span class="strip-k">Model</span><span class="strip-v">${esc(shortModel(wl.model) || "-")}</span></li>
-          <li><span class="strip-k">Chips</span><span class="strip-v">${esc(wl.chips || "-")}</span></li>
-          <li><span class="strip-k">Precision</span><span class="strip-v">${esc(wl.precision || "-")}</span></li>
-          <li><span class="strip-k">Dataset</span><span class="strip-v"><code>${esc(wl.dataset || "-")}</code></span></li>
-          <li><span class="strip-k">Tokens (in / out)</span><span class="strip-v tnum">${esc(wl.inputTokens || "-")} / ${esc(wl.outputTokens || "-")}</span></li>
-          <li><span class="strip-k">Coverage</span><span class="strip-v tnum">${fmtNum(facts.submissions)} results &middot; ${fmtNum(facts.chips)} chips</span></li>
+          <li><span class="strip-k">${_i('suites.wlModel')}</span><span class="strip-v">${esc(shortModel(wl.model) || "-")}</span></li>
+          <li><span class="strip-k">${_i('suites.wlChips')}</span><span class="strip-v">${esc(wl.chips || "-")}</span></li>
+          <li><span class="strip-k">${_i('suites.wlPrecision')}</span><span class="strip-v">${esc(wl.precision || "-")}</span></li>
+          <li><span class="strip-k">${_i('suites.wlDataset')}</span><span class="strip-v"><code>${esc(wl.dataset || "-")}</code></span></li>
+          <li><span class="strip-k">${_i('suites.wlTokens')}</span><span class="strip-v tnum">${esc(wl.inputTokens || "-")} / ${esc(wl.outputTokens || "-")}</span></li>
+          <li><span class="strip-k">${_i('suites.coverage')}</span><span class="strip-v tnum">${fmtNum(facts.submissions)} results &middot; ${fmtNum(facts.chips)} chips</span></li>
         </ul>
 
         <div class="suite-scns">
-          <span class="suite-scns-label">Protocols</span>
+          <span class="suite-scns-label">${_i('suites.protocols')}</span>
           <ul class="suite-scns-list">
             ${scenarios.map((s) => `
-              <li class="scn-pill ${s.isExtra ? "scn-extra" : "scn-default"}" title="${esc(s.isExtra ? "Extra protocol (opt-in)" : "Default protocol")}">
-                ${esc(s.name)}${s.isExtra ? `<span class="scn-extra-tag">extra</span>` : ""}
+              <li class="scn-pill ${s.isExtra ? "scn-extra" : "scn-default"}" title="${esc(s.isExtra ? _i('suites.extraProtocol') : _i('suites.defaultProtocol'))}">
+                ${esc(s.name)}${s.isExtra ? `<span class="scn-extra-tag">${_i('suites.extra')}</span>` : ""}
               </li>
             `).join("")}
           </ul>
@@ -671,7 +624,7 @@ function renderSuiteSpec(suiteId) {
 
         ${leaderScenarios.length ? `
           <div class="suite-leaders">
-            <span class="suite-leaders-label">Current leaders</span>
+            <span class="suite-leaders-label">${_i('suites.currentLeaders')}</span>
             <ul class="leader-list">
               ${leaderScenarios.map((s) => renderLeaderRow(suiteId, s)).join("")}
             </ul>
@@ -681,12 +634,12 @@ function renderSuiteSpec(suiteId) {
         <div class="suite-spec-cta">
           <a class="btn primary small"
              href="${esc(buildHash("/rankings", { suite: suiteId }))}">
-            Open results →
+            ${_i('suites.openResults')}
           </a>
           <a class="btn small"
              href="${GH_BASE}/blob/main/suites/${esc(suiteId)}/suite.json"
              target="_blank" rel="noopener">
-            View suite.json
+            ${_i('suites.viewJson')}
           </a>
         </div>
       </div>
@@ -701,7 +654,7 @@ function renderLeaderRow(suiteId, scn) {
     return `
       <li class="leader-row leader-row--empty">
         <span class="scn-pill ${pillClass}">${esc(scn.name)}</span>
-        <span class="leader-empty">No qualifying submissions yet</span>
+        <span class="leader-empty">${_i('suites.noSubmissions')}</span>
       </li>
     `;
   }
@@ -741,7 +694,7 @@ function renderDataset(d) {
       <span class="dt-count tnum">${esc(d.prompts)}</span>
       <span class="dt-in tnum">${esc(d.inputP50)}</span>
       <span class="dt-out tnum">${esc(d.outputP50)}</span>
-      <span class="dt-notes">${esc(d.notes)}</span>
+      <span class="dt-notes">${esc(_i('suites.dataset.' + d.name + '.notes'))}</span>
     </div>
   `;
 }
