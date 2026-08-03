@@ -188,14 +188,6 @@ class SGLangRunner(BenchmarkRunner):
         wall-clock elapsed time of the entire batch — the correct denominator
         for throughput = total_tokens / elapsed.
         """
-        # SGLang Engine.generate() calls asyncio.get_event_loop() internally.
-        # With uvloop installed, this fails if no loop is already running.
-        import asyncio
-        try:
-            asyncio.get_event_loop()
-        except RuntimeError:
-            asyncio.set_event_loop(asyncio.new_event_loop())
-
         formatted  = [self.format_prompt(r.prompt) for r in requests]
         t_start    = time.perf_counter()
         outputs    = self.engine.generate(
