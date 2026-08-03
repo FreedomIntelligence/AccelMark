@@ -13,6 +13,7 @@
 .suite-card[data-suite="E"], .lb-row[data-suite="E"], .vendor-suite-pill[data-suite="E"] { --suite-color: var(--suite-E); }
 .suite-card[data-suite="F"], .lb-row[data-suite="F"], .vendor-suite-pill[data-suite="F"] { --suite-color: var(--suite-F); }
 .suite-card[data-suite="G"], .lb-row[data-suite="G"], .vendor-suite-pill[data-suite="G"] { --suite-color: var(--suite-G); }
+.suite-card[data-suite="H"], .lb-row[data-suite="H"], .vendor-suite-pill[data-suite="H"] { --suite-color: var(--suite-H); }
 
 /* Default fallback color */
 .suite-card,
