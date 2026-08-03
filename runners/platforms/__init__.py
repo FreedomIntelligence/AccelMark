@@ -23,6 +23,7 @@ following module-level attributes:
     def detect_pcie_gen() -> str | None: ...
     def detect_topology() -> str | None: ...
     def detect_intra_node_interconnect() -> str | None: ...
+    def sample_power_watts() -> float | None: ...
     def diagnostics(env, accelerators) -> list[str]: ...
 
 All functions are optional. The collector skips any that are missing
@@ -35,7 +36,7 @@ from __future__ import annotations
 import importlib
 import pkgutil
 from types import ModuleType
-from typing import List
+from typing import List, Optional
 
 
 def _plugin_sort_key(mod: ModuleType) -> tuple[int, str]:
@@ -64,4 +65,37 @@ def discover_plugins() -> List[ModuleType]:
     return plugins
 
 
-__all__ = ["discover_plugins"]
+_active_plugin_cache: Optional[ModuleType] = None
+"""Module-level cache — the active platform does not change during a run."""
+
+
+def get_active_plugin() -> Optional[ModuleType]:
+    """
+    Return the first platform plug-in whose ``collect()`` returns a
+    non-empty accelerator list, or None if no platform is detected.
+    Result is cached at module level — ``collect()`` is called at most once
+    per plug-in across the lifetime of the process.
+
+    Shared helper used by both ``collect_env.py`` and ``loadgen/power.py``
+    so that vendor resolution logic is defined in one place.
+    """
+    global _active_plugin_cache
+    if _active_plugin_cache is not None:
+        return _active_plugin_cache
+
+    for mod in discover_plugins():
+        try:
+            fn = getattr(mod, "collect", None)
+            if fn is None:
+                continue
+            result = fn()
+            if result:
+                _active_plugin_cache = mod
+                return mod
+        except Exception:
+            continue
+    _active_plugin_cache = None  # sentinel: no platform found
+    return None
+
+
+__all__ = ["discover_plugins", "get_active_plugin"]

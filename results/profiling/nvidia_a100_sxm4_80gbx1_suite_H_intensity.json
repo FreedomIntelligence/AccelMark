@@ -1,0 +1,59 @@
+{
+  "suite": "suite_H",
+  "chip": "NVIDIA A100-SXM4-80GB",
+  "model": "mistralai/Mistral-7B-Instruct-v0.1",
+  "operating_point": {
+    "batch": 16,
+    "prompt_len": 10000,
+    "gen_len": 256,
+    "dtype": "bfloat16"
+  },
+  "phases": {
+    "prefill": {
+      "flops": 2694798378240000,
+      "bytes": 496828424192,
+      "bytes_read": 475856904192,
+      "bytes_written": 20971520000,
+      "arithmetic_intensity": 5424.0,
+      "achieved_tflops": 105.09,
+      "achieved_bw_gbps": 19.38,
+      "time_ms_median": 25642.14,
+      "time_frac": 0.9851,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    },
+    "decode": {
+      "flops": 261892341888,
+      "bytes": 35503218688,
+      "bytes_read": 35501121536,
+      "bytes_written": 2097152,
+      "arithmetic_intensity": 7.38,
+      "achieved_tflops": 0.68,
+      "achieved_bw_gbps": 91.66,
+      "time_ms_median": 387.34,
+      "time_frac": 0.0149,
+      "flops_method": "measured",
+      "bytes_method": "analytical"
+    }
+  },
+  "blended": {
+    "ai": 288.12,
+    "weighting": "token-weighted: 1x prefill (S=10000) + 256x decode (1 token each), batch=16 (weight reads amortised)",
+    "classification": "compute-bound"
+  },
+  "chip_peak": {
+    "tflops": 312.0,
+    "bw_gbps": 2039.0,
+    "ridge_point_i_star": 153.02,
+    "source": "builtin:NVIDIA A100-SXM4-80GB"
+  },
+  "classification": {
+    "prefill": "compute-bound",
+    "decode": "bandwidth-bound"
+  },
+  "env_ref": {
+    "chip": "NVIDIA A100-SXM4-80GB",
+    "note": "env_info.json not provided; run collect_env.py first"
+  },
+  "runtime_note": "FLOPs: measured via torch.utils.FlopCounterMode (GQA-patched, causal-corrected) on HuggingFace transformers.AutoModelForCausalLM. Bytes: analytical from model geometry (weight reads + KV-cache traffic + activation tensor traffic). Activation model follows FlashAttention HBM traffic: O(B*S*(4d+2*d_ff)) per layer, assuming Q/K/V intermediates and scores stay in SRAM. I-values are architecture-invariant by construction (same on any chip at the same batch/dtype). Decode I scales with batch: I(B=1) \u2248 1, I(B=32) \u2248 28. ncu validation pending: GPU perf counters require admin privileges unavailable in this environment."
+}

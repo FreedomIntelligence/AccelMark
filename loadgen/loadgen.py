@@ -33,6 +33,7 @@ except ImportError:
         return iterable
 
 from .types import InferenceResult, SampleRecord
+from .power import PowerSampler
 
 # Import InferenceRequest for type hints — runners pass list[InferenceRequest]
 # to inference_fn_offline and inference_fn_streaming
@@ -319,6 +320,10 @@ class AccelMarkLoadGen:
         if not requests:
             raise ValueError("run_sustained requires requests to be loaded.")
 
+        # Start power sampling for the full sustained window
+        power_sampler = PowerSampler()
+        power_sampler.start()
+
         samples           = []
         start_time        = _time.perf_counter()
         next_sample_at    = start_time + interval_seconds
@@ -421,6 +426,9 @@ class AccelMarkLoadGen:
         if pending_tasks:
             await asyncio.wait(pending_tasks, timeout=60)
 
+        # Stop power sampling after the full sustained window
+        power_stats = power_sampler.stop()
+
         # ── Derived metrics ───────────────────────────────────────────────────
         # Exclude warmup samples from scalar metrics
         analysis_samples = [s for s in samples if not s.get("is_warmup")]
@@ -474,6 +482,8 @@ class AccelMarkLoadGen:
                 "throttle_onset_minute":               throttle_onset_minute,
                 "ttft_p99_drift_ms":                   ttft_p99_drift_ms,
                 "throughput_post_warmup_reliability":  throughput_cv_block,
+                "power_watts_avg":                     power_stats.avg,
+                "power_watts_peak":                    power_stats.peak,
             }
         }
 
@@ -529,6 +539,8 @@ class AccelMarkLoadGen:
                 run_total_throughputs = []
                 run_elapsed_times = []
                 run_samples: list[SampleRecord] = []
+                run_power_avgs: list[float] = []
+                run_power_peaks: list[float] = []
 
                 for run_idx in range(total_runs):
                     is_warmup = run_idx < self.warmup_runs
@@ -537,6 +549,10 @@ class AccelMarkLoadGen:
 
                     desc = f"  client_concurrency={client_concurrency} ({cc_idx+1}/{total_concurrency_levels}) {run_label}"
                     tqdm.write(f"{desc} — sending all {len(self.requests)} requests...")
+
+                    # Start power sampling before the timed window
+                    power_sampler = PowerSampler()
+                    power_sampler.start()
 
                     t_start = time.perf_counter()
 
@@ -557,6 +573,9 @@ class AccelMarkLoadGen:
 
                     t_end = time.perf_counter()
                     elapsed = t_end - t_start
+
+                    # Stop power sampling after the timed window
+                    power_stats = power_sampler.stop()
 
                     if oom_occurred:
                         results_by_concurrency.append({
@@ -595,6 +614,8 @@ class AccelMarkLoadGen:
                     run_throughputs.append(throughput_output_only)
                     run_total_throughputs.append(throughput_total)
                     run_elapsed_times.append(elapsed)
+                    run_power_avgs.append(power_stats.avg)
+                    run_power_peaks.append(power_stats.peak)
 
                     per_chip_str = ""
                     if self.chip_count > 1:
@@ -631,6 +652,13 @@ class AccelMarkLoadGen:
                     f"median={median_throughput:.0f} tok/s{per_chip_str}\n"
                 )
 
+                # Aggregate power across non-warmup runs:
+                # avg = mean of per-run avgs, peak = max of per-run peaks
+                _valid_avgs = [v for v in run_power_avgs if v is not None]
+                _valid_peaks = [v for v in run_power_peaks if v is not None]
+                _agg_power_avg = round(sum(_valid_avgs) / len(_valid_avgs), 2) if _valid_avgs else None
+                _agg_power_peak = round(max(_valid_peaks), 2) if _valid_peaks else None
+
                 results_by_concurrency.append({
                     "client_concurrency": client_concurrency,
                     "throughput_tokens_per_sec": round(median_throughput, 2),
@@ -638,8 +666,8 @@ class AccelMarkLoadGen:
                     "throughput_tokens_per_sec_total": round(median_throughput_total, 2),
                     "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1),
                     "peak_memory_gb": None,
-                    "power_watts_avg": None,
-                    "power_watts_peak": None,
+                    "power_watts_avg": _agg_power_avg,
+                    "power_watts_peak": _agg_power_peak,
                     "oom": False,
                     # Per-run throughput reliability: lets the UI show "stable ✓ /
                     # noisy ⚠ / unstable ✗" without forcing the user to download
@@ -731,6 +759,8 @@ class AccelMarkLoadGen:
             run_ttfts: list[list[float]] = []
             run_tpots: list[list[float]] = []
             run_elapsed_times: list[float] = []
+            run_power_avgs: list[float] = []
+            run_power_peaks: list[float] = []
 
             for run_idx in range(self.suite["num_runs"]):
                 run_label = f"run {run_idx + 1}/{self.suite['num_runs']}"
@@ -739,6 +769,10 @@ class AccelMarkLoadGen:
                 # Generate all Poisson inter-arrival times upfront
                 inter_arrivals = [self._rng.expovariate(target_qps) for _ in range(n)]
                 arrival_times = list(itertools.accumulate(inter_arrivals))
+
+                # Start power sampling before the timed window
+                power_sampler = PowerSampler()
+                power_sampler.start()
 
                 t_start = loop.time()
 
@@ -762,6 +796,11 @@ class AccelMarkLoadGen:
 
                 t_run_end = loop.time()
                 run_elapsed_times.append(t_run_end - t_start)
+
+                # Stop power sampling after the timed window
+                power_stats = power_sampler.stop()
+                run_power_avgs.append(power_stats.avg)
+                run_power_peaks.append(power_stats.peak)
 
                 ttfts: list[float] = []
                 tpots: list[float] = []
@@ -799,6 +838,12 @@ class AccelMarkLoadGen:
             if sla_met:
                 max_valid_qps = target_qps
 
+            # Aggregate power across runs for this QPS level
+            _valid_avgs = [v for v in run_power_avgs if v is not None]
+            _valid_peaks = [v for v in run_power_peaks if v is not None]
+            _agg_power_avg = round(sum(_valid_avgs) / len(_valid_avgs), 2) if _valid_avgs else None
+            _agg_power_peak = round(max(_valid_peaks), 2) if _valid_peaks else None
+
             sla_icon = "✓" if sla_met else "✗"
             chip_str = f"  ({self.chip_count} chips)" if self.chip_count > 1 else ""
             tqdm.write(f"  [online] qps={target_qps} TTFT_p99={ttft_p99:.0f}ms SLA={sla_ms}ms {sla_icon}{chip_str}")
@@ -814,6 +859,8 @@ class AccelMarkLoadGen:
                 "tpot_ms_p99": round(tpot_p99, 2),
                 "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1),
                 "sla_met": sla_met,
+                "power_watts_avg": _agg_power_avg,
+                "power_watts_peak": _agg_power_peak,
                 "ttft_ms_p99_reliability":
                     _reliability_block(ttft_p99_per_run, decimals=2),
             })
@@ -917,8 +964,14 @@ class AccelMarkLoadGen:
         # recovery_time_seconds in a single post-processing pass after
         # all cycles complete.
         cycle_data: list[dict] = []
+        cycle_power_avgs: list[float] = []
+        cycle_power_peaks: list[float] = []
 
         for cycle_idx in range(num_runs):
+            # Start power sampling for the full cycle (steady + burst)
+            power_sampler = PowerSampler()
+            power_sampler.start()
+
             tqdm.write(f"[burst] cycle {cycle_idx + 1}/{num_runs} — steady({steady_qps} qps)...")
 
             steady_results, steady_elapsed, steady_arrivals = await fire_window(
@@ -942,6 +995,11 @@ class AccelMarkLoadGen:
                 if r.success and r.first_token_time_ms is not None
             ]
             burst_ttfts = [v for _, v in burst_ttfts_pairs]
+
+            # Stop power sampling after the full cycle
+            power_stats = power_sampler.stop()
+            cycle_power_avgs.append(power_stats.avg)
+            cycle_power_peaks.append(power_stats.peak)
 
             all_steady_ttfts.extend(steady_ttfts)
             all_burst_ttfts.extend(burst_ttfts)
@@ -1021,6 +1079,12 @@ class AccelMarkLoadGen:
             f"  [burst] insufficient data"
         )
 
+        # Aggregate power across all cycles
+        _valid_avgs = [v for v in cycle_power_avgs if v is not None]
+        _valid_peaks = [v for v in cycle_power_peaks if v is not None]
+        _agg_power_avg = round(sum(_valid_avgs) / len(_valid_avgs), 2) if _valid_avgs else None
+        _agg_power_peak = round(max(_valid_peaks), 2) if _valid_peaks else None
+
         self._write_samples(all_samples)
         return {"burst": {
             "sla_ttft_ms": sla_ms,
@@ -1040,6 +1104,8 @@ class AccelMarkLoadGen:
             "recovery_time_seconds_per_cycle": [
                 round(v, 2) for v in cycle_recovery_times
             ] if cycle_recovery_times else [],
+            "power_watts_avg": _agg_power_avg,
+            "power_watts_peak": _agg_power_peak,
             "_recovery_definition": (
                 "Median seconds within the post-burst steady window before "
                 "rolling TTFT p99 drops below 1.5x the long-term steady baseline. "
@@ -1074,6 +1140,10 @@ class AccelMarkLoadGen:
         all_samples: list[SampleRecord] = []
         run_elapsed_times: list[float] = []
         ttft_p99_per_run: list[float] = []
+
+        # Start power sampling across the full interactive window
+        power_sampler = PowerSampler()
+        power_sampler.start()
 
         total_runs = self.warmup_runs + self.suite["num_runs"]
 
@@ -1135,6 +1205,9 @@ class AccelMarkLoadGen:
                     f"({run_elapsed:.0f}s)"
                 )
 
+        # Stop power sampling after all interactive runs complete
+        power_stats = power_sampler.stop()
+
         sampled = self._rng.sample(all_samples, min(MAX_SAMPLES_PER_CONFIG, len(all_samples)))
         self._write_samples(sampled)
 
@@ -1149,6 +1222,8 @@ class AccelMarkLoadGen:
             "elapsed_seconds_median": round(float(np.median(run_elapsed_times)), 1) if run_elapsed_times else None,
             "ttft_ms_p99_reliability":
                 _reliability_block(ttft_p99_per_run, decimals=2),
+            "power_watts_avg": power_stats.avg,
+            "power_watts_peak": power_stats.peak,
         }}
 
     # ------------------------------------------------------------------

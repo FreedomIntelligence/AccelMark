@@ -51,7 +51,7 @@ _BASE_FILES = {
     "README.md",
 }
 
-SUITE_KEYS = ["A", "B", "C", "D", "E", "F", "G"]
+SUITE_KEYS = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
 STATUS_GLYPH = {
     "validated": "✓",

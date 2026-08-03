@@ -52,6 +52,7 @@ samples.jsonl.ipynb_checkpoints/
 accuracy_outputs.jsonl
 run.log
 *.log
+model.cache
 my_submission/
 mini_result/
 *_backup/
@@ -63,3 +64,4 @@ backup/
 
 # ── Local-only design QA screenshots ────────────────────────────────────────
 .screenshots/
+workspace/

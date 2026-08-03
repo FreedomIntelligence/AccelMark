@@ -1,0 +1,51 @@
+{
+  "suite": "suite_C",
+  "chip": "NVIDIA A800-SXM4-80GB",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "operating_point": {
+    "batch": 16,
+    "prompt_len": 280,
+    "gen_len": 310,
+    "dtype": "bfloat16"
+  },
+  "phases": {
+    "prefill": {
+      "flops": 67899406453760,
+      "bytes": 137205472256,
+      "bytes_read": 82323283353,
+      "bytes_written": 54882188903,
+      "arithmetic_intensity": 494.87,
+      "achieved_tflops": 118.26,
+      "achieved_bw_gbps": 238.97,
+      "time_ms_median": 574.15,
+      "flops_method": "measured",
+      "bytes_method": "profiler+modelled"
+    },
+    "decode": {
+      "flops": 242783092864,
+      "bytes": 87905687552,
+      "bytes_read": 52743412531,
+      "bytes_written": 35162275021,
+      "arithmetic_intensity": 2.76,
+      "achieved_tflops": 0.89,
+      "achieved_bw_gbps": 321.6,
+      "time_ms_median": 273.34,
+      "flops_method": "measured",
+      "bytes_method": "profiler+modelled"
+    }
+  },
+  "chip_peak": {
+    "tflops": 312.0,
+    "bw_gbps": 2039.0,
+    "ridge_point_i_star": 153.02,
+    "source": "builtin:NVIDIA A800-SXM4-80GB"
+  },
+  "classification": {
+    "prefill": "compute-bound",
+    "decode": "bandwidth-bound"
+  },
+  "env_ref": {
+    "chip": "NVIDIA A800-SXM4-80GB",
+    "note": "env_info.json not provided; run collect_env.py first"
+  }
+}

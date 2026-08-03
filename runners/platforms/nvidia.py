@@ -135,6 +135,118 @@ def detect_intra_node_interconnect() -> str | None:
     return None
 
 
+def sample_power_watts() -> float | None:
+    """Return instantaneous total board power (watts) summed across all
+    visible NVIDIA GPUs, or None if unavailable. Respects CUDA_VISIBLE_DEVICES
+    in both integer-index and UUID formats."""
+    import os
+
+    try:
+        out = subprocess.check_output(
+            [
+                "nvidia-smi",
+                "--query-gpu=index,power.draw",
+                "--format=csv,noheader,nounits",
+            ],
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
+    except Exception:
+        return None
+
+    visible = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+    visible_indices = _resolve_visible_indices(visible) if visible else None
+
+    total = 0.0
+    found = 0
+    for line in out.strip().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = [x.strip() for x in line.split(",")]
+        if len(parts) < 2:
+            continue
+        try:
+            idx = int(parts[0])
+        except ValueError:
+            continue
+        if visible_indices is not None and idx not in visible_indices:
+            continue
+        val = parts[1]
+        if val.lower() in ("[not supported]", "[unknown]", "0.0", "n/a"):
+            continue
+        try:
+            total += float(val)
+            found += 1
+        except ValueError:
+            continue
+
+    return round(total, 1) if found > 0 else None
+
+
+def _resolve_visible_indices(visible: str) -> set[int] | None:
+    """Parse CUDA_VISIBLE_DEVICES into a set of GPU indices.
+
+    Handles both integer indices (``"0,1,2"``) and GPU UUIDs
+    (``"GPU-abc123-def,..."``) by cross-referencing nvidia-smi.
+    Returns None if the value is empty or cannot be resolved.
+    """
+    tokens = [x.strip() for x in visible.split(",") if x.strip()]
+    if not tokens:
+        return None
+
+    # Integer indices — common case
+    try:
+        return {int(t) for t in tokens}
+    except ValueError:
+        pass
+
+    # UUID form — cross-reference nvidia-smi for index mapping
+    try:
+        mapping = subprocess.check_output(
+            [
+                "nvidia-smi",
+                "--query-gpu=uuid,index",
+                "--format=csv,noheader",
+            ],
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
+    except Exception:
+        print(
+            "WARNING: CUDA_VISIBLE_DEVICES contains non-integer values but "
+            "nvidia-smi is unavailable for UUID→index resolution. "
+            "Power sampling will include all GPUs — may over-count on "
+            "shared nodes."
+        )
+        return None
+
+    uuid_to_index: dict[str, int] = {}
+    for line in mapping.strip().splitlines():
+        parts = [x.strip() for x in line.split(",")]
+        if len(parts) >= 2 and parts[1].isdigit():
+            uuid_to_index[parts[0]] = int(parts[1])
+
+    indices: set[int] = set()
+    unresolved: list[str] = []
+    for token in tokens:
+        if token in uuid_to_index:
+            indices.add(uuid_to_index[token])
+        elif token.startswith("GPU-"):
+            unresolved.append(token)
+
+    if unresolved:
+        print(
+            f"WARNING: CUDA_VISIBLE_DEVICES contains UUIDs not found in "
+            f"nvidia-smi output: {unresolved}. These devices may not exist "
+            f"or may be inaccessible."
+        )
+
+    return indices if indices else None
+
+
 def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     notes: list[str] = []
     pytorch_v = env.get("pytorch_version") or ""
@@ -159,5 +271,10 @@ def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
     if env.get("accelerator_topology") is None and accelerators:
         notes.append(
             "accelerator_topology is null — nvidia-smi topo did not return data."
+        )
+    if accelerators and sample_power_watts() is None:
+        notes.append(
+            "Power sampling returned None — nvidia-smi power.draw is unavailable. "
+            "tokens_per_sec_per_watt will not be computed."
         )
     return notes

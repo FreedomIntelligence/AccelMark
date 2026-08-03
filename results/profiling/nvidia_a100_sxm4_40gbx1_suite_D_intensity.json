@@ -1,0 +1,47 @@
+{
+  "suite": "suite_D",
+  "chip": "NVIDIA A100-SXM4-40GB",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "operating_point": {
+    "batch": 1,
+    "prompt_len": 28650,
+    "gen_len": 256,
+    "dtype": "bfloat16"
+  },
+  "phases": {
+    "prefill": {
+      "flops": 460133969510400,
+      "bytes": 19815735296,
+      "arithmetic_intensity": 23220.64,
+      "achieved_tflops": 143.2,
+      "achieved_bw_gbps": 6.17,
+      "time_ms_median": 3213.26,
+      "flops_method": "analytical",
+      "bytes_method": "modelled"
+    },
+    "decode": {
+      "flops": 30041178240,
+      "bytes": 19815735296,
+      "arithmetic_intensity": 1.52,
+      "achieved_tflops": 0.27,
+      "achieved_bw_gbps": 178.93,
+      "time_ms_median": 110.75,
+      "flops_method": "analytical",
+      "bytes_method": "modelled"
+    }
+  },
+  "chip_peak": {
+    "tflops": 312.0,
+    "bw_gbps": 1555.0,
+    "ridge_point_i_star": 200.64,
+    "source": "builtin:NVIDIA A100-SXM4-40GB"
+  },
+  "classification": {
+    "prefill": "compute-bound",
+    "decode": "bandwidth-bound"
+  },
+  "env_ref": {
+    "chip": "NVIDIA A100-SXM4-40GB",
+    "note": "env_info.json not provided; run collect_env.py first"
+  }
+}

@@ -109,18 +109,19 @@ A snapshot of accelerators that have at least one submission on the leaderboard.
 Reference runners live under `runners/` (see each folder’s `meta.json`). The table below is **auto-generated** from each runner's `meta.json` — never hand-edited. Add a runner, declare its `suite_support` in `meta.json`, and the matrix updates on its own.
 
 <!-- platforms-matrix:start -->
-| Hardware | Runner folder | Framework | A | B | C | D | E | F | G |
-|---|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| NVIDIA A100-SXM4-80GB | `nvidia_sglang_inference_opt_5fe06410` | SGLang | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ |
-| NVIDIA GPU | `nvidia_sglang_c43a8309` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| NVIDIA GPU | `nvidia_vllm020_0f6c56e4` | vLLM | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ |
-| NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| NVIDIA V100 (SM70) | `nvidia_onecat_vllm_12a253c2` | 1Cat-vLLM | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | — | ⋯ |
-| AMD GPU | `amd_vllm_rocm_6c18cd8f` | vLLM-ROCm | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Huawei Ascend NPU | `ascend_vllm_ascend_d4aa9fda` | vllm-ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — |
-| Apple Silicon | `apple_mlx_lm_9546b8b5` | mlx-lm | ⋯ | — | — | ⋯ | — | ⋯ | — |
-| Google TPU | `google_vllm_tpu_68cc9ffa` | vllm-tpu | ✓ | — | — | ✓ | — | ✓ | — |
-| Moore Threads GPU | `moorethreads_vllm_musa_f2f6f965` | vllm-musa | ✓ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | — |
+| Hardware | Runner folder | Framework | A | B | C | D | E | F | G | H |
+|---|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| NVIDIA A100-SXM4-80GB | `nvidia_sglang_inference_opt_5fe06410` | SGLang | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ | ? |
+| NVIDIA GPU | `nvidia_sglang_c43a8309` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ⋯ |
+| NVIDIA GPU | `nvidia_tensorrt_llm_21323970` | TensorRT-LLM | ✓ | ⋯ | ✓ | — | ⋯ | ✓ | ⋯ | ⋯ |
+| NVIDIA GPU | `nvidia_vllm020_0f6c56e4` | vLLM | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ? |
+| NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| NVIDIA V100 (SM70) | `nvidia_onecat_vllm_12a253c2` | 1Cat-vLLM | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | — | ⋯ | ? |
+| AMD GPU | `amd_vllm_rocm_6c18cd8f` | vLLM-ROCm | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ? |
+| Huawei Ascend NPU | `ascend_vllm_ascend_d4aa9fda` | vllm-ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ? |
+| Apple Silicon | `apple_mlx_lm_9546b8b5` | mlx-lm | ⋯ | — | — | ⋯ | — | ⋯ | — | ? |
+| Google TPU | `google_vllm_tpu_68cc9ffa` | vllm-tpu | ✓ | — | — | ✓ | — | ✓ | — | ? |
+| Moore Threads GPU | `moorethreads_vllm_musa_f2f6f965` | vllm-musa | ✓ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | — | ? |
 
 _Legend: ✓ validated · ⋯ author-declared (not smoke-tested in this repo yet) · — unsupported._
 <!-- platforms-matrix:end -->
