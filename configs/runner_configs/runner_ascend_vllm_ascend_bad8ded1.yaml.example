@@ -1,0 +1,62 @@
+# AccelMark runner config — ascend_vllm_ascend_bad8ded1 (vllm-ascend on Huawei Ascend)
+#
+# Copy this file to runner_ascend_vllm_ascend_bad8ded1.yaml (remove .example suffix)
+# and edit as needed for your hardware. The actual .yaml is gitignored.
+#
+# These settings adapt the runner to your hardware environment.
+# They are recorded in result.json task.extra_config for transparency
+# but are NOT part of the benchmark identity (not hashed into run_id).
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults (apply to all suites) ─────────────────────────────────────
+
+# Tensor parallel size — number of NPU dies to use for tensor parallelism (default: 1).
+# For Ascend 910C (dual-die): each physical card contains 2 dies.
+# When the model fits on a single die (e.g. Suite A, 8B), the runner
+# auto-detects dual-die hardware and applies data_parallel_size: 2 by default,
+# launching one independent engine per die. TP=1 + DP=2 = full card throughput.
+# For large models (Suite B, 70B) that don't fit per-die, set
+# tensor_parallel_size to the total die count (e.g. 8 for 8 cards).
+tensor_parallel_size: 1
+
+# Data parallel size — number of independent engine replicas (default: auto).
+# Auto-detection: if the NPU reports Chip Count >= 2 in board info, and
+# the model fits on a single die, dp_size is set to the chip count (2 on 910C).
+# Set explicitly to override: 1 to disable DP, or a higher value for testing.
+# data_parallel_size: 1    # Uncomment to force single-die mode
+
+# Disable CANN graph compilation. Set to true if you encounter graph capture
+# errors (e.g. unsupported ops on your CANN version). Equivalent to
+# --enforce-eager on the CLI.
+enforce_eager: false
+
+# Maximum number of sequences in a batch (default: 512).
+# Reduce on lower-memory NPUs: 256 for 32 GB, 128 for 16 GB or less.
+max_num_seqs: 512
+
+# Fraction of NPU HBM reserved for the KV cache (default: 0.90).
+# Reduce if you get OOM errors: try 0.85 or 0.80 for tighter memory budgets.
+gpu_memory_utilization: 0.90
+
+# Pass-through kwargs forwarded directly to vLLM LLM() / AsyncEngineArgs().
+# Use for any vLLM setting not listed above. See vLLM docs for valid keys:
+# https://docs.vllm.ai/en/latest/api/vllm/engine/arg_utils.html
+# engine_kwargs:
+#   swap_space: 8
+#   max_seq_len_to_capture: 4096
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+# Keys here override the global defaults above for a specific suite only.
+# Only the section matching the current suite is used — other suite sections
+# are never loaded or recorded.
+
+suites:
+  suite_D:
+    # Long-context suite (~28K input tokens) — tighter memory budget.
+    max_num_seqs: 64
+    gpu_memory_utilization: 0.85
+
+  suite_F:
+    # Consumer/edge suite (Qwen2.5-0.5B) — single-chip only, lower concurrency.
+    max_num_seqs: 128

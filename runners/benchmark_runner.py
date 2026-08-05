@@ -679,6 +679,7 @@ class BenchmarkRunner(ABC):
             "chip_name":      accel.get("name", "unknown"),
             "chip_memory_gb": round(float(accel.get("memory_gb") or 0)),
             "chip_count":     chip_count,
+            "dies_per_card":  getattr(self, "_dies_per_card", 1) or 1,
             "interconnect":   interconnect,
             # Software
             "runner_id":         self._compute_implementation_id() or "unknown",
@@ -2077,10 +2078,16 @@ class BenchmarkRunner(ABC):
         accelerators = env_info.get("accelerators", [])
         if accelerators:
             a = accelerators[0]
-            # Total chips = TP × PP. Expert parallelism (EP) is within the TP
-            # group in current frameworks (EP ≤ TP) so does not add chips.
-            # Data parallelism = 1 for inference benchmarks.
+            # Total chips (dies) = TP × PP × DP.
+            # Expert parallelism (EP) is within the TP group in current
+            # frameworks (EP ≤ TP) so does not add chips.
             total_chips = getattr(self, "_chip_count", 1)
+            # ── Multi-die (dual-die) support ──
+            # _dies_per_card and _card_count are set by the runner (e.g. Ascend)
+            # when the hardware reports Chip Count >= 2 in board info.
+            # For single-die hardware these default to total_chips.
+            dies_per_card = getattr(self, "_dies_per_card", 1) or 1
+            card_count = getattr(self, "_card_count", total_chips) or total_chips
             # interconnect_intra_node: None for single-chip runs
             intra_node = None if total_chips <= 1 else (
                 env_info.get("intra_node_interconnect") or a.get("interconnect_intra_node")
@@ -2089,6 +2096,8 @@ class BenchmarkRunner(ABC):
                 "name":                   a.get("name", "Unknown"),
                 "vendor":                 a.get("vendor", suite.get("chip", {}).get("vendor", "Unknown")),
                 "count":                  total_chips,
+                "card_count":             card_count,
+                "dies_per_card":          dies_per_card,
                 "memory_gb":     a.get("memory_gb", None),
                 "interconnect_intra_node": intra_node,
                 "interconnect_inter_node": a.get("interconnect_inter_node", None),
