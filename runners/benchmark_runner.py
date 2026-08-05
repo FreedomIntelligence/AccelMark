@@ -642,7 +642,19 @@ class BenchmarkRunner(ABC):
         Precision: uses effective runtime precision (e.g. FP16 on V100), not suite.precision_required.
           This ensures the hash matches what check_run_id_integrity() recomputes from model.precision.
         """
-        accel   = env_info.get("accelerators", [{}])[0]
+        accelerators = env_info.get("accelerators") or []
+        if not accelerators:
+            print(
+                "ERROR: No accelerators found in env_info.json. "
+                "The environment collector (collect_env.py) returned an empty "
+                "accelerator list — check that your accelerator is visible to "
+                "the system (e.g. nvidia-smi / npu-smi / rocm-smi). "
+                "If running in a container, ensure --privileged is set and "
+                "device mounts are correct.",
+                flush=True,
+            )
+            sys.exit(1)
+        accel   = accelerators[0]
         profile = self._load_submitter_profile()
 
         chip_count = getattr(self, "_chip_count", 1)

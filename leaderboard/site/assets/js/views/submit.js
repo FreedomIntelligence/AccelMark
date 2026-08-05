@@ -87,7 +87,7 @@ export function render({ query, el }) {
           <div class="cmd-head"><span>${_i('submit.install')}</span><button type="button" class="btn small copy-btn" data-copy="install">${_i('submit.copy')}</button></div>
           <pre id="sw-cmd-install">git clone https://github.com/FreedomIntelligence/AccelMark.git
 cd AccelMark
-pip install -e .</pre>
+pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"</pre>
         </div>
         <div class="cmd-block">
           <div class="cmd-head"><span>${_i('submit.benchmark')}</span><button type="button" class="btn small copy-btn" data-copy="run">${_i('submit.copy')}</button></div>

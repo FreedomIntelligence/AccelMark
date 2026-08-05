@@ -51,7 +51,7 @@
 # 1. Clone and install
 git clone https://github.com/FreedomIntelligence/AccelMark.git
 cd AccelMark
-pip install -e .                                              # installs framework dependencies (Python >=3.10 required)
+pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"       # framework dependencies (Python >=3.10 required)
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt # installs runner dependencies
 
 # 2. One-time setup
