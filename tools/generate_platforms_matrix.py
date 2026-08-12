@@ -64,7 +64,7 @@ def _load_platforms_catalog() -> dict[str, dict]:
     if not _PLATFORMS_CATALOG.exists():
         return {}
     try:
-        data = json.loads(_PLATFORMS_CATALOG.read_text())
+        data = json.loads(_PLATFORMS_CATALOG.read_text(encoding="utf-8"))
     except Exception:
         return {}
     out: dict[str, dict] = {}
@@ -87,7 +87,7 @@ def _iter_runner_metas() -> Iterable[dict]:
         if not meta_path.exists():
             continue
         try:
-            meta = json.loads(meta_path.read_text())
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
         except Exception:
             continue
         # Skip runners that have been superseded — they should not clutter
@@ -172,7 +172,7 @@ def _build_table() -> str:
 
 
 def _splice_into_readme(table: str) -> str:
-    src = _README.read_text()
+    src = _README.read_text(encoding="utf-8")
     if START_MARKER not in src or END_MARKER not in src:
         raise SystemExit(
             f"README.md is missing the platforms-matrix markers. "
@@ -195,7 +195,7 @@ def main() -> int:
 
     table = _build_table()
     new_readme = _splice_into_readme(table)
-    current = _README.read_text()
+    current = _README.read_text(encoding="utf-8")
 
     if new_readme == current:
         print("README.md platforms matrix is up to date.")
@@ -211,7 +211,7 @@ def main() -> int:
         )
         return 1
 
-    _README.write_text(new_readme)
+    _README.write_text(new_readme, encoding="utf-8")
     print("README.md platforms matrix regenerated.")
     return 0
 
