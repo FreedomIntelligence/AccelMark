@@ -1,0 +1,102 @@
+# AccelMark runner config — ascend_vllm_ascend_b1957851 (vllm-ascend on Huawei Ascend)
+#
+# Copy this file to runner_ascend_vllm_ascend_b1957851.yaml (remove .example suffix)
+# and edit as needed for your hardware. The actual .yaml is gitignored.
+#
+# These settings adapt the runner to your hardware environment.
+# They are recorded in result.json task.extra_config for transparency
+# but are NOT part of the benchmark identity (not hashed into run_id).
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults (apply to all suites) ─────────────────────────────────────
+
+# Tensor parallel size — number of NPU dies to use for tensor parallelism (default: 1).
+# For Ascend 910C (dual-die): each physical card contains 2 dies.
+# When data_parallel_size > 1, the runner launches one independent engine per die.
+# TP=1 + DP=2 = full single-card throughput with near-linear scaling.
+# For large models (Suite B, 70B) that don't fit per-die, set
+# tensor_parallel_size to the total die count (e.g. 8 for 4×910C cards).
+tensor_parallel_size: 1
+
+# Data parallel size — number of independent engine replicas (default: auto).
+# Auto-detection: if the NPU reports Chip Count >= 2 in board info, dp_size = 2.
+# DP benefits suites where the model fits comfortably on a single die (Suites A, C, H).
+# The following suites override this to dp=1 (see suite-specific section below):
+#   Suite B, G — model too large for single die, must use TP across cards
+#   Suite D    — long-context KV cache makes per-die memory tight, OOM risk
+#   Suite E    — multi-card scaling benchmark, DP would break cross-platform comparability
+#   Suite F    — 0.5B model, engine overhead > throughput gain from parallelism
+# Set explicitly to override: 1 to disable DP, or a higher value for testing.
+# data_parallel_size: 1    # Uncomment to force single-die mode globally
+
+# Disable CANN graph compilation. Set to true if you encounter graph capture
+# errors (e.g. unsupported ops on your CANN version). Equivalent to
+# --enforce-eager on the CLI.
+enforce_eager: false
+
+# Maximum number of sequences in a batch — per-engine value (default: 512).
+# Reduce on lower-memory NPUs: 256 for 32 GB, 128 for 16 GB or less.
+# When data_parallel_size > 1, this value is automatically divided by dp_size
+# (e.g. 512 → 256 per worker for DP=2) to avoid shared-memory broadcast
+# contention between engines on the same physical card.
+max_num_seqs: 512
+
+# Fraction of NPU HBM reserved for the KV cache (default: 0.90).
+# Reduce if you get OOM errors: try 0.85 or 0.80 for tighter memory budgets.
+gpu_memory_utilization: 0.90
+
+# Pass-through kwargs forwarded directly to vLLM LLM() / AsyncEngineArgs().
+# Use for any vLLM setting not listed above. See vLLM docs for valid keys:
+# https://docs.vllm.ai/en/latest/api/vllm/engine/arg_utils.html
+# engine_kwargs:
+#   swap_space: 8
+#   max_seq_len_to_capture: 4096
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+# Keys here override the global defaults above for a specific suite only.
+# Only the section matching the current suite is used — other suite sections
+# are never loaded or recorded.
+
+suites:
+  # Suite A: Llama-3-8B — DP=2 benefits greatly (~2× throughput, near-linear)
+  #   dp auto-detected (910C → 2), no override needed.
+
+  # Suite B: Llama-3-70B — model too large for single die, TP across cards.
+  #   DP auto-detected but model won't fit → tp_size forces multi-card.
+  #   dp is already 1 in practice because available_dies < dies_per_card * tp_size.
+  #   Explicit override for clarity:
+  suite_B:
+    data_parallel_size: 1
+
+  # Suite C: Llama-3.1-8B quantization benchmark — DP=2 benefits.
+  #   dp auto-detected, no override needed.
+
+  suite_D:
+    # Long-context suite (~28K input tokens) — tighter memory budget.
+    # Per-die KV cache is large; DP=2 risks OOM at higher concurrency.
+    max_num_seqs: 64
+    gpu_memory_utilization: 0.85
+    data_parallel_size: 1
+
+  # Suite E: Multi-card scaling benchmark (1x/2x/4x cards).
+  #   DP would inflate chip_count with intra-card parallelism,
+  #   breaking cross-platform scaling comparisons. Force single-engine.
+  suite_E:
+    data_parallel_size: 1
+
+  suite_F:
+    # Consumer/edge suite (Qwen2.5-0.5B) — single-die only.
+    # 0.5B model = ~1GB, engine overhead far exceeds any DP gain.
+    # User testing confirms: single die performs better than DP=2.
+    max_num_seqs: 128
+    data_parallel_size: 1
+
+  # Suite G: Mixtral-8x7B MoE — model too large for single die (like Suite B).
+  #   dp auto-falls-back to 1 because model won't fit.
+  suite_G:
+    data_parallel_size: 1
+
+  # Suite H: Mistral-7B SWA — DP=2 benefits.
+  #   7B model fits on single die, SWA caps KV cache at window=4096.
+  #   dp auto-detected, no override needed.

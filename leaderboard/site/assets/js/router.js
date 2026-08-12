@@ -134,6 +134,8 @@ export function start() {
   else dispatch();
 }
 
+export function refresh() { dispatch(); }
+
 // ── Compare basket (shared state across views) ──
 const basketListeners = new Set();
 

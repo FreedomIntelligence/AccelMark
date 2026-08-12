@@ -16,6 +16,7 @@ import {
   rowsForSuite, suiteFacts, chipCloudData,
   summary, recent, recentSince, formatPrimary,
   suiteChartAxisLabel, suiteChartBlurb, suiteChartHead, suiteChartPurpose,
+  implOpsLabel,
 } from "../data.js";
 import { contributorIndex } from "../contributors.js";
 import {
@@ -23,6 +24,7 @@ import {
   shortVersion, shortModel, submitterHandle,
 } from "../utils.js";
 
+const _i = (k,r) => (window._i ? window._i(k,r) : k);
 const TOP_N = 8;
 const RECENT_WINDOW_DAYS = 7;
 
@@ -107,9 +109,9 @@ function renderDistChart() {
     var gxMn=valid.map(function(d){return getV(d);}).filter(function(v){return v>0;});
     gxMn=gxMn.length?Math.max(0.5,Math.min.apply(null,gxMn)*0.5):1;
     suites.forEach(function(suite){var sd=valid.filter(function(d){return d.suite===suite;});if(!sd.length)return;var inner=document.createElement('div');inner.style.cssText='background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:var(--r-md);padding:6px';inner.innerHTML='<div style="font-size:.68rem;font-weight:600;color:var(--fg-strong);margin-bottom:2px;line-height:1.4">'+esc(suiteChartHead(suite))+'<br><span style="font-weight:400;color:var(--fg-muted)">'+esc(suiteChartPurpose(suite))+'</span> <span style="font-weight:400;color:var(--fg-faint)">('+sd.length+')</span></div><div style="width:100%;height:160px" class="sm-chart"></div>';el.appendChild(inner);setTimeout(function(){var el2=inner.querySelector('.sm-chart');if(!el2)return;var c=echarts.init(el2);var vends=[...new Set(sd.map(function(d){return d.chip_vendor;}))];var ser=vends.map(function(v){return{name:v,type:'scatter',data:sd.filter(function(d){return d.chip_vendor===v&&getV(d)>0;}).map(function(d){return{value:[getV(d),(d.scenarios&&d.scenarios.online&&d.scenarios.online.is_valid&&d.scenarios.online.throughput>0)?d.scenarios.online.throughput:0.05],submission:d};}),symbol:'circle',symbolSize:6,itemStyle:{color:distVc(v),opacity:.7},emphasis:{scale:1.5}};});c.setOption({tooltip:{trigger:'item',backgroundColor:TBG,borderColor:TBR,textStyle:{color:TFG,fontSize:9},formatter:function(p){return distTip(distSubOf(p),mt,getV);}},grid:{left:36,right:6,top:6,bottom:18},xAxis:{type:'log',min:gxMn,axisLabel:{fontSize:6,color:AT},splitLine:{show:false}},yAxis:{type:'log',axisLabel:{fontSize:6,color:AT},splitLine:{show:false},min:0.05},series:ser});distBindClick(c);},30);});
-    if(info)info.textContent='Each suite in its own chart · '+valid.length+' recipes';
+    if(info)info.textContent=_i('dist.info.smallchart')+' · '+valid.length+' recipes';
     var cap0=document.getElementById('home-dist-caption');
-    if(cap0)cap0.textContent='Figure 1. Per-suite mini scatter plots (throughput × QPS); each point is one serving recipe.';
+    if(cap0)cap0.textContent=_i('dist.caption.small');
     return;
   }
 
@@ -155,16 +157,15 @@ function renderDistChart() {
   chart.resize();
   var normHint=distNormalize&&(distView!=='beeswarm'&&distView!=='byframework')?' · Normalize applies to column views only':'';
   if(distNormalize&&(distView==='beeswarm'||distView==='byframework'))normHint=' · normalized to % of column best';
-  if(info)info.innerHTML='Showing '+valid.length+' recipes across '+suites.length+' suites · <span class="dist-info-metric">'+esc(mt.label)+'</span>'+esc(normHint);
+  if(info)info.innerHTML=_i('dist.info.showing',{n:valid.length,s:suites.length,m:esc(mt.label)})+esc(normHint);
   var cap=document.getElementById('home-dist-caption');
   if(cap){
-    var base='Figure 1. Each point is one serving recipe (framework × precision × hardware); larger markers denote best-in-class per vendor.';
-    if(distNormalize&&(distView==='beeswarm'||distView==='byframework'))cap.textContent=base+' Y-axis shows % of column best (linear scale).';
-    else if(distView==='beeswarm'||distView==='byframework')cap.textContent=base+' Y-axis log-scaled.';
-    else if(distView==='scatter')cap.textContent='Figure 1. Throughput (x) vs online QPS (y); each point is one serving recipe. Both axes log-scaled.';
-    else if(distView==='density')cap.textContent='Figure 1. Kernel-density-style overlap of recipe throughput; darker regions indicate more submissions.';
-    else if(distView==='heatmap')cap.textContent='Figure 1. Best throughput per chip × suite cell; color intensity encodes '+mt.label.toLowerCase()+'.';
-    else cap.textContent='Figure 1. Per-suite mini scatter plots (throughput × QPS); each point is one serving recipe.';
+    if(distNormalize&&(distView==='beeswarm'||distView==='byframework'))cap.textContent=_i('dist.caption.beeswarm_norm');
+    else if(distView==='beeswarm'||distView==='byframework')cap.textContent=_i('dist.caption.beeswarm');
+    else if(distView==='scatter')cap.textContent=_i('dist.caption.scatter');
+    else if(distView==='density')cap.textContent=_i('dist.caption.density');
+    else if(distView==='heatmap')cap.textContent=_i('dist.caption.heatmap');
+    else cap.textContent=_i('dist.caption.small');
   }
 }
 
@@ -179,26 +180,96 @@ function renderCommunityHub() {
       <td class="tnum">${fmtNum(c.verified)}</td>
       <td class="tnum">${fmtNum(c.score)}</td>
     </tr>
-  `).join("") : `<tr><td colspan="5" class="muted" style="padding:1rem">No contributors yet.</td></tr>`;
+  `).join("") : `<tr><td colspan="5" class="muted" style="padding:1rem">${_i('community.empty')}</td></tr>`;
 
   return `
     <section class="section community-hub">
       <div class="section-header">
         <div class="section-title">
-          <span class="eyebrow">05 · Community</span>
-          <h2>Contribution index</h2>
+          <span class="eyebrow">${_i('community.eyebrow')}</span>
+          <h2>${_i('community.title')}</h2>
         </div>
-        <a class="btn small" href="#/contributors">All contributors →</a>
+        <a class="btn small" href="#/contributors">${_i('community.all')}</a>
       </div>
-      <p class="section-sub">Ranked by verified runs and reproducible evidence — each submission links to full artifacts.</p>
+      <p class="section-sub">${_i('community.subtitle')}</p>
       <div class="contrib-table-wrap card community-hub-table">
         <table class="contrib-table community-data-table">
-          <thead><tr><th>Rank</th><th>Contributor</th><th>Runs</th><th>Verified</th><th>Score</th></tr></thead>
+          <thead><tr><th>${_i('community.rank')}</th><th>${_i('community.contributor')}</th><th>${_i('community.runs')}</th><th>${_i('community.verified')}</th><th>${_i('community.score')}</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>
     </section>
   `;
+}
+
+// Rankings-reverse hero chart — A100 vs 5090 across Suite A (bandwidth-bound),
+// Suite D (compute-bound), and MSRP.  Pure inline SVG themed via CSS variables.
+// Unified perspective from A100: green = A100 advantage, red = A100 disadvantage
+function renderHeroChart() {
+  const C = {
+    blue: "var(--accent-2, #3b82f6)",
+    warm: "#e8904f",
+  };
+  const W = 126, H = 140, PAD = { t: 20, r: 6, b: 26, l: 40 };
+  const PW = W - PAD.l - PAD.r, PH = H - PAD.t - PAD.b;
+
+  function panel(data, yFmt) {
+    const max = Math.max(...data.map(d => d.v)) * 1.12;
+    const y = v => PAD.t + PH - (v / max) * (PH - 4);
+    const gap = 22, barW = (PW - gap) / 2;
+    const xOffset = PAD.l;
+
+    let bars = "";
+    data.forEach((d, i) => {
+      const bx = xOffset + i * (barW + gap);
+      const by = y(d.v), bh = PAD.t + PH - by;
+      bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(bh, 0).toFixed(1)}" rx="3" fill="${d.color}" opacity="0.85"/>`;
+      bars += `<text x="${(bx + barW/2).toFixed(1)}" y="${(by - 6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--fg-strong)">${yFmt(d.v)}</text>`;
+      bars += `<text x="${(bx + barW/2).toFixed(1)}" y="${H - 10}" text-anchor="middle" font-size="9.5" font-weight="500" fill="var(--fg-muted, #a1a1aa)">${d.label}</text>`;
+    });
+
+    let ticks = "";
+    for (let i = 0; i <= 3; i++) {
+      const v = (max / 3) * i;
+      const ty = y(v);
+      ticks += `<line x1="${PAD.l.toFixed(1)}" x2="${(W - PAD.r).toFixed(1)}" y1="${ty.toFixed(1)}" y2="${ty.toFixed(1)}" stroke="var(--border-soft, #20232b)" stroke-dasharray="2 3" opacity="0.5"/>`;
+      ticks += `<text x="${(PAD.l - 5).toFixed(1)}" y="${(ty + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--fg-muted, #a1a1aa)">${yFmt(v)}</text>`;
+    }
+
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">${ticks}${bars}</svg>`;
+  }
+
+  const fmtA   = v => v >= 1000 ? (v / 1000).toFixed(1) + "k" : v.toFixed(0);
+  const fmtD   = v => v.toFixed(1);
+  const fmtUSD = v => v >= 1000 ? "$" + (v / 1000).toFixed(0) + "k" : "$" + v;
+
+  const pA = panel([
+    { label: "A100", v: 2701, color: C.blue },
+    { label: "5090", v: 3487, color: C.warm },
+  ], fmtA);
+  const pD = panel([
+    { label: "A100", v: 70.2, color: C.blue },
+    { label: "5090", v: 54.3, color: C.warm },
+  ], fmtD);
+  const pP = panel([
+    { label: "A100", v: 15000, color: C.blue },
+    { label: "5090", v: 1999, color: C.warm },
+  ], fmtUSD);
+
+  return `<div class="hero-chart-row">
+    <div class="hero-chart-panel">
+      <span class="hero-chart-panel-title">Suite A · tok/s</span>${pA}
+      <span class="hero-chart-panel-note disadvantage"><span class="winner-chip">A100</span> -29%</span>
+    </div>
+    <div class="hero-chart-panel">
+      <span class="hero-chart-panel-title">Suite D · tok/s</span>${pD}
+      <span class="hero-chart-panel-note advantage"><span class="winner-chip">A100</span> +29%</span>
+    </div>
+    <div class="hero-chart-panel">
+      <span class="hero-chart-panel-title">MSRP</span>${pP}
+      <span class="hero-chart-panel-note disadvantage"><span class="winner-chip">A100</span> 7.5× pricier</span>
+    </div>
+  </div>`;
 }
 
 export function render({ el }) {
@@ -212,55 +283,60 @@ export function render({ el }) {
     : "";
   el.innerHTML = `
     <section class="hero">
-      <h1>
-        Run your accelerator.
-        <span class="hero-title-phrase">Publish reproducible LLM inference results.</span>
-      </h1>
-      <p class="hero-sub">Compare NVIDIA, AMD, Ascend, Apple Silicon, TPU and emerging chips under the same workload suites.</p>
-      <p class="tagline">
-        Every row links to <code>result.json</code>, <code>env_info.json</code>, runner hash,
-        accuracy receipt, and reproduction instructions — open evidence, not just a number on a chart.
-      </p>
+      <div class="hero-main" style="display:flex;align-items:center;justify-content:center;gap:2rem;max-width:none;flex-wrap:nowrap">
+        <div class="hero-text" style="flex:0 0 auto;min-width:0;overflow:visible">
+          <h1 style="margin:0 0 0.8rem;line-height:1.35">
+            ${_i('hero.title1')}
+            <span class="hero-title-phrase">${_i('hero.title2')}</span>
+          </h1>
+          <p class="hero-sub" style="white-space:nowrap;max-width:none;line-height:1.6;margin:0.3rem 0 0">${_i('hero.subtitle')}</p>
+        </div>
+        <div class="hero-chart-card" style="flex-shrink:0">
+          <span class="hero-chart-eyebrow">${_i('hero.chartEyebrow')}</span>
+          ${renderHeroChart()}
+          <p class="hero-chart-caption">${_i('hero.chartCaption')}</p>
+        </div>
+      </div>
       <div class="hero-stats">
-        <div class="kpi"><span class="kpi-value">${fmtNum(s.total)}</span><span class="kpi-label">benchmarks</span></div>
-        <div class="kpi"><span class="kpi-value">${fmtNum(s.chips)}</span><span class="kpi-label">platforms</span></div>
-        <div class="kpi"><span class="kpi-value">${fmtNum(s.vendors)}</span><span class="kpi-label">vendors</span></div>
-        <div class="kpi"><span class="kpi-value">${fmtNum(s.suites)}</span><span class="kpi-label">workloads</span></div>
-        <div class="kpi"><span class="kpi-value">${fmtNum(s.verified)}</span><span class="kpi-label">verified</span></div>
+        <div class="kpi"><span class="kpi-value">${fmtNum(s.total)}</span><span class="kpi-label">${_i('hero.kpi.benchmarks')}</span></div>
+        <div class="kpi"><span class="kpi-value">${fmtNum(s.chips)}</span><span class="kpi-label">${_i('hero.kpi.gpus')}</span></div>
+        <div class="kpi"><span class="kpi-value">${fmtNum(s.vendors)}</span><span class="kpi-label">${_i('hero.kpi.vendors')}</span></div>
+        <div class="kpi"><span class="kpi-value">${fmtNum(s.suites)}</span><span class="kpi-label">${_i('hero.kpi.workloads')}</span></div>
+        <div class="kpi"><span class="kpi-value">${fmtNum(s.verified)}</span><span class="kpi-label">${_i('hero.kpi.verified')}</span></div>
         ${recentCount > 0 ? `
           <div class="kpi kpi--fresh">
             <span class="kpi-value">${fmtNum(recentCount)}</span>
-            <span class="kpi-label">this week</span>
+            <span class="kpi-label">${_i('hero.kpi.thisWeek')}</span>
           </div>
         ` : ""}
       </div>
       ${recentRibbon}
       <div class="hero-cta">
-        <a class="btn primary" href="#/submit">Submit a result →</a>
-        <a class="btn" href="#/compare">Compare chips</a>
-        <a class="btn" href="#/citation">Cite the dataset</a>
+        <a class="btn primary" href="#/submit">${_i('hero.cta.submit')}</a>
+        <a class="btn" href="#/compare">${_i('hero.cta.compare')}</a>
+        <a class="btn" href="#/citation">${_i('hero.cta.cite')}</a>
       </div>
     </section>
 
     <section class="section why-submit-section">
       <div class="section-header">
         <div class="section-title">
-          <span class="eyebrow">Why submit</span>
-          <h2>Get a shareable, citable public record</h2>
+          <span class="eyebrow">${_i('why.eyebrow')}</span>
+          <h2>${_i('why.title')}</h2>
         </div>
       </div>
       <div class="why-submit-grid">
         <article class="why-submit-card">
-          <h3>Reproducible evidence</h3>
-          <p>Your run ships with environment fingerprint, runner source hash, and validation receipts — others can rerun and verify, not just trust a screenshot.</p>
+          <h3>${_i('why.card1.title')}</h3>
+          <p>${_i('why.card1.desc')}</p>
         </article>
         <article class="why-submit-card">
-          <h3>First results on new hardware</h3>
-          <p>Missing your platform? <a href="#/wanted">See wanted hardware</a>. Have matching hardware? <a href="#/reproduce">Browse reproduction quests</a>.</p>
+          <h3>${_i('why.card2.title')}</h3>
+          <p>${_i('why.card2.desc')}</p>
         </article>
         <article class="why-submit-card">
-          <h3>Citable submissions</h3>
-          <p>Papers and reports can cite project-level, snapshot-level, or per-run BibTeX — with deep links back to your submission artifacts.</p>
+          <h3>${_i('why.card3.title')}</h3>
+          <p>${_i('why.card3.desc')}</p>
         </article>
       </div>
     </section>
@@ -268,31 +344,31 @@ export function render({ el }) {
     <section class="section">
       <div class="section-header">
         <div class="section-title">
-          <span class="eyebrow">01 · Explore</span>
-          <h2>The recipe landscape</h2>
+          <span class="eyebrow">${_i('dist.eyebrow')}</span>
+          <h2>${_i('dist.title')}</h2>
         </div>
-        <span class="section-sub">Each dot is a serving recipe — framework, precision, and hardware together. Wider spread within a suite means more room for tuning.</span>
+        <span class="section-sub">${_i('dist.subtitle')}</span>
       </div>
       <div class="filter-row" style="margin-bottom:8px">
-        <div class="fi"><label>Suite</label><select id="f-suite"><option value="">All</option></select></div>
-        <div class="fi"><label>Vendor</label><select id="f-vendor"><option value="">All</option></select></div>
-        <div class="fi"><label>Framework</label><select id="f-framework"><option value="">All</option></select></div>
-        <div class="fi"><label>Precision</label><select id="f-precision"><option value="">All</option></select></div>
-        <div class="fi"><label>Chip</label><select id="f-chip"><option value="">All</option></select></div>
-        <button class="btn" id="btn-dist-reset" style="align-self:flex-end">↺ Reset</button>
+        <div class="fi"><label>${_i('dist.filter.suite')}</label><select id="f-suite"><option value="">${_i('dist.all')}</option></select></div>
+        <div class="fi"><label>${_i('dist.filter.vendor')}</label><select id="f-vendor"><option value="">${_i('dist.all')}</option></select></div>
+        <div class="fi"><label>${_i('dist.filter.framework')}</label><select id="f-framework"><option value="">${_i('dist.all')}</option></select></div>
+        <div class="fi"><label>${_i('dist.filter.precision')}</label><select id="f-precision"><option value="">${_i('dist.all')}</option></select></div>
+        <div class="fi"><label>${_i('dist.filter.chip')}</label><select id="f-chip"><option value="">${_i('dist.all')}</option></select></div>
+        <button class="btn" id="btn-dist-reset" style="align-self:flex-end">${_i('dist.filter.reset')}</button>
       </div>
       <div class="dist-view-toolbar">
         <div class="dist-view-main">
           <span class="chart-tab active" data-dist-view="beeswarm">Beeswarm</span>
-          <span class="chart-tab" data-dist-view="byframework">By Framework</span>
+          <span class="chart-tab" data-dist-view="byframework">${_i('dist.tab.byframework')}</span>
           <span class="chart-tab" data-dist-view="scatter">Scatter</span>
-          <label class="dist-normalize"><input type="checkbox" id="dist-normalize"> Normalize</label>
-          <span class="info-btn">ⓘ<span class="info-pop"><b>Beeswarm</b> — Grouped by suite; each dot is a recipe. Larger dots = best per vendor.<br><b>By Framework</b> — Same layout, grouped by serving framework.<br><b>Scatter</b> — Throughput × QPS. Top-right = both strong.<br><b>Density</b> — Overlap shading. Darker = more recipes.<br><b>Heatmap</b> — Suite × Chip matrix. Color = throughput.<br><b>By Suite</b> — One mini-chart per suite. Click a dot to open that platform.<br><b>Normalize</b> — Column views only: Y-axis becomes % of column best (0–100%).</span></span>
+          <label class="dist-normalize"><input type="checkbox" id="dist-normalize"> ${_i('dist.normalize')}</label>
+          <span class="info-btn">ⓘ<span class="info-pop">${_i('dist.info.all')}</span></span>
         </div>
-        <span class="dist-metric-bar"><span class="dist-metric-label">Metric</span><select id="home-dist-metric"><option value="offline">Offline Throughput</option><option value="online">Online Max QPS</option><option value="sustained">Sustained Throughput</option><option value="speculative">Speculative Throughput</option></select></span>
+        <span class="dist-metric-bar"><span class="dist-metric-label">${_i('dist.metric.label')}</span><select id="home-dist-metric"><option value="offline">${_i('dist.metric.offline')}</option><option value="online">${_i('dist.metric.online')}</option><option value="sustained">${_i('dist.metric.sustained')}</option><option value="speculative">${_i('dist.metric.speculative')}</option></select></span>
       </div>
       <div class="dist-view-more-bar">
-        <span class="dist-view-more-toggle" id="dist-more-toggle" role="button" tabindex="0"><span class="chev">▸</span> More views</span>
+        <span class="dist-view-more-toggle" id="dist-more-toggle" role="button" tabindex="0"><span class="chev">▸</span> ${_i('dist.moreviews')}</span>
       </div>
       <div class="dist-view-more-panel" id="dist-more-panel">
         <span class="chart-tab" data-dist-view="density">Density</span>
@@ -301,16 +377,16 @@ export function render({ el }) {
       </div>
       <div id="home-dist-chart" style="width:100%;height:440px"></div>
       <div id="home-dist-info"></div>
-      <p id="home-dist-caption" class="figure-caption">Figure 1. Each point is one serving recipe (framework × precision × hardware); larger markers denote best-in-class per vendor. Y-axis log-scaled.</p>
+      <p id="home-dist-caption" class="figure-caption">${_i('home.figure1')} (framework × precision × hardware); larger markers denote best-in-class per vendor. Y-axis log-scaled.</p>
     </section>
 
     <section class="section">
       <div class="section-header">
         <div class="section-title">
-          <span class="eyebrow">02 · Workloads</span>
-          <h2>Browse by benchmark suite</h2>
+          <span class="eyebrow">${_i('workloads.eyebrow')}</span>
+          <h2>${_i('workloads.title')}</h2>
         </div>
-        <span class="section-sub">Each suite tests a fixed model under a specific protocol — from single-GPU throughput to long-context serving.</span>
+        <span class="section-sub">${_i('workloads.subtitle')}</span>
       </div>
       <div class="suite-grid" id="suite-grid"></div>
     </section>
@@ -318,10 +394,10 @@ export function render({ el }) {
     <section class="section">
       <div class="section-header">
         <div class="section-title">
-          <span class="eyebrow">03 · Coverage</span>
-          <h2>Platform coverage</h2>
+          <span class="eyebrow">${_i('coverage.eyebrow')}</span>
+          <h2>${_i('coverage.title')}</h2>
         </div>
-        <span class="section-sub">Tile size reflects submission count. Colour indicates vendor family.</span>
+        <span class="section-sub">${_i('coverage.subtitle')}</span>
       </div>
       <div class="chip-cloud" id="chip-cloud"></div>
       <div class="cloud-legend" id="cloud-legend"></div>
@@ -330,10 +406,10 @@ export function render({ el }) {
     <section class="section">
       <div class="section-header">
         <div class="section-title">
-          <span class="eyebrow">04 · Latest activity</span>
-          <h2>Recent submissions</h2>
+          <span class="eyebrow">${_i('recent.eyebrow')}</span>
+          <h2>${_i('recent.title')}</h2>
         </div>
-        <a class="btn small" href="#/rankings">See all →</a>
+        <a class="btn small" href="#/rankings">${_i('recent.seeall')}</a>
       </div>
       <div class="recent-list" id="recent-list"></div>
     </section>
@@ -342,24 +418,22 @@ export function render({ el }) {
 
     <section class="section submit-section">
       <div class="submit-card">
-        <span class="eyebrow">06 · Contribute</span>
-        <h2 class="submit-title">Ready to publish your benchmark?</h2>
-        <p class="submit-body">
-          If you already have the hardware and a supported serving stack, you can go from zero to a merged PR in about ten minutes.
-        </p>
+        <span class="eyebrow">${_i('contribute.eyebrow')}</span>
+        <h2 class="submit-title">${_i('contribute.title')}</h2>
+        <p class="submit-body">${_i('contribute.body')}</p>
         <ol class="submit-quickstart">
-          <li><strong>Open the submit wizard</strong> — pick workload suite, platform, and framework; it prints the exact command and output folder layout.</li>
-          <li><strong>Run the benchmark</strong> — one command produces <code>result.json</code>, <code>env_info.json</code>, and accuracy receipts under <code>results/community/</code>.</li>
-          <li><strong>Open a pull request</strong> — add that folder; CI checks artifacts. After merge you get a permanent link and citation exports.</li>
+          <li>${_i('contribute.step1')}</li>
+          <li>${_i('contribute.step2')}</li>
+          <li>${_i('contribute.step3')}</li>
         </ol>
         <p class="submit-body submit-body-foot muted">
-          First time with the harness, accuracy rules, or hardware setup?
-          <a href="https://github.com/FreedomIntelligence/AccelMark/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Read the full contributor guide ↗</a>
+          ${_i('contribute.foot')}
+          <a href="https://github.com/FreedomIntelligence/AccelMark/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">${_i('contribute.guide')}</a>
         </p>
         <div class="submit-cta">
-          <a class="btn primary" href="#/submit">Open submit wizard →</a>
-          <a class="btn" href="#/wanted">Wanted hardware</a>
-          <a class="btn" href="#/reproduce">Reproduction quests</a>
+          <a class="btn primary" href="#/submit">${_i('contribute.cta1')}</a>
+          <a class="btn" href="#/wanted">${_i('contribute.cta2')}</a>
+          <a class="btn" href="#/reproduce">${_i('contribute.cta3')}</a>
         </div>
       </div>
     </section>
@@ -386,7 +460,7 @@ export function render({ el }) {
     ['f-suite','f-vendor','f-framework','f-precision','f-chip'].forEach(function(id){
       var field = id === 'f-suite' ? 'suite' : id === 'f-vendor' ? 'chip_vendor' : id === 'f-framework' ? 'framework' : id === 'f-precision' ? 'precision' : 'chip';
       var sel = el.querySelector('#'+id); if (!sel) return;
-      sel.innerHTML = '<option value="">All</option>' + uniq(field).map(function(v){return '<option value="'+esc(v)+'">'+esc(v)+'</option>';}).join('');
+      sel.innerHTML = '<option value="">'+_i('dist.all')+'</option>' + uniq(field).map(function(v){return '<option value="'+esc(v)+'">'+esc(v)+'</option>';}).join('');
     });
   }
 
@@ -468,11 +542,11 @@ function renderSuiteCard(suiteId) {
       <div class="suite-head-row1">
         <div class="suite-head-left">
           <span class="suite-letter">${esc(meta.letter)}</span>
-          <span class="suite-title">${esc(meta.title)}</span>
+          <span class="suite-title">${esc(_i('suite.' + suiteId + '.title'))}</span>
         </div>
         <span class="suite-metric-tag">${esc(meta.primary.label)}</span>
       </div>
-      <p class="suite-head-tagline">${esc(meta.tagline)}</p>
+      <p class="suite-head-tagline">${esc(_i('suite.' + suiteId + '.tagline'))}</p>
       <div class="suite-head-meta">${metaLine}</div>
     </div>
   `;
@@ -480,8 +554,8 @@ function renderSuiteCard(suiteId) {
   if (empty) {
     card.innerHTML = `
       ${header}
-      <div class="suite-card-body">Awaiting first submission.</div>
-      <div class="suite-card-foot"><a class="cta" href="${rankingsHref}">View all results →</a></div>
+      <div class="suite-card-body">${_i('workloads.awaiting')}</div>
+      <div class="suite-card-foot"><a class="cta" href="${rankingsHref}">${_i('workloads.viewfull')}</a></div>
     `;
     return card;
   }
@@ -490,7 +564,7 @@ function renderSuiteCard(suiteId) {
   card.innerHTML = `
     ${header}
     <div class="suite-card-body">${body}</div>
-    <div class="suite-card-foot"><a class="cta" href="${rankingsHref}">View all results →</a></div>
+    <div class="suite-card-foot"><a class="cta" href="${rankingsHref}">${_i('workloads.viewfull')}</a></div>
   `;
   return card;
 }
@@ -508,10 +582,10 @@ function renderSuiteMeta(suiteId, facts) {
     items.push(`<span class="meta-item">${esc(wl.inputTokens)} → ${esc(wl.outputTokens)} tok</span>`);
   }
   if (facts.submissions) {
-    items.push(`<span class="meta-item"><strong>${fmtNum(facts.submissions)}</strong> results</span>`);
+    items.push(`<span class="meta-item"><strong>${fmtNum(facts.submissions)}</strong> ${_i('home.resultsLabel')}</span>`);
   }
   if (facts.chips) {
-    items.push(`<span class="meta-item"><strong>${fmtNum(facts.chips)}</strong> chips</span>`);
+    items.push(`<span class="meta-item"><strong>${fmtNum(facts.chips)}</strong> ${_i('home.chipsLabel')}</span>`);
   }
   return items.join("");
 }
@@ -529,8 +603,9 @@ function renderLbRow(row, suiteId, rank) {
   const runId = row.run_id || row.submission || "";
   const ver = shortVersion(row.framework_version);
   const fw = row.framework || "";
+  const ops = implOpsLabel(row);
   const chipRecipe = fw
-    ? `${esc(row._chip_label)} · <span class="lb-row-fw">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>`
+    ? `${esc(row._chip_label)} · <span class="lb-row-fw"><span style="white-space:nowrap">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>${ops ? ` <span class="fw-ops">${esc(ops)}</span>` : ""}</span>`
     : esc(row._chip_label);
   const a11yLabel = `Open run details for ${row._chip_label}${fw ? " on " + fw : ""}`;
   return `
@@ -541,9 +616,8 @@ function renderLbRow(row, suiteId, rank) {
          data-open-run="${esc(runId)}">
       <span class="lb-row-rank ${medal}">${rank}</span>
       <span class="lb-row-main">
-        <a class="lb-row-name" href="${chipHref(row)}" title="${esc(row._chip_label)}${fw ? " · " + fw + (ver ? " " + ver : "") : ""}">
+        <a class="lb-row-name" href="${chipHref(row)}">
           <span class="lb-row-chip">${chipRecipe}</span>
-          <span class="row-tip"><b>${esc(row._chip_label)}</b><span>${esc(fw)} ${esc(ver)}</span></span>
         </a>
         ${renderRecipeSub(row)}
       </span>
@@ -609,8 +683,8 @@ function renderChipCloud(container, legendEl) {
   }
   const vendors = Array.from(byVendor.values()).sort((a, b) => b.submissions - a.submissions);
   legendEl.innerHTML = vendors.map((v) => {
-    const chipsLbl = v.chips === 1 ? "chip" : "chips";
-    const subsLbl  = v.submissions === 1 ? "result" : "results";
+    const chipsLbl = v.chips === 1 ? _i('home.chipLabel') : _i('home.chipsLabel');
+    const subsLbl  = v.submissions === 1 ? _i('home.resultLabel') : _i('home.resultsLabel');
     return `
       <span class="cloud-legend-item" data-vendor="${esc(v.vendor)}">
         <span class="dot"></span>
@@ -631,8 +705,9 @@ function renderRecentRow(row) {
   const handle = submitterHandle(row.submitted_by);
   const ver = shortVersion(row.framework_version);
   const fw = row.framework || "";
+  const ops = implOpsLabel(row);
   const chipRecipe = fw
-    ? `${esc(row._chip_label)} · <span class="lb-row-fw">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>`
+    ? `${esc(row._chip_label)} · <span class="lb-row-fw"><span style="white-space:nowrap">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>${ops ? ` <span class="fw-ops">${esc(ops)}</span>` : ""}</span>`
     : esc(row._chip_label);
   // Mirrors renderLbRow: outer <div> = run-modal trigger, inner chip-name
   // <a> escapes via modal.js nested-anchor rule to navigate to /chip/<slug>.

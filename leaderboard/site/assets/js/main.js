@@ -1,7 +1,7 @@
 // main.js — entry point.  Wires up router, data, and the top nav.
 
 import { init as initData } from "./data.js";
-import { mount, register, start } from "./router.js";
+import { mount, register, start, refresh } from "./router.js";
 import { initModal } from "./modal.js";
 import { render as renderHome }     from "./views/home.js";
 import { render as renderRankings } from "./views/rankings.js";
@@ -35,6 +35,9 @@ function boot() {
   register("/reproduce",     renderReproduce);
 
   start();
+
+  // Expose router refresh for i18n toggle
+  window.router = { refresh };
 }
 
 if (document.readyState === "loading") {

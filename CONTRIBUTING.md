@@ -14,7 +14,7 @@ in the leaderboard and submitting your results.
 # 1. Fork the repo on GitHub, then clone your fork
 git clone https://github.com/<you>/AccelMark.git
 cd AccelMark
-pip install -e .
+pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"   # framework dependencies (Python >=3.10 required)
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 
 # 2. Set your name (one-time setup)

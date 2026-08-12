@@ -1,0 +1,21 @@
+{
+  "id": "ascend_vllm_ascend_b1957851",
+  "platform": "ascend",
+  "name": "vllm-ascend on Huawei Ascend NPU",
+  "framework": "vllm-ascend",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "AccelMark runner for Huawei Ascend 910B/910C NPUs using vllm-ascend (vLLM community fork for CANN). Supports Suites A–F. NPU memory queried via torch_npu. FP8 excluded: not supported on current Ascend 910B/910C hardware. W4A16 uses gptq backend (Marlin kernels not available on CANN).",
+  "supersedes_chain": [],
+  "notes": "DP (data-parallel) support for dual-die Ascend 910C: auto-detects dies_per_card via npu-smi, launches one engine per die with ASCEND_RT_VISIBLE_DEVICES binding, merges throughput. max_num_seqs automatically divided by dp_size to avoid shm_broadcast contention.",
+  "created": "2026-04-03",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "validated",
+    "B": "validated",
+    "C": "validated",
+    "D": "validated",
+    "E": "validated",
+    "F": "unsupported",
+    "G": "unsupported"
+  }
+}

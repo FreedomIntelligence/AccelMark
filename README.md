@@ -51,7 +51,7 @@
 # 1. Clone and install
 git clone https://github.com/FreedomIntelligence/AccelMark.git
 cd AccelMark
-pip install -e .                                              # installs framework dependencies (Python >=3.10 required)
+pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"       # framework dependencies (Python >=3.10 required)
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt # installs runner dependencies
 
 # 2. One-time setup
@@ -118,6 +118,7 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). The t
 | NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | NVIDIA V100 (SM70) | `nvidia_onecat_vllm_12a253c2` | 1Cat-vLLM | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | — | ⋯ | ? |
 | AMD GPU | `amd_vllm_rocm_6c18cd8f` | vLLM-ROCm | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ? |
+| Huawei Ascend NPU | `ascend_vllm_ascend_b1957851` | vllm-ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ? |
 | Huawei Ascend NPU | `ascend_vllm_ascend_d4aa9fda` | vllm-ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ? |
 | Apple Silicon | `apple_mlx_lm_9546b8b5` | mlx-lm | ⋯ | — | — | ⋯ | — | ⋯ | — | ? |
 | Google TPU | `google_vllm_tpu_68cc9ffa` | vllm-tpu | ✓ | — | — | ✓ | — | ✓ | — | ? |

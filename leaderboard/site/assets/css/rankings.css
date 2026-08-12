@@ -473,6 +473,11 @@
   font-size: 0.85em;
   color: var(--fg-faint);
 }
+.data-table td.col-chip .rk-chip-fw .fw-ops {
+  font-size: 0.82em;
+  color: var(--accent);
+  font-weight: 500;
+}
 .data-table td.col-chip .rk-chip-meta {
   display: block;
   margin-top: 0.1rem;
@@ -652,6 +657,22 @@
   font-weight: 500;
   color: var(--fg-muted);
   letter-spacing: 0.005em;
+}
+.cmp-basket-chip-select {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm, 4px);
+  padding: 0.1rem 0.25rem;
+  cursor: pointer;
+  max-width: 20ch;
+  font-family: inherit;
+}
+.cmp-basket-chip-select:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 1px;
 }
 .cmp-basket-chip .vendor-dot {
   display: inline-block;

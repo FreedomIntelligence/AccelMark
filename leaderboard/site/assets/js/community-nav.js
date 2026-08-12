@@ -1,18 +1,19 @@
 // community-nav.js — shared navigation for community sub-pages.
 
 import { esc } from "./utils.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
-const TABS = [
-  { id: "contributors", href: "#/contributors", label: "Contributors" },
-  { id: "wanted",       href: "#/wanted",       label: "Wanted hardware" },
-  { id: "reproduce",    href: "#/reproduce",    label: "Reproduction quests" },
-];
+function getTabs() { return [
+  { id: "contributors", href: "#/contributors", label: _i('nav.contributors') },
+  { id: "wanted",       href: "#/wanted",       label: _i('nav.wanted') },
+  { id: "reproduce",    href: "#/reproduce",    label: _i('nav.reproduce') },
+]; }
 
 /** Underline tab strip — one row, no subtitles. */
 export function communityTabs(activeId) {
   return `
     <nav class="community-tabs" aria-label="Community">
-      ${TABS.map((t) => `
+      ${getTabs().map((t) => `
         <a class="community-tab${t.id === activeId ? " active" : ""}" href="${esc(t.href)}">${esc(t.label)}</a>
       `).join("")}
     </nav>
@@ -79,8 +80,8 @@ export function wireTableFilters(root, opts) {
     }
     if (countEl) {
       countEl.textContent = visible === rows.length
-        ? `${visible} entries`
-        : `${visible} of ${rows.length} entries`;
+        ? `${visible} ${_i('community.entries')}`
+        : `${visible} ${_i('community.of')} ${rows.length} ${_i('community.entries')}`;
     }
   }
 

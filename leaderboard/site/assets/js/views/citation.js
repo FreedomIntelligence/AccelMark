@@ -3,6 +3,7 @@
 import { esc } from "../utils.js";
 import { PROJECT_BIBTEX, datasetBibTeX } from "../cite.js";
 import { copyToClipboard, flashButtonLabel } from "../utils.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 const DATASET_VERSION = "2026.07.08";
 const API_BASE = typeof location !== "undefined" ? `${location.origin}${location.pathname}` : "";
@@ -14,14 +15,14 @@ export function render({ el }) {
   el.innerHTML = `
     <section class="page-hero">
       <span class="eyebrow">Reference</span>
-      <h1>Cite the dataset</h1>
-      <p class="page-lead">Three levels of citation — framework, versioned snapshot, and individual reproducible runs. All community results are <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+      <h1>${_i('cite.title')}</h1>
+      <p class="page-lead">${_i('cite.lead')}</p>
     </section>
 
     <section class="section cite-section">
       <article class="cite-block card">
-        <div class="cite-head"><h2>1 · Project</h2><button type="button" class="btn small copy-btn" data-copy-target="proj-bib">Copy BibTeX</button></div>
-        <p class="muted">Cite the AccelMark benchmarking framework and methodology.</p>
+        <div class="cite-head"><h2>1 · Project</h2><button type="button" class="btn small copy-btn" data-copy-target="proj-bib">${_i('cite.copyBibtex')}</button></div>
+        <p class="muted">${_i('cite.projectDesc')}</p>
         <pre class="cite-pre" id="proj-bib">${esc(PROJECT_BIBTEX)}</pre>
       </article>
 
@@ -39,13 +40,13 @@ export function render({ el }) {
 
       <article class="cite-block card">
         <div class="cite-head"><h2>3 · Single result</h2></div>
-        <p class="muted">Open any result on the Results page → use <strong>Copy link</strong>, <strong>Copy Markdown</strong>, or <strong>Copy BibTeX</strong> in the detail panel. Each run links to <code>result.json</code>, runner hash, and reproduction script.</p>
-        <a class="btn" href="#/rankings">Browse results →</a>
+        <p class="muted">${_i('cite.singleResultDesc')}</p>
+        <a class="btn" href="#/rankings">${_i('cite.browseResults')}</a>
       </article>
     </section>
 
     <section class="section">
-      <div class="section-header"><div class="section-title"><h2>Machine-readable API</h2></div></div>
+      <div class="section-header"><div class="section-title"><h2>${_i('cite.apiTitle')}</h2></div></div>
       <div class="api-links card">
         <a href="api/manifest.json"><code>/api/manifest.json</code></a>
         <a href="api/schema.json"><code>/api/schema.json</code></a>
@@ -53,7 +54,7 @@ export function render({ el }) {
         <a href="api/chips.json"><code>/api/chips.json</code></a>
         <a href="api/index.json"><code>/api/index.json</code></a>
         <a href="api/suites.json"><code>/api/suites.json</code></a>
-        <p class="muted" style="margin-top:0.75rem">Future: <code>/api/runs.json</code>, <code>/api/runs/&lt;run_id&gt;.json</code>, versioned snapshots, Zenodo DOI per release.</p>
+        <p class="muted" style="margin-top:0.75rem">${_i('cite.apiFuture')}</p>
       </div>
     </section>
   `;

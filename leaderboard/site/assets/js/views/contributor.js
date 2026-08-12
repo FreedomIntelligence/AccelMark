@@ -3,6 +3,7 @@
 import { esc, fmtNum, fmtDate } from "../utils.js";
 import { contributorByHandle, BADGE_DEFS, contributorIndex } from "../contributors.js";
 import { SUITE_META } from "../data.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 function badgeHtml(ids) {
   return (ids || []).map((id) => {
@@ -25,9 +26,9 @@ export function render({ params, el }) {
     el.innerHTML = `
       <section class="state">
         No published results for <code>@${esc(handle)}</code>.<br>
-        <span class="muted">Make sure your GitHub login matches <code>submitted_by</code> in the PR.</span><br>
+        <span class="muted">${_i('contributor.githubHint')} <code>submitted_by</code> in the PR.</span><br>
         <a href="#/contributors" class="btn" style="margin-top:1rem">← All contributors</a>
-        <a href="#/submit" class="btn primary" style="margin-top:1rem">Submit a result</a>
+        <a href="#/submit" class="btn primary" style="margin-top:1rem">${_i('contributor.submitResult')}</a>
       </section>
     `;
     return;
@@ -61,8 +62,8 @@ export function render({ params, el }) {
     ${c.firstChips.length ? `
       <section class="section">
         <div class="section-header">
-          <div class="section-title"><h2>First results</h2></div>
-          <span class="section-sub">First published benchmark on the leaderboard for this hardware</span>
+          <div class="section-title"><h2>${_i('contributor.firstResults')}</h2></div>
+          <span class="section-sub">${_i('contributor.firstBenchmark')}</span>
         </div>
         <div class="first-chips-row">
           ${c.firstChips.map((chip) => `
@@ -74,7 +75,7 @@ export function render({ params, el }) {
 
     <section class="section">
       <div class="section-header">
-        <div class="section-title"><h2>Published runs</h2></div>
+        <div class="section-title"><h2>${_i('contributor.publishedRuns')}</h2></div>
         <span class="section-sub">Latest activity: ${esc(fmtDate(c.latestDate))}</span>
       </div>
       <div class="contrib-runs card">

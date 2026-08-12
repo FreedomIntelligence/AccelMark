@@ -122,6 +122,29 @@ const FALLBACK_PALETTE = [
   "#a78bfa", "#2dd4bf", "#fbbf24", "#fb7185", "#22d3ee",
 ];
 
+// Return a compact operator/kernel label from the impl dict.
+// Extracts backend and notable kernels so users can distinguish
+// different implementations of the same framework at a glance.
+export function implOpsLabel(row) {
+  const imp = row && row.impl;
+  if (!imp || typeof imp !== "object") return "";
+  const desc = (imp.description || "") + " " + (imp.notes || "");
+  const parts = [];
+  // backend
+  if (/JAX\/XLA|tpu-inference/i.test(desc))      parts.push("JAX/XLA");
+  else if (/CANN|torch_npu|Ascend/i.test(desc))   parts.push("CANN");
+  else if (/Metal\b|Metal\./i.test(desc))         parts.push("Metal");
+  else if (/MUSA/i.test(desc))                    parts.push("MUSA");
+  else                                            parts.push("CUDA");
+  // notable kernels / constraints
+  if (/FLASH_ATTN_V100/i.test(desc))              parts.push("FlashAttn-V100");
+  if (/AWQ\s*SM70|SM70\s*AWQ/i.test(desc))       parts.push("AWQ SM70");
+  if (/turboquant/i.test(desc))                   parts.push("turboquant");
+  if (/BF16\s*only|FP8.*not\s*supported/i.test(desc)) parts.push("BF16 only");
+  if (/Standard vLLM|no custom patches/i.test(desc))  parts.push("std");
+  return parts.join(" · ");
+}
+
 export function vendorColor(name) {
   if (!name) return "#888780";
   if (VENDOR_COLORS[name]) return VENDOR_COLORS[name];

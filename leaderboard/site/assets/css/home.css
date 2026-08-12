@@ -186,6 +186,11 @@
 .suite-card .lb-row-chip .lb-row-fw .fw-ver {
   font-size: 0.88em;
 }
+.suite-card .lb-row-chip .lb-row-fw .fw-ops {
+  font-size: 0.82em;
+  color: var(--accent);
+  font-weight: 500;
+}
 .suite-card .lb-row-sub {
   font-size: 0.68rem;
   line-height: 1.2;
@@ -323,6 +328,11 @@
 .lb-row-chip .lb-row-fw .fw-ver {
   font-size: 0.85em;
   color: var(--fg-faint);
+}
+.lb-row-chip .lb-row-fw .fw-ops {
+  font-size: 0.82em;
+  color: var(--accent);
+  font-weight: 500;
 }
 .lb-row-name:hover {
   color: var(--accent-2);
