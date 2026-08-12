@@ -242,6 +242,10 @@ def _get_board_info(npu_id: str) -> dict:
         pass
 
     if result["driver_version"] == "unknown":
+        # Only check version.cfg as a last-resort fallback for the *driver*
+        # version field.  Prefer the Software Version line from -t board
+        # (parsed above); version.cfg contains the CANN *toolkit* version,
+        # not the driver version, but it is better than "unknown".
         for cann_path in (
             "/usr/local/Ascend/ascend-toolkit/latest",
             "/usr/local/Ascend/nnae/latest",
@@ -250,9 +254,9 @@ def _get_board_info(npu_id: str) -> dict:
             if version_file.exists():
                 try:
                     text = version_file.read_text()
-                    m = re.search(r"Version=(.+)", text)
+                    m = re.search(r"Version\s*=\s*(.+)", text, re.IGNORECASE)
                     if m:
-                        result["driver_version"] = f"CANN {m.group(1).strip()}"
+                        result["driver_version"] = f"driver unknown (CANN toolkit {m.group(1).strip()})"
                         break
                 except Exception:
                     pass
@@ -358,18 +362,69 @@ def collect() -> list[dict]:
 
 
 def detect_runtime_version() -> str | None:
+    """Return the CANN *toolkit* version (e.g. ``"CANN 8.5.1"``).
+
+    This is the SDK / compiler / runtime stack — analogous to CUDA toolkit
+    version on NVIDIA.  The NPU *driver* version (e.g. 25.2.3) is stored
+    per-accelerator in ``driver_version`` and is a separate thing.
+
+    Detection order:
+      1. ``/usr/local/Ascend/ascend-toolkit/latest/version.cfg`` (primary)
+      2. ``/usr/local/Ascend/nnae/latest/version.cfg`` (legacy installs)
+      3. ``ASCEND_TOOLKIT_HOME`` / ``ASCEND_HOME`` env vars → version.cfg
+      4. Fallback: ``npu-smi info -t board`` Software Version, labelled as
+         driver (not toolkit) via a ``_note`` suffix.
+    """
+    import os as _os
+
+    # Canonical CANN toolkit install paths (in priority order).
+    _CANN_ROOTS = [
+        "/usr/local/Ascend/ascend-toolkit/latest",
+        "/usr/local/Ascend/nnae/latest",
+    ]
+    # Environment variables that may point to a CANN toolkit root.
+    _CANN_ENV_VARS = ["ASCEND_TOOLKIT_HOME", "ASCEND_HOME"]
+
+    for var in _CANN_ENV_VARS:
+        val = _os.environ.get(var, "").strip()
+        if val:
+            _CANN_ROOTS.append(val)
+
+    for root in _CANN_ROOTS:
+        version_file = Path(root) / "version.cfg"
+        if version_file.exists():
+            try:
+                text = version_file.read_text()
+                m = re.search(r"Version\s*=\s*(.+)", text, re.IGNORECASE)
+                if m:
+                    return f"CANN {m.group(1).strip()}"
+            except Exception:
+                continue
+
+    # Symlink-target fallback: ascend-toolkit/latest → 8.5.1
+    for root in _CANN_ROOTS[:2]:  # only the well-known paths
+        try:
+            resolved = Path(root).resolve()
+            version_dir = resolved.name  # e.g. "8.5.1"
+            if re.match(r"\d+\.\d+", version_dir):
+                return f"CANN {version_dir}"
+        except Exception:
+            continue
+
+    # Last resort: try npu-smi for the driver version (NOT the toolkit).
+    # Clearly label this so it isn't mistaken for the CANN toolkit version.
     try:
         info_out = subprocess.check_output(
             ["npu-smi", "info"], text=True, stderr=subprocess.DEVNULL
         )
+        m = re.search(r"\|\s*(\d+)\s+\S+\s*\|", info_out)
+        if m:
+            board = _get_board_info(m.group(1))
+            if board["driver_version"] != "unknown":
+                return f"CANN driver {board['driver_version']} (toolkit version unknown)"
     except Exception:
-        return None
-    m = re.search(r"\|\s*(\d+)\s+\S+\s*\|", info_out)
-    if not m:
-        return None
-    board = _get_board_info(m.group(1))
-    if board["driver_version"] != "unknown":
-        return f"CANN {board['driver_version']}"
+        pass
+
     return None
 
 
@@ -432,8 +487,10 @@ def diagnostics(env: dict, accelerators: list[dict]) -> list[str]:
         )
     if (env.get("runtime_version") or "") == "unknown":
         notes.append(
-            "Could not detect CANN/runtime from npu-smi / install paths. "
-            "runtime_version is unknown."
+            "Could not detect CANN toolkit version from "
+            "/usr/local/Ascend/ascend-toolkit/latest/version.cfg or "
+            "/usr/local/Ascend/nnae/latest/version.cfg. "
+            "runtime_version is unknown — this may affect result reproducibility."
         )
     for a in accelerators:
         if a.get("memory_gb") is None:

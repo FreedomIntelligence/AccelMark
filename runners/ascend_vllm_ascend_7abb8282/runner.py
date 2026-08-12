@@ -156,7 +156,10 @@ class AscendVLLMRunner(BenchmarkRunner):
         enforce_eager = getattr(self, "_enforce_eager", False)
 
         cfg             = getattr(self, "_runner_config", {})
+        dp_size         = parallelism.get("data_parallel_size", 1)
         max_num_seqs    = cfg.get("max_num_seqs", 512)
+        if dp_size > 1:
+            max_num_seqs = max(1, max_num_seqs // dp_size)
         npu_memory_util = cfg.get("gpu_memory_utilization", 0.90)
         extra_kwargs    = dict(cfg.get("engine_kwargs") or {})
 
