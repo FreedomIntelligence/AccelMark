@@ -99,8 +99,8 @@
 #   # Step 4: Enter and install
 #   docker exec -it vllm-ascend-env /bin/bash
 #   # (inside) cd /accelmark
-#   # (inside) pip install -r runners/ascend_vllm_ascend_7abb8282/requirements.txt
-#   # (inside) python run.py --runner ascend_vllm_ascend_7abb8282 --suite suite_A
+#   # (inside) pip install -r runners/ascend_vllm_ascend_b1957851/requirements.txt
+#   # (inside) python run.py --runner ascend_vllm_ascend_b1957851 --suite suite_A
 #
 # Pre-installed in image (versions from v0.18.0rc1-a3):
 #   torch==2.9.0+cpu  torch_npu==2.9.0.post1  vllm==0.18.0  vllm-ascend==0.18.0rc1

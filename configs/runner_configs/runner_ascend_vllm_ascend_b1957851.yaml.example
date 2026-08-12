@@ -1,6 +1,6 @@
-# AccelMark runner config — ascend_vllm_ascend_7abb8282 (vllm-ascend on Huawei Ascend)
+# AccelMark runner config — ascend_vllm_ascend_b1957851 (vllm-ascend on Huawei Ascend)
 #
-# Copy this file to runner_ascend_vllm_ascend_7abb8282.yaml (remove .example suffix)
+# Copy this file to runner_ascend_vllm_ascend_b1957851.yaml (remove .example suffix)
 # and edit as needed for your hardware. The actual .yaml is gitignored.
 #
 # These settings adapt the runner to your hardware environment.
