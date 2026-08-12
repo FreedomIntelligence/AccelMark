@@ -28,6 +28,7 @@ import {
   esc, fmtDate, shortVersion, submitterHandle,
   copyToClipboard, flashButtonLabel, downloadCanvasAsPng,
 } from "../utils.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 export function render({ el, params }) {
   const slug = params.slug;
@@ -40,11 +41,11 @@ export function render({ el, params }) {
     el.innerHTML = `
       <section class="chip-empty">
         <span class="state-icon" aria-hidden="true">⚠</span>
-        <p>No chip found for <code>${esc(slug)}</code>.</p>
-        <p class="chip-empty-sub">It may have been removed, or the link is from an older revision of the dataset.</p>
+        <p>${_i('chipDetail.notFound')} <code>${esc(slug)}</code>.</p>
+        <p class="chip-empty-sub">${_i('chipDetail.stale')}</p>
         <div class="hero-cta" style="justify-content:center;margin-top:1rem">
-          <a class="btn primary" href="#/">Back to home</a>
-        <a class="btn" href="#/rankings">Browse results</a>
+          <a class="btn primary" href="#/">${_i('chipDetail.backToHome')}</a>
+        <a class="btn" href="#/rankings">${_i('chipDetail.browseResults')}</a>
         </div>
       </section>
     `;
@@ -79,17 +80,15 @@ export function render({ el, params }) {
 
   const memoryStr = sample.memory_gb ? `${sample.memory_gb} GB` : "";
   const factPills = [
-    `${activeSuites.length} suite${activeSuites.length === 1 ? "" : "s"}`,
-    `${rs.length} run${rs.length === 1 ? "" : "s"}`,
-    `${frameworks.size} framework${frameworks.size === 1 ? "" : "s"}`,
-    `${precisions.size} precision${precisions.size === 1 ? "" : "s"}`,
+    `${activeSuites.length} ${_i('chipDetail.suiteUnit', activeSuites.length === 1 ? 'suite' : 'suites')}`,
+    `${rs.length} ${_i('chipDetail.runUnit', rs.length === 1 ? 'run' : 'runs')}`,
+    `${frameworks.size} ${_i('chipDetail.frameworkUnit', frameworks.size === 1 ? 'framework' : 'frameworks')}`,
+    `${precisions.size} ${_i('chipDetail.precisionUnit', precisions.size === 1 ? 'precision' : 'precisions')}`,
   ];
-  // Chip-count fact only adds noise for single-variant chips; only
-  // surface it when the chip has been deployed at >1 fan-out.
   if (chipCounts.length > 1) {
-    factPills.push(`${chipCounts.length} chip-count variants (${chipCounts.map((c) => `×${c}`).join(", ")})`);
+    factPills.push(`${chipCounts.length} ${_i('chipDetail.chipCountVariants', 'chip-count variants')} (${chipCounts.map((c) => `×${c}`).join(", ")})`);
   } else if (chipCounts.length === 1 && chipCounts[0] > 1) {
-    factPills.push(`deployed at ×${chipCounts[0]}`);
+    factPills.push(`${_i('chipDetail.deployedAt')} ×${chipCounts[0]}`);
   }
 
   el.innerHTML = `
@@ -102,15 +101,15 @@ export function render({ el, params }) {
       <p class="hero-sub">${factPills.map(esc).join(" · ")}</p>
       <div class="hero-cta">
         ${latestRid
-          ? `<a class="btn primary" href="#/compare?runs=${encodeURIComponent(latestRid)}">Compare configurations</a>`
+          ? `<a class="btn primary" href="#/compare?runs=${encodeURIComponent(latestRid)}">${_i('chipDetail.compareConfigs')}</a>`
           : ""}
-        <a class="btn" href="#/rankings?vendor=${encodeURIComponent(sample.vendor)}">Browse ${esc(sample.vendor)} results</a>
+        <a class="btn" href="#/rankings?vendor=${encodeURIComponent(sample.vendor)}">${_i('chipDetail.browseVendor')} ${esc(sample.vendor)} ${_i('chipDetail.results')}</a>
         <button class="btn copy-btn chip-share-btn"
                 type="button"
                 data-chip-share="1"
-                title="Copy a link to this chip's overview page.">
+                title="${_i('chipDetail.copyLinkTitle')}">
           <span class="copy-btn-icon" aria-hidden="true">↗</span>
-          <span class="copy-btn-label">Copy link</span>
+          <span class="copy-btn-label">${_i('chipDetail.copyLink')}</span>
         </button>
       </div>
     </section>
@@ -118,10 +117,10 @@ export function render({ el, params }) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">01 · Best per suite</span>
-          <h2>Best result per suite</h2>
+          <span class="eyebrow">${_i('chipDetail.bestPerSuiteEyebrow')}</span>
+          <h2>${_i('chipDetail.bestPerSuiteTitle')}</h2>
         </div>
-        <p class="section-sub">Top primary-metric run in each suite. Click a card to open its details.</p>
+        <p class="section-sub">${_i('chipDetail.bestPerSuiteSub')}</p>
       </div>
       <div class="chip-suite-grid">
         ${SUITE_ORDER.map((sid) => renderSuiteCard(sid, bestPerSuite.get(sid), slug)).join("")}
@@ -135,10 +134,10 @@ export function render({ el, params }) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">${runsNum} · Every submission</span>
-          <h2>${rs.length} run${rs.length === 1 ? "" : "s"} on file</h2>
+          <span class="eyebrow">${runsNum}${_i('chipDetail.everySubEyebrow')}</span>
+          <h2>${rs.length} ${_i('chipDetail.runsOnFile', rs.length === 1 ? 'run on file' : 'runs on file')}</h2>
         </div>
-        <p class="section-sub">Sorted newest first. Click a row to open the run detail.</p>
+        <p class="section-sub">${_i('chipDetail.runsOnFileSub')}</p>
       </div>
       <div class="chip-runs-wrap">
         ${renderRunsTable(rs)}
@@ -211,13 +210,13 @@ async function _downloadChipChart(btn) {
   const wrap = btn.closest(".chip-fp-canvas, .chip-scl-canvas");
   const canvas = wrap && wrap.querySelector("canvas");
   if (!canvas) {
-    flashButtonLabel(btn, "Failed", { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
+    flashButtonLabel(btn, _i('chipDetail.flashFailed'), { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
     return;
   }
   const slug = _activeChipSlug();
   const filename = `${slug}-${kind === "radar" ? "fingerprint" : "scaling"}.png`;
   const ok = await downloadCanvasAsPng(canvas, { filename });
-  flashButtonLabel(btn, ok ? "Saved" : "Failed", {
+  flashButtonLabel(btn, ok ? _i('chipDetail.flashSaved') : _i('chipDetail.flashFailed'), {
     holdMs: ok ? 1400 : 2200,
     className: ok ? "is-saved" : "is-failed",
     labelSelector: ".chart-dl-btn-label",
@@ -237,7 +236,7 @@ function _chipShareUrl() {
 async function _copyChipShareLink(btn) {
   const url = _chipShareUrl();
   const ok = await copyToClipboard(url);
-  flashButtonLabel(btn, ok ? "Copied!" : "Copy failed — select & ⌘C", {
+  flashButtonLabel(btn, ok ? _i('chipDetail.flashCopied') : _i('chipDetail.flashCopyFailed'), {
     holdMs: ok ? 1600 : 3500,
     className: ok ? "is-copied" : "is-copy-failed",
     labelSelector: ".copy-btn-label",
@@ -286,31 +285,30 @@ function renderFingerprintSection(slug, sample) {
     <section class="section chip-fp-section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">02 · Performance fingerprint</span>
-          <h2>How this chip sits across the spectrum</h2>
+          <span class="eyebrow">${_i('chipDetail.fingerprintEyebrow')}</span>
+          <h2>${_i('chipDetail.fingerprintTitle')}</h2>
         </div>
         <p class="section-sub">
-          Each axis is one suite.  100 % is the global best primary metric
-          for that suite — your chip's normalised score sits inside.
+          ${_i('chipDetail.fingerprintSub1')}
           ${missing.length
-            ? `Suites without a submission collapse to the centre (${missing.map((sid) => SUITE_META[sid]?.letter).filter(Boolean).join(", ")}).`
+            ? _i('chipDetail.fingerprintSubMissing', `Suites without a submission collapse to the centre (${missing.map((sid) => SUITE_META[sid]?.letter).filter(Boolean).join(", ")}).`)
             : ""}
         </p>
       </div>
       <div class="chip-fp-wrap" data-vendor="${esc(sample.vendor)}">
         <div class="chip-fp-canvas">
           <canvas data-chip-radar
-                  aria-label="Radar chart of ${esc(sample.chip)} performance across all suites"
+                  aria-label="${_i('chipDetail.radarAriaLabel', `Radar chart of ${esc(sample.chip)} performance across all suites`)}"
                   role="img"></canvas>
           <button class="chart-dl-btn"
                   type="button"
                   data-chart-dl="radar"
-                  title="Download this radar as a PNG image">
+                  title="${_i('chipDetail.downloadRadarTitle')}">
             <span class="chart-dl-btn-icon" aria-hidden="true">↓</span>
-            <span class="chart-dl-btn-label">PNG</span>
+            <span class="chart-dl-btn-label">${_i('chipDetail.png')}</span>
           </button>
         </div>
-        <ol class="chip-fp-legend" aria-label="Per-suite normalised scores">
+        <ol class="chip-fp-legend" aria-label="${_i('chipDetail.fpLegendAria')}">
           ${cells}
         </ol>
       </div>
@@ -352,7 +350,7 @@ function _mountFingerprintChart(el, slug, sample) {
       labels,
       datasets: [
         {
-          label: "Global best",
+          label: _i('chipDetail.globalBest'),
           data: reference,
           borderColor: refColor,
           borderDash: [4, 4],
@@ -442,11 +440,11 @@ function renderScalingSection(slug, sample) {
   const breakdownRows = data.suites.map((s) => {
     const bestPerCount = chipCounts.map((c) => {
       const cell = s.perCount.get(c);
-      if (!cell || cell.value == null) return `<span class="chip-scl-cell-empty" title="No submission at ×${c}">—</span>`;
+      if (!cell || cell.value == null) return `<span class="chip-scl-cell-empty" title="${_i('chipDetail.noSubmissionAt', `No submission at ×${c}`)}">—</span>`;
       const pct = Math.round(cell.normalized * 100);
       const display = formatPrimary(cell.value, s.sid);
       return `
-        <span class="chip-scl-cell" title="${esc(`×${c}: ${display} (${pct}% of this chip's best in Suite ${s.letter})`)}">
+        <span class="chip-scl-cell" title="${esc(_i('chipDetail.sclCellTitle', `×${c}: ${display} (${pct}% of this chip's best in Suite ${s.letter})`))}">
           <span class="chip-scl-cell-pct tnum">${pct}%</span>
           <span class="chip-scl-cell-val tnum">${esc(display || "—")}</span>
         </span>
@@ -465,34 +463,29 @@ function renderScalingSection(slug, sample) {
     <section class="section chip-scl-section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">03 · Scaling across chip-counts</span>
-          <h2>Does going wide actually pay off?</h2>
+          <span class="eyebrow">${_i('chipDetail.scalingEyebrow')}</span>
+          <h2>${_i('chipDetail.scalingTitle')}</h2>
         </div>
-        <p class="section-sub">
-          Bars are normalised to this chip's best result on each suite —
-          ×N at 100 % means that fan-out wins the suite among this chip's
-          variants.  Chip-counts without a submission for a suite show as
-          gaps; zoom out via Compare to put another chip on the same axes.
-        </p>
+        <p class="section-sub">${_i('chipDetail.scalingSub')}</p>
       </div>
       <div class="chip-scl-wrap" data-vendor="${esc(sample.vendor)}">
         <div class="chip-scl-canvas">
           <canvas data-chip-scaling
-                  aria-label="Grouped bar chart of ${esc(sample.chip)} scaling across chip-counts ${chipCounts.map((c) => `×${c}`).join(", ")}"
+                  aria-label="${_i('chipDetail.scalingChartAria', `Grouped bar chart of ${esc(sample.chip)} scaling across chip-counts ${chipCounts.map((c) => `×${c}`).join(', ')}`)}"
                   role="img"></canvas>
           <button class="chart-dl-btn"
                   type="button"
                   data-chart-dl="scaling"
-                  title="Download this scaling chart as a PNG image">
+                  title="${_i('chipDetail.downloadScalingTitle')}">
             <span class="chart-dl-btn-icon" aria-hidden="true">↓</span>
-            <span class="chart-dl-btn-label">PNG</span>
+            <span class="chart-dl-btn-label">${_i('chipDetail.png')}</span>
           </button>
         </div>
-        <ol class="chip-scl-legend" aria-label="Chip-count series">
+        <ol class="chip-scl-legend" aria-label="${_i('chipDetail.sclLegendAria')}">
           ${legendItems}
         </ol>
       </div>
-      <div class="chip-scl-breakdown" role="table" aria-label="Per-suite scaling breakdown">
+      <div class="chip-scl-breakdown" role="table" aria-label="${_i('chipDetail.sclBreakdownAria')}">
         ${breakdownRows}
       </div>
     </section>
@@ -570,9 +563,9 @@ function _mountScalingChart(el, slug, sample) {
               const suite = data.suites[sIdx];
               const cnt = chipCounts[cIdx];
               const cell = suite?.perCount.get(cnt);
-              if (!cell || cell.value == null) return `×${cnt}: no submission`;
+              if (!cell || cell.value == null) return `×${cnt}: ${_i('chipDetail.noSubmission')}`;
               const display = formatPrimary(cell.value, suite.sid);
-              return `×${cnt}: ${display} (${ctx.parsed.y}% of best)`;
+              return `×${cnt}: ${display} (${ctx.parsed.y}% ${_i('chipDetail.ofBest')})`;
             },
           },
         },
@@ -636,10 +629,10 @@ function renderSimilarChipsSection(slug, latestRid, sectionNum = "04") {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">${sectionNum} · Peers</span>
-          <h2>Compare with similar chips</h2>
+          <span class="eyebrow">${sectionNum}${_i('chipDetail.peersEyebrow')}</span>
+          <h2>${_i('chipDetail.peersTitle')}</h2>
         </div>
-        <p class="section-sub">Chips that compete on the same workload suites — sorted by suite overlap, same-vendor first.</p>
+        <p class="section-sub">${_i('chipDetail.peersSub')}</p>
       </div>
       <div class="chip-peer-grid">${tiles}</div>
     </section>
@@ -670,7 +663,7 @@ function renderSuiteCard(sid, row, chipSlug) {
           <span class="chip-suite-letter">${esc(meta.letter)}</span>
           <span class="chip-suite-title">${esc(meta.title)}</span>
         </div>
-        <div class="chip-suite-empty">Not submitted</div>
+        <div class="chip-suite-empty">${_i('chipDetail.notSubmitted')}</div>
       </div>
     `;
   }
@@ -702,7 +695,7 @@ function renderSuiteCard(sid, row, chipSlug) {
   // (more visibly) in a tiny hint footer so the modifier-click path is
   // findable without a separate help layer.
   const chipLabel = row._chip_label || "this chip";
-  const cardTitle = `Click to open this run · Cmd/Ctrl-click to see all ${chipLabel} runs in Suite ${meta.letter}`;
+  const cardTitle = _i('chipDetail.cardTitle', `Click to open this run · Cmd/Ctrl-click to see all ${chipLabel} runs in Suite ${meta.letter}`);
 
   // Now that chip_count variants share a chip-detail page, the "best
   // per suite" run can land on any fan-out (×1 vs ×4 vs ×8).  Surface
@@ -724,7 +717,7 @@ function renderSuiteCard(sid, row, chipSlug) {
         <span class="chip-suite-title">${esc(meta.title)}</span>
         ${rank ? `
           <span class="chip-suite-rank${medal}"
-                title="Ranked #${rank.rank} of ${rank.total} in Suite ${esc(meta.letter)}">
+                title="${_i('chipDetail.rankedInSuite', `Ranked #${rank.rank} of ${rank.total} in Suite ${esc(meta.letter)}`)}">
             #${rank.rank}<span class="chip-suite-rank-total"> / ${rank.total}</span>
           </span>
         ` : ""}
@@ -733,16 +726,16 @@ function renderSuiteCard(sid, row, chipSlug) {
         <span class="chip-suite-val">${esc(num)}</span>
         ${unit ? `<span class="chip-suite-unit">${esc(unit)}</span>` : ""}
         ${showCountBadge
-          ? `<span class="chip-suite-count" title="Best score in this suite came from a ×${bestCount} deployment">×${bestCount}</span>`
+          ? `<span class="chip-suite-count" title="${_i('chipDetail.bestScoreCountTitle', `Best score in this suite came from a ×${bestCount} deployment`)}">×${bestCount}</span>`
           : ""}
       </div>
       <div class="chip-suite-meta">
         ${fwLine}${row.precision ? ` · ${esc(row.precision)}` : ""}${row.date ? ` · ${esc(fmtDate(row.date))}` : ""}
       </div>
       <div class="chip-suite-hint" aria-hidden="true">
-        <span class="chip-suite-hint-primary">Open run</span>
+        <span class="chip-suite-hint-primary">${_i('chipDetail.openRun')}</span>
         <span class="chip-suite-hint-sep">·</span>
-        <span class="chip-suite-hint-secondary"><kbd>⌘</kbd>+click for all in suite</span>
+        <span class="chip-suite-hint-secondary"><kbd>⌘</kbd>${_i('chipDetail.cmdClickAllInSuite')}</span>
       </div>
     </a>
   `;
@@ -766,14 +759,14 @@ function renderRunsTable(rs) {
     <table class="data-table chip-runs">
       <thead>
         <tr>
-          <th class="col-suite">Suite</th>
-          ${showChipCol ? `<th class="col-chips">Chips</th>` : ""}
-          <th class="col-framework">Framework</th>
-          <th class="col-precision">Precision</th>
-          <th class="col-primary">Primary metric</th>
-          <th class="col-date">Date</th>
-          <th class="col-submitter">Submitter</th>
-          <th class="col-tier">Tier</th>
+          <th class="col-suite">${_i('chipDetail.thSuite')}</th>
+          ${showChipCol ? `<th class="col-chips">${_i('chipDetail.thChips')}</th>` : ""}
+          <th class="col-framework">${_i('chipDetail.thFramework')}</th>
+          <th class="col-precision">${_i('chipDetail.thPrecision')}</th>
+          <th class="col-primary">${_i('chipDetail.thPrimaryMetric')}</th>
+          <th class="col-date">${_i('chipDetail.thDate')}</th>
+          <th class="col-submitter">${_i('chipDetail.thSubmitter')}</th>
+          <th class="col-tier">${_i('chipDetail.thTier')}</th>
         </tr>
       </thead>
       <tbody>
@@ -800,7 +793,7 @@ function renderRunRow(row, showChipCol) {
   // keydown delegate fires openModal on Enter/Space.  Native <tr>
   // semantics stay so screen-reader column headers still pair with
   // each cell.
-  const a11yLabel = `Open run details: ${meta ? meta.title + " · " : ""}${row.framework || ""} ${display || ""}`.trim();
+  const a11yLabel = `${_i('chipDetail.openRunDetails')} ${meta ? meta.title + " · " : ""}${row.framework || ""} ${display || ""}`.trim();
   return `
     <tr data-open-run="${esc(rid)}"
         data-suite="${meta ? esc(meta.letter) : ""}"

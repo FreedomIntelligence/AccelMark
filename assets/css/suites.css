@@ -107,6 +107,12 @@
   line-height: 1.7;
   margin: 0 0 1rem;
 }
+.why-prose .why-lead {
+  color: var(--accent);
+  font-size: 1.08rem;
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
+}
 .why-prose p:last-child { margin-bottom: 0; }
 .why-prose strong { color: var(--fg-strong); font-weight: 600; }
 .why-prose em { color: var(--fg-strong); font-style: italic; }

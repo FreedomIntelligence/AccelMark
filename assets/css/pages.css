@@ -2,8 +2,8 @@
 
 .page-hero {
   text-align: center;
-  padding: 2rem 1rem 1.5rem;
-  max-width: 48rem;
+  padding: 2rem 2rem 1.5rem;
+  max-width: 72rem;
   margin: 0 auto;
 }
 .page-hero .eyebrow { display: block; margin-bottom: 0.5rem; }
@@ -19,7 +19,7 @@
   color: var(--fg-muted);
   font-size: 1rem;
   line-height: 1.6;
-  max-width: 42rem;
+  max-width: none;
   margin: 0 auto 1.25rem;
 }
 .hero-stats.compact { margin-bottom: 1rem; padding: 0.75rem 0; }

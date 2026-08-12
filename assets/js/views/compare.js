@@ -26,7 +26,7 @@
 import {
   SUITE_ORDER, SUITE_META, SUITE_COLUMNS, formatMetric,
   rowByRunId, bestRowForRunInSuite, chipCloudData,
-  representativeRunForChip,
+  representativeRunForChip, rowsForChip, vendorColor,
 } from "../data.js";
 import {
   esc, fmtNum, buildHash, chipHref, parseHash, shortVersion,
@@ -35,6 +35,7 @@ import {
 import {
   basketGet, basketHas, basketToggle, basketOnChange,
 } from "../router.js";
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 export function render({ el, query }) {
   // Seed from ?runs=a,b,c (back-compat: ?chips=…).  Used both for
@@ -75,18 +76,17 @@ export function render({ el, query }) {
   if (runIds.length === 0) {
     el.innerHTML = `
       <section class="cmp-hero">
-        <span class="eyebrow">Compare</span>
-        <h1 class="cmp-hero-title">Side-by-Side Comparison</h1>
+        <span class="eyebrow">${_i('compare.eyebrow')}</span>
+        <h1 class="cmp-hero-title">${_i('compare.title')}</h1>
         <p class="cmp-hero-sub">
-          Pick platforms below to start a head-to-head across every metric.
-          You can also tick runs from
-          <a class="cmp-hero-link" href="#/rankings">any results page</a>
-          to compare specific framework and precision configurations.
+          ${_i('compare.sub1')}
+          <a class="cmp-hero-link" href="#/rankings">${_i('compare.sub2')}</a>
+          ${_i('compare.sub3')}
         </p>
       </section>
       ${renderChipCloudBlock({
-        title: "Quick-add by platform",
-        hint: "Each click adds that platform's most recent run. Choose any two or more.",
+        title: _i('compare.quickadd'),
+        hint: _i('compare.quickaddHint'),
         compact: false,
       })}
     `;
@@ -109,24 +109,24 @@ export function render({ el, query }) {
   if (seeds.length === 0) {
     el.innerHTML = `
       <section class="cmp-hero">
-        <span class="eyebrow">Compare</span>
-        <h1 class="cmp-hero-title">Side-by-Side Comparison</h1>
+        <span class="eyebrow">${_i('compare.eyebrow')}</span>
+        <h1 class="cmp-hero-title">${_i('compare.title')}</h1>
         <p class="cmp-hero-sub">
-          This comparison link refers to ${runIds.length === 1 ? "a run" : `${runIds.length} runs`}
-          that ${runIds.length === 1 ? "is" : "are"} no longer in the dataset
-          (re-uploaded or pruned). Pick platforms below to start a new comparison.
+          ${_i('compare.stalePrefix')} ${runIds.length === 1 ? _i('compare.aRun') : `${runIds.length} ${_i('compare.runs')}`}
+          ${_i('compare.staleMid')}
+          ${_i('compare.staleSuffix')}
         </p>
       </section>
       <div class="cmp-basket cmp-basket--empty">
-        <span class="cmp-basket-label">Comparing</span>
-        <span class="cmp-basket-stale">${runIds.length} stale ${runIds.length === 1 ? "run" : "runs"}</span>
+        <span class="cmp-basket-label">${_i('compare.comparing')}</span>
+        <span class="cmp-basket-stale">${runIds.length} ${_i('compare.stale')} ${runIds.length === 1 ? _i('compare.run') : _i('compare.runs')}</span>
         <div class="cmp-basket-actions">
-          <button class="cmp-basket-clear" data-basket-clear="1" type="button">Clear &amp; start over</button>
+          <button class="cmp-basket-clear" data-basket-clear="1" type="button">${_i('compare.clearStartOver')}</button>
         </div>
       </div>
       ${renderChipCloudBlock({
-        title: "Quick-add by platform",
-        hint: "Each click adds that platform's most recent run. Choose any two or more.",
+        title: _i('compare.quickadd'),
+        hint: _i('compare.quickaddHint'),
         compact: false,
       })}
     `;
@@ -172,34 +172,34 @@ export function render({ el, query }) {
 
   el.innerHTML = `
     <section class="cmp-hero">
-      <span class="eyebrow">Compare</span>
-      <h1 class="cmp-hero-title">${esc(meta.title)}</h1>
-      <p class="cmp-hero-sub">${esc(meta.tagline)}</p>
+      <span class="eyebrow">${_i('compare.eyebrow')}</span>
+      <h1 class="cmp-hero-title">${esc(_i('suite.' + suiteId + '.title'))}</h1>
+      <p class="cmp-hero-sub">${esc(_i('suite.' + suiteId + '.tagline'))}</p>
     </section>
 
     ${renderChipCloudBlock({
-      title: "Quick-add by platform",
-      hint: "Click a platform to add or remove its most recent run. Already-selected platforms are highlighted.",
+      title: _i('compare.quickAddPlatform'),
+      hint: _i('compare.quickAddPlatformHint'),
       compact: true,
     })}
 
     <div class="cmp-basket">
-      <span class="cmp-basket-label">Comparing</span>
+      <span class="cmp-basket-label">${_i('compare.comparing')}</span>
       ${chips.map((c) => renderBasketChip(c)).join("")}
       <div class="cmp-basket-actions">
         <button class="copy-btn cmp-basket-share"
                 data-basket-share="1"
                 type="button"
-                title="Copy a URL that pre-loads this comparison.">
+                title="${_i('compare.copyShareLinkTitle')}">
           <span class="copy-btn-icon" aria-hidden="true">↗</span>
-          <span class="copy-btn-label">Copy share link</span>
+          <span class="copy-btn-label">${_i('compare.copyShareLink')}</span>
         </button>
-        <button class="cmp-basket-clear" data-basket-clear="1" type="button">Clear all</button>
+        <button class="cmp-basket-clear" data-basket-clear="1" type="button">${_i('compare.clearAll')}</button>
       </div>
     </div>
 
     <div class="cmp-suite-row">
-      <span class="rk-facet-label">Suite</span>
+      <span class="rk-facet-label">${_i('compare.suite')}</span>
       <div class="rk-suite-pills">
         ${SUITE_ORDER.map((sid) => renderSuitePill(sid, sid === suiteId)).join("")}
       </div>
@@ -208,17 +208,17 @@ export function render({ el, query }) {
     ${suiteEmpty ? `
       <div class="cmp-suite-empty">
         <span class="state-icon" aria-hidden="true">∅</span>
-        <p>None of the selected configurations have <strong>Suite ${esc(meta.letter)} · ${esc(meta.title)}</strong> data.</p>
+        <p>${_i('compare.noSuiteData1')} <strong>Suite ${esc(meta.letter)} · ${esc(_i('suite.' + suiteId + '.title'))}</strong> ${_i('compare.noSuiteData2')}</p>
         ${suitesWithData.length ? `
-          <p class="cmp-suite-empty-sub">Try
+          <p class="cmp-suite-empty-sub">${_i('compare.try')}
             ${suitesWithData.map((sid) => `
               <a class="cmp-suite-empty-link" href="${esc(buildHash("/compare", { ...query, suite: sid }))}">
                 Suite ${esc(SUITE_META[sid].letter)}
               </a>
             `).join(" · ")}
-            instead.
+            ${_i('compare.instead')}
           </p>
-        ` : `<p class="cmp-suite-empty-sub">The platforms you picked have no submissions on file.</p>`}
+        ` : `<p class="cmp-suite-empty-sub">${_i('compare.noSubmissions')}</p>`}
       </div>
     ` : `
       <div class="cmp-table-wrap">
@@ -253,24 +253,16 @@ function renderChipCloudBlock({ title, hint, compact }) {
   if (!chips.length) return "";
   const tiles = chips.map((c) => {
     const inBasket = basketChipNames.has(c.label);
-    const subL  = c.submissions === 1 ? "submission" : "submissions";
-    const suiteL = c.suites.length === 1 ? "suite" : "suites";
-    const variantPart = c.variants > 1 ? ` · ${c.variants} chip-count variants` : "";
-    // Left-click is intercepted by bindClicks for the toggle add/remove
-    // basket behaviour; the href is the middle-click / Cmd-click /
-    // copy-link fallback and points at the chip's overview page so it
-    // matches every other chip-name link on the site.
-    //
-    // a11y: tile doubles as a toggle (left-click) and a navigation link
-    // (modifier-click).  We treat the toggle as the primary action for
-    // assistive tech — `role="button"` + `aria-pressed` mirrors the
-    // visual "in-basket" state.  Modifier-click is documented in the
-    // tooltip so non-mouse users know about the secondary affordance.
-    const a11yTitle = `${c.label}: ${c.submissions} ${subL} across ${c.suites.length} ${suiteL}${variantPart}. Click to ${inBasket ? "remove from" : "add to"} compare basket; Cmd / Ctrl-click to open chip overview.`;
+    const subL  = c.submissions === 1 ? _i('compare.submissionUnit', 'submission') : _i('compare.submissionUnitPlural', 'submissions');
+    const suiteL = c.suites.length === 1 ? _i('compare.suiteUnit', 'suite') : _i('compare.suiteUnitPlural', 'suites');
+    const variantPart = c.variants > 1 ? ` · ${c.variants} ${_i('compare.chipCountVariants', 'chip-count variants')}` : "";
+    const vc = vendorColor(c.vendor);
+    const a11yTitle = `${c.label}: ${c.submissions} ${subL} ${_i('compare.across')} ${c.suites.length} ${suiteL}${variantPart}. ${_i('compare.clickTo')} ${inBasket ? _i('compare.removeFrom') : _i('compare.addTo')} ${_i('compare.compareBasketCtx', 'compare basket; Cmd / Ctrl-click to open chip overview.')}`;
     return `
       <a class="chip-tile size-${esc(c.size)}${inBasket ? " in-basket" : ""}"
          href="#/chip/${esc(c.slug)}"
          data-vendor="${esc(c.vendor)}"
+         style="--vendor-color:${esc(vc)}"
          data-cmp-add-slug="${esc(c.slug)}"
          role="button"
          aria-pressed="${inBasket ? "true" : "false"}"
@@ -350,11 +342,11 @@ function renderCmpCharts(wrap, suiteId, chips) {
 
   wrap.innerHTML = `
     <div class="cmp-charts-head">
-      <h2 class="cmp-charts-title">Head-to-head charts</h2>
+      <h2 class="cmp-charts-title">${_i('compare.headToHeadCharts')}</h2>
       <p class="cmp-charts-hint">${esc(
         active.length === chips.length
-          ? "Each chip overlaid on the same axes."
-          : `${active.length} of ${chips.length} chips have Suite ${SUITE_META[suiteId].letter} data — others are listed below.`
+          ? _i('compare.chartsHintAll')
+          : `${active.length} ${_i('compare.chartsHintOf')} ${chips.length} ${_i('compare.chartsHintChips', `chips have Suite ${SUITE_META[suiteId].letter} data — others are listed below.`)}`
       )}</p>
     </div>
   `;
@@ -384,10 +376,10 @@ function renderCmpCharts(wrap, suiteId, chips) {
     dlBtn.type = "button";
     dlBtn.dataset.chartDl = (spec.title || "chart").toLowerCase()
       .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
-    dlBtn.title = "Download this chart as a PNG image";
+    dlBtn.title = _i('compare.downloadChartTitle');
     dlBtn.innerHTML = `
       <span class="chart-dl-btn-icon" aria-hidden="true">↓</span>
-      <span class="chart-dl-btn-label">PNG</span>
+      <span class="chart-dl-btn-label">${_i('compare.png')}</span>
     `;
     canvasWrap.appendChild(dlBtn);
     body.appendChild(canvasWrap);
@@ -396,7 +388,7 @@ function renderCmpCharts(wrap, suiteId, chips) {
     try {
       _activeCmpCharts.push(new window.Chart(canvas, spec.config));
     } catch (e) {
-      body.innerHTML = `<div class="cmp-chart-empty">Chart failed to render.</div>`;
+      body.innerHTML = `<div class="cmp-chart-empty">${_i('compare.chartFailed')}</div>`;
     }
   }
 
@@ -404,7 +396,7 @@ function renderCmpCharts(wrap, suiteId, chips) {
     const note = document.createElement("div");
     note.className = "cmp-charts-missing";
     const names = missing.map((m) => esc(m.label)).join(", ");
-    note.innerHTML = `<strong>No Suite ${esc(SUITE_META[suiteId].letter)} data:</strong> ${names}`;
+    note.innerHTML = `<strong>${_i('compare.noSuiteData')} ${esc(SUITE_META[suiteId].letter)}:</strong> ${names}`;
     wrap.appendChild(note);
   }
 }
@@ -427,11 +419,11 @@ function _cmpLegend(items) {
 // legend}).  Config goes straight to new Chart(canvas, config).
 
 const CMP_CHART_RENDERERS = {
-  suite_A: (chips) => _offlineConcurrencyBars(chips, "Single-chip offline throughput",  "tok/s by concurrency"),
-  suite_F: (chips) => _offlineConcurrencyBars(chips, "Edge offline throughput",          "tok/s by concurrency"),
-  suite_G: (chips) => _offlineConcurrencyBars(chips, "MoE offline throughput",           "tok/s by concurrency"),
+  suite_A: (chips) => _offlineConcurrencyBars(chips, _i('compare.chartSingleChipOffline'),  _i('compare.chartTokByConcurrency')),
+  suite_F: (chips) => _offlineConcurrencyBars(chips, _i('compare.chartEdgeOffline'),          _i('compare.chartTokByConcurrency')),
+  suite_G: (chips) => _offlineConcurrencyBars(chips, _i('compare.chartMoeOffline'),           _i('compare.chartTokByConcurrency')),
   suite_B: (chips) => [
-    ..._offlineConcurrencyBars(chips, "Multi-chip total throughput", "tok/s by concurrency"),
+    ..._offlineConcurrencyBars(chips, _i('compare.chartMultiChipTotal'), _i('compare.chartTokByConcurrency')),
     ..._perChipThroughputBars(chips),
   ],
   suite_C: (chips) => _quantThroughputBars(chips),
@@ -459,7 +451,7 @@ function _offlineConcurrencyBars(chips, title, subtitle) {
     const data = chips.map((c) => c.suiteRow.offline_throughput ?? null);
     return [{
       title,
-      subtitle: "Peak offline throughput",
+      subtitle: _i('compare.chartPeakOffline'),
       height: 200,
       config: {
         type: "bar",
@@ -477,7 +469,7 @@ function _offlineConcurrencyBars(chips, title, subtitle) {
           plugins: { legend: { display: false } },
           scales: {
             x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-            y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: "tokens / sec", color: C.text, font: { size: 11 } } },
+            y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartTokensPerSec'), color: C.text, font: { size: 11 } } },
           },
         },
       },
@@ -516,8 +508,8 @@ function _offlineConcurrencyBars(chips, title, subtitle) {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid }, title: { display: true, text: "concurrency", color: C.text, font: { size: 11 } } },
-          y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: "tokens / sec", color: C.text, font: { size: 11 } } },
+          x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartConcurrency'), color: C.text, font: { size: 11 } } },
+          y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartTokensPerSec'), color: C.text, font: { size: 11 } } },
         },
       },
     },
@@ -531,8 +523,8 @@ function _perChipThroughputBars(chips) {
   const data   = chips.map((c) => c.suiteRow.tokens_per_sec_per_chip ?? null);
   if (data.every((v) => v == null)) return [];
   return [{
-    title: "Per-chip throughput",
-    subtitle: "tok/s per accelerator, scales with hardware count",
+    title: _i('compare.chartPerChipThroughput'),
+    subtitle: _i('compare.chartPerChipSub'),
     height: 200,
     config: {
       type: "bar",
@@ -550,7 +542,7 @@ function _perChipThroughputBars(chips) {
         plugins: { legend: { display: false } },
         scales: {
           x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-          y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: "tok / sec / chip", color: C.text, font: { size: 11 } } },
+          y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartTokPerSecPerChip'), color: C.text, font: { size: 11 } } },
         },
       },
     },
@@ -598,8 +590,8 @@ function _quantThroughputBars(chips) {
     };
   });
   return [{
-    title: "Throughput across quantization formats",
-    subtitle: "tok/s by precision · grouped by chip",
+    title: _i('compare.chartQuantThroughput'),
+    subtitle: _i('compare.chartQuantSub'),
     height: 230,
     config: {
       type: "bar",
@@ -608,8 +600,8 @@ function _quantThroughputBars(chips) {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid }, title: { display: true, text: "precision", color: C.text, font: { size: 11 } } },
-          y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 0 }) }, grid: { color: C.grid }, title: { display: true, text: "tokens / sec", color: C.text, font: { size: 11 } } },
+          x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartPrecision'), color: C.text, font: { size: 11 } } },
+          y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString(undefined, { maximumFractionDigits: 0 }) }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartTokensPerSec'), color: C.text, font: { size: 11 } } },
         },
       },
     },
@@ -620,12 +612,12 @@ function _quantThroughputBars(chips) {
 function _longContextLatency(chips) {
   const C = _cmpChartColors();
   const buckets = [
-    { key: "ttft_p50", label: "TTFT p50" },
-    { key: "ttft_p90", label: "TTFT p90" },
-    { key: "ttft_p99", label: "TTFT p99" },
-    { key: "tpot_p50", label: "TPOT p50" },
-    { key: "tpot_p90", label: "TPOT p90" },
-    { key: "tpot_p99", label: "TPOT p99" },
+    { key: "ttft_p50", label: _i('compare.chartTtftP50') },
+    { key: "ttft_p90", label: _i('compare.chartTtftP90') },
+    { key: "ttft_p99", label: _i('compare.chartTtftP99') },
+    { key: "tpot_p50", label: _i('compare.chartTpotP50') },
+    { key: "tpot_p90", label: _i('compare.chartTpotP90') },
+    { key: "tpot_p99", label: _i('compare.chartTpotP99') },
   ];
   const datasets = chips.map((c, i) => {
     const v = (c.suiteRow.viz && c.suiteRow.viz.interactive) || {};
@@ -641,8 +633,8 @@ function _longContextLatency(chips) {
   const filtered = datasets.filter((ds) => ds.data.some((v) => v != null));
   if (!filtered.length) return [];
   return [{
-    title: "Long-context latency",
-    subtitle: "ms · TTFT (prefill) and TPOT (decode) percentiles",
+    title: _i('compare.chartLongContextLatency'),
+    subtitle: _i('compare.chartLongContextSub'),
     height: 280,
     config: {
       type: "bar",
@@ -652,7 +644,7 @@ function _longContextLatency(chips) {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v >= 1000 ? (v / 1000).toFixed(1) + "s" : v + "ms" }, grid: { color: C.grid }, title: { display: true, text: "latency", color: C.text, font: { size: 11 } } },
+          x: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v >= 1000 ? (v / 1000).toFixed(1) + "s" : v + "ms" }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartLatency'), color: C.text, font: { size: 11 } } },
           y: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
         },
       },
@@ -715,8 +707,8 @@ function _scalingCurves(chips) {
   });
   return [
     {
-      title: "Throughput by chip count",
-      subtitle: "tok/s · one line per chip",
+      title: _i('compare.chartThroughputByCount'),
+      subtitle: _i('compare.chartThroughputByCountSub'),
       height: 240,
       config: {
         type: "line",
@@ -726,15 +718,15 @@ function _scalingCurves(chips) {
           plugins: { legend: { display: false } },
           scales: {
             x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-            y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: "tokens / sec", color: C.text, font: { size: 11 } } },
+            y: { ticks: { color: C.text, font: { size: 11 }, callback: (v) => v.toLocaleString() }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartTokensPerSec'), color: C.text, font: { size: 11 } } },
           },
         },
       },
       legend: chips.map((c, i) => ({ color: _palette(i), label: c.label })),
     },
     {
-      title: "Scaling efficiency vs linear ideal",
-      subtitle: "% · 100 % is perfect linear scaling",
+      title: _i('compare.chartScalingEfficiency'),
+      subtitle: _i('compare.chartScalingEfficiencySub'),
       height: 240,
       config: {
         type: "line",
@@ -742,9 +734,9 @@ function _scalingCurves(chips) {
           labels,
           datasets: [
             ...effDs,
-            { label: "Linear ideal", data: counts.map(() => 100),
+            { label: _i('compare.chartLinearIdeal'), data: counts.map(() => 100),
               borderColor: C.text, borderDash: [6, 4], pointRadius: 0, fill: false, tension: 0 },
-            { label: "Good (80 %)", data: counts.map(() => 80),
+            { label: _i('compare.chartGood80'), data: counts.map(() => 80),
               borderColor: "#2dd4bf", borderDash: [3, 3], pointRadius: 0, fill: false, tension: 0 },
           ],
         },
@@ -753,12 +745,12 @@ function _scalingCurves(chips) {
           plugins: { legend: { display: false } },
           scales: {
             x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-            y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: (v) => v + "%" }, grid: { color: C.grid }, title: { display: true, text: "efficiency %", color: C.text, font: { size: 11 } } },
+            y: { min: 0, max: 110, ticks: { color: C.text, font: { size: 11 }, callback: (v) => v + "%" }, grid: { color: C.grid }, title: { display: true, text: _i('compare.chartEfficiencyPct'), color: C.text, font: { size: 11 } } },
           },
         },
       },
       legend: chips.map((c, i) => ({ color: _palette(i), label: c.label }))
-        .concat([{ color: "#2dd4bf", label: "Good (80 %)" }]),
+        .concat([{ color: "#2dd4bf", label: _i('compare.chartGood80') }]),
     },
   ];
 }
@@ -777,6 +769,22 @@ function renderSuitePill(sid, active) {
   `;
 }
 
+// Returns all unique framework+precision variants available for a chip.
+// Used by renderBasketChip to show a dropdown when the chip has 2+ variants
+// so users can compare runs on the same framework, not vLLM vs SGLang.
+function getSiblingRuns(rid) {
+  const row = rowByRunId(rid);
+  if (!row) return [];
+  const all = rowsForChip(row._chip_slug);
+  const seen = new Set();
+  return all.filter(r => {
+    const key = `${r.framework}|${r.framework_version}|${r.precision}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 // Basket strip pill — chip name on top line, framework + version + precision
 // on the second so the user can tell two same-chip runs apart at a glance.
 // Plain click on the name opens the seed run's detail modal; Cmd-click
@@ -786,16 +794,30 @@ function renderBasketChip(c) {
   const ver = shortVersion(r.framework_version);
   const fwLine = [r.framework, ver].filter(Boolean).join(" ");
   const detail = [fwLine, r.precision].filter(Boolean).join(" · ");
-  // Chip-name link goes to the chip overview (every chip name on the
-  // site should navigate to /chip/<slug>).  The × button still removes
-  // the specific run from the basket — that's the basket-local action.
+
+  // Build framework selector if this chip has multiple variants
+  const siblings = getSiblingRuns(c.rid);
+  let metaHtml;
+  if (siblings.length > 1) {
+    const opts = siblings.map(s => {
+      const sv = shortVersion(s.framework_version);
+      const sfw = [s.framework, sv].filter(Boolean).join(" ");
+      const sdetail = [sfw, s.precision].filter(Boolean).join(" · ");
+      const sid = s.run_id || s.submission;
+      return `<option value="${esc(sid)}"${sid === c.rid ? " selected" : ""}>${esc(sdetail)}</option>`;
+    }).join("");
+    metaHtml = `<select class="cmp-basket-chip-select" data-rid="${esc(c.rid)}">${opts}</select>`;
+  } else {
+    metaHtml = detail ? `<span class="cmp-basket-chip-meta">${esc(detail)}</span>` : "";
+  }
+
   return `
     <span class="cmp-basket-chip" data-vendor="${esc(c.vendor)}">
       <span class="vendor-dot"></span>
       <a href="${chipHref(r)}" class="cmp-basket-name">
         <span class="cmp-basket-chip-name">${esc(c.label)}</span>
-        ${detail ? `<span class="cmp-basket-chip-meta">${esc(detail)}</span>` : ""}
       </a>
+      ${metaHtml}
       <button class="cmp-basket-remove"
               data-remove-run="${esc(c.rid)}"
               aria-label="Remove ${esc(c.label)} from compare"
@@ -810,7 +832,7 @@ function renderCmpTable(suiteId, cols, chips) {
     <table class="cmp-table" data-suite="${esc(meta.letter)}">
       <thead>
         <tr>
-          <th class="cmp-row-header" scope="col">Metric</th>
+          <th class="cmp-row-header" scope="col">${_i('compare.metric')}</th>
           ${chips.map((c) => renderChipHead(c, meta)).join("")}
         </tr>
       </thead>
@@ -823,7 +845,7 @@ function renderCmpTable(suiteId, cols, chips) {
 
 function renderChipHead(c, meta) {
   const r = c.suiteRow;
-  let metaLine = `No Suite ${esc(meta.letter)} data`;
+  let metaLine = `${_i('compare.noSuiteData')} ${esc(meta.letter)}`;
   if (r) {
     const fw = r.framework || "";
     const ver = shortVersion(r.framework_version);
@@ -881,7 +903,7 @@ function renderCmpRow(col, chips) {
     return max > 0 ? v / max : 0;
   };
 
-  const dirLabel = col.direction === "asc" ? "lower is better" : "higher is better";
+  const dirLabel = col.direction === "asc" ? _i('compare.lowerIsBetter') : _i('compare.higherIsBetter');
 
   return `
     <tr>
@@ -939,7 +961,7 @@ function _shareUrlForBasket(suiteId) {
 async function _copyShareLink(btn, suiteId) {
   const url = _shareUrlForBasket(suiteId);
   const ok = await copyToClipboard(url);
-  flashButtonLabel(btn, ok ? "Copied!" : "Copy failed — select & ⌘C", {
+  flashButtonLabel(btn, ok ? _i('compare.flashCopied') : _i('compare.flashCopyFailed'), {
     holdMs: ok ? 1600 : 3500,
     className: ok ? "is-copied" : "is-copy-failed",
     labelSelector: ".copy-btn-label",
@@ -1022,7 +1044,9 @@ function bindClicks(el) {
       ev.preventDefault();
       const sid = suitePill.dataset.suite;
       if (sid && sid !== suiteId) {
+        const sy = window.scrollY;
         location.hash = buildHash("/compare", { suite: sid });
+        requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, sy)));
       }
       return;
     }
@@ -1036,20 +1060,33 @@ function bindClicks(el) {
       return;
     }
   });
+
+  // Framework/precision selector — swap a chip's run variant in-place
+  el.addEventListener("change", (ev) => {
+    if (!location.hash.startsWith("#/compare")) return;
+    const sel = ev.target.closest(".cmp-basket-chip-select");
+    if (!sel) return;
+    const oldRid = sel.dataset.rid;
+    const newRid = sel.value;
+    if (oldRid && newRid && oldRid !== newRid) {
+      basketToggle(oldRid);
+      basketToggle(newRid);
+    }
+  });
 }
 
 async function _downloadCmpChart(btn, suiteId) {
   const wrap = btn.closest(".cmp-chart-canvas");
   const canvas = wrap && wrap.querySelector("canvas");
   if (!canvas) {
-    flashButtonLabel(btn, "Failed", { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
+    flashButtonLabel(btn, _i('compare.flashFailed'), { holdMs: 2000, className: "is-failed", labelSelector: ".chart-dl-btn-label" });
     return;
   }
   const sectionSlug = btn.dataset.chartDl || "chart";
   const ok = await downloadCanvasAsPng(canvas, {
     filename: `compare-${suiteId.replace(/^suite_/, "suite-")}-${sectionSlug}.png`,
   });
-  flashButtonLabel(btn, ok ? "Saved" : "Failed", {
+  flashButtonLabel(btn, ok ? _i('compare.flashSaved') : _i('compare.flashFailed'), {
     holdMs: ok ? 1400 : 2200,
     className: ok ? "is-saved" : "is-failed",
     labelSelector: ".chart-dl-btn-label",
