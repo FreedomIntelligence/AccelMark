@@ -1,0 +1,5 @@
+{
+  "decode_grouped_block_h": 32,
+  "decode_grouped_block_n": 128,
+  "decode_grouped_num_warps": 8
+}
