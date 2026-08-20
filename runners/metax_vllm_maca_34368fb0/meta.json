@@ -1,0 +1,22 @@
+{
+  "id": "metax_vllm_maca_34368fb0",
+  "platform": "metax",
+  "name": "vllm-metax on MetaX MXMACA GPU",
+  "framework": "vllm-metax",
+  "submitted_by": "zzy",
+  "description": "AccelMark runner for MetaX MXMACA GPUs using vllm-metax (MacaRT-vLLM). Presents MACA as CUDA-compatible via cu-bridge; no device flag needed. BF16/FP16; FP8 unsupported. GPTQ/AWQ via MACA kernels; MCCL tensor parallelism.",
+  "supersedes_chain": [],
+  "notes": "Not yet smoke-tested. Install vllm-metax per developer.metax-tech.com (proprietary); requirements.txt adds benchmark deps only.",
+  "created": "2026-08-17",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "pending",
+    "G": "pending",
+    "H": "pending"
+  }
+}

@@ -79,6 +79,41 @@
       "sort_order": 60
     },
     {
+      "id": "metax",
+      "display_name": "MetaX MXMACA GPU",
+      "vendor": "MetaX",
+      "accelerator_kind": "GPU",
+      "sort_order": 70
+    },
+    {
+      "id": "enflame",
+      "display_name": "Enflame GCU",
+      "vendor": "Enflame",
+      "accelerator_kind": "GPU",
+      "sort_order": 80
+    },
+    {
+      "id": "iluvatar",
+      "display_name": "Iluvatar CoreX GPU",
+      "vendor": "Iluvatar",
+      "accelerator_kind": "GPU",
+      "sort_order": 90
+    },
+    {
+      "id": "tecorigin",
+      "display_name": "TecoOrigin SDAA",
+      "vendor": "TecoOrigin",
+      "accelerator_kind": "GPU",
+      "sort_order": 100
+    },
+    {
+      "id": "hygon",
+      "display_name": "Hygon DCU",
+      "vendor": "Hygon",
+      "accelerator_kind": "GPU",
+      "sort_order": 110
+    },
+    {
       "id": "other",
       "display_name": "Other accelerator",
       "vendor": null,

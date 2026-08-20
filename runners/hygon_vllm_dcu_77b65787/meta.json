@@ -1,0 +1,22 @@
+{
+  "id": "hygon_vllm_dcu_77b65787",
+  "platform": "hygon",
+  "name": "vLLM-DCU on Hygon DCU",
+  "framework": "vLLM-DCU (ROCm)",
+  "submitted_by": "zzy",
+  "description": "AccelMark runner for Hygon DCU accelerators via the ROCm-compatible DTK stack. DCU enumerated as ROCm/HIP; no device flag. BF16/FP16/FP32; FP8 unsupported. GPTQ/INT8; RCCL tensor parallelism.",
+  "supersedes_chain": [],
+  "notes": "Not yet smoke-tested. Obtain the vLLM-DCU wheel / Docker image built for Hygon DTK (proprietary); requirements.txt adds benchmark deps only.",
+  "created": "2026-08-17",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "pending",
+    "G": "pending",
+    "H": "pending"
+  }
+}

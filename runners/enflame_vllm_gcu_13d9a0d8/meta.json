@@ -1,0 +1,22 @@
+{
+  "id": "enflame_vllm_gcu_13d9a0d8",
+  "platform": "enflame",
+  "name": "vllm-gcu on Enflame GCU",
+  "framework": "vllm-gcu",
+  "submitted_by": "zzy",
+  "description": "AccelMark runner for Enflame GCU accelerators using vllm-gcu (github.com/EnflameTechnology/vllm-gcu). Requires device=gcu. BF16/FP16; FP8 unsupported. GPTQ/AWQ/INT8; TP/PP/DP/EP via GCU interconnect.",
+  "supersedes_chain": [],
+  "notes": "Not yet smoke-tested. Install vllm-gcu per the upstream repo (proprietary); requirements.txt adds benchmark deps only.",
+  "created": "2026-08-17",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "pending",
+    "G": "pending",
+    "H": "pending"
+  }
+}

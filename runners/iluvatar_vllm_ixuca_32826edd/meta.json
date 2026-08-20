@@ -1,0 +1,22 @@
+{
+  "id": "iluvatar_vllm_ixuca_32826edd",
+  "platform": "iluvatar",
+  "name": "vllm-ixuca on Iluvatar CoreX GPU",
+  "framework": "vllm-ixuca",
+  "submitted_by": "zzy",
+  "description": "AccelMark runner for Iluvatar CoreX GPUs via the IXUCA software stack (torch_ixuca). Presents the accelerator as CUDA-compatible; no device flag. BF16/FP16; FP8 unsupported. GPTQ/INT8; ixCCL tensor parallelism.",
+  "supersedes_chain": [],
+  "notes": "Not yet smoke-tested. Obtain the IXUCA SDK from Iluvatar (proprietary); requirements.txt adds benchmark deps only.",
+  "created": "2026-08-17",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "pending",
+    "G": "pending",
+    "H": "pending"
+  }
+}

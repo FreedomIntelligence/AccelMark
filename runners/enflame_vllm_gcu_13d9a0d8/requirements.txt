@@ -1,0 +1,12 @@
+# AccelMark — enflame_vllm_gcu_13d9a0d8 (vllm-gcu on Enflame GCU)
+#
+# AccelMark benchmark dependencies only. Install vllm-gcu + TopsRider first
+# per github.com/EnflameTechnology/vllm-gcu (proprietary). Do NOT `pip install
+# torch` or `vllm` from PyPI on the host.
+#
+#   pip install -r runners/enflame_vllm_gcu_13d9a0d8/requirements.txt
+
+# AccelMark / loadgen
+jsonschema==4.26.0
+psutil==7.2.2
+tqdm==4.67.3

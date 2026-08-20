@@ -1,0 +1,44 @@
+# AccelMark runner config — hygon_vllm_dcu_77b65787 (vLLM-DCU on Hygon DCU)
+#
+# Copy this file to runner_hygon_vllm_dcu_77b65787.yaml (remove .example
+# suffix) and edit as needed for your hardware. The actual .yaml is gitignored.
+#
+# These settings adapt the runner to your hardware environment. They are
+# recorded in result.json task.extra_config for transparency but are NOT
+# part of the benchmark identity (not hashed into run_id).
+#
+# Merge priority: CLI flags > suite-specific > global defaults > runner defaults
+
+# ── Global defaults (apply to all suites) ─────────────────────────────────────
+
+# Tensor parallel size — number of Hygon DCUs to use (default: 1).
+# For multi-card runs make sure to export VLLM_WORKER_MULTIPROC_METHOD=spawn.
+tensor_parallel_size: 1
+
+# Disable graph capture / compilation. Set true if you hit graph capture errors.
+enforce_eager: false
+
+# Maximum number of sequences in a batch (default: 512).
+# Reduce on lower-memory DCUs: 256 on 32 GB, 128 on 16 GB.
+max_num_seqs: 512
+
+# Fraction of DCU HBM reserved for the KV cache (default: 0.90). Reduce if you
+# hit OOM.
+gpu_memory_utilization: 0.90
+
+# Pass-through kwargs forwarded directly to vLLM LLM() / AsyncEngineArgs().
+# Unknown keys are dropped automatically with a warning.
+# engine_kwargs:
+#   swap_space: 8
+#   max_seq_len_to_capture: 4096
+
+# ── Suite-specific overrides ───────────────────────────────────────────────────
+
+suites:
+  suite_D:
+    # Long-context — reduce batch size and reserve more memory.
+    max_num_seqs: 64
+    gpu_memory_utilization: 0.85
+
+  suite_F:
+    max_num_seqs: 128

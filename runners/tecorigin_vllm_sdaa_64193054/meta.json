@@ -1,0 +1,22 @@
+{
+  "id": "tecorigin_vllm_sdaa_64193054",
+  "platform": "tecorigin",
+  "name": "Teco-vLLM on TecoOrigin SDAA",
+  "framework": "Teco-vLLM",
+  "submitted_by": "zzy",
+  "description": "AccelMark runner for TecoOrigin SDAA accelerators using Teco-vLLM. Presents SDAA as CUDA-compatible; no device flag. BF16/FP16; FP8 unsupported. GPTQ/INT8; SDAA interconnect tensor parallelism.",
+  "supersedes_chain": [],
+  "notes": "Not yet smoke-tested. Obtain the Teco-vLLM wheel / Docker image from TecoOrigin (proprietary); requirements.txt adds benchmark deps only.",
+  "created": "2026-08-17",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "pending",
+    "G": "pending",
+    "H": "pending"
+  }
+}

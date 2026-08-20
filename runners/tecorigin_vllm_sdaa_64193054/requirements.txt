@@ -1,0 +1,12 @@
+# AccelMark — tecorigin_vllm_sdaa_64193054 (Teco-vLLM on TecoOrigin SDAA)
+#
+# AccelMark benchmark dependencies only. Install Teco-vLLM + SDAA SDK first
+# (proprietary; obtained from TecoOrigin). Do NOT `pip install torch` or
+# `vllm` from PyPI on the host.
+#
+#   pip install -r runners/tecorigin_vllm_sdaa_64193054/requirements.txt
+
+# AccelMark / loadgen
+jsonschema==4.26.0
+psutil==7.2.2
+tqdm==4.67.3

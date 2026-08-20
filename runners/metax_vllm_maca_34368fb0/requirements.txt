@@ -1,0 +1,12 @@
+# AccelMark — metax_vllm_maca_34368fb0 (vllm-metax on MetaX MXMACA)
+#
+# AccelMark benchmark dependencies only. Install vllm-metax + MXMACA SDK
+# first per developer.metax-tech.com (proprietary). Do NOT `pip install torch`
+# or `vllm` from PyPI on the host.
+#
+#   pip install -r runners/metax_vllm_maca_34368fb0/requirements.txt
+
+# AccelMark / loadgen
+jsonschema==4.26.0
+psutil==7.2.2
+tqdm==4.67.3
