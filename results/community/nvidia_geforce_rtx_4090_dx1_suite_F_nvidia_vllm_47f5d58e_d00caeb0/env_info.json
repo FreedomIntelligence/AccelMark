@@ -1,0 +1,33 @@
+{
+  "collected_at": "2026-08-21T22:45:35.076567+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 4090 D",
+      "vendor": "NVIDIA",
+      "memory_gb": 48.0,
+      "driver_version": "610.43.03",
+      "firmware_version": null,
+      "compute_capability": "8.9",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_platform": "nvidia",
+  "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t0-13\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "AMD EPYC 7542 32-Core Processor",
+    "physical_cores": 64,
+    "logical_cores": 14,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 120.0,
+  "pcie_generation": "PCIe Gen 4",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": null,
+  "os": "Ubuntu 22.04.5 LTS",
+  "python_version": "3.10.20",
+  "kernel_version": "6.8.0-90-generic",
+  "runtime_version": "CUDA 12.4",
+  "pytorch_version": "2.5.1+cu124"
+}
