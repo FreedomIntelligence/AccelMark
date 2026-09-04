@@ -4,11 +4,11 @@ Standalone vLLM-DCU smoke test (does not use the AccelMark runner).
 
 Usage (from repo root):
 
-    python runners/hygon_vllm_dcu_f9b95f94/test_smoke.py
-    python runners/hygon_vllm_dcu_f9b95f94/test_smoke.py /path/to/model
+    python runners/hygon_vllm_dcu_94fd7f1e/test_smoke.py
+    python runners/hygon_vllm_dcu_94fd7f1e/test_smoke.py /path/to/model
 
     MODEL_PATH=/path/to/Qwen2.5-0.5B-Instruct \\
-    python runners/hygon_vllm_dcu_f9b95f94/test_smoke.py
+    python runners/hygon_vllm_dcu_94fd7f1e/test_smoke.py
 """
 
 from __future__ import annotations

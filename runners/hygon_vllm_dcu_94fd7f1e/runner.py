@@ -29,6 +29,7 @@ Usage:
 
 import asyncio
 import gc
+import os
 import sys
 import time
 from pathlib import Path
@@ -74,6 +75,7 @@ class HygonVLLMROCmRunner(BenchmarkRunner):
         self.tokenizer       = None
         self.sampling_params = None
         self._loop: asyncio.AbstractEventLoop = None
+        self._rocm_sitecustomize_dir: Optional[str] = None
 
     def _get_chip_count(self) -> int:
         """Return the number of visible Hygon DCUs (ROCm/HIP devices)."""
@@ -125,21 +127,48 @@ class HygonVLLMROCmRunner(BenchmarkRunner):
         except Exception:
             return set()
 
-    @staticmethod
-    def _force_rocm_platform() -> None:
-        """Disable vLLM's NVML-based CUDA auto-detection before importing vLLM.
+    def _force_rocm_platform(self) -> None:
+        """Force vLLM to use the ROCm platform on dual cuda+rocm nodes.
 
         On nodes where both NVIDIA GPUs and Hygon DCUs are visible, vLLM 0.9's
         platform resolver activates both ``cuda`` (via NVML) and ``rocm`` (via
         amdsmi) and aborts with "Only one platform plugin can be activated".
         This runner targets Hygon DCU (ROCm) exclusively, so neutralize the
-        builtin CUDA plugin so only ``rocm`` activates.
+        builtin CUDA plugin in the current process and in every vLLM subprocess.
         """
         try:
             import vllm.platforms as _vp
             # Patch the resolver's plugin table directly — rebinding the module
             # attribute would leave the dict entry pointing at the original fn.
             _vp.builtin_platform_plugins["cuda"] = lambda: None
+        except Exception:
+            pass
+
+        # vLLM inspects the model architecture in a fresh subprocess
+        # (`python -m vllm.model_executor.models.registry`), which re-runs
+        # platform auto-detection and would hit the same dual-platform error.
+        # Inject the patch into every spawned interpreter via sitecustomize.py.
+        self._install_rocm_sitecustomize()
+
+    def _install_rocm_sitecustomize(self) -> None:
+        if self._rocm_sitecustomize_dir is not None:
+            return
+        try:
+            import tempfile
+            _sitecustomize = (
+                "try:\n"
+                "    import vllm.platforms as _vp\n"
+                "    _vp.builtin_platform_plugins['cuda'] = lambda: None\n"
+                "except Exception:\n"
+                "    pass\n"
+            )
+            _d = tempfile.mkdtemp(prefix="hygon_force_rocm_")
+            (Path(_d) / "sitecustomize.py").write_text(_sitecustomize)
+            _old = os.environ.get("PYTHONPATH", "")
+            os.environ["PYTHONPATH"] = (
+                _d if not _old else _d + os.pathsep + _old
+            )
+            self._rocm_sitecustomize_dir = _d
         except Exception:
             pass
 

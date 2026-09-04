@@ -1,6 +1,6 @@
-# AccelMark runner config — hygon_vllm_dcu_f9b95f94 (vLLM-DCU on Hygon DCU)
+# AccelMark runner config — hygon_vllm_dcu_94fd7f1e (vLLM-DCU on Hygon DCU)
 #
-# Copy this file to runner_hygon_vllm_dcu_f9b95f94.yaml (remove .example
+# Copy this file to runner_hygon_vllm_dcu_94fd7f1e.yaml (remove .example
 # suffix) and edit as needed for your hardware. The actual .yaml is gitignored.
 #
 # These settings adapt the runner to your hardware environment. They are
