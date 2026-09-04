@@ -125,7 +125,26 @@ class HygonVLLMROCmRunner(BenchmarkRunner):
         except Exception:
             return set()
 
+    @staticmethod
+    def _force_rocm_platform() -> None:
+        """Disable vLLM's NVML-based CUDA auto-detection before importing vLLM.
+
+        On nodes where both NVIDIA GPUs and Hygon DCUs are visible, vLLM 0.9's
+        platform resolver activates both ``cuda`` (via NVML) and ``rocm`` (via
+        amdsmi) and aborts with "Only one platform plugin can be activated".
+        This runner targets Hygon DCU (ROCm) exclusively, so neutralize the
+        builtin CUDA plugin so only ``rocm`` activates.
+        """
+        try:
+            import vllm.platforms as _vp
+            # Patch the resolver's plugin table directly — rebinding the module
+            # attribute would leave the dict entry pointing at the original fn.
+            _vp.builtin_platform_plugins["cuda"] = lambda: None
+        except Exception:
+            pass
+
     def load_model(self, model_path: str, parallelism: dict) -> None:
+        self._force_rocm_platform()
         from transformers import AutoTokenizer
         from vllm import LLM, AsyncLLMEngine, SamplingParams
         from vllm.engine.arg_utils import AsyncEngineArgs

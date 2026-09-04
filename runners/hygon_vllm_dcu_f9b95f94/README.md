@@ -1,4 +1,4 @@
-# hygon_vllm_dcu_77b65787 — Hygon DCU Runner (vLLM-DCU / ROCm)
+# hygon_vllm_dcu_f9b95f94 — Hygon DCU Runner (vLLM-DCU / ROCm)
 
 AccelMark runner for Hygon DCU accelerators via the **ROCm-compatible DTK**
 stack (vLLM-DCU).
@@ -37,31 +37,31 @@ a bare Linux host:
 3. **Runner dependencies**:
 
    ```bash
-   pip install -r runners/hygon_vllm_dcu_77b65787/requirements.txt
+   pip install -r runners/hygon_vllm_dcu_f9b95f94/requirements.txt
    ```
 
 ## Smoke test
 
 ```bash
-python runners/hygon_vllm_dcu_77b65787/test_smoke.py
-python runners/hygon_vllm_dcu_77b65787/test_smoke.py /path/to/model
+python runners/hygon_vllm_dcu_f9b95f94/test_smoke.py
+python runners/hygon_vllm_dcu_f9b95f94/test_smoke.py /path/to/model
 ```
 
 ## Usage
 
 ```bash
-python run.py --runner hygon_vllm_dcu_77b65787 --suite suite_A --precision BF16
+python run.py --runner hygon_vllm_dcu_f9b95f94 --suite suite_A --precision BF16
 
 # Multi-chip tensor parallelism (RCCL)
-python run.py --runner hygon_vllm_dcu_77b65787 \
+python run.py --runner hygon_vllm_dcu_f9b95f94 \
   --suite suite_B --tensor-parallel-size 8
 ```
 
 Optional runner config (copy and edit):
 
 ```bash
-cp configs/runner_configs/runner_hygon_vllm_dcu_77b65787.yaml.example \
-   configs/runner_configs/runner_hygon_vllm_dcu_77b65787.yaml
+cp configs/runner_configs/runner_hygon_vllm_dcu_f9b95f94.yaml.example \
+   configs/runner_configs/runner_hygon_vllm_dcu_f9b95f94.yaml
 ```
 
 | Field | Default | Notes |
