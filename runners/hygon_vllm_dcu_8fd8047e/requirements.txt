@@ -1,10 +1,10 @@
-# AccelMark — hygon_vllm_dcu_65aa3172 (vLLM-DCU on Hygon DCU)
+# AccelMark — hygon_vllm_dcu_8fd8047e (vLLM-DCU on Hygon DCU)
 #
 # AccelMark benchmark dependencies only. Install the vLLM-DCU wheel / image
 # built for Hygon DTK first (proprietary). Do NOT `pip install torch` or
 # `vllm` from PyPI on the host.
 #
-#   pip install -r runners/hygon_vllm_dcu_65aa3172/requirements.txt
+#   pip install -r runners/hygon_vllm_dcu_8fd8047e/requirements.txt
 
 # AccelMark / loadgen
 jsonschema==4.26.0

@@ -222,6 +222,12 @@ class HygonVLLMROCmRunner(BenchmarkRunner):
             pass
 
     def load_model(self, model_path: str, parallelism: dict) -> None:
+        # gfx906 (Vega/MI50-class) runs the slow MATH SDPA path + ROCm JIT, so a
+        # single decode step can exceed vLLM's default 60s async-engine watchdog
+        # and abort with "Engine iteration timed out", which also leaves the DCU
+        # quarantined after the forced Ctrl+C. Raise the ceiling so
+        # online/interactive finish cleanly (vLLM #6254 idle residual step).
+        os.environ.setdefault("VLLM_ENGINE_ITERATION_TIMEOUT_S", "600")
         self._force_rocm_platform()
         from transformers import AutoTokenizer
         from vllm import LLM, AsyncLLMEngine, SamplingParams

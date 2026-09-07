@@ -1,12 +1,12 @@
 {
-  "id": "hygon_vllm_dcu_65aa3172",
+  "id": "hygon_vllm_dcu_8fd8047e",
   "platform": "hygon",
   "name": "vLLM-DCU on Hygon DCU",
   "framework": "vLLM-DCU (ROCm)",
   "submitted_by": "Gong-K",
   "description": "AccelMark runner for Hygon DCU accelerators via the ROCm-compatible DTK stack. DCU enumerated as ROCm/HIP; no device flag. BF16/FP16/FP32; FP8 unsupported. GPTQ/INT8; RCCL tensor parallelism.",
-  "supersedes_chain": [],
-  "notes": "Not yet smoke-tested. Obtain the vLLM-DCU wheel / Docker image built for Hygon DTK (proprietary); requirements.txt adds benchmark deps only.",
+  "supersedes_chain": ["hygon_vllm_dcu_65aa3172"],
+  "notes": "gfx906 (Vega/MI50-class) falls back to the MATH SDPA path (no flash-attn/aotriton kernel); the runner patches _sdpa_attention and raises VLLM_ENGINE_ITERATION_TIMEOUT_S=600 so online/interactive finish despite slow decode (vLLM #6254). suite_F validated on Z200SM_80 (16 GB). suite_A (Llama-3-8B BF16 ~15 GB) does not fit 16 GB - needs >=32 GB.",
   "created": "2026-08-17",
   "hardware_label": null,
   "suite_support": {
@@ -15,7 +15,7 @@
     "C": "pending",
     "D": "pending",
     "E": "pending",
-    "F": "pending",
+    "F": "passing",
     "G": "pending",
     "H": "pending"
   }
