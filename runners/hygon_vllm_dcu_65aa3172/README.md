@@ -1,4 +1,4 @@
-# hygon_vllm_dcu_94fd7f1e — Hygon DCU Runner (vLLM-DCU / ROCm)
+# hygon_vllm_dcu_65aa3172 — Hygon DCU Runner (vLLM-DCU / ROCm)
 
 AccelMark runner for Hygon DCU accelerators via the **ROCm-compatible DTK**
 stack (vLLM-DCU).
@@ -37,46 +37,46 @@ a bare Linux host:
 3. **Runner dependencies**:
 
    ```bash
-   pip install -r runners/hygon_vllm_dcu_94fd7f1e/requirements.txt
+   pip install -r runners/hygon_vllm_dcu_65aa3172/requirements.txt
    ```
 
 ## Smoke test
 
 ```bash
-python runners/hygon_vllm_dcu_94fd7f1e/test_smoke.py
-python runners/hygon_vllm_dcu_94fd7f1e/test_smoke.py /path/to/model
+python runners/hygon_vllm_dcu_65aa3172/test_smoke.py
+python runners/hygon_vllm_dcu_65aa3172/test_smoke.py /path/to/model
 ```
 
 ## Usage
 
 ```bash
-python run.py --runner hygon_vllm_dcu_94fd7f1e --suite suite_A --precision BF16
+python run.py --runner hygon_vllm_dcu_65aa3172 --suite suite_A --precision BF16
 
 # Multi-chip tensor parallelism (RCCL)
-python run.py --runner hygon_vllm_dcu_94fd7f1e \
+python run.py --runner hygon_vllm_dcu_65aa3172 \
   --suite suite_B --tensor-parallel-size 8
 ```
 
 Optional runner config (copy and edit):
 
 ```bash
-cp configs/runner_configs/runner_hygon_vllm_dcu_94fd7f1e.yaml.example \
-   configs/runner_configs/runner_hygon_vllm_dcu_94fd7f1e.yaml
+cp configs/runner_configs/runner_hygon_vllm_dcu_65aa3172.yaml.example \
+   configs/runner_configs/runner_hygon_vllm_dcu_65aa3172.yaml
 ```
 
 | Field | Default | Notes |
 |-------|---------|-------|
 | `tensor_parallel_size` | 1 | RCCL tensor parallelism |
 | `enforce_eager` | false | Only if graph capture errors |
-| `max_num_seqs` | 512 | Lower on small HBM |
-| `gpu_memory_utilization` | 0.90 | Lower if OOM |
+| `max_num_seqs` | 512 | 64 on 16 GB, 128 on 32 GB |
+| `gpu_memory_utilization` | 0.90 | Raise to 0.95 on 16 GB (model already ~94%) |
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
 | `hipErrorNoDevice` / no DCU | Ensure Hygon DTK + ROCm runtime are sourced |
-| OOM | Lower `gpu_memory_utilization` / `max_num_seqs` |
+| OOM (16 GB card, 15 GB BF16 model) | `max_num_seqs: 64` + `gpu_memory_utilization: 0.95`; ideally a quantized model or ≥32 GB card |
 | Graph capture errors | `--enforce-eager` or `enforce_eager: true` in runner YAML |
 | FP8 errors | FP8 unsupported — use BF16/FP16/FP32 |
 

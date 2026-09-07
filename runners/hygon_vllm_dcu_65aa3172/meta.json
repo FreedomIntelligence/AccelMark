@@ -1,5 +1,5 @@
 {
-  "id": "hygon_vllm_dcu_94fd7f1e",
+  "id": "hygon_vllm_dcu_65aa3172",
   "platform": "hygon",
   "name": "vLLM-DCU on Hygon DCU",
   "framework": "vLLM-DCU (ROCm)",

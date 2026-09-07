@@ -144,11 +144,60 @@ class HygonVLLMROCmRunner(BenchmarkRunner):
         except Exception:
             pass
 
+        # gfx906 has no aotriton/flash-attn kernel, so vLLM falls back to a
+        # buggy SDPA path — patch it (see _patch_gfx906_sdpa_attention).
+        self._patch_gfx906_sdpa_attention()
+
         # vLLM inspects the model architecture in a fresh subprocess
         # (`python -m vllm.model_executor.models.registry`), which re-runs
         # platform auto-detection and would hit the same dual-platform error.
         # Inject the patch into every spawned interpreter via sitecustomize.py.
         self._install_rocm_sitecustomize()
+
+    def _patch_gfx906_sdpa_attention(self) -> None:
+        """Fix vLLM's SDPA fallback for gfx906 (Vega-class) DCUs.
+
+        gfx906 has no aotriton/flash-attn kernel, so ROCmFlashAttentionBackend
+        falls back to ``use_naive_attn`` and calls the module-level
+        ``_sdpa_attention`` helper. That helper misreads its 5th argument — the
+        caller passes ``query_seq_start_loc``, the *cumulative* start offsets
+        ``[0, L1, L1+L2, ...]`` (one element longer than the sequence count) —
+        as per-sequence *lengths*. The first offset is 0, so the first iteration
+        slices ``query[:, 0:0, :]`` and SDPA raises ``IndexError: max():
+        Expected reduction dim 2 to have non-zero size``. Rewrite the loop to
+        iterate over adjacent start offsets instead.
+        """
+        try:
+            import vllm.attention.backends.rocm_flash_attn as _rfa
+
+            def _fixed_sdpa(query, key, value, output, seq_lens, num_tokens,
+                            num_heads, head_size, scale, attn_masks=None):
+                import torch.nn.functional as _F
+                from torch.nn.attention import sdpa_kernel, SDPBackend
+                for i in range(len(seq_lens) - 1):
+                    start = int(seq_lens[i])
+                    end = int(seq_lens[i + 1])
+                    if end <= start:
+                        continue
+                    with sdpa_kernel(SDPBackend.MATH):
+                        sub_out = _F.scaled_dot_product_attention(
+                            query[:, start:end, :],
+                            key[:, start:end, :],
+                            value[:, start:end, :],
+                            dropout_p=0.0,
+                            is_causal=attn_masks is None,
+                            attn_mask=attn_masks[i] if attn_masks else None,
+                            scale=scale).movedim(query.dim() - 2, 0)
+                        output[start:end, :, :] = sub_out
+                return output
+
+            # The backend binds this in __init__ via
+            # ``self.sdpa_attn_func = _sdpa_attention`` (instance attr), reading
+            # the module global — so patching the global before LLM() constructs
+            # the backend is sufficient.
+            _rfa._sdpa_attention = _fixed_sdpa
+        except Exception:
+            pass
 
     def _install_rocm_sitecustomize(self) -> None:
         if self._rocm_sitecustomize_dir is not None:

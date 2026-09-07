@@ -1,6 +1,6 @@
-# AccelMark runner config — hygon_vllm_dcu_94fd7f1e (vLLM-DCU on Hygon DCU)
+# AccelMark runner config — hygon_vllm_dcu_65aa3172 (vLLM-DCU on Hygon DCU)
 #
-# Copy this file to runner_hygon_vllm_dcu_94fd7f1e.yaml (remove .example
+# Copy this file to runner_hygon_vllm_dcu_65aa3172.yaml (remove .example
 # suffix) and edit as needed for your hardware. The actual .yaml is gitignored.
 #
 # These settings adapt the runner to your hardware environment. They are
@@ -19,12 +19,14 @@ tensor_parallel_size: 1
 enforce_eager: false
 
 # Maximum number of sequences in a batch (default: 512).
-# Reduce on lower-memory DCUs: 256 on 32 GB, 128 on 16 GB.
-max_num_seqs: 512
+# Llama-3-8B (BF16) is ~15 GB. On a 16 GB DCU the model nearly fills the card,
+# so keep the batch small. Recommended: 64 on 16 GB, 128 on 32 GB, 512 on 64 GB.
+max_num_seqs: 128
 
-# Fraction of DCU HBM reserved for the KV cache (default: 0.90). Reduce if you
-# hit OOM.
-gpu_memory_utilization: 0.90
+# Fraction of DCU HBM reserved for model + KV cache (default: 0.90).
+# On 16 GB cards the BF16 model already uses ~94%, so RAISE this (0.95) — a
+# lower value makes vLLM compute 0 KV-cache blocks and it cannot serve.
+gpu_memory_utilization: 0.95
 
 # Pass-through kwargs forwarded directly to vLLM LLM() / AsyncEngineArgs().
 # Unknown keys are dropped automatically with a warning.
