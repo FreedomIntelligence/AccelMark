@@ -75,11 +75,17 @@ def _card_series(tool: str) -> str | None:
 
 
 def _vram_gb_by_index(tool: str) -> dict[int, float]:
-    """Parse ``--showmeminfo vram`` into ``{hcu_index: total_gb}``."""
+    """Parse ``--showmeminfo vram`` into ``{hcu_index: total_gb}``.
+
+    Hygon's ROCm fork labels devices inconsistently across driver builds:
+    ``HCU[0]`` / ``DCU[0]`` / ``GPU[0]``. Accept all three (brackets optional)
+    so the VRAM total is captured regardless of which label this DTK build
+    emits (e.g. ``DCU[0]  : vram Total Memory (MiB): 16368``).
+    """
     out = _run_smi(tool, "--showmeminfo", "vram") or ""
     mem: dict[int, float] = {}
     for m in re.finditer(
-        r"(?i)hcu\s*\[\s*(\d+)\s*\]\s*:\s*vram\s+total\s+memory\s*\(\s*mib\s*\)\s*:\s*(\d+)",
+        r"(?i)(?:hcu|dcu|gpu)\s*\[?\s*(\d+)\s*\]?\s*:\s*vram\s+total\s+memory\s*\(\s*mib\s*\)\s*:\s*(\d+)",
         out,
     ):
         mem[int(m.group(1))] = round(int(m.group(2)) / 1024.0, 1)
