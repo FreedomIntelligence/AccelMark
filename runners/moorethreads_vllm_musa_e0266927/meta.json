@@ -1,0 +1,24 @@
+{
+  "id": "moorethreads_vllm_musa_e0266927",
+  "platform": "moorethreads",
+  "name": "vllm-musa on Moore Threads MUSA GPU",
+  "framework": "vllm-musa",
+  "submitted_by": "Keke946",
+  "description": "AccelMark runner for Moore Threads MUSA GPUs using vllm-musa (https://github.com/MooreThreads/vllm-musa). Install torch/vllm per upstream README_vllm_musa.md; requirements.txt adds benchmark deps only. Sets device=musa; BF16 maps to float16 on vLLM <0.10. MCCL tensor parallelism. FP8 unsupported.",
+  "supersedes_chain": [
+    "moorethreads_vllm_musa_006fed40",
+    "moorethreads_vllm_musa_f2f6f965"
+  ],
+  "notes": "Legacy vLLM-MUSA 0.4.x reports FP16 as the effective precision because BF16 execution is mapped to float16. Tested on MTT S4000.",
+  "created": "2026-08-25",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "validated",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "validated",
+    "F": "validated",
+    "G": "unsupported"
+  }
+}
