@@ -5,15 +5,15 @@
   "chip": {
     "name": "MTT S4000",
     "vendor": "Moore Threads",
-    "count": 2,
-    "card_count": 2,
+    "count": 4,
+    "card_count": 4,
     "dies_per_card": 1,
     "memory_gb": 48.0,
     "interconnect_intra_node": "MCCL/PCIe",
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-09-08T16:28:17.259554+00:00",
+    "collected_at": "2026-09-08T17:51:04.613786+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -26,6 +26,24 @@
       },
       {
         "index": 1,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
         "name": "MTT S4000",
         "vendor": "Moore Threads",
         "memory_gb": 48.0,
@@ -91,41 +109,42 @@
     "model_format": "HuggingFace original"
   },
   "task": {
-    "scenario": "offline",
-    "num_runs": 3,
-    "warmup_runs": 1,
+    "scenarios_run": [
+      "offline"
+    ],
     "parallelism": {
-      "tensor_parallel_size": 2,
+      "tensor_parallel_size": 4,
       "pipeline_parallel_size": 1,
       "expert_parallel_size": 1,
       "data_parallel_size": 1
     },
-    "extra_config": null,
-    "runtime_metrics": null
+    "num_runs": 3,
+    "extra_config": null
   },
   "metrics": {
+    "derived": {},
     "offline": {
       "results_by_concurrency": [
         {
           "client_concurrency": 8,
-          "throughput_tokens_per_sec": 497.84,
-          "throughput_tokens_per_sec_per_chip": 248.92,
-          "throughput_tokens_per_sec_total": 1169.62,
-          "elapsed_seconds_median": 55.2,
+          "throughput_tokens_per_sec": 532.61,
+          "throughput_tokens_per_sec_per_chip": 133.15,
+          "throughput_tokens_per_sec_total": 1253.59,
+          "elapsed_seconds_median": 51.4,
           "peak_memory_gb": null,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
           "throughput_tokens_per_sec_reliability": {
             "n": 3,
-            "mean": 497.52,
-            "std": 0.59,
-            "cv_pct": 0.12,
+            "mean": 532.57,
+            "std": 0.25,
+            "cv_pct": 0.05,
             "stability": "stable",
             "runs": [
-              497.84,
-              497.88,
-              496.84
+              532.61,
+              532.8,
+              532.3
             ]
           },
           "_throughput_note": "output_only",
@@ -133,24 +152,24 @@
         },
         {
           "client_concurrency": 32,
-          "throughput_tokens_per_sec": 493.37,
-          "throughput_tokens_per_sec_per_chip": 246.69,
-          "throughput_tokens_per_sec_total": 1159.13,
-          "elapsed_seconds_median": 55.7,
+          "throughput_tokens_per_sec": 528.67,
+          "throughput_tokens_per_sec_per_chip": 132.17,
+          "throughput_tokens_per_sec_total": 1244.31,
+          "elapsed_seconds_median": 51.8,
           "peak_memory_gb": null,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
           "throughput_tokens_per_sec_reliability": {
             "n": 3,
-            "mean": 493.63,
-            "std": 0.57,
-            "cv_pct": 0.12,
+            "mean": 528.77,
+            "std": 0.34,
+            "cv_pct": 0.06,
             "stability": "stable",
             "runs": [
-              494.28,
-              493.37,
-              493.23
+              528.5,
+              528.67,
+              529.15
             ]
           },
           "_throughput_note": "output_only",
@@ -158,24 +177,24 @@
         },
         {
           "client_concurrency": 128,
-          "throughput_tokens_per_sec": 492.85,
-          "throughput_tokens_per_sec_per_chip": 246.42,
-          "throughput_tokens_per_sec_total": 1157.9,
-          "elapsed_seconds_median": 55.7,
+          "throughput_tokens_per_sec": 524.51,
+          "throughput_tokens_per_sec_per_chip": 131.13,
+          "throughput_tokens_per_sec_total": 1234.52,
+          "elapsed_seconds_median": 52.2,
           "peak_memory_gb": null,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
           "throughput_tokens_per_sec_reliability": {
             "n": 3,
-            "mean": 492.78,
-            "std": 0.32,
-            "cv_pct": 0.06,
+            "mean": 524.52,
+            "std": 1.15,
+            "cv_pct": 0.22,
             "stability": "stable",
             "runs": [
-              492.85,
-              493.06,
-              492.43
+              524.51,
+              525.68,
+              523.37
             ]
           },
           "_throughput_note": "output_only",
@@ -188,24 +207,28 @@
     "subset_score": null,
     "baseline_delta": null,
     "valid": false,
-    "notes": "Run --scenario accuracy to check model accuracy."
+    "notes": "Run --scenario accuracy to populate."
   },
   "meta": {
     "submitted_by": "Keke946",
     "submission_type": "individual",
     "date": "2026-09-09",
-    "time": "00:44:13",
-    "run_id": "bc213e2a",
-    "run_name": "mtt_s4000x2_suite_E_moorethreads_vllm_musa_e0266927_bc213e2a",
+    "time": "02:06:21",
+    "run_id": "559dc817",
+    "run_name": "mtt_s4000x4_suite_E_moorethreads_vllm_musa_e0266927_559dc817",
     "flagged": null,
     "reproduce_script": "runners/moorethreads_vllm_musa_e0266927/runner.py",
     "env_info_file": "../../env_info.json",
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-09-08T16:33:06.185550+00:00",
-    "benchmark_end_time": "2026-09-08T16:44:13.305182+00:00",
-    "benchmark_elapsed_minutes": 11.1,
-    "model_load_seconds": 121.4
+    "benchmark_start_time": "2026-09-08T17:55:58.630224+00:00",
+    "benchmark_end_time": "2026-09-08T18:06:21.927438+00:00",
+    "benchmark_elapsed_minutes": 10.4,
+    "model_load_seconds": 139.2,
+    "benchmark_elapsed_minutes_note": "Total across ['offline'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/community/mtt_s4000x4_suite_E_moorethreads_vllm_musa_e0266927_559dc817/4x/offline"
+    }
   }
 }

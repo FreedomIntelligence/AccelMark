@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-09-08T16:28:17.259554+00:00",
+  "collected_at": "2026-09-08T17:51:04.613786+00:00",
   "accelerators": [
     {
       "index": 0,
@@ -12,6 +12,24 @@
     },
     {
       "index": 1,
+      "name": "MTT S4000",
+      "vendor": "Moore Threads",
+      "memory_gb": 48.0,
+      "driver_version": "2.7.0",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 2,
+      "name": "MTT S4000",
+      "vendor": "Moore Threads",
+      "memory_gb": 48.0,
+      "driver_version": "2.7.0",
+      "firmware_version": null,
+      "supports_bf16": true
+    },
+    {
+      "index": 3,
       "name": "MTT S4000",
       "vendor": "Moore Threads",
       "memory_gb": 48.0,
