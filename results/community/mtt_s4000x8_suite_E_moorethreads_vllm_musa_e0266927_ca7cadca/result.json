@@ -5,7 +5,7 @@
   "chip": {
     "name": "MTT S4000",
     "vendor": "Moore Threads",
-    "count": 4,
+    "count": 8,
     "card_count": 1,
     "dies_per_card": 1,
     "memory_gb": 48.0,
@@ -41,7 +41,8 @@
     "chip_counts_run": [
       1,
       2,
-      4
+      4,
+      8
     ],
     "parallelism_note": "Each chip_count uses tensor_parallel_size=N",
     "num_runs": 3
@@ -49,34 +50,34 @@
   "metrics": {
     "scaling": {
       "base_chip_count": 1,
-      "base_throughput_tokens_per_sec": 410.6,
+      "base_throughput_tokens_per_sec": 409.71,
       "results_by_chip_count": [
         {
           "chip_count": 1,
-          "best_throughput_tokens_per_sec": 410.6,
-          "throughput_tokens_per_sec_per_chip": 410.6,
+          "best_throughput_tokens_per_sec": 409.71,
+          "throughput_tokens_per_sec_per_chip": 409.71,
           "scaling_efficiency": 1.0,
           "results_by_concurrency": [
             {
               "client_concurrency": 8,
-              "throughput_tokens_per_sec": 410.16,
-              "throughput_tokens_per_sec_per_chip": 410.16,
-              "throughput_tokens_per_sec_total": 964.21,
-              "elapsed_seconds_median": 66.9,
+              "throughput_tokens_per_sec": 409.59,
+              "throughput_tokens_per_sec_per_chip": 409.59,
+              "throughput_tokens_per_sec_total": 962.86,
+              "elapsed_seconds_median": 67.0,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 410.14,
-                "std": 0.16,
-                "cv_pct": 0.04,
+                "mean": 409.26,
+                "std": 0.57,
+                "cv_pct": 0.14,
                 "stability": "stable",
                 "runs": [
-                  409.97,
-                  410.29,
-                  410.16
+                  408.6,
+                  409.59,
+                  409.59
                 ]
               },
               "_throughput_note": "output_only",
@@ -84,24 +85,24 @@
             },
             {
               "client_concurrency": 32,
-              "throughput_tokens_per_sec": 410.34,
-              "throughput_tokens_per_sec_per_chip": 410.34,
-              "throughput_tokens_per_sec_total": 964.63,
-              "elapsed_seconds_median": 66.9,
+              "throughput_tokens_per_sec": 409.71,
+              "throughput_tokens_per_sec_per_chip": 409.71,
+              "throughput_tokens_per_sec_total": 963.17,
+              "elapsed_seconds_median": 67.0,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 410.15,
-                "std": 0.84,
-                "cv_pct": 0.2,
+                "mean": 409.34,
+                "std": 0.77,
+                "cv_pct": 0.19,
                 "stability": "stable",
                 "runs": [
-                  410.34,
-                  409.23,
-                  410.87
+                  409.85,
+                  409.71,
+                  408.45
                 ]
               },
               "_throughput_note": "output_only",
@@ -109,24 +110,24 @@
             },
             {
               "client_concurrency": 128,
-              "throughput_tokens_per_sec": 410.6,
-              "throughput_tokens_per_sec_per_chip": 410.6,
-              "throughput_tokens_per_sec_total": 965.25,
-              "elapsed_seconds_median": 66.8,
+              "throughput_tokens_per_sec": 409.53,
+              "throughput_tokens_per_sec_per_chip": 409.53,
+              "throughput_tokens_per_sec_total": 962.73,
+              "elapsed_seconds_median": 67.0,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 410.41,
-                "std": 0.44,
-                "cv_pct": 0.11,
+                "mean": 409.36,
+                "std": 0.52,
+                "cv_pct": 0.13,
                 "stability": "stable",
                 "runs": [
-                  409.91,
-                  410.72,
-                  410.6
+                  408.78,
+                  409.53,
+                  409.78
                 ]
               },
               "_throughput_note": "output_only",
@@ -137,30 +138,30 @@
         },
         {
           "chip_count": 2,
-          "best_throughput_tokens_per_sec": 473.16,
-          "throughput_tokens_per_sec_per_chip": 236.58,
-          "scaling_efficiency": 0.576,
+          "best_throughput_tokens_per_sec": 498.36,
+          "throughput_tokens_per_sec_per_chip": 249.18,
+          "scaling_efficiency": 0.608,
           "results_by_concurrency": [
             {
               "client_concurrency": 8,
-              "throughput_tokens_per_sec": 473.16,
-              "throughput_tokens_per_sec_per_chip": 236.58,
-              "throughput_tokens_per_sec_total": 1111.64,
-              "elapsed_seconds_median": 58.1,
+              "throughput_tokens_per_sec": 497.55,
+              "throughput_tokens_per_sec_per_chip": 248.78,
+              "throughput_tokens_per_sec_total": 1168.95,
+              "elapsed_seconds_median": 55.2,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 472.64,
-                "std": 2.09,
-                "cv_pct": 0.44,
+                "mean": 498.89,
+                "std": 3.23,
+                "cv_pct": 0.65,
                 "stability": "stable",
                 "runs": [
-                  474.43,
-                  473.16,
-                  470.34
+                  502.57,
+                  496.54,
+                  497.55
                 ]
               },
               "_throughput_note": "output_only",
@@ -168,24 +169,24 @@
             },
             {
               "client_concurrency": 32,
-              "throughput_tokens_per_sec": 469.92,
-              "throughput_tokens_per_sec_per_chip": 234.96,
-              "throughput_tokens_per_sec_total": 1104.02,
-              "elapsed_seconds_median": 58.5,
+              "throughput_tokens_per_sec": 498.36,
+              "throughput_tokens_per_sec_per_chip": 249.18,
+              "throughput_tokens_per_sec_total": 1170.85,
+              "elapsed_seconds_median": 55.1,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 469.27,
-                "std": 1.2,
-                "cv_pct": 0.26,
+                "mean": 498.02,
+                "std": 1.18,
+                "cv_pct": 0.24,
                 "stability": "stable",
                 "runs": [
-                  470.0,
-                  469.92,
-                  467.88
+                  498.99,
+                  498.36,
+                  496.71
                 ]
               },
               "_throughput_note": "output_only",
@@ -193,24 +194,24 @@
             },
             {
               "client_concurrency": 128,
-              "throughput_tokens_per_sec": 468.21,
-              "throughput_tokens_per_sec_per_chip": 234.1,
-              "throughput_tokens_per_sec_total": 1100.01,
-              "elapsed_seconds_median": 58.7,
+              "throughput_tokens_per_sec": 496.3,
+              "throughput_tokens_per_sec_per_chip": 248.15,
+              "throughput_tokens_per_sec_total": 1166.02,
+              "elapsed_seconds_median": 55.4,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 468.32,
-                "std": 0.7,
-                "cv_pct": 0.15,
+                "mean": 496.23,
+                "std": 0.46,
+                "cv_pct": 0.09,
                 "stability": "stable",
                 "runs": [
-                  468.21,
-                  467.68,
-                  469.06
+                  496.65,
+                  496.3,
+                  495.73
                 ]
               },
               "_throughput_note": "output_only",
@@ -221,30 +222,30 @@
         },
         {
           "chip_count": 4,
-          "best_throughput_tokens_per_sec": 532.61,
-          "throughput_tokens_per_sec_per_chip": 133.15,
-          "scaling_efficiency": 0.324,
+          "best_throughput_tokens_per_sec": 570.06,
+          "throughput_tokens_per_sec_per_chip": 142.51,
+          "scaling_efficiency": 0.348,
           "results_by_concurrency": [
             {
               "client_concurrency": 8,
-              "throughput_tokens_per_sec": 532.61,
-              "throughput_tokens_per_sec_per_chip": 133.15,
-              "throughput_tokens_per_sec_total": 1253.59,
-              "elapsed_seconds_median": 51.4,
+              "throughput_tokens_per_sec": 570.06,
+              "throughput_tokens_per_sec_per_chip": 142.51,
+              "throughput_tokens_per_sec_total": 1328.0,
+              "elapsed_seconds_median": 48.9,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 532.57,
-                "std": 0.25,
-                "cv_pct": 0.05,
+                "mean": 571.24,
+                "std": 2.9,
+                "cv_pct": 0.51,
                 "stability": "stable",
                 "runs": [
-                  532.61,
-                  532.8,
-                  532.3
+                  574.55,
+                  570.06,
+                  569.12
                 ]
               },
               "_throughput_note": "output_only",
@@ -252,24 +253,24 @@
             },
             {
               "client_concurrency": 32,
-              "throughput_tokens_per_sec": 528.67,
-              "throughput_tokens_per_sec_per_chip": 132.17,
-              "throughput_tokens_per_sec_total": 1244.31,
-              "elapsed_seconds_median": 51.8,
+              "throughput_tokens_per_sec": 567.24,
+              "throughput_tokens_per_sec_per_chip": 141.81,
+              "throughput_tokens_per_sec_total": 1321.45,
+              "elapsed_seconds_median": 49.2,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 528.77,
-                "std": 0.34,
-                "cv_pct": 0.06,
+                "mean": 567.81,
+                "std": 1.4,
+                "cv_pct": 0.25,
                 "stability": "stable",
                 "runs": [
-                  528.5,
-                  528.67,
-                  529.15
+                  569.41,
+                  567.24,
+                  566.78
                 ]
               },
               "_throughput_note": "output_only",
@@ -277,24 +278,24 @@
             },
             {
               "client_concurrency": 128,
-              "throughput_tokens_per_sec": 524.51,
-              "throughput_tokens_per_sec_per_chip": 131.13,
-              "throughput_tokens_per_sec_total": 1234.52,
-              "elapsed_seconds_median": 52.2,
+              "throughput_tokens_per_sec": 565.21,
+              "throughput_tokens_per_sec_per_chip": 141.3,
+              "throughput_tokens_per_sec_total": 1316.72,
+              "elapsed_seconds_median": 49.3,
               "peak_memory_gb": null,
               "power_watts_avg": null,
               "power_watts_peak": null,
               "oom": false,
               "throughput_tokens_per_sec_reliability": {
                 "n": 3,
-                "mean": 524.52,
-                "std": 1.15,
-                "cv_pct": 0.22,
+                "mean": 564.52,
+                "std": 1.5,
+                "cv_pct": 0.27,
                 "stability": "stable",
                 "runs": [
-                  524.51,
-                  525.68,
-                  523.37
+                  562.8,
+                  565.21,
+                  565.54
                 ]
               },
               "_throughput_note": "output_only",
@@ -302,6 +303,90 @@
             }
           ],
           "result_dir": "4x"
+        },
+        {
+          "chip_count": 8,
+          "best_throughput_tokens_per_sec": 530.78,
+          "throughput_tokens_per_sec_per_chip": 66.35,
+          "scaling_efficiency": 0.162,
+          "results_by_concurrency": [
+            {
+              "client_concurrency": 8,
+              "throughput_tokens_per_sec": 530.78,
+              "throughput_tokens_per_sec_per_chip": 66.35,
+              "throughput_tokens_per_sec_total": 1235.04,
+              "elapsed_seconds_median": 52.6,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "throughput_tokens_per_sec_reliability": {
+                "n": 3,
+                "mean": 530.47,
+                "std": 0.63,
+                "cv_pct": 0.12,
+                "stability": "stable",
+                "runs": [
+                  530.9,
+                  530.78,
+                  529.74
+                ]
+              },
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 32,
+              "throughput_tokens_per_sec": 527.95,
+              "throughput_tokens_per_sec_per_chip": 65.99,
+              "throughput_tokens_per_sec_total": 1228.45,
+              "elapsed_seconds_median": 52.9,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "throughput_tokens_per_sec_reliability": {
+                "n": 3,
+                "mean": 528.34,
+                "std": 0.75,
+                "cv_pct": 0.14,
+                "stability": "stable",
+                "runs": [
+                  527.95,
+                  527.86,
+                  529.21
+                ]
+              },
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            },
+            {
+              "client_concurrency": 128,
+              "throughput_tokens_per_sec": 526.69,
+              "throughput_tokens_per_sec_per_chip": 65.84,
+              "throughput_tokens_per_sec_total": 1225.52,
+              "elapsed_seconds_median": 53.0,
+              "peak_memory_gb": null,
+              "power_watts_avg": null,
+              "power_watts_peak": null,
+              "oom": false,
+              "throughput_tokens_per_sec_reliability": {
+                "n": 3,
+                "mean": 526.18,
+                "std": 1.88,
+                "cv_pct": 0.36,
+                "stability": "stable",
+                "runs": [
+                  524.1,
+                  527.76,
+                  526.69
+                ]
+              },
+              "_throughput_note": "output_only",
+              "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+            }
+          ],
+          "result_dir": "8x"
         }
       ]
     },
@@ -318,28 +403,29 @@
   "meta": {
     "submitted_by": "Keke946",
     "submission_type": "individual",
-    "date": "2026-09-09",
-    "time": "02:36:24",
-    "run_id": "559dc817",
-    "run_name": "mtt_s4000x4_suite_E_moorethreads_vllm_musa_e0266927_559dc817",
+    "date": "2026-09-12",
+    "time": "16:43:53",
+    "run_id": "ca7cadca",
+    "run_name": "mtt_s4000x8_suite_E_moorethreads_vllm_musa_e0266927_ca7cadca",
     "flagged": null,
     "reproduce_script": "runners/moorethreads_vllm_musa_e0266927/runner.py",
     "env_info_file": "../../env_info.json",
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-09-08T18:23:00.513416+00:00",
-    "benchmark_end_time": "2026-09-08T18:36:24.149660+00:00",
-    "benchmark_elapsed_minutes": 35.5,
-    "model_load_seconds": 123.2,
+    "benchmark_start_time": "2026-09-12T08:30:28.704152+00:00",
+    "benchmark_end_time": "2026-09-12T08:43:53.726201+00:00",
+    "benchmark_elapsed_minutes": 44.9,
+    "model_load_seconds": 115.6,
     "benchmark_elapsed_minutes_note": "Sum of per-chip-count benchmark_elapsed_minutes (excludes sleep gaps, orchestrator overhead, and skipped counts).",
     "scenario_dirs": {
-      "offline": "results/community/mtt_s4000x4_suite_E_moorethreads_vllm_musa_e0266927_559dc817/1x/offline"
+      "offline": "results/community/mtt_s4000x8_suite_E_moorethreads_vllm_musa_e0266927_ca7cadca/1x/offline"
     },
     "chip_count_dirs": {
       "1": "1x",
       "2": "2x",
-      "4": "4x"
+      "4": "4x",
+      "8": "8x"
     }
   }
 }

@@ -5,15 +5,15 @@
   "chip": {
     "name": "MTT S4000",
     "vendor": "Moore Threads",
-    "count": 2,
-    "card_count": 2,
+    "count": 4,
+    "card_count": 4,
     "dies_per_card": 1,
     "memory_gb": 48.0,
     "interconnect_intra_node": "MCCL/PCIe",
     "interconnect_inter_node": null
   },
   "environment": {
-    "collected_at": "2026-09-08T17:51:04.613786+00:00",
+    "collected_at": "2026-09-12T07:46:01.833373+00:00",
     "accelerators": [
       {
         "index": 0,
@@ -44,6 +44,42 @@
       },
       {
         "index": 3,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
         "name": "MTT S4000",
         "vendor": "Moore Threads",
         "memory_gb": 48.0,
@@ -113,7 +149,7 @@
     "num_runs": 3,
     "warmup_runs": 1,
     "parallelism": {
-      "tensor_parallel_size": 2,
+      "tensor_parallel_size": 4,
       "pipeline_parallel_size": 1,
       "expert_parallel_size": 1,
       "data_parallel_size": 1
@@ -126,24 +162,24 @@
       "results_by_concurrency": [
         {
           "client_concurrency": 8,
-          "throughput_tokens_per_sec": 473.16,
-          "throughput_tokens_per_sec_per_chip": 236.58,
-          "throughput_tokens_per_sec_total": 1111.64,
-          "elapsed_seconds_median": 58.1,
+          "throughput_tokens_per_sec": 570.06,
+          "throughput_tokens_per_sec_per_chip": 142.51,
+          "throughput_tokens_per_sec_total": 1328.0,
+          "elapsed_seconds_median": 48.9,
           "peak_memory_gb": null,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
           "throughput_tokens_per_sec_reliability": {
             "n": 3,
-            "mean": 472.64,
-            "std": 2.09,
-            "cv_pct": 0.44,
+            "mean": 571.24,
+            "std": 2.9,
+            "cv_pct": 0.51,
             "stability": "stable",
             "runs": [
-              474.43,
-              473.16,
-              470.34
+              574.55,
+              570.06,
+              569.12
             ]
           },
           "_throughput_note": "output_only",
@@ -151,24 +187,24 @@
         },
         {
           "client_concurrency": 32,
-          "throughput_tokens_per_sec": 469.92,
-          "throughput_tokens_per_sec_per_chip": 234.96,
-          "throughput_tokens_per_sec_total": 1104.02,
-          "elapsed_seconds_median": 58.5,
+          "throughput_tokens_per_sec": 567.24,
+          "throughput_tokens_per_sec_per_chip": 141.81,
+          "throughput_tokens_per_sec_total": 1321.45,
+          "elapsed_seconds_median": 49.2,
           "peak_memory_gb": null,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
           "throughput_tokens_per_sec_reliability": {
             "n": 3,
-            "mean": 469.27,
-            "std": 1.2,
-            "cv_pct": 0.26,
+            "mean": 567.81,
+            "std": 1.4,
+            "cv_pct": 0.25,
             "stability": "stable",
             "runs": [
-              470.0,
-              469.92,
-              467.88
+              569.41,
+              567.24,
+              566.78
             ]
           },
           "_throughput_note": "output_only",
@@ -176,24 +212,24 @@
         },
         {
           "client_concurrency": 128,
-          "throughput_tokens_per_sec": 468.21,
-          "throughput_tokens_per_sec_per_chip": 234.11,
-          "throughput_tokens_per_sec_total": 1100.01,
-          "elapsed_seconds_median": 58.7,
+          "throughput_tokens_per_sec": 565.21,
+          "throughput_tokens_per_sec_per_chip": 141.3,
+          "throughput_tokens_per_sec_total": 1316.72,
+          "elapsed_seconds_median": 49.3,
           "peak_memory_gb": null,
           "power_watts_avg": null,
           "power_watts_peak": null,
           "oom": false,
           "throughput_tokens_per_sec_reliability": {
             "n": 3,
-            "mean": 468.32,
-            "std": 0.7,
-            "cv_pct": 0.15,
+            "mean": 564.52,
+            "std": 1.5,
+            "cv_pct": 0.27,
             "stability": "stable",
             "runs": [
-              468.21,
-              467.68,
-              469.06
+              562.8,
+              565.21,
+              565.54
             ]
           },
           "_throughput_note": "output_only",
@@ -211,19 +247,19 @@
   "meta": {
     "submitted_by": "Keke946",
     "submission_type": "individual",
-    "date": "2026-09-09",
-    "time": "02:20:32",
-    "run_id": "bc213e2a",
-    "run_name": "mtt_s4000x2_suite_E_moorethreads_vllm_musa_e0266927_bc213e2a",
+    "date": "2026-09-12",
+    "time": "16:14:32",
+    "run_id": "559dc817",
+    "run_name": "mtt_s4000x4_suite_E_moorethreads_vllm_musa_e0266927_559dc817",
     "flagged": null,
     "reproduce_script": "runners/moorethreads_vllm_musa_e0266927/runner.py",
     "env_info_file": "../../env_info.json",
     "log_file": "run.log",
     "samples_file": "samples.jsonl",
     "notes": null,
-    "benchmark_start_time": "2026-09-08T18:08:50.502588+00:00",
-    "benchmark_end_time": "2026-09-08T18:20:32.906620+00:00",
-    "benchmark_elapsed_minutes": 11.7,
-    "model_load_seconds": 123.1
+    "benchmark_start_time": "2026-09-12T08:04:42.359689+00:00",
+    "benchmark_end_time": "2026-09-12T08:14:32.303387+00:00",
+    "benchmark_elapsed_minutes": 9.8,
+    "model_load_seconds": 135.9
   }
 }
