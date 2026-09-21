@@ -1,0 +1,229 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_B",
+  "implementation_id": "moorethreads_vllm_musa_6607740b",
+  "chip": {
+    "name": "MTT S4000",
+    "vendor": "Moore Threads",
+    "count": 4,
+    "card_count": 4,
+    "dies_per_card": 1,
+    "memory_gb": 48.0,
+    "interconnect_intra_node": "MCCL/PCIe",
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-09-21T07:08:32.784934+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "moorethreads",
+    "accelerator_topology": null,
+    "intra_node_interconnect": "MCCL/PCIe",
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Gold 6430",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.5,
+    "pcie_generation": "PCIe 16x/16x",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_bond_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu Jammy Jellyfish (development branch)",
+    "python_version": "3.10.8",
+    "kernel_version": "5.15.0-105-generic",
+    "runtime_version": "Moore Threads Driver 2.7.0",
+    "pytorch_version": "2.2.0"
+  },
+  "software": {
+    "framework": "vllm-musa",
+    "framework_version": "0.4.2",
+    "driver_version": "2.7.0",
+    "runtime_version": "Moore Threads Driver 2.7.0",
+    "os": "Ubuntu Jammy Jellyfish (development branch)",
+    "python_version": "3.10.8"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 70.0,
+    "precision": "FP16",
+    "effective_dtype": "float16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "offline",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 4,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 8,
+          "throughput_tokens_per_sec": 148.0,
+          "throughput_tokens_per_sec_per_chip": 37.0,
+          "throughput_tokens_per_sec_total": 307.86,
+          "elapsed_seconds_median": 160.4,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 148.03,
+            "std": 0.11,
+            "cv_pct": 0.08,
+            "stability": "stable",
+            "runs": [
+              148.16,
+              147.94,
+              148.0
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 32,
+          "throughput_tokens_per_sec": 147.71,
+          "throughput_tokens_per_sec_per_chip": 36.93,
+          "throughput_tokens_per_sec_total": 307.26,
+          "elapsed_seconds_median": 160.7,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 147.76,
+            "std": 0.1,
+            "cv_pct": 0.06,
+            "stability": "stable",
+            "runs": [
+              147.87,
+              147.69,
+              147.71
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 128,
+          "throughput_tokens_per_sec": 147.51,
+          "throughput_tokens_per_sec_per_chip": 36.88,
+          "throughput_tokens_per_sec_total": 306.83,
+          "elapsed_seconds_median": 161.0,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 147.54,
+            "std": 0.06,
+            "cv_pct": 0.04,
+            "stability": "stable",
+            "runs": [
+              147.51,
+              147.5,
+              147.6
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-09-21",
+    "time": "15:47:09",
+    "run_id": "91e1cc05",
+    "run_name": "mtt_s4000x4_suite_B_moorethreads_vllm_musa_6607740b_91e1cc05",
+    "flagged": null,
+    "reproduce_script": "runners/moorethreads_vllm_musa_6607740b/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-09-21T07:15:01.357149+00:00",
+    "benchmark_end_time": "2026-09-21T07:47:09.635450+00:00",
+    "benchmark_elapsed_minutes": 32.1,
+    "model_load_seconds": 126.3
+  }
+}

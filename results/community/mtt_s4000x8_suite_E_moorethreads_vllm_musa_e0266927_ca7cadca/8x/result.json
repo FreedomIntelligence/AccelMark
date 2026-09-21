@@ -1,0 +1,270 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_E",
+  "implementation_id": "moorethreads_vllm_musa_e0266927",
+  "chip": {
+    "name": "MTT S4000",
+    "vendor": "Moore Threads",
+    "count": 8,
+    "card_count": 8,
+    "dies_per_card": 1,
+    "memory_gb": 48.0,
+    "interconnect_intra_node": "MCCL/PCIe",
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-09-12T07:46:01.833373+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "moorethreads",
+    "accelerator_topology": null,
+    "intra_node_interconnect": "MCCL/PCIe",
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Gold 6430",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.5,
+    "pcie_generation": "PCIe 16x/16x",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_bond_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu Jammy Jellyfish (development branch)",
+    "python_version": "3.10.8",
+    "kernel_version": "5.15.0-105-generic",
+    "runtime_version": "Moore Threads Driver 2.7.0",
+    "pytorch_version": "2.2.0"
+  },
+  "software": {
+    "framework": "vllm-musa",
+    "framework_version": "0.4.2",
+    "driver_version": "2.7.0",
+    "runtime_version": "Moore Threads Driver 2.7.0",
+    "os": "Ubuntu Jammy Jellyfish (development branch)",
+    "python_version": "3.10.8"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "FP16",
+    "effective_dtype": "float16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 8,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": null
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 8,
+          "throughput_tokens_per_sec": 530.78,
+          "throughput_tokens_per_sec_per_chip": 66.35,
+          "throughput_tokens_per_sec_total": 1235.04,
+          "elapsed_seconds_median": 52.6,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 530.47,
+            "std": 0.63,
+            "cv_pct": 0.12,
+            "stability": "stable",
+            "runs": [
+              530.9,
+              530.78,
+              529.74
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 32,
+          "throughput_tokens_per_sec": 527.95,
+          "throughput_tokens_per_sec_per_chip": 65.99,
+          "throughput_tokens_per_sec_total": 1228.45,
+          "elapsed_seconds_median": 52.9,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 528.34,
+            "std": 0.75,
+            "cv_pct": 0.14,
+            "stability": "stable",
+            "runs": [
+              527.95,
+              527.86,
+              529.21
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 128,
+          "throughput_tokens_per_sec": 526.69,
+          "throughput_tokens_per_sec_per_chip": 65.84,
+          "throughput_tokens_per_sec_total": 1225.52,
+          "elapsed_seconds_median": 53.0,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 526.18,
+            "std": 1.88,
+            "cv_pct": 0.36,
+            "stability": "stable",
+            "runs": [
+              524.1,
+              527.76,
+              526.69
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to populate."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-09-12",
+    "time": "16:01:58",
+    "run_id": "ca7cadca",
+    "run_name": "mtt_s4000x8_suite_E_moorethreads_vllm_musa_e0266927_ca7cadca",
+    "flagged": null,
+    "reproduce_script": "runners/moorethreads_vllm_musa_e0266927/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-09-12T07:51:22.811438+00:00",
+    "benchmark_end_time": "2026-09-12T08:01:58.951982+00:00",
+    "benchmark_elapsed_minutes": 10.6,
+    "model_load_seconds": 156.4,
+    "benchmark_elapsed_minutes_note": "Total across ['offline'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/community/mtt_s4000x8_suite_E_moorethreads_vllm_musa_e0266927_ca7cadca/8x/offline"
+    }
+  }
+}

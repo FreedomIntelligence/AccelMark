@@ -1,0 +1,38 @@
+--- a/vllm/distributed/communication_op.py
++++ b/vllm/distributed/communication_op.py
+@@ -203,11 +203,12 @@
+                                                 group=metadata_group)
+         async_handles = []
+         for tensor in tensor_list:
+-            async_handles.append(
+-                torch.distributed.broadcast(tensor,
+-                                            src=src,
+-                                            group=group,
+-                                            async_op=True))
++            if tensor.numel() > 0:
++                async_handles.append(
++                    torch.distributed.broadcast(tensor,
++                                                src=src,
++                                                group=group,
++                                                async_op=True))
+         for async_handle in async_handles:
+             async_handle.wait()
+
+@@ -224,11 +225,12 @@
+                 tensor = torch.empty(value.size,
+                                      dtype=value.dtype,
+                                      device="musa")
+-                async_handle = torch.distributed.broadcast(tensor,
+-                                                           src=src,
+-                                                           async_op=True,
+-                                                           group=group)
+-                async_handles.append(async_handle)
++                if tensor.numel() > 0:
++                    async_handle = torch.distributed.broadcast(tensor,
++                                                               src=src,
++                                                               async_op=True,
++                                                               group=group)
++                    async_handles.append(async_handle)
+                 tensor_dict[key] = tensor
+             else:
+                 tensor_dict[key] = value

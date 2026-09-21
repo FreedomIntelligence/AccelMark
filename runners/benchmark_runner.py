@@ -1293,6 +1293,14 @@ class BenchmarkRunner(ABC):
                         warmup_minutes=suite.get("warmup_minutes", 2.0),
                     )
                 )
+        elif args.scenario == "online" and getattr(self, "_loop", None) is not None:
+            # Reuse the runner-owned event loop. Legacy vLLM-MUSA starts a
+            # persistent background engine task on this loop; asyncio.run()
+            # would try to tear that loop down immediately after the benchmark
+            # and can hang before result.json is written.
+            metrics = self._loop.run_until_complete(
+                loadgen._run_online_async(inference_fn)
+            )
         else:
             metrics = loadgen.run(inference_fn)
 
