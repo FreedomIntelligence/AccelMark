@@ -1,0 +1,285 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_H",
+  "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+  "chip": {
+    "name": "Iluvatar MR-V100",
+    "vendor": "Iluvatar",
+    "count": 1,
+    "card_count": 1,
+    "dies_per_card": 1,
+    "memory_gb": 32.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-10-22T13:42:12.351393+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "iluvatar",
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8358P CPU @ 2.60GHz",
+      "physical_cores": 56,
+      "logical_cores": 112,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 32.0,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3",
+    "kernel_version": "5.4.0-148-generic",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "pytorch_version": "2.7.1"
+  },
+  "software": {
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "driver_version": "unknown",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3"
+  },
+  "model": {
+    "model_id": "mistralai/Mistral-7B-Instruct-v0.1",
+    "model_revision": "ec5deb64f2c6e6fa90c1abf74a91d5c93a9669ca",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 7.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": null
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 8,
+          "throughput_tokens_per_sec": 59.53,
+          "throughput_tokens_per_sec_per_chip": 59.53,
+          "throughput_tokens_per_sec_total": 2547.65,
+          "elapsed_seconds_median": 201.1,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 59.41,
+            "std": 0.23,
+            "cv_pct": 0.38,
+            "stability": "stable",
+            "runs": [
+              59.56,
+              59.15,
+              59.53
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 32,
+          "throughput_tokens_per_sec": 59.51,
+          "throughput_tokens_per_sec_per_chip": 59.51,
+          "throughput_tokens_per_sec_total": 2546.63,
+          "elapsed_seconds_median": 201.2,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 59.51,
+            "std": 0.01,
+            "cv_pct": 0.02,
+            "stability": "stable",
+            "runs": [
+              59.52,
+              59.49,
+              59.51
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 128,
+          "throughput_tokens_per_sec": 59.11,
+          "throughput_tokens_per_sec_per_chip": 59.11,
+          "throughput_tokens_per_sec_total": 2529.6,
+          "elapsed_seconds_median": 202.6,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 59.19,
+            "std": 0.24,
+            "cv_pct": 0.41,
+            "stability": "stable",
+            "runs": [
+              59.0,
+              59.46,
+              59.11
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    },
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 0.0,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 161403.75,
+          "ttft_ms_p90": 308063.14,
+          "ttft_ms_p99": 350954.02,
+          "tpot_ms_p50": 416.75,
+          "tpot_ms_p90": 438.07,
+          "tpot_ms_p99": 576.02,
+          "elapsed_seconds_median": 390.5,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 338100.16,
+            "std": 23720.78,
+            "cv_pct": 7.02,
+            "stability": "noisy",
+            "runs": [
+              310726.34,
+              352612.36,
+              350961.77
+            ]
+          }
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 181668.96,
+          "ttft_ms_p90": 337549.43,
+          "ttft_ms_p99": 370657.91,
+          "tpot_ms_p50": 423.01,
+          "tpot_ms_p90": 445.15,
+          "tpot_ms_p99": 577.2,
+          "elapsed_seconds_median": 391.8,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 369953.16,
+            "std": 671.98,
+            "cv_pct": 0.18,
+            "stability": "stable",
+            "runs": [
+              369331.24,
+              369862.27,
+              370665.96
+            ]
+          }
+        },
+        {
+          "target_qps": 100,
+          "achieved_qps": 100.0,
+          "ttft_ms_p50": 183180.64,
+          "ttft_ms_p90": 340167.42,
+          "ttft_ms_p99": 373242.76,
+          "tpot_ms_p50": 423.4,
+          "tpot_ms_p90": 445.89,
+          "tpot_ms_p99": 577.81,
+          "elapsed_seconds_median": 393.1,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 372938.16,
+            "std": 342.77,
+            "cv_pct": 0.09,
+            "stability": "stable",
+            "runs": [
+              373001.66,
+              372568.08,
+              373244.74
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.42,
+    "baseline_delta": -0.01,
+    "valid": true,
+    "framework": "vllm-ixuca",
+    "precision": "BF16",
+    "notes": "Integrated accuracy check \u2014 used same vllm-ixuca instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-10-22",
+    "time": "22:24:18",
+    "run_id": "1184f4aa",
+    "run_name": "iluvatar_mr_v100x1_suite_H_iluvatar_vllm_ixuca_4d3befc9_1184f4aa",
+    "flagged": null,
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-10-22T13:44:23.534055+00:00",
+    "benchmark_end_time": "2026-10-22T14:24:18.002313+00:00",
+    "benchmark_elapsed_minutes": 99.5,
+    "model_load_seconds": 49.4,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/community/iluvatar_mr_v100x1_suite_H_iluvatar_vllm_ixuca_4d3befc9_1184f4aa/offline",
+      "online": "results/community/iluvatar_mr_v100x1_suite_H_iluvatar_vllm_ixuca_4d3befc9_1184f4aa/online"
+    }
+  }
+}

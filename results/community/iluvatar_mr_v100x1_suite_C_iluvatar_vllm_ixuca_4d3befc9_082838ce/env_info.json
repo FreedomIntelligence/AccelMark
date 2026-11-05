@@ -1,0 +1,38 @@
+{
+  "collected_at": "2026-10-24T14:47:18.114304+00:00",
+  "accelerators": [
+    {
+      "index": 0,
+      "name": "Iluvatar MR-V100",
+      "vendor": "Iluvatar",
+      "memory_gb": 32.0,
+      "driver_version": "unknown",
+      "firmware_version": null,
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_platform": "iluvatar",
+  "accelerator_topology": null,
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "Intel(R) Xeon(R) Platinum 8358P CPU @ 2.60GHz",
+    "physical_cores": 56,
+    "logical_cores": 112,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 32.0,
+  "pcie_generation": "unknown",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 24.04.4 LTS",
+  "python_version": "3.12.3",
+  "kernel_version": "5.4.0-148-generic",
+  "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+  "pytorch_version": "2.7.1"
+}

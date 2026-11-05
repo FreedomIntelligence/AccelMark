@@ -153,7 +153,8 @@ def _collect_via_torch() -> list[dict]:
     driver = _driver_version_from_smi() or "unknown"
     accelerators: list[dict] = []
 
-    if hasattr(torch, "musa"):
+    using_musa = hasattr(torch, "musa")
+    if using_musa:
         try:
             count = torch.musa.device_count()
             get_props = torch.musa.get_device_properties
@@ -171,6 +172,11 @@ def _collect_via_torch() -> list[dict]:
         try:
             props = get_props(idx)
             name = getattr(props, "name", None) or f"MTT GPU {idx}"
+            # A number of non-NVIDIA vendor runtimes expose their devices via
+            # torch.cuda for compatibility.  Do not claim those devices as
+            # Moore Threads unless their reported name is actually MTT/Moore.
+            if not using_musa and not re.search(r"(?:^MTT\b|Moore\s+Threads)", str(name), re.I):
+                continue
             total = getattr(props, "total_memory", None)
             memory_gb = round(total / (1024 ** 3), 1) if total else None
         except Exception:
