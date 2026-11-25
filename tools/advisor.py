@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -22,7 +24,26 @@ API_DIR = ROOT / "leaderboard" / "site" / "api"
 PRICING_PATH = ROOT / "schema" / "cloud_pricing.json"
 
 
+def _ensure_api_data() -> None:
+    """Auto-generate leaderboard/site/api/*.json on a fresh clone if missing."""
+    required = (API_DIR / "rank.json", API_DIR / "chips.json")
+    if all(p.exists() for p in required):
+        return
+    gen_script = ROOT / "leaderboard" / "generate.py"
+    if not gen_script.exists():
+        return
+    print("Building local leaderboard index (first run after clone)...", file=sys.stderr)
+    subprocess.run(
+        [sys.executable, str(gen_script)],
+        cwd=str(ROOT),
+        stdout=subprocess.DEVNULL,
+        check=True,
+    )
+
+
 def _load_json(path: Path):
+    if path.parent == API_DIR and not path.exists():
+        _ensure_api_data()
     if not path.exists():
         raise FileNotFoundError(
             f"Missing {path}. Run 'python leaderboard/generate.py' first."

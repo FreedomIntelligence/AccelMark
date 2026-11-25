@@ -214,7 +214,7 @@ jobs:
         run: |
           python tools/pr_rank_preview.py --dirs-file /tmp/changed_dirs.txt --output /tmp/pr_preview.md || true
 
-      - name: Comment on PR with validation summary
+      - name: Publish validation summary (Step Summary + PR comment)
         if: always()
         uses: actions/github-script@v7
         with:
@@ -233,29 +233,41 @@ jobs:
             const previewBlock = preview ? `\n\n${preview}` : '';
             const body   = `${marker}\n## ${icon} AccelMark Validation: ${status}${previewBlock}\n\nSee the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`;
 
-            // Update existing bot comment rather than accumulating new ones
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo:  context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const existing = comments.find(c =>
-              c.user.type === 'Bot' && c.body.includes(marker)
-            );
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner:      context.repo.owner,
-                repo:       context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner:        context.repo.owner,
-                repo:         context.repo.repo,
+            // Always write to GitHub Actions Step Summary (works on fork PRs too)
+            const summaryFile = process.env.GITHUB_STEP_SUMMARY;
+            if (summaryFile) {
+              fs.appendFileSync(summaryFile, `${body}\n`);
+            }
+
+            // Best-effort PR comment: fork PRs have read-only GITHUB_TOKEN on
+            // `pull_request` triggers and return 403 "Resource not accessible by integration".
+            // Never fail a valid community PR because the bot couldn't post a comment.
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
                 issue_number: context.issue.number,
-                body,
               });
+              const existing = comments.find(c =>
+                c.user.type === 'Bot' && c.body.includes(marker)
+              );
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner:      context.repo.owner,
+                  repo:       context.repo.repo,
+                  comment_id: existing.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner:        context.repo.owner,
+                  repo:         context.repo.repo,
+                  issue_number: context.issue.number,
+                  body,
+                });
+              }
+            } catch (err) {
+              core.warning(`Could not post PR comment (expected for fork PRs with read-only token): ${err.message}`);
             }
 
   frontend-tests:
@@ -318,4 +330,14 @@ jobs:
             echo "::endgroup::"
           else
             echo "openclaw_skill/tests/ not present — skipping."
+          fi
+
+      - name: Run CLI & tools unit tests
+        run: |
+          if [ -d tools/tests ]; then
+            echo "::group::pytest tools/tests"
+            python -m pytest tools/tests -q --no-header --color=no
+            echo "::endgroup::"
+          else
+            echo "tools/tests/ not present — skipping."
           fi

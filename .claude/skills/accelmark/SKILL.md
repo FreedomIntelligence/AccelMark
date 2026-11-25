@@ -11,13 +11,13 @@ Help the user either **(A) run and submit a real-world benchmark** on their own 
 
 ## Mode A: Check Environment, Run Benchmark & Prepare Submission
 
-1. **Pre-flight check (10 seconds, no model download)**:
+1. **One-time setup & pre-flight check (10 seconds, no model download)**:
    ```bash
-   python run.py --check-env
-   # Or check a specific runner:
-   python run.py --check-env --runner nvidia_vllm_47f5d58e
+   python run.py --init
+   # Or just check environment / a specific runner (aliases: auto, vllm, sglang, trtllm, ascend, rocm, mlx, tpu, musa):
+   python run.py --check-env --runner auto
    ```
-   Verify Python >= 3.10, `jsonschema` / `numpy` / `pyyaml`, `configs/submitter.yaml`, and hardware visibility (`nvidia-smi`, `npu-smi`, `rocm-smi`, or Apple Silicon).
+   Verify Python >= 3.10, `jsonschema` / `numpy` / `pyyaml`, `configs/submitter.yaml`, `HF_TOKEN`/`HF_ENDPOINT`, and hardware visibility (`nvidia-smi`, `npu-smi`, `rocm-smi`, or Apple Silicon).
 
 2. **Pick the fastest matching suite** (unless the user specifies one):
    - **Consumer / Edge / Quickest (~10 min)**: `suite_F` (`Qwen2.5-0.5B`, 4GB+ VRAM)
@@ -27,11 +27,11 @@ Help the user either **(A) run and submit a real-world benchmark** on their own 
    - **Sliding-Window Attention (~14 min)**: `suite_H` (`Mistral-7B`, 10K ctx, 4K window)
    - **Multi-Chip / Large / MoE**: `suite_B` (`Llama-3-70B`), `suite_E` (TP scaling 1x–8x), `suite_G` (`Mixtral-8x7B`)
 
-3. **Run & validate**:
+3. **Run, validate & preview projected rank**:
    ```bash
-   python run.py --runner <runner_id> --suite <suite_id>
-   python runners/validate_submission.py --dir results/community/<run_name>
-   python tools/pr_rank_preview.py results/community/<run_name>
+   python run.py --runner auto --suite <suite_id>
+   python run.py --submit results/community/<run_name>
+   # Add --zip if the user prefers uploading via GitHub Issue instead of git/PR
    ```
 
 4. **Open a PR** (CLI or GitHub Web UI):

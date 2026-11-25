@@ -349,11 +349,29 @@ def check_accuracy(submission_dir: Path, result: dict) -> list[str]:
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", required=True)
+    parser = argparse.ArgumentParser(
+        description="Validate an AccelMark submission directory before opening a PR."
+    )
+    parser.add_argument(
+        "path",
+        nargs="?",
+        default=None,
+        help="Submission directory (or path to its result.json)",
+    )
+    parser.add_argument(
+        "--dir",
+        dest="dir_arg",
+        default=None,
+        help="Submission directory (equivalent to positional path)",
+    )
     args = parser.parse_args()
 
-    result_dir = Path(args.dir)
+    raw_target = args.dir_arg or args.path
+    if not raw_target:
+        parser.error("Provide a submission directory via --dir <dir> or as a positional argument.")
+
+    target = Path(raw_target)
+    result_dir = target.parent if target.is_file() or target.name == "result.json" else target
     result_path = result_dir / "result.json"
 
     all_errors = []

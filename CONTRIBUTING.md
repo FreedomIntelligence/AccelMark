@@ -5,9 +5,9 @@ The most valuable contribution is running the benchmark on hardware not yet
 in the leaderboard and submitting your **real, out-of-the-box results** — no SOTA tuning required.
 
 > **30-Second TL;DR:**
-> 1. Run `python run.py --check-env` to verify your setup in 10 seconds (no model download).
-> 2. Run `python run.py --runner <your_runner> --suite suite_F` (~10 min) or `suite_A` (~11 min).
-> 3. Submit `results/community/<run_name>/` via PR — or if you don't use `git`/`gh` CLI, upload `result.json` and `env_info.json` directly on your GitHub fork via **Add file → Upload files**.
+> 1. Run `python run.py --init` to configure your handle and verify your setup in 10 seconds (no model download).
+> 2. Run `python run.py --runner auto --suite suite_F` (~10 min) or `suite_A` (~11 min).
+> 3. Run `python run.py --submit` to validate, preview your projected rank, and get exact PR commands — or pass `--zip` to package a bundle for the [no-git Issue upload form](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=result_submission.md).
 
 ---
 
@@ -301,9 +301,11 @@ where it stopped. Completed steps are skipped automatically.
 After a successful run, validate locally and open a PR:
 
 ```bash
-# Validate the produced files against the schemas (the same check CI runs).
-python runners/validate_submission.py \
-    results/community/<run_name>/result.json
+# Validate, preview your projected rank, and print exact PR commands:
+python run.py --submit results/community/<run_name>
+
+# Or run the schema validator directly (same check CI runs):
+python runners/validate_submission.py --dir results/community/<run_name>
 
 # Stage just the new result and env file.
 git checkout -b submit/<your-hardware>

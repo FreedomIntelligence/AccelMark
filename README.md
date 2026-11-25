@@ -66,19 +66,15 @@ pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"       # framework depe
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt # installs runner dependencies
 
 # 2. One-time setup & 10-second pre-flight check (no model download)
-cp configs/submitter.yaml.example configs/submitter.yaml
-python run.py --check-env --runner nvidia_vllm_47f5d58e
+python run.py --init
 
 # 3. Run the fastest suite (~10 min on consumer GPU) or Suite A (~11 min on A100)
-python run.py --runner nvidia_vllm_47f5d58e --suite suite_F
+#    --runner auto picks the default runner for your hardware (or use aliases: vllm, sglang, ascend, mlx, rocm, tpu, musa)
+python run.py --runner auto --suite suite_F
 
-# 4. Submit your result — open a pull request:
-#    git checkout -b submit/<your-hardware>
-#    git add results/community/<run_name>/ && git commit -m "results: <hardware>"
-#    gh pr create   # or open via the GitHub web UI
-#
-# <run_name> is the directory auto-created by run.py — it already contains
-# your result.json and env_info.json; no manual file moves are needed.
+# 4. Validate, preview your projected rank, and get exact PR / zip upload steps:
+python run.py --submit results/community/<run_name>
+#    (Add --zip if you prefer uploading via a GitHub Issue instead of git/PR)
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
