@@ -111,6 +111,7 @@ export const VENDOR_COLORS = {
   "Google":        "#4285f4",
   "Huawei":        "#ff4d4d",
   "Moore Threads": "#c084fc",
+  "Iluvatar":      "#06b6d4",
   "Intel":         "#0071c5",
 };
 

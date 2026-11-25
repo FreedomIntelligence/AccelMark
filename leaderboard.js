@@ -53889,7 +53889,7 @@ const LEADERBOARD_DATA = [
       "notes": "Smoke-tested on MTT S4000 (vLLM 0.4.2+musa): Suite A and F default scenarios run. MMLU not at baseline \u2014 see runner README.",
       "created": "2026-05-18",
       "supersedes_chain": [],
-      "deprecated_by": null,
+      "deprecated_by": "moorethreads_vllm_musa_6607740b",
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
@@ -54089,7 +54089,7 @@ const LEADERBOARD_DATA = [
       "notes": "Smoke-tested on MTT S4000 (vLLM 0.4.2+musa): Suite A and F default scenarios run. MMLU not at baseline \u2014 see runner README.",
       "created": "2026-05-18",
       "supersedes_chain": [],
-      "deprecated_by": null,
+      "deprecated_by": "moorethreads_vllm_musa_6607740b",
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
@@ -55336,7 +55336,7 @@ const LEADERBOARD_DATA = [
       "notes": "Smoke-tested on MTT S4000 (vLLM 0.4.2+musa): Suite A and F default scenarios run. MMLU not at baseline \u2014 see runner README.",
       "created": "2026-05-18",
       "supersedes_chain": [],
-      "deprecated_by": null,
+      "deprecated_by": "moorethreads_vllm_musa_6607740b",
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
@@ -55518,7 +55518,7 @@ const LEADERBOARD_DATA = [
       "notes": "Smoke-tested on MTT S4000 (vLLM 0.4.2+musa): Suite A and F default scenarios run. MMLU not at baseline \u2014 see runner README.",
       "created": "2026-05-18",
       "supersedes_chain": [],
-      "deprecated_by": null,
+      "deprecated_by": "moorethreads_vllm_musa_6607740b",
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
@@ -56022,7 +56022,7 @@ const LEADERBOARD_DATA = [
       "notes": "Smoke-tested on MTT S4000 (vLLM 0.4.2+musa): Suite A and F default scenarios run. MMLU not at baseline \u2014 see runner README.",
       "created": "2026-05-18",
       "supersedes_chain": [],
-      "deprecated_by": null,
+      "deprecated_by": "moorethreads_vllm_musa_6607740b",
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
