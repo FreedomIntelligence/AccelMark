@@ -218,12 +218,19 @@ pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"</pre>
     el.querySelector("#sw-time-hint").textContent =
       hint ? `${_i('submit.estimatedRuntime')}: ~${hint.mins} min · ${_i(hint.noteKey)}` : "";
 
+    el.querySelector("#sw-cmd-install").textContent =
+      `git clone https://github.com/FreedomIntelligence/AccelMark.git\n` +
+      `cd AccelMark\n` +
+      `pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"\n` +
+      `pip install -r runners/${runner}/requirements.txt\n` +
+      `python run.py --init --runner ${runner}`;
+
     el.querySelector("#sw-cmd-run").textContent =
       `python run.py --runner ${runner} --suite ${state.suite}` +
-      (state.count !== "1" ? ` --chip-count ${state.count}` : "");
+      (state.count !== "1" ? ` --tensor-parallel-size ${state.count}` : "");
 
     el.querySelector("#sw-cmd-validate").textContent =
-      `python runners/validate_submission.py results/community/${runName}/result.json`;
+      `python run.py --submit results/community/${runName}`;
   }
 
   function showStep(n) {
