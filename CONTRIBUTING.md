@@ -462,8 +462,7 @@ version is:
    never edit `README.md` yourself.
 4. Add a `requirements.txt`.
 5. Validate: `python runners/validate_runners.py --dir runners/<your_folder>`.
-6. Regenerate the README matrix locally:
-   `python tools/generate_platforms_matrix.py`.
+   *(Maintainers will regenerate the top-level `README.md` platforms matrix after merge — you don't need to edit `README.md`.)*
 
 ```python
 # runners/your_platform_{hash8}/runner.py
@@ -519,8 +518,6 @@ inherited from `BenchmarkRunner` automatically.
 - [ ] `meta.json` present and valid (see `runners/meta.schema.json`), with
       `suite_support` declared for every suite your runner can or cannot run
 - [ ] `requirements.txt` included
-- [ ] `tools/generate_platforms_matrix.py --check` passes locally (CI also
-      enforces this)
 - [ ] At least one reference result in `results/community/` (validated by CI)
 
 ### Adding a new accelerator family

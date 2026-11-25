@@ -135,7 +135,7 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). The t
 _Legend: ✓ validated · ⋯ author-declared (not smoke-tested in this repo yet) · — unsupported._
 <!-- platforms-matrix:end -->
 
-> Regenerate locally with `python tools/generate_platforms_matrix.py`. CI runs `--check` and fails the PR if the README and runner metadata disagree.
+> Maintainers regenerate this matrix with `python tools/generate_platforms_matrix.py` — contributor PRs do not need to edit `README.md`.
 
 Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 

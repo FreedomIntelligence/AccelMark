@@ -87,13 +87,12 @@ jobs:
           python runners/validate_runners.py
           echo "::endgroup::"
 
-      # README "Supported platforms" matrix is generated from each runner's
-      # meta.json. If a PR changes a runner's suite_support / hardware_label
-      # or adds a new runner without regenerating the table, fail.
-      - name: README platforms matrix is in sync
+      # README "Supported platforms" matrix is maintained by maintainers (non-blocking for contributor PRs).
+      - name: Check README platforms matrix (advisory)
+        continue-on-error: true
         run: |
-          echo "::group::tools/generate_platforms_matrix.py --check"
-          python tools/generate_platforms_matrix.py --check
+          echo "::group::tools/generate_platforms_matrix.py --check (advisory)"
+          python tools/generate_platforms_matrix.py --check || echo "::notice::README platforms matrix is out of sync — maintainers will regenerate it after merge."
           echo "::endgroup::"
 
   validate-suites:
