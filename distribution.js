@@ -9636,6 +9636,58 @@ const DISTRIBUTION_SUBMISSIONS = [
     }
   },
   {
+    "id": "1189951b",
+    "chip": "NVIDIA A100-SXM4-80GB",
+    "chip_vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 80.0,
+    "suite": "suite_F",
+    "model": "Qwen2.5-0.5B-Instruct",
+    "model_full": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_params_b": 0.5,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "SGLang",
+    "framework_version": "0.5.6",
+    "tier": "community",
+    "submitted_by": "ChiangYuhsin",
+    "date": "2026-07-31",
+    "reproduce_script": "runners/nvidia_sglang_inference_opt_4fd1e59e/runner.py",
+    "runner_id": "nvidia_sglang_inference_opt_4fd1e59e",
+    "scenarios": {
+      "offline": {
+        "throughput": 46500.82,
+        "metric_label": "tokens/sec",
+        "concurrency": 64,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 40,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "interactive": {
+        "throughput": 46500.82,
+        "metric_label": "tokens/sec",
+        "concurrency": 64,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 46500.82,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 64,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
     "id": "7d8fa669",
     "chip": "NVIDIA A100-SXM4-80GB",
     "chip_vendor": "NVIDIA",
@@ -12383,26 +12435,26 @@ const DISTRIBUTION_GROUPS = [
     "chip_vendor": "NVIDIA",
     "suite": "suite_F",
     "model": "Qwen2.5-0.5B-Instruct",
-    "submission_count": 4,
-    "best_throughput": 43718.16,
+    "submission_count": 5,
+    "best_throughput": 46500.82,
     "median_throughput": 35341.25,
     "min_throughput": 11011.89,
-    "max_throughput": 43718.16,
-    "stddev_throughput": 14323.48,
+    "max_throughput": 46500.82,
+    "stddev_throughput": 14851.59,
     "scenario_summary": {
       "offline": {
-        "count": 4,
-        "best_throughput": 43718.16,
+        "count": 5,
+        "best_throughput": 46500.82,
         "best_framework": "SGLang"
       },
       "online": {
-        "count": 4,
+        "count": 5,
         "best_throughput": 40,
         "best_framework": "vLLM"
       },
       "interactive": {
-        "count": 4,
-        "best_throughput": 43718.16,
+        "count": 5,
+        "best_throughput": 46500.82,
         "best_framework": "SGLang"
       },
       "sustained": {
@@ -12411,7 +12463,7 @@ const DISTRIBUTION_GROUPS = [
         "best_framework": "vLLM"
       }
     },
-    "best_submission_id": "7d8fa669",
+    "best_submission_id": "1189951b",
     "best_framework": "SGLang",
     "best_submitted_by": "ChiangYuhsin"
   },
