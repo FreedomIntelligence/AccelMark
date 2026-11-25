@@ -971,11 +971,18 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
         if best_thr is None:
             quant = r.get("metrics", {}).get("quantization", {})
             if quant:
+                entries = quant.get("results_by_precision", [])
                 qes = [e.get("quality_efficiency")
-                       for e in quant.get("results_by_precision", [])
+                       for e in entries
                        if e.get("quality_efficiency")]
                 if qes:
                     best_thr = max(qes)
+                else:
+                    thrs = [e.get("best_throughput_tokens_per_sec")
+                            for e in entries
+                            if e.get("best_throughput_tokens_per_sec")]
+                    if thrs:
+                        best_thr = max(thrs)
 
         if not best_thr:
             continue

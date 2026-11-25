@@ -1,0 +1,6 @@
+{
+  "name": "accelmark-leaderboard-site",
+  "private": true,
+  "type": "module",
+  "description": "Zero-dependency static site and unit tests for the AccelMark leaderboard"
+}

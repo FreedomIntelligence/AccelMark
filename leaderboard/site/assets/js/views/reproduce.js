@@ -1,6 +1,6 @@
 // reproduce.js — Reproduction quests (community → verified), filterable table.
 
-import { esc, fmtNum, fmtDate, shortVersion } from "../utils.js";
+import { esc, fmtNum, fmtDate, shortVersion, copyToClipboard, flashButtonLabel } from "../utils.js";
 
 import { rowByRunId, SUITE_META } from "../data.js";
 
@@ -75,7 +75,7 @@ function renderCriteria(ex) {
 
       <p class="repro-criteria-example muted">
 
-        <strong>${_i("reproduce.criteriaNote")}</p>
+        <strong>${_i("reproduce.criteriaNote")}</strong></p>
 
       <p class="repro-criteria-stats">
 
@@ -394,11 +394,15 @@ export function render({ el }) {
                     <td><span class="tier-pill community">${esc(q.tier)}</span></td>
 
                     <td class="repro-actions">
-
+                      ${(() => {
+                        const runner = row?.implementation_id || "<runner_folder>";
+                        const cmd = `python run.py --runner ${runner} --suite ${q.suite} --reproduces-run-id ${q.run_id} --tier verified`;
+                        return q.run_id
+                          ? `<button type="button" class="btn small" data-copy-cmd="${esc(cmd)}" title="${esc(cmd)}"><span class="copy-btn-label">${_i("reproduce.copyCmd")}</span></button>`
+                          : "";
+                      })()}
                       ${q.run_id ? `<button type="button" class="btn small" data-open-run="${esc(q.run_id)}">${_i("reproduce.btnDetails")}</button>` : ""}
-
-                      <a class="text-link" href="${esc(reproUrl)}" target="_blank" rel="noopener">Request</a>
-
+                      <a class="text-link" href="${esc(reproUrl)}" target="_blank" rel="noopener">${_i("reproduce.btnRequest")}</a>
                     </td>
 
                   </tr>
@@ -427,7 +431,7 @@ export function render({ el }) {
 
           <li>${_i("reproduce.procedure1")}</li>
 
-          <li>${_i("reproduce.procedure2")}
+          <li>${_i("reproduce.procedure2")}</li>
 
           <li>${_i("reproduce.procedure3")}</li>
 
@@ -442,6 +446,13 @@ export function render({ el }) {
     ${renderCrossVerified(crossVerified)}
 
   `;
+
+  el.addEventListener("click", async (ev) => {
+    const btn = ev.target.closest("button[data-copy-cmd]");
+    if (!btn) return;
+    const ok = await copyToClipboard(btn.getAttribute("data-copy-cmd") || "");
+    flashButtonLabel(btn, ok ? _i("reproduce.copied") : "Copy failed");
+  });
 
   if (quests.length) {
 

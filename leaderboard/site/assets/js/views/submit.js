@@ -17,6 +17,7 @@ const SUITE_HINTS = {
   suite_D: { mins: 22, noteKey: 'submit.suiteHint.D' },
   suite_E: { mins: 9, noteKey: 'submit.suiteHint.E' },
   suite_G: { mins: 35, noteKey: 'submit.suiteHint.G' },
+  suite_H: { mins: 14, noteKey: 'submit.suiteHint.H' },
 };
 
 const FLOW = ["Detect", "Run", "Validate", "Preview", "Submit", "Published"];

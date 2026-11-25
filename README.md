@@ -20,6 +20,8 @@
   <a href="CONTRIBUTING.md">Contributing</a> ·
   <a href="suites/README.md">Suites</a> ·
   <a href="https://github.com/FreedomIntelligence/AccelMark/discussions">Discussions</a> ·
+  <a href="https://freedomintelligence.github.io/AccelMark/#/agent">Agent Track</a> ·
+  <a href="https://freedomintelligence.github.io/AccelMark/#/wanted">Wanted Hardware</a> ·
   <a href="DEVELOPMENT.md">Development</a>
 </p>
 
@@ -85,6 +87,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 | **E** | Llama-3-8B | 1×/2×/4×/8× | How well does this chip scale? | Scaling efficiency |
 | **F** | Qwen2.5-0.5B | 1 | How fast is this consumer/edge GPU? | Offline tokens/sec |
 | **G** | Mixtral-8x7B-Instruct | ≥2 (auto) | How efficiently does this chip handle sparse MoE inference? | Offline tokens/sec |
+| **H** | Mistral-7B-Instruct | 1 | How well does this chip handle sliding-window attention (10K ctx, 4K window)? | Offline tokens/sec |
 
 Suites A, B, and D also include optional **speculative decoding** and/or **burst load** extra scenarios — see [suites/README.md](suites/README.md) for per-suite details.
 
@@ -151,6 +154,8 @@ Community results are fully visible and comparable — they just haven't been in
 The most valuable contribution is running the benchmark on hardware not yet in the leaderboard.
 
 - **Submit a result** → [Submitting a result](CONTRIBUTING.md#submitting-a-result)
+- **Browse wanted hardware & reproduction quests** → [Wanted Hardware](https://freedomintelligence.github.io/AccelMark/#/wanted) · [Reproduce Community Results](https://freedomintelligence.github.io/AccelMark/#/reproduce)
+- **Explore inference-optimization agents** → [Agent Optimization Track](https://freedomintelligence.github.io/AccelMark/#/agent)
 - **Add a new runner** → [Adding a new runner](CONTRIBUTING.md#adding-a-new-runner)
 - **Add a new accelerator family** → [Platform plug-in guide](runners/README.md#adding-a-new-accelerator-family)
 - **Report a bug** → [Open an issue](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=bug_report.md)
