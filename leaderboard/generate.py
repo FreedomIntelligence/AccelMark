@@ -929,7 +929,31 @@ def extract_row(result: dict) -> dict:
         "viz":    extract_viz(result, metrics),
         "impl":   extract_impl(result),
         "implementation_id": result.get("implementation_id"),
+        "runner_tier":       _get_runner_tier(result.get("implementation_id")),
     }
+
+
+_RUNNER_TIER_CACHE: dict[str, str] = {}
+
+
+def _get_runner_tier(impl_id: str | None) -> str:
+    """Return runner_tier ('reference' | 'optimized' | 'experimental') from meta.json."""
+    if not impl_id:
+        return "reference"
+    if impl_id in _RUNNER_TIER_CACHE:
+        return _RUNNER_TIER_CACHE[impl_id]
+    tier = "reference"
+    meta_path = Path(__file__).resolve().parent.parent / "runners" / impl_id / "meta.json"
+    if meta_path.exists():
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+            raw = (meta.get("runner_tier") or "reference").strip().lower()
+            if raw in ("reference", "optimized", "experimental"):
+                tier = raw
+        except Exception:
+            pass
+    _RUNNER_TIER_CACHE[impl_id] = tier
+    return tier
 
 
 # ── API generation ────────────────────────────────────────────────────────────
@@ -987,24 +1011,32 @@ def generate_api(results: list[dict], output_dir: Path) -> None:
         if not best_thr:
             continue
 
-        by_chip_suite[(chip_name, suite_id)].append((submission_name, best_thr, tier))
+        impl_id     = r.get("implementation_id")
+        framework   = (r.get("software") or {}).get("framework") or "Unknown"
+        runner_tier = _get_runner_tier(impl_id)
+        by_chip_suite[(chip_name, suite_id)].append(
+            (submission_name, best_thr, tier, framework, impl_id, runner_tier)
+        )
         by_chip[chip_name].append((submission_name, best_thr, suite_id, tier))
 
     rank_data: dict[str, dict] = {}
     for (chip_name, suite_id), entries in by_chip_suite.items():
         sorted_entries = sorted(entries, key=lambda x: x[1], reverse=True)
         total = len(sorted_entries)
-        for rank_idx, (submission_name, metric, tier) in enumerate(sorted_entries):
+        for rank_idx, (submission_name, metric, tier, framework, impl_id, runner_tier) in enumerate(sorted_entries):
             rank = rank_idx + 1
             rank_data[submission_name] = {
-                "chip_name":    chip_name,
-                "suite_id":     suite_id,
-                "tier":         tier,
-                "rank":         rank,
-                "total":        total,
-                "percentile":   round((total - rank) / total * 100, 1)
-                                if total > 1 else 100.0,
-                "primary_metric": metric,
+                "chip_name":         chip_name,
+                "suite_id":          suite_id,
+                "tier":              tier,
+                "framework":         framework,
+                "implementation_id": impl_id,
+                "runner_tier":       runner_tier,
+                "rank":              rank,
+                "total":             total,
+                "percentile":        round((total - rank) / total * 100, 1)
+                                     if total > 1 else 100.0,
+                "primary_metric":    metric,
             }
     with open(api_dir / "rank.json", "w") as f:
         json.dump(rank_data, f, indent=2)

@@ -12,6 +12,8 @@
 
 <p align="center">
   <a href="https://freedomintelligence.github.io/AccelMark"><img src="https://img.shields.io/badge/leaderboard-live-brightgreen" alt="Live Leaderboard"></a>
+  <a href="https://github.com/FreedomIntelligence/AccelMark/actions/workflows/validate_pr.yml"><img src="https://github.com/FreedomIntelligence/AccelMark/actions/workflows/validate_pr.yml/badge.svg" alt="Validate Submission"></a>
+  <a href="https://github.com/FreedomIntelligence/AccelMark/actions/workflows/generate_leaderboard.yml"><img src="https://github.com/FreedomIntelligence/AccelMark/actions/workflows/generate_leaderboard.yml/badge.svg" alt="Generate Leaderboard"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributions-welcome-orange.svg" alt="Contributions welcome"></a>
 </p>
@@ -150,6 +152,32 @@ _Legend: ✓ validated · ⋯ author-declared (not smoke-tested in this repo yet
 Other stacks (TensorRT-LLM, MindIE, mlx-lm, etc.) can be added as new runner folders; see the contributor guide.
 
 Adding a new runner? See [CONTRIBUTING.md#adding-a-new-runner](CONTRIBUTING.md#adding-a-new-runner). Adding a new accelerator family? See [`runners/README.md`](runners/README.md#adding-a-new-accelerator-family).
+
+---
+
+## Open JSON API & Zero-GPU Advisor
+
+Every merge to `main` automatically publishes static, auth-free JSON endpoints on GitHub Pages for scripts, dashboards, and AI agents:
+
+| Endpoint | Contents |
+|---|---|
+| `https://freedomintelligence.github.io/AccelMark/api/chips.json` | Indexed accelerators, submission counts, best & median throughput |
+| `https://freedomintelligence.github.io/AccelMark/api/rank.json` | Per-submission suite ranks, framework, runner tier, and primary metric |
+| `https://freedomintelligence.github.io/AccelMark/api/index.json` | Per-chip suite breakdown for fast programmatic lookup |
+| `https://freedomintelligence.github.io/AccelMark/api/suites.json` | Suite specifications, models, and SLA parameters |
+
+Query the leaderboard locally (no GPU required) with `tools/advisor.py`:
+
+```bash
+# Find the best Tok/$ options under $2.00/hr using out-of-the-box reference runners
+python tools/advisor.py --suite suite_A --budget 2.0 --tier reference
+
+# Compare frameworks (vLLM vs SGLang vs TensorRT-LLM) on the same chip
+python tools/advisor.py --engine-compare "A100"
+
+# Export a Markdown or JSON comparison table for docs / agents
+python tools/advisor.py --compare "4090" "3090" "A100" --format markdown
+```
 
 ---
 

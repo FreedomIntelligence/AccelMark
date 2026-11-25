@@ -47,6 +47,7 @@ export function render({ el, query }) {
   const vendorFilter    = parseCsv(query.vendor);
   const precisionFilter = parseCsv(query.precision);
   const frameworkFilter = parseCsv(query.framework);
+  const runnerTierFilter = parseCsv(query.runner_tier);
   // `?chip=<slug>` lets the chip-detail KPI cards deep-link straight to
   // a rankings view scoped to that chip variant.  We don't expose it as
   // a facet pill — it's a soft filter set externally and announced via
@@ -78,9 +79,10 @@ export function render({ el, query }) {
   const facets = buildFacets(allRows);
 
   const filtered = allRows.filter((r) =>
-    matchSet(vendorFilter,    r.vendor) &&
-    matchSet(precisionFilter, r.precision) &&
-    matchSet(frameworkFilter, r.framework) &&
+    matchSet(vendorFilter,     r.vendor) &&
+    matchSet(precisionFilter,  r.precision) &&
+    matchSet(frameworkFilter,  r.framework) &&
+    matchSet(runnerTierFilter, r.runner_tier || "reference") &&
     (!chipFilter || r._chip_slug === chipFilter)
   );
 
@@ -102,7 +104,7 @@ export function render({ el, query }) {
     ? cols.filter((c) => !emptyMetricKeys.includes(c.key))
     : cols;
 
-  const filtersActive = !!(query.vendor || query.precision || query.framework || chipFilter);
+  const filtersActive = !!(query.vendor || query.precision || query.framework || query.runner_tier || chipFilter);
 
   // Banner label for the chip-focus mode: now that `?chip=<slug>`
   // matches every chip_count variant of a single chip model (×1 / ×4 /
@@ -131,9 +133,12 @@ export function render({ el, query }) {
       </div>
 
       <div class="rk-filter-row">
-        ${renderFacetGroup("vendor",    _i('rankings.table.vendor'),    facets.vendor,    vendorFilter,    suiteId, query)}
-        ${renderFacetGroup("precision", _i('rankings.table.precision'), facets.precision, precisionFilter, suiteId, query)}
-        ${renderFacetGroup("framework", _i('rankings.table.framework'), facets.framework, frameworkFilter, suiteId, query)}
+        ${renderFacetGroup("vendor",      _i('rankings.table.vendor'),     facets.vendor,     vendorFilter,     suiteId, query)}
+        ${renderFacetGroup("precision",   _i('rankings.table.precision'),  facets.precision,  precisionFilter,  suiteId, query)}
+        ${renderFacetGroup("framework",   _i('rankings.table.framework'),  facets.framework,  frameworkFilter,  suiteId, query)}
+        ${facets.runnerTier.length > 1
+          ? renderFacetGroup("runner_tier", _i('rankings.table.runnerTier', 'Runner'), facets.runnerTier, runnerTierFilter, suiteId, query)
+          : ""}
         ${filtersActive
           ? `<a class="rk-clear-all" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(suiteId)))}">${_i('rankings.clear')}</a>`
           : ""}
@@ -561,11 +566,15 @@ function buildFacets(rows) {
   const vendor = new Set();
   const precision = new Set();
   const framework = new Set();
+  const runnerTier = new Set();
   for (const r of rows) {
     if (r.vendor)    vendor.add(r.vendor);
     if (r.precision) precision.add(r.precision);
     if (r.framework) framework.add(r.framework);
+    runnerTier.add(r.runner_tier || "reference");
   }
+  const tierOrder = ["reference", "optimized", "experimental"];
+  const sortedRunnerTier = tierOrder.filter((t) => runnerTier.has(t));
   // Vendors follow the canonical order; precision/framework alphabetical.
   const sortedVendor = VENDOR_ORDER.filter((v) => vendor.has(v))
     .concat(Array.from(vendor).filter((v) => !VENDOR_ORDER.includes(v)).sort());
@@ -573,6 +582,7 @@ function buildFacets(rows) {
     vendor: sortedVendor,
     precision: Array.from(precision).sort(),
     framework: Array.from(framework).sort(),
+    runnerTier: sortedRunnerTier,
   };
 }
 

@@ -97,6 +97,8 @@ def test_submit_zip_packaging(tmp_path: Path):
 
 
 def test_advisor_runs_cleanly():
+    import json
+
     res = subprocess.run(
         [sys.executable, str(REPO_ROOT / "tools" / "advisor.py"), "--suite", "suite_A", "--limit", "3"],
         cwd=str(REPO_ROOT),
@@ -105,3 +107,38 @@ def test_advisor_runs_cleanly():
     )
     assert res.returncode == 0, res.stdout + res.stderr
     assert "AccelMark suite_A" in res.stdout
+
+    # Budget + tier + JSON output
+    res_json = subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "tools" / "advisor.py"),
+            "--suite", "suite_A",
+            "--budget", "2.0",
+            "--tier", "reference",
+            "--format", "json",
+        ],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    assert res_json.returncode == 0, res_json.stdout + res_json.stderr
+    payload = json.loads(res_json.stdout)
+    assert payload["suite_id"] == "suite_A"
+    assert all(r["price_usd_per_hr"] <= 2.0 for r in payload["results"])
+    assert all(r["runner_tier"] == "reference" for r in payload["results"])
+
+    # Engine comparison + Markdown output
+    res_eng = subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "tools" / "advisor.py"),
+            "--engine-compare", "A100",
+            "--format", "markdown",
+        ],
+        cwd=str(REPO_ROOT),
+        capture_output=True,
+        text=True,
+    )
+    assert res_eng.returncode == 0, res_eng.stdout + res_eng.stderr
+    assert "| Chip | Suite | Best Engine |" in res_eng.stdout
