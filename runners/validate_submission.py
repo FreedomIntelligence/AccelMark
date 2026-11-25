@@ -213,7 +213,7 @@ def check_run_id_integrity(result: dict) -> list[str]:
     model      = result.get("model", {})
     chip_count = chip.get("count", 1)
 
-    key = {
+    legacy_key = {
         "chip_name":         chip.get("name", "unknown"),
         "chip_memory_gb":    round(float(chip.get("memory_gb") or 0)),
         "chip_count":        chip_count,
@@ -225,14 +225,18 @@ def check_run_id_integrity(result: dict) -> list[str]:
         "precision":         model.get("precision", "BF16"),
         "submitted_by":      meta.get("submitted_by", "unknown"),
     }
+    current_key = {
+        **legacy_key,
+        "dies_per_card":     chip.get("dies_per_card", 1) or 1,
+    }
 
-    raw      = json.dumps(key, sort_keys=True)
-    expected = hashlib.sha256(raw.encode()).hexdigest()[:8]
+    expected_current = hashlib.sha256(json.dumps(current_key, sort_keys=True).encode()).hexdigest()[:8]
+    expected_legacy  = hashlib.sha256(json.dumps(legacy_key, sort_keys=True).encode()).hexdigest()[:8]
 
-    if stored_run_id != expected:
+    if stored_run_id not in (expected_current, expected_legacy):
         return [
             f"meta.run_id mismatch — stored '{stored_run_id}' "
-            f"but recomputed '{expected}'. "
+            f"but recomputed '{expected_current}'. "
             f"result.json may have been manually edited after the run."
         ]
     return []
