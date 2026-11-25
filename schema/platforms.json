@@ -79,6 +79,13 @@
       "sort_order": 60
     },
     {
+      "id": "iluvatar",
+      "display_name": "Iluvatar CoreX GPU",
+      "vendor": "Iluvatar",
+      "accelerator_kind": "GPU",
+      "sort_order": 70
+    },
+    {
       "id": "other",
       "display_name": "Other accelerator",
       "vendor": null,

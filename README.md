@@ -130,7 +130,9 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). The t
 | Huawei Ascend NPU | `ascend_vllm_ascend_d4aa9fda` | vllm-ascend | ✓ | ✓ | ✓ | ✓ | ✓ | — | — | ? |
 | Apple Silicon | `apple_mlx_lm_9546b8b5` | mlx-lm | ⋯ | — | — | ⋯ | — | ⋯ | — | ? |
 | Google TPU | `google_vllm_tpu_68cc9ffa` | vllm-tpu | ✓ | — | — | ✓ | — | ✓ | — | ? |
+| Moore Threads GPU | `moorethreads_vllm_musa_6607740b` | vllm-musa | ✓ | ✓ | ⋯ | ⋯ | ✓ | ✓ | — | ? |
 | Moore Threads GPU | `moorethreads_vllm_musa_f2f6f965` | vllm-musa | ✓ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | — | ? |
+| Iluvatar CoreX GPU | `iluvatar_vllm_ixuca_4d3befc9` | vllm-ixuca | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ | ✓ |
 
 _Legend: ✓ validated · ⋯ author-declared (not smoke-tested in this repo yet) · — unsupported._
 <!-- platforms-matrix:end -->

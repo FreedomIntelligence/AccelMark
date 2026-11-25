@@ -69,9 +69,11 @@ _RUNNER_ALIASES: dict[str, str] = {
     "mac":              "apple_mlx_lm_9546b8b5",
     "tpu":              "google_vllm_tpu_68cc9ffa",
     "google":           "google_vllm_tpu_68cc9ffa",
-    "musa":             "moorethreads_vllm_musa_f2f6f965",
-    "moorethreads":     "moorethreads_vllm_musa_f2f6f965",
-    "mtt":              "moorethreads_vllm_musa_f2f6f965",
+    "musa":             "moorethreads_vllm_musa_6607740b",
+    "moorethreads":     "moorethreads_vllm_musa_6607740b",
+    "mtt":              "moorethreads_vllm_musa_6607740b",
+    "iluvatar":         "iluvatar_vllm_ixuca_4d3befc9",
+    "ixuca":            "iluvatar_vllm_ixuca_4d3befc9",
 }
 
 # Files that live flat in runners/ — not runner folders
