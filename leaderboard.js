@@ -177,7 +177,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/apple_mlx_lm_9546b8b5",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/apple_mlx_lm_9546b8b5/runner.py"
     },
-    "implementation_id": "apple_mlx_lm_9546b8b5"
+    "implementation_id": "apple_mlx_lm_9546b8b5",
+    "runner_tier": "reference"
   },
   {
     "submission": "google_tpu_v5ex1_suite_F_google_vllm_tpu_68cc9ffa_300ac34c",
@@ -356,7 +357,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
-    "implementation_id": "google_vllm_tpu_68cc9ffa"
+    "implementation_id": "google_vllm_tpu_68cc9ffa",
+    "runner_tier": "reference"
   },
   {
     "submission": "google_tpu_v6ex1_suite_A_google_vllm_tpu_68cc9ffa_d9b3177f",
@@ -542,7 +544,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
-    "implementation_id": "google_vllm_tpu_68cc9ffa"
+    "implementation_id": "google_vllm_tpu_68cc9ffa",
+    "runner_tier": "reference"
   },
   {
     "submission": "google_tpu_v6ex1_suite_D_google_vllm_tpu_68cc9ffa_d037f60f",
@@ -709,7 +712,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
-    "implementation_id": "google_vllm_tpu_68cc9ffa"
+    "implementation_id": "google_vllm_tpu_68cc9ffa",
+    "runner_tier": "reference"
   },
   {
     "submission": "google_tpu_v6ex1_suite_F_google_vllm_tpu_68cc9ffa_9318bfeb",
@@ -888,7 +892,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/google_vllm_tpu_68cc9ffa",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/google_vllm_tpu_68cc9ffa/runner.py"
     },
-    "implementation_id": "google_vllm_tpu_68cc9ffa"
+    "implementation_id": "google_vllm_tpu_68cc9ffa",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_910b2x1_suite_A_ascend_vllm_ascend_d4aa9fda_a2777c30",
@@ -1599,7 +1604,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_910b2x1_suite_D_ascend_vllm_ascend_d4aa9fda_a3547ba9",
@@ -2230,7 +2236,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_910b2x1_suite_F_ascend_vllm_ascend_d4aa9fda_bd7d8f87",
@@ -2667,7 +2674,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_910b2x8_suite_B_ascend_vllm_ascend_d4aa9fda_fcb9725c",
@@ -3374,7 +3382,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_910b2x8_suite_E_ascend_vllm_ascend_d4aa9fda_354e5562",
@@ -3541,7 +3550,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_910b2x8_suite_G_ascend_vllm_ascend_d4aa9fda_d726144e",
@@ -4209,7 +4219,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_ascend910x16_suite_B_ascend_vllm_ascend_d4aa9fda_635ecf42",
@@ -4916,7 +4927,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_ascend910x16_suite_E_ascend_vllm_ascend_d4aa9fda_b1fe92eb",
@@ -5083,7 +5095,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_ascend910x16_suite_G_ascend_vllm_ascend_d4aa9fda_329a2b9e",
@@ -5751,7 +5764,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_ascend910x1_suite_A_ascend_vllm_ascend_d4aa9fda_74d19743",
@@ -6462,7 +6476,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_ascend910x1_suite_D_ascend_vllm_ascend_d4aa9fda_6c1e7ffe",
@@ -7093,7 +7108,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "huawei_ascend_ascend910x1_suite_F_ascend_vllm_ascend_d4aa9fda_8826a63d",
@@ -7530,7 +7546,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/ascend_vllm_ascend_d4aa9fda",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/ascend_vllm_ascend_d4aa9fda/runner.py"
     },
-    "implementation_id": "ascend_vllm_ascend_d4aa9fda"
+    "implementation_id": "ascend_vllm_ascend_d4aa9fda",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_A_nvidia_vllm_47f5d58e_b4a92b30",
@@ -8241,7 +8258,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_vllm_47f5d58e_57cc3fdf",
@@ -8871,7 +8889,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_D_nvidia_vllm_47f5d58e_8e114cbe",
@@ -9502,7 +9521,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_F_nvidia_vllm_47f5d58e_fe3156b5",
@@ -9939,7 +9959,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx8_suite_B_nvidia_vllm_47f5d58e_14410aea",
@@ -10646,7 +10667,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx8_suite_E_nvidia_vllm_47f5d58e_e76a4402",
@@ -10813,7 +10835,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx8_suite_G_nvidia_vllm_47f5d58e_08de2dc2",
@@ -11481,7 +11504,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm020_0f6c56e4_8f83bfab",
@@ -12187,7 +12211,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557",
@@ -12898,7 +12923,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm020_0f6c56e4_ffd81462",
@@ -13528,7 +13554,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_vllm_47f5d58e_6940965a",
@@ -14158,7 +14185,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm020_0f6c56e4_43e96189",
@@ -14789,7 +14817,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_vllm_47f5d58e_7bef8eef",
@@ -15420,7 +15449,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_vllm020_0f6c56e4_a4e6a6e4",
@@ -15857,7 +15887,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_vllm_47f5d58e_52ad2fe3",
@@ -16294,7 +16325,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_298e6500",
@@ -17005,7 +17037,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_C_nvidia_vllm_47f5d58e_944773aa",
@@ -17635,7 +17668,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_D_nvidia_vllm_47f5d58e_4d0e7990",
@@ -18266,7 +18300,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_vllm_47f5d58e_54d0e7aa",
@@ -18703,7 +18738,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx8_suite_B_nvidia_vllm_47f5d58e_de0853fa",
@@ -19410,7 +19446,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx8_suite_E_nvidia_vllm_47f5d58e_74d08a7a",
@@ -19577,7 +19614,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx8_suite_G_nvidia_vllm_47f5d58e_d31ba78b",
@@ -20245,7 +20283,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_3090x1_suite_A_nvidia_vllm_47f5d58e_e95e2caa",
@@ -20951,7 +20990,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_3090x1_suite_C_nvidia_vllm_47f5d58e_4955fbb1",
@@ -21580,7 +21620,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_3090x1_suite_F_nvidia_vllm_47f5d58e_faf550ec",
@@ -22017,7 +22058,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_3090x4_suite_E_nvidia_vllm_47f5d58e_81ca6d0e",
@@ -22179,7 +22221,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090_dx1_suite_A_nvidia_vllm_47f5d58e_d6543f77",
@@ -22885,7 +22928,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090_dx1_suite_C_nvidia_vllm_47f5d58e_b59b0798",
@@ -23515,7 +23559,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090_dx1_suite_F_nvidia_vllm_47f5d58e_06662a14",
@@ -23952,7 +23997,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090_dx4_suite_E_nvidia_vllm_47f5d58e_bba67533",
@@ -24114,7 +24160,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x1_suite_A_nvidia_vllm_47f5d58e_675e325e",
@@ -24820,7 +24867,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x1_suite_C_nvidia_vllm_47f5d58e_6d7e1d48",
@@ -25450,7 +25498,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x1_suite_F_nvidia_vllm_47f5d58e_b228454f",
@@ -25887,7 +25936,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x8_suite_B_nvidia_vllm_47f5d58e_cfd0bdc8",
@@ -26594,7 +26644,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x8_suite_E_nvidia_vllm_47f5d58e_54dccbd0",
@@ -26761,7 +26812,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x8_suite_G_nvidia_vllm_47f5d58e_a4179ecc",
@@ -27429,7 +27481,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_5090x1_suite_A_nvidia_vllm_47f5d58e_b8f8ed0f",
@@ -28135,7 +28188,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_5090x1_suite_C_nvidia_vllm_47f5d58e_d1baa050",
@@ -28578,7 +28632,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_5090x1_suite_D_nvidia_vllm_47f5d58e_e87e6c36",
@@ -29209,7 +29264,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_5090x1_suite_F_nvidia_vllm_47f5d58e_776d2702",
@@ -29646,7 +29702,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h100_80gb_hbm3x1_suite_A_nvidia_vllm_47f5d58e_831c95a7",
@@ -30357,7 +30414,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h100_80gb_hbm3x1_suite_C_nvidia_vllm_47f5d58e_a4a8716a",
@@ -30563,7 +30621,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h100_80gb_hbm3x1_suite_D_nvidia_vllm_47f5d58e_02748da4",
@@ -31194,7 +31253,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h100_80gb_hbm3x1_suite_F_nvidia_vllm_47f5d58e_2c0b7beb",
@@ -31631,7 +31691,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h200x1_suite_A_nvidia_vllm_47f5d58e_29b2ec38",
@@ -32342,7 +32403,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h200x1_suite_C_nvidia_vllm_47f5d58e_f07c60f8",
@@ -32972,7 +33034,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h200x1_suite_D_nvidia_vllm_47f5d58e_62a36028",
@@ -33608,7 +33671,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h200x1_suite_F_nvidia_vllm_47f5d58e_53471efa",
@@ -34045,7 +34109,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h200x8_suite_B_nvidia_vllm_47f5d58e_b727568e",
@@ -34752,7 +34817,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h200x8_suite_E_nvidia_vllm_47f5d58e_f005e907",
@@ -34919,7 +34985,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h200x8_suite_G_nvidia_vllm_47f5d58e_7f7a270e",
@@ -35587,7 +35654,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex1_suite_A_nvidia_vllm_47f5d58e_3f6269bb",
@@ -36298,7 +36366,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex1_suite_C_nvidia_vllm_47f5d58e_1bcdc710",
@@ -36928,7 +36997,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex1_suite_D_nvidia_vllm_47f5d58e_60c91bf0",
@@ -37559,7 +37629,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex1_suite_F_nvidia_vllm_47f5d58e_1e7ed8ca",
@@ -37996,7 +38067,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex8_suite_B_nvidia_vllm_47f5d58e_76ce4cd0",
@@ -38703,7 +38775,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex8_suite_E_nvidia_vllm_47f5d58e_f0d031f5",
@@ -38870,7 +38943,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex8_suite_G_nvidia_vllm_47f5d58e_7bd76bb5",
@@ -39538,7 +39612,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_l4x1_suite_A_nvidia_vllm_47f5d58e_b991b4c1",
@@ -40212,7 +40287,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_l4x1_suite_F_nvidia_vllm_47f5d58e_d58fa923",
@@ -40649,7 +40725,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_4000_ada_generationx1_suite_F_nvidia_vllm_47f5d58e_125c6b61",
@@ -41086,7 +41163,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_6000_ada_generationx1_suite_A_nvidia_vllm_47f5d58e_bd3b5d27",
@@ -41797,7 +41875,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_6000_ada_generationx1_suite_C_nvidia_vllm_47f5d58e_e60276e9",
@@ -42427,7 +42506,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_6000_ada_generationx1_suite_D_nvidia_vllm_47f5d58e_42ab3af7",
@@ -43058,7 +43138,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_6000_ada_generationx1_suite_F_nvidia_vllm_47f5d58e_2b905f5e",
@@ -43495,7 +43576,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_A_nvidia_vllm_47f5d58e_7cd0b745",
@@ -44206,7 +44288,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_C_nvidia_vllm_47f5d58e_b87c1621",
@@ -44835,7 +44918,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_D_nvidia_vllm_47f5d58e_f2197473",
@@ -45466,7 +45550,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_F_nvidia_vllm_47f5d58e_a33d6eb3",
@@ -45903,7 +45988,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x8_suite_B_nvidia_vllm_47f5d58e_0981ecf7",
@@ -46610,7 +46696,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x8_suite_E_nvidia_vllm_47f5d58e_334507e5",
@@ -46777,7 +46864,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x8_suite_G_nvidia_vllm_47f5d58e_a8cf2a0f",
@@ -47445,7 +47533,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_t4x1_suite_F_nvidia_vllm_47f5d58e_4660bc0b",
@@ -47882,7 +47971,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100s_pcie_32gbx1_suite_A_nvidia_vllm_47f5d58e_48261ecc",
@@ -48593,7 +48683,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100s_pcie_32gbx1_suite_C_nvidia_vllm_47f5d58e_b957e789",
@@ -48944,7 +49035,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100s_pcie_32gbx1_suite_D_nvidia_vllm_47f5d58e_6eb549a8",
@@ -49575,7 +49667,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100s_pcie_32gbx1_suite_F_nvidia_vllm_47f5d58e_04fce6f6",
@@ -50012,7 +50105,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100s_pcie_32gbx8_suite_B_nvidia_vllm_47f5d58e_48f19c22",
@@ -50719,7 +50813,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100s_pcie_32gbx8_suite_E_nvidia_vllm_47f5d58e_865d778c",
@@ -50886,7 +50981,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100s_pcie_32gbx8_suite_G_nvidia_vllm_47f5d58e_2ef567be",
@@ -51554,7 +51650,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x1_suite_A_iluvatar_vllm_ixuca_4d3befc9_dd23685e",
@@ -51828,7 +51925,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x1_suite_C_iluvatar_vllm_ixuca_4d3befc9_082838ce",
@@ -51981,7 +52079,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x1_suite_C_iluvatar_vllm_ixuca_4d3befc9_c7937c52",
@@ -52134,7 +52233,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x1_suite_D_iluvatar_vllm_ixuca_4d3befc9_7d4fed58",
@@ -52323,7 +52423,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x1_suite_F_iluvatar_vllm_ixuca_4d3befc9_c68d1ecc",
@@ -52590,7 +52691,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x1_suite_H_iluvatar_vllm_ixuca_4d3befc9_1184f4aa",
@@ -52863,7 +52965,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x2_suite_E_iluvatar_vllm_ixuca_4d3befc9_51480878",
@@ -53022,7 +53125,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x4_suite_G_iluvatar_vllm_ixuca_4d3befc9_8efbe4f0",
@@ -53295,7 +53399,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "iluvatar_mr_v100x8_suite_B_iluvatar_vllm_ixuca_4d3befc9_9dde59e5",
@@ -53581,7 +53686,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/iluvatar_vllm_ixuca_4d3befc9",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/iluvatar_vllm_ixuca_4d3befc9/runner.py"
     },
-    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9"
+    "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "runner_tier": "reference"
   },
   {
     "submission": "mtt_s4000x1_suite_A_moorethreads_vllm_musa_f2f6f965_cabb7bd0",
@@ -53787,7 +53893,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
-    "implementation_id": "moorethreads_vllm_musa_f2f6f965"
+    "implementation_id": "moorethreads_vllm_musa_f2f6f965",
+    "runner_tier": "reference"
   },
   {
     "submission": "mtt_s4000x1_suite_F_moorethreads_vllm_musa_f2f6f965_4f66d29d",
@@ -53986,7 +54093,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
-    "implementation_id": "moorethreads_vllm_musa_f2f6f965"
+    "implementation_id": "moorethreads_vllm_musa_f2f6f965",
+    "runner_tier": "reference"
   },
   {
     "submission": "mtt_s4000x4_suite_B_moorethreads_vllm_musa_6607740b_91e1cc05",
@@ -54274,7 +54382,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_6607740b",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_6607740b/runner.py"
     },
-    "implementation_id": "moorethreads_vllm_musa_6607740b"
+    "implementation_id": "moorethreads_vllm_musa_6607740b",
+    "runner_tier": "reference"
   },
   {
     "submission": "mtt_s4000x8_suite_E_moorethreads_vllm_musa_e0266927_ca7cadca",
@@ -54444,7 +54553,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_e0266927",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_e0266927/runner.py"
     },
-    "implementation_id": "moorethreads_vllm_musa_e0266927"
+    "implementation_id": "moorethreads_vllm_musa_e0266927",
+    "runner_tier": "reference"
   },
   {
     "submission": "mtt_s5000x1_suite_A_moorethreads_vllm_musa_f2f6f965_3c0a9e7d",
@@ -55230,7 +55340,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
-    "implementation_id": "moorethreads_vllm_musa_f2f6f965"
+    "implementation_id": "moorethreads_vllm_musa_f2f6f965",
+    "runner_tier": "reference"
   },
   {
     "submission": "mtt_s5000x1_suite_C_moorethreads_vllm_musa_f2f6f965_184c9276",
@@ -55411,7 +55522,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
-    "implementation_id": "moorethreads_vllm_musa_f2f6f965"
+    "implementation_id": "moorethreads_vllm_musa_f2f6f965",
+    "runner_tier": "reference"
   },
   {
     "submission": "mtt_s5000x1_suite_F_moorethreads_vllm_musa_f2f6f965_78e08b8f",
@@ -55914,7 +56026,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/moorethreads_vllm_musa_f2f6f965",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/moorethreads_vllm_musa_f2f6f965/runner.py"
     },
-    "implementation_id": "moorethreads_vllm_musa_f2f6f965"
+    "implementation_id": "moorethreads_vllm_musa_f2f6f965",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_A_nvidia_sglang_c43a8309_958afbbd",
@@ -56625,7 +56738,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_C_nvidia_sglang_c43a8309_651fefa6",
@@ -57069,7 +57183,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_D_nvidia_sglang_c43a8309_99c43b97",
@@ -57705,7 +57820,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx1_suite_F_nvidia_sglang_c43a8309_435424a8",
@@ -58142,7 +58258,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx8_suite_B_nvidia_sglang_c43a8309_40a62dd1",
@@ -58813,7 +58930,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx8_suite_E_nvidia_sglang_c43a8309_67683413",
@@ -58980,7 +59098,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_40gbx8_suite_G_nvidia_sglang_c43a8309_9e9c88dd",
@@ -59612,7 +59731,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_A_nvidia_sglang_c43a8309_b14c1ebc",
@@ -60287,7 +60407,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_C_nvidia_sglang_c43a8309_29a32aea",
@@ -60731,7 +60852,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_D_nvidia_sglang_c43a8309_4f45791f",
@@ -61331,7 +61453,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_sglang_c43a8309_280f3db2",
@@ -61746,7 +61869,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_sglang_inference_opt_4fd1e59e_1189951b",
@@ -62013,7 +62137,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_inference_opt_4fd1e59e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_inference_opt_4fd1e59e/runner.py"
     },
-    "implementation_id": "nvidia_sglang_inference_opt_4fd1e59e"
+    "implementation_id": "nvidia_sglang_inference_opt_4fd1e59e",
+    "runner_tier": "optimized"
   },
   {
     "submission": "nvidia_a100_sxm4_80gbx1_suite_F_nvidia_sglang_inference_opt_5fe06410_7d8fa669",
@@ -62278,7 +62403,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_inference_opt_5fe06410",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_inference_opt_5fe06410/runner.py"
     },
-    "implementation_id": "nvidia_sglang_inference_opt_5fe06410"
+    "implementation_id": "nvidia_sglang_inference_opt_5fe06410",
+    "runner_tier": "optimized"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_sglang_c43a8309_93928a91",
@@ -62953,7 +63079,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_A_nvidia_tensorrt_llm_21323970_941a7be7",
@@ -63167,7 +63294,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_tensorrt_llm_21323970",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_tensorrt_llm_21323970/runner.py"
     },
-    "implementation_id": "nvidia_tensorrt_llm_21323970"
+    "implementation_id": "nvidia_tensorrt_llm_21323970",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_C_nvidia_sglang_c43a8309_8eb86278",
@@ -63611,7 +63739,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_C_nvidia_tensorrt_llm_21323970_be65dbfb",
@@ -63781,7 +63910,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_tensorrt_llm_21323970",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_tensorrt_llm_21323970/runner.py"
     },
-    "implementation_id": "nvidia_tensorrt_llm_21323970"
+    "implementation_id": "nvidia_tensorrt_llm_21323970",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_D_nvidia_sglang_c43a8309_1992bcc0",
@@ -64381,7 +64511,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_sglang_c43a8309_088cfa14",
@@ -64796,7 +64927,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_F_nvidia_tensorrt_llm_21323970_0934c3e7",
@@ -65008,7 +65140,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_tensorrt_llm_21323970",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_tensorrt_llm_21323970/runner.py"
     },
-    "implementation_id": "nvidia_tensorrt_llm_21323970"
+    "implementation_id": "nvidia_tensorrt_llm_21323970",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_H_nvidia_tensorrt_llm_21323970_39c3d117",
@@ -65221,7 +65354,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_tensorrt_llm_21323970",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_tensorrt_llm_21323970/runner.py"
     },
-    "implementation_id": "nvidia_tensorrt_llm_21323970"
+    "implementation_id": "nvidia_tensorrt_llm_21323970",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_a800_sxm4_80gbx1_suite_H_nvidia_vllm_47f5d58e_4528133f",
@@ -66006,7 +66140,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x1_suite_A_nvidia_sglang_c43a8309_d60b952a",
@@ -66797,7 +66932,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x1_suite_A_nvidia_vllm020_0f6c56e4_2c345026",
@@ -67583,7 +67719,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_b200x1_suite_C_nvidia_sglang_c43a8309_f7318214",
@@ -68120,7 +68257,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x1_suite_C_nvidia_vllm020_0f6c56e4_ea976bca",
@@ -68319,7 +68457,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_b200x1_suite_D_nvidia_sglang_c43a8309_79163e2a",
@@ -68980,7 +69119,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x1_suite_D_nvidia_vllm020_0f6c56e4_c35cf907",
@@ -69641,7 +69781,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_b200x1_suite_F_nvidia_sglang_c43a8309_e593b394",
@@ -70144,7 +70285,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x1_suite_F_nvidia_vllm020_0f6c56e4_ef7c9362",
@@ -70647,7 +70789,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_b200x8_suite_B_nvidia_sglang_c43a8309_d261c6b9",
@@ -71434,7 +71577,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x8_suite_B_nvidia_vllm020_0f6c56e4_caaded72",
@@ -72221,7 +72365,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_b200x8_suite_E_nvidia_sglang_c43a8309_056018b1",
@@ -72388,7 +72533,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x8_suite_E_nvidia_vllm020_0f6c56e4_1a5bff37",
@@ -72555,7 +72701,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_b200x8_suite_G_nvidia_sglang_c43a8309_5fffeaca",
@@ -73300,7 +73447,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_b200x8_suite_G_nvidia_vllm020_0f6c56e4_8f2a84de",
@@ -74045,7 +74193,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm020_0f6c56e4",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm020_0f6c56e4/runner.py"
     },
-    "implementation_id": "nvidia_vllm020_0f6c56e4"
+    "implementation_id": "nvidia_vllm020_0f6c56e4",
+    "runner_tier": "experimental"
   },
   {
     "submission": "nvidia_geforce_rtx_4090_dx1_suite_F_nvidia_vllm_47f5d58e_d00caeb0",
@@ -74310,7 +74459,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_vllm_47f5d58e",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_vllm_47f5d58e/runner.py"
     },
-    "implementation_id": "nvidia_vllm_47f5d58e"
+    "implementation_id": "nvidia_vllm_47f5d58e",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x1_suite_A_nvidia_sglang_c43a8309_9b2b01fd",
@@ -74985,7 +75135,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x1_suite_C_nvidia_sglang_c43a8309_4ce353c2",
@@ -75615,7 +75766,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x1_suite_D_nvidia_sglang_c43a8309_3f838de7",
@@ -76210,7 +76362,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_geforce_rtx_4090x1_suite_F_nvidia_sglang_c43a8309_12d28697",
@@ -76625,7 +76778,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_h20_3ex1_suite_A_nvidia_sglang_c43a8309_83e3ec26",
@@ -77300,7 +77454,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_A_nvidia_sglang_c43a8309_9c6920b5",
@@ -77975,7 +78130,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_C_nvidia_sglang_c43a8309_4c65fcfb",
@@ -78419,7 +78575,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_D_nvidia_sglang_c43a8309_4974e840",
@@ -79019,7 +79176,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "nvidia_rtx_a6000x1_suite_F_nvidia_sglang_c43a8309_68ab5b50",
@@ -79434,7 +79592,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_sglang_c43a8309",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_sglang_c43a8309/runner.py"
     },
-    "implementation_id": "nvidia_sglang_c43a8309"
+    "implementation_id": "nvidia_sglang_c43a8309",
+    "runner_tier": "reference"
   },
   {
     "submission": "tesla_v100_pcie_32gbx1_suite_A_nvidia_onecat_vllm_12a253c2_4e0e6eba",
@@ -79643,7 +79802,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_onecat_vllm_12a253c2",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_onecat_vllm_12a253c2/runner.py"
     },
-    "implementation_id": "nvidia_onecat_vllm_12a253c2"
+    "implementation_id": "nvidia_onecat_vllm_12a253c2",
+    "runner_tier": "experimental"
   },
   {
     "submission": "tesla_v100_pcie_32gbx1_suite_F_nvidia_onecat_vllm_12a253c2_419b138c",
@@ -79845,7 +80005,8 @@ const LEADERBOARD_DATA = [
       "github_url": "https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/nvidia_onecat_vllm_12a253c2",
       "runner_url": "https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/nvidia_onecat_vllm_12a253c2/runner.py"
     },
-    "implementation_id": "nvidia_onecat_vllm_12a253c2"
+    "implementation_id": "nvidia_onecat_vllm_12a253c2",
+    "runner_tier": "experimental"
   }
 ];
 window.LEADERBOARD_DATA = LEADERBOARD_DATA;
