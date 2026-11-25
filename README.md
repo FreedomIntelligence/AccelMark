@@ -6,7 +6,8 @@
 </p>
 
 <p align="center">
-  <strong>Open benchmark leaderboard for AI accelerators on LLM workloads.</strong>
+  <strong>Open, community-driven LLM inference leaderboard for every AI accelerator.</strong><br>
+  <sub>Real-world speed, latency, and cost-efficiency across NVIDIA, AMD, Huawei Ascend, Apple Silicon, Google TPU &amp; Moore Threads — no SOTA tuning required.</sub>
 </p>
 
 <p align="center">
@@ -47,6 +48,14 @@
 
 ---
 
+## 3 Ways to Participate
+
+1. **Got a GPU/NPU? Submit a real-world baseline (~10 min)** — Out-of-the-box default numbers on consumer, older, or domestic chips are *just as valuable* as tuned SOTA runs.
+2. **Verify someone else's run** — Pick an open [Reproduction Quest](https://freedomintelligence.github.io/AccelMark/#/reproduce) to promote a `community` result to `verified`.
+3. **No GPU? Query & contribute** — Compare chips/cost-efficiency locally with `python tools/advisor.py --compare "4090" "3090"`, use our [Agent Skill](.claude/skills/accelmark/SKILL.md), or [request a hardware benchmark](https://github.com/FreedomIntelligence/AccelMark/issues/new?template=hardware_request.md).
+
+---
+
 ## Quick start
 
 ```bash
@@ -56,12 +65,12 @@ cd AccelMark
 pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"       # framework dependencies (Python >=3.10 required)
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt # installs runner dependencies
 
-# 2. One-time setup
+# 2. One-time setup & 10-second pre-flight check (no model download)
 cp configs/submitter.yaml.example configs/submitter.yaml
-# Edit configs/submitter.yaml — add your name
+python run.py --check-env --runner nvidia_vllm_47f5d58e
 
-# 3. Run the benchmark (~11 min on A100)
-python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
+# 3. Run the fastest suite (~10 min on consumer GPU) or Suite A (~11 min on A100)
+python run.py --runner nvidia_vllm_47f5d58e --suite suite_F
 
 # 4. Submit your result — open a pull request:
 #    git checkout -b submit/<your-hardware>
@@ -80,14 +89,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 | Suite | Model | Chips | Question answered | Primary metric |
 |-------|-------|-------|-------------------|----------------|
-| **A** | Llama-3-8B | 1 | How fast is this chip at inference? | Offline tokens/sec |
-| **B** | Llama-3-70B | flexible | Can this chip serve large models? | Offline tokens/sec |
-| **C** | Llama-3.1-8B | 1 | Quantization speed/quality tradeoff? | Speedup vs BF16 |
-| **D** | Llama-3.1-8B | 1 | How does this chip handle long-context (28K) inputs? | Offline tokens/sec |
-| **E** | Llama-3-8B | 1×/2×/4×/8× | How well does this chip scale? | Scaling efficiency |
-| **F** | Qwen2.5-0.5B | 1 | How fast is this consumer/edge GPU? | Offline tokens/sec |
-| **G** | Mixtral-8x7B-Instruct | ≥2 (auto) | How efficiently does this chip handle sparse MoE inference? | Offline tokens/sec |
-| **H** | Mistral-7B-Instruct | 1 | How well does this chip handle sliding-window attention (10K ctx, 4K window)? | Offline tokens/sec |
+| **A** (Single-chip chat) | Llama-3-8B | 1 | How fast is this chip at inference? | Offline tokens/sec |
+| **B** (Large model TP) | Llama-3-70B | flexible | Can this chip serve large models? | Offline tokens/sec |
+| **C** (Quantization) | Llama-3.1-8B | 1 | Quantization speed/quality tradeoff? | Speedup vs BF16 |
+| **D** (28K long context) | Llama-3.1-8B | 1 | How does this chip handle long-context (28K) inputs? | Offline tokens/sec |
+| **E** (Multi-GPU scaling) | Llama-3-8B | 1×/2×/4×/8× | How well does this chip scale? | Scaling efficiency |
+| **F** (Consumer / quick 10m) | Qwen2.5-0.5B | 1 | How fast is this consumer/edge GPU? | Offline tokens/sec |
+| **G** (Sparse MoE) | Mixtral-8x7B-Instruct | ≥2 (auto) | How efficiently does this chip handle sparse MoE inference? | Offline tokens/sec |
+| **H** (Sliding-window SWA) | Mistral-7B-Instruct | 1 | How well does this chip handle sliding-window attention (10K ctx, 4K window)? | Offline tokens/sec |
 
 Suites A, B, and D also include optional **speculative decoding** and/or **burst load** extra scenarios — see [suites/README.md](suites/README.md) for per-suite details.
 

@@ -362,6 +362,68 @@ def _parse_serve_args(runner_args: list[str]) -> argparse.Namespace:
     return args
 
 
+
+def cmd_check_env(runner_id: str | None = None) -> int:
+    """Fast, zero-download pre-flight check for contributors."""
+    import importlib
+    import shutil
+
+    print("AccelMark Environment Check")
+    print("=" * 40)
+
+    py_ok = sys.version_info >= (3, 10)
+    print(f"[{'OK' if py_ok else 'FAIL'}] Python {sys.version.split()[0]} (requires >= 3.10)")
+
+    deps_ok = True
+    for mod, pkg in [("jsonschema", "jsonschema"), ("numpy", "numpy"), ("yaml", "pyyaml")]:
+        try:
+            importlib.import_module(mod)
+            print(f"[OK]   {pkg}")
+        except ImportError:
+            deps_ok = False
+            print(f"[MISS] {pkg}  -> pip install {pkg}")
+
+    sub_cfg = REPO_ROOT / "configs" / "submitter.yaml"
+    if sub_cfg.exists():
+        print(f"[OK]   {sub_cfg.relative_to(REPO_ROOT)}")
+    else:
+        print(f"[WARN] configs/submitter.yaml not found -> cp configs/submitter.yaml.example configs/submitter.yaml")
+
+    detected = []
+    for tool, label in [
+        ("nvidia-smi", "NVIDIA GPU"),
+        ("npu-smi", "Huawei Ascend NPU"),
+        ("rocm-smi", "AMD ROCm GPU"),
+        ("mthreads-gmi", "Moore Threads GPU"),
+    ]:
+        if shutil.which(tool):
+            detected.append(label)
+    if sys.platform == "darwin":
+        detected.append("Apple Silicon / macOS")
+    print(f"[INFO] Detected hardware tools: {', '.join(detected) if detected else 'none (CPU / remote)'}")
+
+    runner_ok = True
+    if runner_id:
+        rdir = RUNNERS_DIR / runner_id
+        if not rdir.is_dir() or not (rdir / "runner.py").exists():
+            runner_ok = False
+            print(f"[FAIL] Runner '{runner_id}' not found in runners/")
+        else:
+            print(f"[OK]   Runner folder: runners/{runner_id}")
+            req = rdir / "requirements.txt"
+            if req.exists():
+                print(f"[INFO] Install runner deps if needed: pip install -r runners/{runner_id}/requirements.txt")
+
+    print("-" * 40)
+    if py_ok and deps_ok and runner_ok:
+        rec_runner = runner_id or "nvidia_vllm_47f5d58e"
+        print("Ready! Fastest 10-min run to get on the board (default settings welcome):")
+        print(f"  python run.py --runner {rec_runner} --suite suite_F")
+        return 0
+    print("Please resolve the [FAIL]/[MISS] items above before running.")
+    return 1
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 def main() -> int:
@@ -374,9 +436,18 @@ def main() -> int:
         show_all = "--all" in argv
         return cmd_list(type('args', (), {'all': show_all})())
 
+    if "--check-env" in argv:
+        rid = None
+        if "--runner" in argv:
+            idx = argv.index("--runner")
+            if idx + 1 < len(argv):
+                rid = argv[idx + 1]
+        return cmd_check_env(rid)
+
     if "--runner" not in argv:
         print("Usage:")
         print("  python run.py --list [--all]")
+        print("  python run.py --check-env [--runner <id>]")
         print("  python run.py --runner <id> --suite <suite> --scenario <scenario> [...]")
         print("  python run.py --runner <id> --serve --suite <suite>  [--model <id>] [--model-path <path>]")
         print("  python run.py --runner <id> --serve --model <model_id>")

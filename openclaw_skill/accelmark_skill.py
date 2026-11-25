@@ -22,6 +22,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import urllib.request
 from pathlib import Path
 
 
@@ -178,6 +179,49 @@ def format_details(result: dict) -> str:
     return "\n".join(lines)
 
 
+
+def handle_compare(chips_query: str) -> str:
+    """Compare chips from the live leaderboard API without running a GPU job."""
+    try:
+        req = urllib.request.Request(
+            f"{LEADERBOARD_API}/chips.json",
+            headers={"User-Agent": "accelmark-openclaw-skill/1.0"},
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            chips = json.loads(resp.read().decode("utf-8"))
+    except Exception as e:
+        return f"Could not fetch leaderboard data: {e}"
+
+    terms = [t.strip().lower() for t in chips_query.replace("vs", ",").split(",") if t.strip()]
+    matched = [
+        c for c in chips
+        if not terms or any(t in c.get("name", "").lower() for t in terms)
+    ][:8]
+    if not matched:
+        return f"No chips matched '{chips_query}' on the leaderboard."
+
+    lines = ["📊 AccelMark Leaderboard Comparison:"]
+    for c in matched:
+        lines.append(
+            f"• {c['name']}: best {c['best_throughput_tokens_per_sec']:,.1f} tok/s "
+            f"(median {c['median_throughput_tokens_per_sec']:,.1f} tok/s, {c['submission_count']} runs)"
+        )
+    lines.append(f"\nFull interactive compare: https://freedomintelligence.github.io/AccelMark/#/compare")
+    return "\n".join(lines)
+
+
+def handle_help() -> str:
+    """Return available skill commands and low-barrier participation guide."""
+    return (
+        "⚡ AccelMark Skill Commands:\n"
+        "• 'benchmark my gpu' — Auto-detect hardware and run a quick benchmark\n"
+        "• 'compare 4090 vs 3090' — Compare chips from the live leaderboard (no GPU needed)\n"
+        "• 'details' — Show full breakdown of your last run\n"
+        "• 'submit' — Get step-by-step PR / Web UI upload instructions\n\n"
+        "Out-of-the-box default results are just as welcome as tuned SOTA runs!"
+    )
+
+
 def main(user_message: str, context: dict) -> str:
     """
     Called by OpenClaw when a trigger phrase is detected.
@@ -191,6 +235,12 @@ def main(user_message: str, context: dict) -> str:
             return "No recent benchmark result to submit. Run 'benchmark my gpu' first."
         username = context.get("user", {}).get("username", "anonymous")
         return handle_submit(pending, username)
+
+    if msg in ("help", "?"):
+        return handle_help()
+
+    if msg.startswith("compare ") or msg.startswith("leaderboard"):
+        return handle_compare(msg.removeprefix("compare").removeprefix("leaderboard").strip())
 
     if msg == "details":
         pending = context.get("accelmark_pending_result")

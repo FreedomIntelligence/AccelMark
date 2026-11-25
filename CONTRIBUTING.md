@@ -2,7 +2,12 @@
 
 AccelMark is a community-driven benchmark leaderboard for AI accelerators.
 The most valuable contribution is running the benchmark on hardware not yet
-in the leaderboard and submitting your results.
+in the leaderboard and submitting your **real, out-of-the-box results** — no SOTA tuning required.
+
+> **30-Second TL;DR:**
+> 1. Run `python run.py --check-env` to verify your setup in 10 seconds (no model download).
+> 2. Run `python run.py --runner <your_runner> --suite suite_F` (~10 min) or `suite_A` (~11 min).
+> 3. Submit `results/community/<run_name>/` via PR — or if you don't use `git`/`gh` CLI, upload `result.json` and `env_info.json` directly on your GitHub fork via **Add file → Upload files**.
 
 ---
 

@@ -38,6 +38,10 @@ export function render({ query, el }) {
       <span class="eyebrow">${_i('submit.eyebrow')}</span>
       <h1>${_i('submit.hero')}</h1>
       <p class="page-lead">${_i('submit.heroSub')}</p>
+      <div class="card" style="margin-top:0.9rem;padding:0.75rem 1rem;border-left:3px solid var(--accent,#2563eb);text-align:left">
+        <strong>${_i('submit.noSotaTitle')}</strong> — ${_i('submit.noSotaBody')}
+        <code style="margin-left:0.35rem">python run.py --check-env</code>
+      </div>
     </section>
 
     <div class="flow-bar" aria-label="${_i('submit.flowBarAria')}">
