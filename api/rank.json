@@ -580,9 +580,18 @@
     "suite_id": "suite_F",
     "tier": "verified",
     "rank": 1,
-    "total": 1,
-    "percentile": 100.0,
+    "total": 2,
+    "percentile": 50.0,
     "primary_metric": 14273.14
+  },
+  "nvidia_geforce_rtx_4090_dx1_suite_F_nvidia_vllm_47f5d58e_d00caeb0": {
+    "chip_name": "NVIDIA GeForce RTX 4090 D",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 11026.74
   },
   "nvidia_geforce_rtx_4090_dx4_suite_E_nvidia_vllm_47f5d58e_bba67533": {
     "chip_name": "NVIDIA GeForce RTX 4090 D",
@@ -1115,6 +1124,87 @@
     "percentile": 100.0,
     "primary_metric": 1026.12
   },
+  "iluvatar_mr_v100x1_suite_A_iluvatar_vllm_ixuca_4d3befc9_dd23685e": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_A",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1428.54
+  },
+  "iluvatar_mr_v100x1_suite_C_iluvatar_vllm_ixuca_4d3befc9_082838ce": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 1,
+    "total": 2,
+    "percentile": 50.0,
+    "primary_metric": 1442.03
+  },
+  "iluvatar_mr_v100x1_suite_C_iluvatar_vllm_ixuca_4d3befc9_c7937c52": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_C",
+    "tier": "community",
+    "rank": 2,
+    "total": 2,
+    "percentile": 0.0,
+    "primary_metric": 1366.73
+  },
+  "iluvatar_mr_v100x1_suite_D_iluvatar_vllm_ixuca_4d3befc9_7d4fed58": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_D",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 14.28
+  },
+  "iluvatar_mr_v100x1_suite_F_iluvatar_vllm_ixuca_4d3befc9_c68d1ecc": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_F",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 9185.68
+  },
+  "iluvatar_mr_v100x1_suite_H_iluvatar_vllm_ixuca_4d3befc9_1184f4aa": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_H",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 59.53
+  },
+  "iluvatar_mr_v100x2_suite_E_iluvatar_vllm_ixuca_4d3befc9_51480878": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_E",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1589.55
+  },
+  "iluvatar_mr_v100x4_suite_G_iluvatar_vllm_ixuca_4d3befc9_8efbe4f0": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_G",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 620.76
+  },
+  "iluvatar_mr_v100x8_suite_B_iluvatar_vllm_ixuca_4d3befc9_9dde59e5": {
+    "chip_name": "Iluvatar MR-V100",
+    "suite_id": "suite_B",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 1077.83
+  },
   "mtt_s4000x1_suite_A_moorethreads_vllm_musa_f2f6f965_cabb7bd0": {
     "chip_name": "MTT S4000",
     "suite_id": "suite_A",
@@ -1132,6 +1222,24 @@
     "total": 1,
     "percentile": 100.0,
     "primary_metric": 2004.02
+  },
+  "mtt_s4000x4_suite_B_moorethreads_vllm_musa_6607740b_91e1cc05": {
+    "chip_name": "MTT S4000",
+    "suite_id": "suite_B",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 148.0
+  },
+  "mtt_s4000x8_suite_E_moorethreads_vllm_musa_e0266927_ca7cadca": {
+    "chip_name": "MTT S4000",
+    "suite_id": "suite_E",
+    "tier": "community",
+    "rank": 1,
+    "total": 1,
+    "percentile": 100.0,
+    "primary_metric": 409.71
   },
   "mtt_s5000x1_suite_A_moorethreads_vllm_musa_f2f6f965_3c0a9e7d": {
     "chip_name": "MTT S5000",

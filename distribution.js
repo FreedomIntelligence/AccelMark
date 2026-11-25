@@ -8091,6 +8091,309 @@ const DISTRIBUTION_SUBMISSIONS = [
     }
   },
   {
+    "id": "dd23685e",
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "chip_count": 1,
+    "memory_gb": 32.0,
+    "suite": "suite_A",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "model_full": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_params_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-10-23",
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "runner_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "scenarios": {
+      "offline": {
+        "throughput": 1428.54,
+        "metric_label": "tokens/sec",
+        "concurrency": 8,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 0.0,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 1428.54,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 8,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "7d4fed58",
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "chip_count": 1,
+    "memory_gb": 32.0,
+    "suite": "suite_D",
+    "model": "Llama-3.1-8B-Instruct",
+    "model_full": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_params_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-10-24",
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "runner_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "scenarios": {
+      "offline": {
+        "throughput": 14.28,
+        "metric_label": "tokens/sec",
+        "concurrency": 1,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 14.28,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 1,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "c68d1ecc",
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "chip_count": 1,
+    "memory_gb": 32.0,
+    "suite": "suite_F",
+    "model": "Qwen2.5-0.5B-Instruct",
+    "model_full": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_params_b": 0.5,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-10-22",
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "runner_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "scenarios": {
+      "offline": {
+        "throughput": 9185.68,
+        "metric_label": "tokens/sec",
+        "concurrency": 16,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 10,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "interactive": {
+        "throughput": 9185.68,
+        "metric_label": "tokens/sec",
+        "concurrency": 16,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 9185.68,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 16,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "1184f4aa",
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "chip_count": 1,
+    "memory_gb": 32.0,
+    "suite": "suite_H",
+    "model": "Mistral-7B-Instruct-v0.1",
+    "model_full": "mistralai/Mistral-7B-Instruct-v0.1",
+    "model_params_b": 7.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-10-22",
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "runner_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "scenarios": {
+      "offline": {
+        "throughput": 59.53,
+        "metric_label": "tokens/sec",
+        "concurrency": 8,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 0.0,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 59.53,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 8,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "51480878",
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "chip_count": 2,
+    "memory_gb": 32.0,
+    "suite": "suite_E",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "model_full": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_params_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-11-01",
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "runner_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "scenarios": {
+      "offline": {
+        "throughput": null,
+        "metric_label": "",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": false
+      }
+    },
+    "primary_scenario": "scaling",
+    "primary_throughput": 1589.55,
+    "primary_metric_label": "tokens/sec (1x baseline)",
+    "config": {}
+  },
+  {
+    "id": "8efbe4f0",
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "chip_count": 4,
+    "memory_gb": 32.0,
+    "suite": "suite_G",
+    "model": "Mixtral-8x7B-Instruct-v0.1",
+    "model_full": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "model_params_b": 46.7,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-11-02",
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "runner_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "scenarios": {
+      "offline": {
+        "throughput": 620.76,
+        "metric_label": "tokens/sec",
+        "concurrency": 16,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 2,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 620.76,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 16,
+      "batch_size": null,
+      "tensor_parallel": 4,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "9dde59e5",
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "chip_count": 8,
+    "memory_gb": 32.0,
+    "suite": "suite_B",
+    "model": "Meta-Llama-3-70B-Instruct",
+    "model_full": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_params_b": 70.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-11-06",
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "runner_id": "iluvatar_vllm_ixuca_4d3befc9",
+    "scenarios": {
+      "offline": {
+        "throughput": 1077.83,
+        "metric_label": "tokens/sec",
+        "concurrency": 8,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 0.0,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 1077.83,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 8,
+      "batch_size": null,
+      "tensor_parallel": 8,
+      "peak_memory_gb": null
+    }
+  },
+  {
     "id": "cabb7bd0",
     "chip": "MTT S4000",
     "chip_vendor": "Moore Threads",
@@ -8186,6 +8489,84 @@ const DISTRIBUTION_SUBMISSIONS = [
       "tensor_parallel": 1,
       "peak_memory_gb": null
     }
+  },
+  {
+    "id": "91e1cc05",
+    "chip": "MTT S4000",
+    "chip_vendor": "Moore Threads",
+    "chip_count": 4,
+    "memory_gb": 48.0,
+    "suite": "suite_B",
+    "model": "Meta-Llama-3-70B-Instruct",
+    "model_full": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_params_b": 70.0,
+    "precision": "FP16",
+    "effective_dtype": "float16",
+    "framework": "vllm-musa",
+    "framework_version": "0.4.2",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-09-21",
+    "reproduce_script": "runners/moorethreads_vllm_musa_6607740b/runner.py",
+    "runner_id": "moorethreads_vllm_musa_6607740b",
+    "scenarios": {
+      "offline": {
+        "throughput": 148.0,
+        "metric_label": "tokens/sec",
+        "concurrency": 8,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 0.0,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 148.0,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 8,
+      "batch_size": null,
+      "tensor_parallel": 4,
+      "peak_memory_gb": null
+    }
+  },
+  {
+    "id": "ca7cadca",
+    "chip": "MTT S4000",
+    "chip_vendor": "Moore Threads",
+    "chip_count": 8,
+    "memory_gb": 48.0,
+    "suite": "suite_E",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "model_full": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_params_b": 8.0,
+    "precision": "FP16",
+    "effective_dtype": "float16",
+    "framework": "vllm-musa",
+    "framework_version": "0.4.2",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-09-12",
+    "reproduce_script": "runners/moorethreads_vllm_musa_e0266927/runner.py",
+    "runner_id": "moorethreads_vllm_musa_e0266927",
+    "scenarios": {
+      "offline": {
+        "throughput": null,
+        "metric_label": "",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": false
+      }
+    },
+    "primary_scenario": "scaling",
+    "primary_throughput": 409.71,
+    "primary_metric_label": "tokens/sec (1x baseline)",
+    "config": {}
   },
   {
     "id": "3c0a9e7d",
@@ -10930,6 +11311,58 @@ const DISTRIBUTION_SUBMISSIONS = [
     }
   },
   {
+    "id": "d00caeb0",
+    "chip": "NVIDIA GeForce RTX 4090 D",
+    "chip_vendor": "NVIDIA",
+    "chip_count": 1,
+    "memory_gb": 48.0,
+    "suite": "suite_F",
+    "model": "Qwen2.5-0.5B-Instruct",
+    "model_full": "Qwen/Qwen2.5-0.5B-Instruct",
+    "model_params_b": 0.5,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "framework": "vLLM",
+    "framework_version": "0.7.3",
+    "tier": "community",
+    "submitted_by": "Keke946",
+    "date": "2026-08-21",
+    "reproduce_script": "runners/nvidia_vllm_47f5d58e/runner.py",
+    "runner_id": "nvidia_vllm_47f5d58e",
+    "scenarios": {
+      "offline": {
+        "throughput": 11026.74,
+        "metric_label": "tokens/sec",
+        "concurrency": 16,
+        "peak_memory_gb": 40.36,
+        "is_valid": true
+      },
+      "online": {
+        "throughput": 10,
+        "metric_label": "max valid QPS",
+        "concurrency": null,
+        "peak_memory_gb": null,
+        "is_valid": true
+      },
+      "interactive": {
+        "throughput": 11026.74,
+        "metric_label": "tokens/sec",
+        "concurrency": 16,
+        "peak_memory_gb": 40.36,
+        "is_valid": true
+      }
+    },
+    "primary_scenario": "offline",
+    "primary_throughput": 11026.74,
+    "primary_metric_label": "tokens/sec",
+    "config": {
+      "concurrency": 16,
+      "batch_size": null,
+      "tensor_parallel": 1,
+      "peak_memory_gb": 40.36
+    }
+  },
+  {
     "id": "9b2b01fd",
     "chip": "NVIDIA GeForce RTX 4090",
     "chip_vendor": "NVIDIA",
@@ -12167,25 +12600,25 @@ const DISTRIBUTION_GROUPS = [
     "chip_vendor": "NVIDIA",
     "suite": "suite_F",
     "model": "Qwen2.5-0.5B-Instruct",
-    "submission_count": 1,
+    "submission_count": 2,
     "best_throughput": 14273.14,
     "median_throughput": 14273.14,
-    "min_throughput": 14273.14,
+    "min_throughput": 11026.74,
     "max_throughput": 14273.14,
-    "stddev_throughput": null,
+    "stddev_throughput": 2295.55,
     "scenario_summary": {
       "offline": {
-        "count": 1,
+        "count": 2,
         "best_throughput": 14273.14,
         "best_framework": "vLLM"
       },
       "online": {
-        "count": 1,
+        "count": 2,
         "best_throughput": 40,
         "best_framework": "vLLM"
       },
       "interactive": {
-        "count": 1,
+        "count": 2,
         "best_throughput": 14273.14,
         "best_framework": "vLLM"
       },
@@ -15642,6 +16075,38 @@ const DISTRIBUTION_GROUPS = [
     "best_submitted_by": "JuhaoLiang1997"
   },
   {
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "suite": "suite_F",
+    "model": "Qwen2.5-0.5B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 9185.68,
+    "median_throughput": 9185.68,
+    "min_throughput": 9185.68,
+    "max_throughput": 9185.68,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 9185.68,
+        "best_framework": "vllm-ixuca"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": 10,
+        "best_framework": "vllm-ixuca"
+      },
+      "interactive": {
+        "count": 1,
+        "best_throughput": 9185.68,
+        "best_framework": "vllm-ixuca"
+      }
+    },
+    "best_submission_id": "c68d1ecc",
+    "best_framework": "vllm-ixuca",
+    "best_submitted_by": "Keke946"
+  },
+  {
     "chip": "MTT S5000",
     "chip_vendor": "Moore Threads",
     "suite": "suite_F",
@@ -15711,6 +16176,28 @@ const DISTRIBUTION_GROUPS = [
     "best_submitted_by": "JuhaoLiang1997"
   },
   {
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "suite": "suite_E",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 1589.55,
+    "median_throughput": 1589.55,
+    "min_throughput": 1589.55,
+    "max_throughput": 1589.55,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "51480878",
+    "best_framework": "vllm-ixuca",
+    "best_submitted_by": "Keke946"
+  },
+  {
     "chip": "MTT S5000",
     "chip_vendor": "Moore Threads",
     "suite": "suite_C",
@@ -15775,6 +16262,109 @@ const DISTRIBUTION_GROUPS = [
     "best_submitted_by": "Gong-K"
   },
   {
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "suite": "suite_A",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 1428.54,
+    "median_throughput": 1428.54,
+    "min_throughput": 1428.54,
+    "max_throughput": 1428.54,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 1428.54,
+        "best_framework": "vllm-ixuca"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "dd23685e",
+    "best_framework": "vllm-ixuca",
+    "best_submitted_by": "Keke946"
+  },
+  {
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "suite": "suite_B",
+    "model": "Meta-Llama-3-70B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 1077.83,
+    "median_throughput": 1077.83,
+    "min_throughput": 1077.83,
+    "max_throughput": 1077.83,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 1077.83,
+        "best_framework": "vllm-ixuca"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "9dde59e5",
+    "best_framework": "vllm-ixuca",
+    "best_submitted_by": "Keke946"
+  },
+  {
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "suite": "suite_G",
+    "model": "Mixtral-8x7B-Instruct-v0.1",
+    "submission_count": 1,
+    "best_throughput": 620.76,
+    "median_throughput": 620.76,
+    "min_throughput": 620.76,
+    "max_throughput": 620.76,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 620.76,
+        "best_framework": "vllm-ixuca"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": 2,
+        "best_framework": "vllm-ixuca"
+      }
+    },
+    "best_submission_id": "8efbe4f0",
+    "best_framework": "vllm-ixuca",
+    "best_submitted_by": "Keke946"
+  },
+  {
+    "chip": "MTT S4000",
+    "chip_vendor": "Moore Threads",
+    "suite": "suite_E",
+    "model": "Meta-Llama-3-8B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 409.71,
+    "median_throughput": 409.71,
+    "min_throughput": 409.71,
+    "max_throughput": 409.71,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "ca7cadca",
+    "best_framework": "vllm-musa",
+    "best_submitted_by": "Keke946"
+  },
+  {
     "chip": "MTT S4000",
     "chip_vendor": "Moore Threads",
     "suite": "suite_A",
@@ -15800,6 +16390,82 @@ const DISTRIBUTION_GROUPS = [
     "best_submission_id": "cabb7bd0",
     "best_framework": "vllm-musa",
     "best_submitted_by": "JuhaoLiang1997"
+  },
+  {
+    "chip": "MTT S4000",
+    "chip_vendor": "Moore Threads",
+    "suite": "suite_B",
+    "model": "Meta-Llama-3-70B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 148.0,
+    "median_throughput": 148.0,
+    "min_throughput": 148.0,
+    "max_throughput": 148.0,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 148.0,
+        "best_framework": "vllm-musa"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "91e1cc05",
+    "best_framework": "vllm-musa",
+    "best_submitted_by": "Keke946"
+  },
+  {
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "suite": "suite_H",
+    "model": "Mistral-7B-Instruct-v0.1",
+    "submission_count": 1,
+    "best_throughput": 59.53,
+    "median_throughput": 59.53,
+    "min_throughput": 59.53,
+    "max_throughput": 59.53,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 59.53,
+        "best_framework": "vllm-ixuca"
+      },
+      "online": {
+        "count": 1,
+        "best_throughput": null,
+        "best_framework": ""
+      }
+    },
+    "best_submission_id": "1184f4aa",
+    "best_framework": "vllm-ixuca",
+    "best_submitted_by": "Keke946"
+  },
+  {
+    "chip": "Iluvatar MR-V100",
+    "chip_vendor": "Iluvatar",
+    "suite": "suite_D",
+    "model": "Llama-3.1-8B-Instruct",
+    "submission_count": 1,
+    "best_throughput": 14.28,
+    "median_throughput": 14.28,
+    "min_throughput": 14.28,
+    "max_throughput": 14.28,
+    "stddev_throughput": null,
+    "scenario_summary": {
+      "offline": {
+        "count": 1,
+        "best_throughput": 14.28,
+        "best_framework": "vllm-ixuca"
+      }
+    },
+    "best_submission_id": "7d4fed58",
+    "best_framework": "vllm-ixuca",
+    "best_submitted_by": "Keke946"
   }
 ];
 window.DISTRIBUTION_GROUPS = DISTRIBUTION_GROUPS;

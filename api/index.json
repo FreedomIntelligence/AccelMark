@@ -681,6 +681,42 @@
       }
     }
   },
+  "Iluvatar MR-V100": {
+    "best_throughput_tokens_per_sec": 9185.68,
+    "suites": {
+      "suite_A": {
+        "best_throughput_tokens_per_sec": 1428.5,
+        "best_online_max_qps": 0.0
+      },
+      "suite_C": {
+        "best_throughput_tokens_per_sec": 1442.0
+      },
+      "suite_D": {
+        "best_throughput_tokens_per_sec": 14.3
+      },
+      "suite_F": {
+        "best_throughput_tokens_per_sec": 9185.7,
+        "best_online_max_qps": 10,
+        "best_interactive_ttft_p99_ms": 34.0
+      },
+      "suite_H": {
+        "best_throughput_tokens_per_sec": 59.5,
+        "best_online_max_qps": 0.0
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 1589.5,
+        "best_scaling_efficiency_2x": 0.807
+      },
+      "suite_G": {
+        "best_throughput_tokens_per_sec": 620.8,
+        "best_online_max_qps": 2
+      },
+      "suite_B": {
+        "best_throughput_tokens_per_sec": 1077.8,
+        "best_online_max_qps": 0.0
+      }
+    }
+  },
   "MTT S4000": {
     "best_throughput_tokens_per_sec": 2004.02,
     "suites": {
@@ -692,6 +728,15 @@
         "best_throughput_tokens_per_sec": 2004.0,
         "best_online_max_qps": 40,
         "best_interactive_ttft_p99_ms": 28.5
+      },
+      "suite_B": {
+        "best_throughput_tokens_per_sec": 148.0,
+        "best_online_max_qps": 0.0
+      },
+      "suite_E": {
+        "best_throughput_tokens_per_sec": 409.7,
+        "best_scaling_efficiency_2x": 0.608,
+        "best_scaling_efficiency_4x": 0.348
       }
     }
   },
