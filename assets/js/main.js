@@ -14,6 +14,7 @@ import { render as renderCitation } from "./views/citation.js";
 import { render as renderContributors } from "./views/contributors.js";
 import { render as renderContributor }  from "./views/contributor.js";
 import { render as renderReproduce }    from "./views/reproduce.js";
+import { render as renderAgent }        from "./views/agent.js";
 
 function boot() {
   initData();
@@ -33,6 +34,7 @@ function boot() {
   register("/contributors", renderContributors);
   register("/contributor/:handle", renderContributor);
   register("/reproduce",     renderReproduce);
+  register("/agent",         renderAgent);
 
   start();
 

@@ -423,3 +423,90 @@
 
 .topnav .nav-link.nav-community.active { color: var(--fg-strong); background: var(--bg-elev); }
 
+
+/* ── Agent Optimization Track (#/agent) ─────────────────────────────────── */
+.agent-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+.agent-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.15rem;
+}
+.agent-kpi-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #64748b);
+}
+.agent-kpi-value {
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+.agent-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1rem;
+}
+.agent-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--muted, #64748b);
+}
+.agent-filters select {
+  padding: 0.4rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--border, #d1d5db);
+  background: var(--surface, #fff);
+  color: var(--text, #0f172a);
+}
+.agent-cell-unchanged {
+  color: var(--muted, #94a3b8);
+  opacity: 0.72;
+}
+.agent-cell-pos {
+  color: #0f766e;
+}
+.agent-cell-best {
+  color: #047857;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.08);
+}
+.agent-summary-row td {
+  border-top: 1px solid var(--border, #e2e8f0);
+  background: rgba(148, 163, 184, 0.06);
+}
+.agent-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.agent-badge-critical { background: rgba(239, 68, 68, 0.14); color: #b91c1c; }
+.agent-badge-warn     { background: rgba(245, 158, 11, 0.16); color: #b45309; }
+.agent-badge-info     { background: rgba(59, 130, 246, 0.14); color: #1d4ed8; }
+.agent-badge-ok       { background: rgba(16, 185, 129, 0.14); color: #047857; }
+.agent-quest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.agent-quest-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.1rem 1.2rem;
+}
+.agent-quest-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}

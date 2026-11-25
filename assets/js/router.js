@@ -115,6 +115,7 @@ function syncNav(path) {
   if (path.startsWith("/rankings"))        active = "/rankings";
   else if (path.startsWith("/compare"))    active = "/compare";
   else if (path.startsWith("/suites"))     active = "/suites";
+  else if (path.startsWith("/agent"))      active = "/agent";
   else if (path.startsWith("/submit"))     active = "/submit";
   else if (path.startsWith("/contributors")) active = "/contributors";
   else if (path.startsWith("/contributor"))  active = "/contributors";
