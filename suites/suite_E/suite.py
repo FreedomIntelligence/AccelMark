@@ -331,7 +331,13 @@ def _merge_suite_e_results(
     merged = {
         "schema_version":    "1.0",
         "suite_id":          "suite_E",
-        "implementation_id": base_result.get("implementation_id"),
+        # The per-chip result can come from a resumable run made before the
+        # current runner was assigned its content-addressed ID.  The suite-level
+        # result must describe the orchestrating runner used for this merge.
+        "implementation_id": (
+            br._compute_implementation_id()
+            or base_result.get("implementation_id")
+        ),
         "chip": {
             **base_result["chip"],
             "count": max_count,

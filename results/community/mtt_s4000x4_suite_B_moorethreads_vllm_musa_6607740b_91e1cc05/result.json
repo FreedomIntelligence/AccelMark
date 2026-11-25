@@ -1,0 +1,348 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_B",
+  "implementation_id": "moorethreads_vllm_musa_6607740b",
+  "chip": {
+    "name": "MTT S4000",
+    "vendor": "Moore Threads",
+    "count": 4,
+    "card_count": 4,
+    "dies_per_card": 1,
+    "memory_gb": 48.0,
+    "interconnect_intra_node": "MCCL/PCIe",
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-09-21T07:08:32.784934+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "MTT S4000",
+        "vendor": "Moore Threads",
+        "memory_gb": 48.0,
+        "driver_version": "2.7.0",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "moorethreads",
+    "accelerator_topology": null,
+    "intra_node_interconnect": "MCCL/PCIe",
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Gold 6430",
+      "physical_cores": 64,
+      "logical_cores": 128,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 1007.5,
+    "pcie_generation": "PCIe 16x/16x",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_1",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      },
+      {
+        "name": "mlx5_bond_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu Jammy Jellyfish (development branch)",
+    "python_version": "3.10.8",
+    "kernel_version": "5.15.0-105-generic",
+    "runtime_version": "Moore Threads Driver 2.7.0",
+    "pytorch_version": "2.2.0"
+  },
+  "software": {
+    "framework": "vllm-musa",
+    "framework_version": "0.4.2",
+    "driver_version": "2.7.0",
+    "runtime_version": "Moore Threads Driver 2.7.0",
+    "os": "Ubuntu Jammy Jellyfish (development branch)",
+    "python_version": "3.10.8"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 70.0,
+    "precision": "FP16",
+    "effective_dtype": "float16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenarios_run": [
+      "offline",
+      "online"
+    ],
+    "parallelism": {
+      "tensor_parallel_size": 4,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "num_runs": 3,
+    "extra_config": null
+  },
+  "metrics": {
+    "derived": {},
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 8,
+          "throughput_tokens_per_sec": 148.0,
+          "throughput_tokens_per_sec_per_chip": 37.0,
+          "throughput_tokens_per_sec_total": 307.86,
+          "elapsed_seconds_median": 160.4,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 148.03,
+            "std": 0.11,
+            "cv_pct": 0.08,
+            "stability": "stable",
+            "runs": [
+              148.16,
+              147.94,
+              148.0
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 32,
+          "throughput_tokens_per_sec": 147.71,
+          "throughput_tokens_per_sec_per_chip": 36.93,
+          "throughput_tokens_per_sec_total": 307.26,
+          "elapsed_seconds_median": 160.7,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 147.76,
+            "std": 0.1,
+            "cv_pct": 0.06,
+            "stability": "stable",
+            "runs": [
+              147.87,
+              147.69,
+              147.71
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 128,
+          "throughput_tokens_per_sec": 147.51,
+          "throughput_tokens_per_sec_per_chip": 36.88,
+          "throughput_tokens_per_sec_total": 306.83,
+          "elapsed_seconds_median": 161.0,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 147.54,
+            "std": 0.06,
+            "cv_pct": 0.04,
+            "stability": "stable",
+            "runs": [
+              147.51,
+              147.5,
+              147.6
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    },
+    "online": {
+      "sla_ttft_ms": 1000,
+      "max_valid_qps": 0.0,
+      "results_by_qps": [
+        {
+          "target_qps": 2,
+          "achieved_qps": 2.0,
+          "ttft_ms_p50": 1164.63,
+          "ttft_ms_p90": 2625.67,
+          "ttft_ms_p99": 4862.05,
+          "tpot_ms_p50": 490.33,
+          "tpot_ms_p90": 936.84,
+          "tpot_ms_p99": 2804.77,
+          "elapsed_seconds_median": 273.6,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 3796.68,
+            "std": 1172.89,
+            "cv_pct": 30.89,
+            "stability": "high-variance",
+            "runs": [
+              3029.83,
+              3213.34,
+              5146.87
+            ]
+          }
+        },
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 16863.89,
+          "ttft_ms_p90": 25406.43,
+          "ttft_ms_p99": 32555.35,
+          "tpot_ms_p50": 547.1,
+          "tpot_ms_p90": 1137.32,
+          "tpot_ms_p99": 15113.98,
+          "elapsed_seconds_median": 219.4,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 27789.14,
+            "std": 5061.29,
+            "cv_pct": 18.21,
+            "stability": "high-variance",
+            "runs": [
+              27224.32,
+              23033.95,
+              33109.14
+            ]
+          }
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 26435.5,
+          "ttft_ms_p90": 43864.04,
+          "ttft_ms_p99": 47938.32,
+          "tpot_ms_p50": 522.04,
+          "tpot_ms_p90": 1033.69,
+          "tpot_ms_p99": 2163.83,
+          "elapsed_seconds_median": 219.0,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 46694.68,
+            "std": 1423.54,
+            "cv_pct": 3.05,
+            "stability": "noisy",
+            "runs": [
+              48155.92,
+              45312.11,
+              46616.01
+            ]
+          }
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 31485.35,
+          "ttft_ms_p90": 54677.08,
+          "ttft_ms_p99": 58525.47,
+          "tpot_ms_p50": 510.18,
+          "tpot_ms_p90": 1041.9,
+          "tpot_ms_p99": 2737.28,
+          "elapsed_seconds_median": 226.9,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 58111.75,
+            "std": 538.55,
+            "cv_pct": 0.93,
+            "stability": "stable",
+            "runs": [
+              58043.41,
+              57610.63,
+              58681.2
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": 0.33,
+    "baseline_delta": null,
+    "valid": true,
+    "framework": "vllm-musa",
+    "precision": "FP16",
+    "notes": "Integrated accuracy check \u2014 used same vllm-musa instance as benchmark."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-09-21",
+    "time": "15:47:09",
+    "run_id": "91e1cc05",
+    "run_name": "mtt_s4000x4_suite_B_moorethreads_vllm_musa_6607740b_91e1cc05",
+    "flagged": null,
+    "reproduce_script": "runners/moorethreads_vllm_musa_6607740b/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-09-21T07:15:01.357149+00:00",
+    "benchmark_end_time": "2026-09-21T07:47:09.635450+00:00",
+    "benchmark_elapsed_minutes": 87.6,
+    "model_load_seconds": 126.3,
+    "benchmark_elapsed_minutes_note": "Total across ['offline', 'online'] scenarios.",
+    "scenario_dirs": {
+      "offline": "results/community/mtt_s4000x4_suite_B_moorethreads_vllm_musa_6607740b_91e1cc05/offline",
+      "online": "results/community/mtt_s4000x4_suite_B_moorethreads_vllm_musa_6607740b_91e1cc05/online"
+    }
+  }
+}
