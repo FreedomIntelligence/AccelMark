@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_B",
+  "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+  "chip": {
+    "name": "Iluvatar MR-V100",
+    "vendor": "Iluvatar",
+    "count": 8,
+    "card_count": 8,
+    "dies_per_card": 1,
+    "memory_gb": 32.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-11-05T17:22:52.430356+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 2,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 3,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 4,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 5,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 6,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 7,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "iluvatar",
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8358P CPU @ 2.60GHz",
+      "physical_cores": 56,
+      "logical_cores": 112,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 256.0,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3",
+    "kernel_version": "5.4.0-216-generic",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "pytorch_version": "2.7.1"
+  },
+  "software": {
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "driver_version": "unknown",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-70B-Instruct",
+    "model_revision": "50fd307e57011801c7833c87efa1984ddf2db42f",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 70.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 8,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "online": {
+      "sla_ttft_ms": 1000,
+      "max_valid_qps": 0.0,
+      "results_by_qps": [
+        {
+          "target_qps": 2,
+          "achieved_qps": 2.0,
+          "ttft_ms_p50": 300.73,
+          "ttft_ms_p90": 1800.58,
+          "ttft_ms_p99": 22769.73,
+          "tpot_ms_p50": 112.75,
+          "tpot_ms_p90": 166.83,
+          "tpot_ms_p99": 175.96,
+          "elapsed_seconds_median": 166.8,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 8644.83,
+            "std": 13329.11,
+            "cv_pct": 154.19,
+            "stability": "high-variance",
+            "runs": [
+              1413.24,
+              494.44,
+              24026.82
+            ]
+          }
+        },
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 324.03,
+          "ttft_ms_p90": 49972.71,
+          "ttft_ms_p99": 59396.03,
+          "tpot_ms_p50": 139.48,
+          "tpot_ms_p90": 173.33,
+          "tpot_ms_p99": 175.17,
+          "elapsed_seconds_median": 148.6,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 59291.54,
+            "std": 1742.75,
+            "cv_pct": 2.94,
+            "stability": "stable",
+            "runs": [
+              57287.97,
+              60130.56,
+              60456.08
+            ]
+          }
+        },
+        {
+          "target_qps": 10,
+          "achieved_qps": 10.0,
+          "ttft_ms_p50": 343.09,
+          "ttft_ms_p90": 53479.6,
+          "ttft_ms_p99": 62842.33,
+          "tpot_ms_p50": 125.75,
+          "tpot_ms_p90": 150.17,
+          "tpot_ms_p99": 155.65,
+          "elapsed_seconds_median": 128.8,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 62333.5,
+            "std": 1625.94,
+            "cv_pct": 2.61,
+            "stability": "stable",
+            "runs": [
+              60506.74,
+              63622.21,
+              62871.55
+            ]
+          }
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 965.49,
+          "ttft_ms_p90": 55489.83,
+          "ttft_ms_p99": 60438.22,
+          "tpot_ms_p50": 105.8,
+          "tpot_ms_p90": 124.71,
+          "tpot_ms_p99": 126.29,
+          "elapsed_seconds_median": 112.1,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 56772.34,
+            "std": 5071.92,
+            "cv_pct": 8.93,
+            "stability": "high-variance",
+            "runs": [
+              60522.93,
+              58792.46,
+              51001.65
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-11-06",
+    "time": "02:18:26",
+    "run_id": "9dde59e5",
+    "run_name": "iluvatar_mr_v100x8_suite_B_iluvatar_vllm_ixuca_4d3befc9_9dde59e5",
+    "flagged": null,
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-11-05T17:47:44.944544+00:00",
+    "benchmark_end_time": "2026-11-05T18:18:26.427190+00:00",
+    "benchmark_elapsed_minutes": 30.7,
+    "model_load_seconds": 75.4
+  }
+}

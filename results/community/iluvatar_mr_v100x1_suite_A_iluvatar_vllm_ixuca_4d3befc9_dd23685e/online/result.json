@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+  "chip": {
+    "name": "Iluvatar MR-V100",
+    "vendor": "Iluvatar",
+    "count": 1,
+    "card_count": 1,
+    "dies_per_card": 1,
+    "memory_gb": 32.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-10-23T11:25:21.551845+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "iluvatar",
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8358P CPU @ 2.60GHz",
+      "physical_cores": 56,
+      "logical_cores": 112,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 32.0,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3",
+    "kernel_version": "5.4.0-148-generic",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "pytorch_version": "2.7.1"
+  },
+  "software": {
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "driver_version": "unknown",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": null,
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "online",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "online": {
+      "sla_ttft_ms": 500,
+      "max_valid_qps": 0.0,
+      "results_by_qps": [
+        {
+          "target_qps": 5,
+          "achieved_qps": 5.0,
+          "ttft_ms_p50": 644.33,
+          "ttft_ms_p90": 13605.44,
+          "ttft_ms_p99": 19295.12,
+          "tpot_ms_p50": 95.86,
+          "tpot_ms_p90": 110.17,
+          "tpot_ms_p99": 145.99,
+          "elapsed_seconds_median": 100.0,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 13815.98,
+            "std": 5940.81,
+            "cv_pct": 43.0,
+            "stability": "high-variance",
+            "runs": [
+              7794.1,
+              19672.25,
+              13981.58
+            ]
+          }
+        },
+        {
+          "target_qps": 25,
+          "achieved_qps": 25.0,
+          "ttft_ms_p50": 14545.02,
+          "ttft_ms_p90": 52310.17,
+          "ttft_ms_p99": 54216.56,
+          "tpot_ms_p50": 100.86,
+          "tpot_ms_p90": 121.09,
+          "tpot_ms_p99": 542.18,
+          "elapsed_seconds_median": 90.4,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 53668.79,
+            "std": 658.61,
+            "cv_pct": 1.23,
+            "stability": "stable",
+            "runs": [
+              53698.38,
+              54312.1,
+              52995.88
+            ]
+          }
+        },
+        {
+          "target_qps": 100,
+          "achieved_qps": 100.0,
+          "ttft_ms_p50": 19057.89,
+          "ttft_ms_p90": 60372.03,
+          "ttft_ms_p99": 62612.32,
+          "tpot_ms_p50": 102.65,
+          "tpot_ms_p90": 124.13,
+          "tpot_ms_p99": 579.25,
+          "elapsed_seconds_median": 90.1,
+          "sla_met": false,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "ttft_ms_p99_reliability": {
+            "n": 3,
+            "mean": 62638.75,
+            "std": 124.15,
+            "cv_pct": 0.2,
+            "stability": "stable",
+            "runs": [
+              62587.4,
+              62548.52,
+              62780.34
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-10-23",
+    "time": "19:50:04",
+    "run_id": "dd23685e",
+    "run_name": "iluvatar_mr_v100x1_suite_A_iluvatar_vllm_ixuca_4d3befc9_dd23685e",
+    "flagged": null,
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-10-23T11:34:31.807471+00:00",
+    "benchmark_end_time": "2026-10-23T11:50:04.726918+00:00",
+    "benchmark_elapsed_minutes": 15.5,
+    "model_load_seconds": 52.7
+  }
+}

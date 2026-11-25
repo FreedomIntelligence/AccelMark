@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_C",
+  "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+  "chip": {
+    "name": "Iluvatar MR-V100",
+    "vendor": "Iluvatar",
+    "count": 1,
+    "card_count": 1,
+    "dies_per_card": 1,
+    "memory_gb": 32.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-10-24T14:47:18.114304+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "iluvatar",
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8358P CPU @ 2.60GHz",
+      "physical_cores": 56,
+      "logical_cores": 112,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 32.0,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3",
+    "kernel_version": "5.4.0-148-generic",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "pytorch_version": "2.7.1"
+  },
+  "software": {
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "driver_version": "unknown",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3"
+  },
+  "model": {
+    "model_id": "meta-llama/Llama-3.1-8B-Instruct",
+    "model_revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "offline",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 1,
+          "throughput_tokens_per_sec": 1431.59,
+          "throughput_tokens_per_sec_per_chip": 1431.59,
+          "throughput_tokens_per_sec_total": 2567.4,
+          "elapsed_seconds_median": 24.8,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 1433.64,
+            "std": 3.67,
+            "cv_pct": 0.26,
+            "stability": "stable",
+            "runs": [
+              1431.59,
+              1437.88,
+              1431.46
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 4,
+          "throughput_tokens_per_sec": 1435.21,
+          "throughput_tokens_per_sec_per_chip": 1435.21,
+          "throughput_tokens_per_sec_total": 2564.82,
+          "elapsed_seconds_median": 24.9,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 1436.7,
+            "std": 8.1,
+            "cv_pct": 0.56,
+            "stability": "stable",
+            "runs": [
+              1429.45,
+              1445.45,
+              1435.21
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 16,
+          "throughput_tokens_per_sec": 1442.03,
+          "throughput_tokens_per_sec_per_chip": 1442.03,
+          "throughput_tokens_per_sec_total": 2574.37,
+          "elapsed_seconds_median": 24.9,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 1442.21,
+            "std": 3.68,
+            "cv_pct": 0.26,
+            "stability": "stable",
+            "runs": [
+              1445.97,
+              1442.03,
+              1438.62
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 64,
+          "throughput_tokens_per_sec": 1440.47,
+          "throughput_tokens_per_sec_per_chip": 1440.47,
+          "throughput_tokens_per_sec_total": 2574.23,
+          "elapsed_seconds_median": 24.8,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 1441.92,
+            "std": 6.42,
+            "cv_pct": 0.45,
+            "stability": "stable",
+            "runs": [
+              1436.35,
+              1440.47,
+              1448.94
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-10-24",
+    "time": "23:06:47",
+    "run_id": "082838ce",
+    "run_name": "iluvatar_mr_v100x1_suite_C_iluvatar_vllm_ixuca_4d3befc9_082838ce",
+    "flagged": null,
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-10-24T15:00:05.052056+00:00",
+    "benchmark_end_time": "2026-10-24T15:06:47.873388+00:00",
+    "benchmark_elapsed_minutes": 6.7,
+    "model_load_seconds": 53.9
+  }
+}

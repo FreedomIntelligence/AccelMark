@@ -1,0 +1,201 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_E",
+  "implementation_id": "iluvatar_vllm_ixuca_4d3befc9",
+  "chip": {
+    "name": "Iluvatar MR-V100",
+    "vendor": "Iluvatar",
+    "count": 1,
+    "card_count": 1,
+    "dies_per_card": 1,
+    "memory_gb": 32.0,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-11-01T12:13:39.735029+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      },
+      {
+        "index": 1,
+        "name": "Iluvatar MR-V100",
+        "vendor": "Iluvatar",
+        "memory_gb": 32.0,
+        "driver_version": "unknown",
+        "firmware_version": null,
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "iluvatar",
+    "accelerator_topology": null,
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8358P CPU @ 2.60GHz",
+      "physical_cores": 56,
+      "logical_cores": 112,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 64.0,
+    "pcie_generation": "unknown",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": [
+      {
+        "name": "mlx5_0",
+        "type": "InfiniBand/RoCE",
+        "bandwidth_gbps": null
+      }
+    ],
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3",
+    "kernel_version": "5.4.0-216-generic",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "pytorch_version": "2.7.1"
+  },
+  "software": {
+    "framework": "vllm-ixuca",
+    "framework_version": "0.17.0",
+    "driver_version": "unknown",
+    "runtime_version": "CoreX 4.4.0 (CUDA shim 10.2)",
+    "os": "Ubuntu 24.04.4 LTS",
+    "python_version": "3.12.3"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bfloat16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "offline",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": null,
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 8,
+          "throughput_tokens_per_sec": 1589.55,
+          "throughput_tokens_per_sec_per_chip": 1589.55,
+          "throughput_tokens_per_sec_total": 2693.42,
+          "elapsed_seconds_median": 33.6,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 1592.51,
+            "std": 10.36,
+            "cv_pct": 0.65,
+            "stability": "stable",
+            "runs": [
+              1583.94,
+              1604.02,
+              1589.55
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 32,
+          "throughput_tokens_per_sec": 1311.41,
+          "throughput_tokens_per_sec_per_chip": 1311.41,
+          "throughput_tokens_per_sec_total": 2222.12,
+          "elapsed_seconds_median": 40.7,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 1340.93,
+            "std": 213.63,
+            "cv_pct": 15.93,
+            "stability": "high-variance",
+            "runs": [
+              1311.41,
+              1567.78,
+              1143.6
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 128,
+          "throughput_tokens_per_sec": 1306.76,
+          "throughput_tokens_per_sec_per_chip": 1306.76,
+          "throughput_tokens_per_sec_total": 2214.24,
+          "elapsed_seconds_median": 40.9,
+          "peak_memory_gb": null,
+          "power_watts_avg": null,
+          "power_watts_peak": null,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 1349.09,
+            "std": 202.57,
+            "cv_pct": 15.02,
+            "stability": "high-variance",
+            "runs": [
+              1306.76,
+              1569.48,
+              1171.03
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "Keke946",
+    "submission_type": "individual",
+    "date": "2026-11-01",
+    "time": "20:29:33",
+    "run_id": "75f86921",
+    "run_name": "iluvatar_mr_v100x1_suite_E_iluvatar_vllm_ixuca_4d3befc9_75f86921",
+    "flagged": null,
+    "reproduce_script": "runners/iluvatar_vllm_ixuca_4d3befc9/runner.py",
+    "env_info_file": "../../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-11-01T12:22:01.175915+00:00",
+    "benchmark_end_time": "2026-11-01T12:29:33.414048+00:00",
+    "benchmark_elapsed_minutes": 7.5,
+    "model_load_seconds": 52.9
+  }
+}
