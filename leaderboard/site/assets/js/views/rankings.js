@@ -307,9 +307,9 @@ function renderTable(suiteId, rows, cols, sortKey, sortDir) {
           <tr>
             <th class="col-compare" scope="col"><span class="visually-hidden">Compare</span></th>
             <th class="col-rank" scope="col">#</th>
-            <th class="col-chip" scope="col">Recipe</th>
-            <th class="col-vendor" scope="col">Vendor</th>
-            <th class="col-precision" scope="col">Precision</th>
+            <th class="col-chip" scope="col">${_i('rankings.table.recipe')}</th>
+            <th class="col-vendor" scope="col">${_i('rankings.table.vendor')}</th>
+            <th class="col-precision" scope="col">${_i('rankings.table.precision')}</th>
             ${cols.map((c) => `
               <th class="col-metric sortable${c.primary ? " col-primary" : ""}${sortKey === c.key ? " is-sort" : ""}"
                   data-sort-key="${esc(c.key)}"
@@ -393,6 +393,9 @@ function renderRow(suiteId, row, cols, sortKey, rank) {
       <td class="col-date tnum${sortKey === "date" ? " is-sort" : ""}">${esc(fmtDate(row.date))}</td>
       <td class="col-tier">
         <span class="badge tier-${esc(row.tier || "community")}">${esc(row.tier || "community")}</span>
+        ${row.runner_tier && row.runner_tier !== "reference"
+          ? `<span class="badge" style="margin-left:0.25rem;opacity:0.85" title="Specialized ${esc(row.runner_tier)} runner">${esc(row.runner_tier)}</span>`
+          : ""}
       </td>
     </tr>
   `;
@@ -403,8 +406,8 @@ function renderEmpty(meta, filtersActive) {
     return `
       <div class="rk-empty">
         <span class="rk-empty-icon" aria-hidden="true">∅</span>
-        <p>${_i('rankings.noSubmissionsFor')} <strong>Suite ${esc(meta.letter)} · ${esc(_i('suite.' + suiteId + '.title', meta.title))}</strong>.</p>
-        <p class="rk-empty-sub">${esc(_i('suite.' + suiteId + '.tagline', meta.tagline))}</p>
+        <p>${_i('rankings.noSubmissionsFor')} <strong>Suite ${esc(meta.letter)} · ${esc(meta.title)}</strong>.</p>
+        <p class="rk-empty-sub">${esc(meta.tagline)}</p>
       </div>
     `;
   }

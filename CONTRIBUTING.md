@@ -22,21 +22,16 @@ cd AccelMark
 pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"   # framework dependencies (Python >=3.10 required)
 pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
 
-# 2. Set your name (one-time setup)
-cp configs/submitter.yaml.example configs/submitter.yaml
-# Edit configs/submitter.yaml — add your name or GitHub username
+# 2. One-time setup & 10-second pre-flight check (creates configs/submitter.yaml)
+python run.py --init
 
-# 3. Run the benchmark (~11 min on A100 for default scenarios)
+# 3. Run the benchmark (~10 min on Suite F, or ~11 min on A100 for Suite A)
 #    Accuracy gate runs automatically before the benchmark starts.
-#    Output directory is auto-named using run_name, e.g.:
-#    results/community/nvidia_a100_sxm4_80gbx1_suite_A_nvidia_vllm_47f5d58e_ed4b0557
-python run.py --runner nvidia_vllm_47f5d58e --suite suite_A
+#    --runner auto detects your accelerator (or pass aliases: vllm, sglang, ascend, mlx, rocm, tpu, musa, iluvatar).
+python run.py --runner auto --suite suite_F
 
-# 4. Open a pull request with your result
-git checkout -b submit/<your-hardware>
-git add results/ && git commit -m "results: <hardware> on suite_A"
-git push origin submit/<your-hardware>
-gh pr create   # or open the PR via the GitHub web UI
+# 4. Validate, preview your projected rank, and get exact PR / --zip upload commands:
+python run.py --submit results/community/<run_name>
 ```
 
 That's it. CI validates the result automatically; merging the PR publishes it to the leaderboard.
@@ -256,6 +251,7 @@ See [suites/README.md](suites/README.md) for full details on all suites and metr
 | E | ~9 min | Up to 4× scaling |
 | F | ~10 min | offline + online + interactive |
 | G | ~35 min | MoE multi-chip (varies with chip count) |
+| H | ~14 min | Sliding-window attention (Mistral-7B, 10K ctx) |
 
 Sustained adds about **30 minutes** on datacenter suites (A–E); **Suite F** uses a **15-minute** sustained profile.
 Add interactive (~35 min on Suite A) by running with `--scenario interactive` or `--scenario all`.
@@ -446,7 +442,7 @@ If your local copy was downloaded at a different revision, add a note in
 A "runner" here is a Python class that wraps an inference framework (vLLM,
 SGLang, mlx-lm, …) and exposes the AccelMark standard interface. Adding
 one for an **existing** platform (NVIDIA, AMD, Ascend, Apple, Google TPU,
-Moore Threads, …) does not require touching any shared file. The full
+Moore Threads, Iluvatar, …) does not require touching any shared file. The full
 walk-through lives in [`runners/README.md`](runners/README.md); the short
 version is:
 

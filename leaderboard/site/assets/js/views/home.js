@@ -38,7 +38,7 @@ const DIST_METRICS = {
   sustained: {label:'Sustained Throughput',unit:'tok/s',get:function(s){var o=s.scenarios&&s.scenarios.sustained;return o&&o.is_valid?o.throughput:null;}},
   speculative: {label:'Speculative Throughput',unit:'tok/s',get:function(s){var o=s.scenarios&&s.scenarios.speculative;return o&&o.is_valid?o.throughput:null;}},
 };
-const DIST_VCOLS = {'NVIDIA':'#1b7a3d','Huawei':'#c2410c','AMD':'#be185d','Google':'#1d4ed8','Apple':'#78716c','Moore Threads':'#7c3aed'};
+const DIST_VCOLS = {'NVIDIA':'#1b7a3d','Huawei':'#c2410c','AMD':'#be185d','Google':'#1d4ed8','Apple':'#78716c','Moore Threads':'#7c3aed','Iluvatar':'#0891b2'};
 const DIST_SUITES = ['suite_A','suite_B','suite_C','suite_D','suite_E','suite_F','suite_G','suite_H'];
 function distVc(v){return DIST_VCOLS[v]||'#7c3aed';}
 function distFm(v){if(v===null||v===undefined)return'—';if(v>=10000)return(v/1000).toFixed(0)+'k';if(v>=1000)return(v/1000).toFixed(1)+'k';if(v>=1)return v.toFixed(1);return v.toFixed(4);}

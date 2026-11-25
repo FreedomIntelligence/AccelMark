@@ -13,7 +13,8 @@ const VENDOR_DEFAULT_RUNNER = {
   Huawei: "ascend_vllm_ascend_d4aa9fda",
   Apple: "apple_mlx_lm_9546b8b5",
   Google: "google_vllm_tpu_68cc9ffa",
-  "Moore Threads": "moorethreads_vllm_musa_f2f6f965",
+  "Moore Threads": "moorethreads_vllm_musa_6607740b",
+  Iluvatar: "iluvatar_vllm_ixuca_4d3befc9",
 };
 
 function tierLabels() { return [

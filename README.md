@@ -7,7 +7,7 @@
 
 <p align="center">
   <strong>Open, community-driven LLM inference leaderboard for every AI accelerator.</strong><br>
-  <sub>Real-world speed, latency, and cost-efficiency across NVIDIA, AMD, Huawei Ascend, Apple Silicon, Google TPU &amp; Moore Threads — no SOTA tuning required.</sub>
+  <sub>Real-world speed, latency, and cost-efficiency across NVIDIA, AMD, Huawei Ascend, Apple Silicon, Google TPU, Moore Threads &amp; Iluvatar CoreX — no SOTA tuning required.</sub>
 </p>
 
 <p align="center">
@@ -46,7 +46,7 @@
 |---|---|---|
 | **MLPerf** | Rigorous but slow — only large vendors participate | Community runs often finish quickly (e.g. Suite A default ~11 min; Suite D default ~22 min; full all-scenarios run ~7 h) |
 | **Vendor whitepapers** | Different setups make cross-vendor comparison impossible | Fixed schema + shared LoadGen = apples-to-apples |
-| **Most benchmarks** | Cover only NVIDIA and only throughput | NVIDIA, AMD, Huawei Ascend, Apple Silicon — throughput, latency, scaling, quantization |
+| **Most benchmarks** | Cover only NVIDIA and only throughput | NVIDIA, AMD, Huawei Ascend, Apple Silicon, Google TPU, Moore Threads &amp; Iluvatar — throughput, latency, scaling, quantization, SWA |
 
 ---
 
@@ -130,8 +130,7 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). The t
 | Apple Silicon | `apple_mlx_lm_9546b8b5` | mlx-lm | ⋯ | — | — | ⋯ | — | ⋯ | — | ? |
 | Google TPU | `google_vllm_tpu_68cc9ffa` | vllm-tpu | ✓ | — | — | ✓ | — | ✓ | — | ? |
 | Moore Threads GPU | `moorethreads_vllm_musa_6607740b` | vllm-musa | ✓ | ✓ | ⋯ | ⋯ | ✓ | ✓ | — | ? |
-| Moore Threads GPU | `moorethreads_vllm_musa_f2f6f965` | vllm-musa | ✓ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | — | ? |
-| Iluvatar CoreX GPU | `iluvatar_vllm_ixuca_4d3befc9` | vllm-ixuca | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ | ✓ |
+| Iluvatar CoreX GPU | `iluvatar_vllm_ixuca_4d3befc9` | vllm-ixuca | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 <details><summary>Optimized &amp; experimental runners (4)</summary>
 

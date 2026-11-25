@@ -12,13 +12,13 @@
   "created": "2026-10-22",
   "hardware_label": null,
   "suite_support": {
-    "A": "pending",
-    "B": "pending",
-    "C": "pending",
-    "D": "pending",
-    "E": "pending",
+    "A": "validated",
+    "B": "validated",
+    "C": "validated",
+    "D": "validated",
+    "E": "validated",
     "F": "validated",
-    "G": "pending",
+    "G": "validated",
     "H": "validated"
   }
 }
