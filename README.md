@@ -119,6 +119,7 @@ Reference runners live under `runners/` (see each folder’s `meta.json`). The t
 <!-- platforms-matrix:start -->
 | Hardware | Runner folder | Framework | A | B | C | D | E | F | G | H |
 |---|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| NVIDIA A100-SXM4-80GB | `nvidia_sglang_inference_opt_4fd1e59e` | SGLang | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ | ? |
 | NVIDIA A100-SXM4-80GB | `nvidia_sglang_inference_opt_5fe06410` | SGLang | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ | ? |
 | NVIDIA GPU | `nvidia_sglang_c43a8309` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ⋯ |
 | NVIDIA GPU | `nvidia_tensorrt_llm_21323970` | TensorRT-LLM | ✓ | ⋯ | ✓ | — | ⋯ | ✓ | ⋯ | ⋯ |

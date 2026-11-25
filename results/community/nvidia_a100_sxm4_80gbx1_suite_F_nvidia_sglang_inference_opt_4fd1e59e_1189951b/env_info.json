@@ -1,0 +1,64 @@
+{
+  "collected_at": "2026-07-31T02:37:50.313608+00:00",
+  "accelerators": [
+    {
+      "index": 5,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 80.0,
+      "driver_version": "570.133.20",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    },
+    {
+      "index": 7,
+      "name": "NVIDIA A100-SXM4-80GB",
+      "vendor": "NVIDIA",
+      "memory_gb": 80.0,
+      "driver_version": "570.133.20",
+      "firmware_version": null,
+      "compute_capability": "8.0",
+      "supports_bf16": true
+    }
+  ],
+  "accelerator_platform": "nvidia",
+  "accelerator_topology": null,
+  "intra_node_interconnect": null,
+  "cpu": {
+    "model": "Intel(R) Xeon(R) Processor @ 2.90GHz",
+    "physical_cores": 96,
+    "logical_cores": 96,
+    "numa_nodes": 2
+  },
+  "system_memory_gb": 1000.0,
+  "pcie_generation": "PCIe Gen 4",
+  "cpu_accelerator_bandwidth_gbs": null,
+  "network_interfaces": [
+    {
+      "name": "mlx5_0",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_1",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_2",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    },
+    {
+      "name": "mlx5_3",
+      "type": "InfiniBand/RoCE",
+      "bandwidth_gbps": null
+    }
+  ],
+  "os": "Ubuntu 22.04.5 LTS",
+  "python_version": "3.11.13",
+  "kernel_version": "5.10.134-013.9.kangaroo.al8.x86_64",
+  "runtime_version": "CUDA 12.8",
+  "pytorch_version": "2.9.1+cu128"
+}
