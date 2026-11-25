@@ -125,17 +125,7 @@ def _runner_row(meta: dict, catalog: dict[str, dict]) -> tuple[tuple, list[str]]
     return sort_key, row
 
 
-def _build_table() -> str:
-    catalog = _load_platforms_catalog()
-    rows = []
-    seen_unknown_platforms: set[str] = set()
-    for meta in _iter_runner_metas():
-        if (meta.get("platform") or "") not in catalog:
-            seen_unknown_platforms.add(meta.get("platform") or "?")
-        rows.append(_runner_row(meta, catalog))
-
-    rows.sort(key=lambda kr: kr[0])
-
+def _render_table(rows: list[tuple[tuple, list[str]]]) -> list[str]:
     header = (
         "| Hardware | Runner folder | Framework "
         + "".join(f"| {s} " for s in SUITE_KEYS)
@@ -146,17 +136,48 @@ def _build_table() -> str:
         + "".join("|:-:" for _ in SUITE_KEYS)
         + "|"
     )
-
-    body_lines = []
+    lines = [header, sep]
     for _key, cells in rows:
-        body_lines.append("| " + " | ".join(cells) + " |")
+        lines.append("| " + " | ".join(cells) + " |")
+    return lines
+
+
+def _build_table() -> str:
+    catalog = _load_platforms_catalog()
+    ref_rows = []
+    extra_rows = []
+    seen_unknown_platforms: set[str] = set()
+    for meta in _iter_runner_metas():
+        if (meta.get("platform") or "") not in catalog:
+            seen_unknown_platforms.add(meta.get("platform") or "?")
+        tier = (meta.get("runner_tier") or "reference").lower()
+        row = _runner_row(meta, catalog)
+        if tier in ("optimized", "experimental"):
+            extra_rows.append(row)
+        else:
+            ref_rows.append(row)
+
+    ref_rows.sort(key=lambda kr: kr[0])
+    extra_rows.sort(key=lambda kr: kr[0])
+
+    parts = _render_table(ref_rows)
+    if extra_rows:
+        parts.extend(
+            [
+                "",
+                f"<details><summary>Optimized &amp; experimental runners ({len(extra_rows)})</summary>",
+                "",
+                *_render_table(extra_rows),
+                "",
+                "</details>",
+            ]
+        )
 
     legend = (
         "_Legend: ✓ validated · ⋯ author-declared "
         "(not smoke-tested in this repo yet) · — unsupported._"
     )
-
-    parts = [header, sep, *body_lines, "", legend]
+    parts.extend(["", legend])
 
     if seen_unknown_platforms:
         unknown = ", ".join(sorted(seen_unknown_platforms))

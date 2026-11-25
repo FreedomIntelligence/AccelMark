@@ -60,6 +60,11 @@
       "description": "Optional override for the 'Hardware' column in the README matrix. When null/missing, the generator falls back to the display_name of this platform from schema/platforms.json. Use this when a runner targets a more specific scope than the platform (e.g. 'NVIDIA V100 (SM70)' for a V100-only fork).",
       "maxLength": 80
     },
+    "runner_tier": {
+      "type": ["string", "null"],
+      "enum": ["reference", "optimized", "experimental", null],
+      "description": "Classification for README/CLI presentation. Defaults to 'reference' when omitted. Use 'optimized' for single-chip/suite-specialized or agent-optimized runners, and 'experimental' for forks or non-standard stacks."
+    },
     "suite_support": {
       "type": ["object", "null"],
       "description": "Self-declared support level for each AccelMark suite. Keys are suite letters (A, B, C, D, E, F, G); values describe support status. The README platforms matrix is generated from these fields — runners do not have to manually edit README.md.",

@@ -65,6 +65,15 @@ jobs:
             runner_path="runners/$folder"
             [ -d "$runner_path" ] || continue
             echo "::group::Validating $folder"
+            if [ -d "$runner_path/.vendor" ]; then
+              echo "::error file=$runner_path::Do not commit a .vendor/ directory inside a runner folder. Use patches/*.patch + apply_patches.sh (see CONTRIBUTING.md) instead."
+              FAILED=1
+            fi
+            FILE_COUNT=$(find "$runner_path" -type f | wc -l | tr -d ' ')
+            if [ "$FILE_COUNT" -gt 100 ]; then
+              echo "::error file=$runner_path::Runner folder contains $FILE_COUNT files (max 100). Avoid vendoring upstream engine repos; ship minimal patches/*.patch + apply_patches.sh instead."
+              FAILED=1
+            fi
             if ! python runners/validate_runners.py --dir "$runner_path"; then
               echo "::error file=runners/$folder/meta.json::Validation failed for $folder"
               FAILED=1

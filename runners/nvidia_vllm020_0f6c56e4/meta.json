@@ -8,6 +8,7 @@
   "supersedes_chain": [],
   "notes": "vLLM 0.20.x line: torch 2.11, CUDA 13.0 default. Adds turboquant backend. Suite C requires enforce_eager in runner config (see README).",
   "created": "2026-05-15",
+  "runner_tier": "experimental",
   "hardware_label": null,
   "suite_support": {
     "A": "pending",

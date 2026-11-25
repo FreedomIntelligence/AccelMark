@@ -517,7 +517,9 @@ inherited from `BenchmarkRunner` automatically.
 - [ ] `runner.py` subclasses `BenchmarkRunner` and passes `runners/validate_runners.py`
 - [ ] `meta.json` present and valid (see `runners/meta.schema.json`), with
       `suite_support` declared for every suite your runner can or cannot run
+      (set `"runner_tier": "optimized"` or `"experimental"` for specialized forks)
 - [ ] `requirements.txt` included
+- [ ] **Patching an upstream engine?** Do **not** commit a vendored `.vendor/` source tree. Ship minimal unified diffs under `patches/*.patch` with an `apply_patches.sh` / `install.sh` script (see `runners/moorethreads_vllm_musa_6607740b/` for an example)
 - [ ] At least one reference result in `results/community/` (validated by CI)
 
 ### Adding a new accelerator family

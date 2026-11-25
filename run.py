@@ -210,13 +210,26 @@ def cmd_list(args) -> int:
 
     for platform in sorted(by_platform):
         print(f"  {platform.upper()}")
-        for rid, meta in by_platform[platform]:
+        # Show reference runners first, then optimized/experimental
+        tier_rank = {"reference": 0, "optimized": 1, "experimental": 2}
+        ordered = sorted(
+            by_platform[platform],
+            key=lambda item: (
+                tier_rank.get((item[1].get("runner_tier") or "reference").lower(), 0),
+                item[0],
+            ),
+        )
+        for rid, meta in ordered:
             deprecated_by    = meta.get("deprecated_by")
             supersedes_chain = meta.get("supersedes_chain") or []
+            tier             = (meta.get("runner_tier") or "reference").lower()
 
-            status = ""
+            tags = []
+            if tier in ("optimized", "experimental"):
+                tags.append(f"[{tier}]")
             if deprecated_by and show_all:
-                status = f"  [DEPRECATED → use {deprecated_by}]"
+                tags.append(f"[DEPRECATED → use {deprecated_by}]")
+            status = ("  " + " ".join(tags)) if tags else ""
 
             print(f"    {rid}{status}")
             print(f"      {meta.get('name', rid)}")

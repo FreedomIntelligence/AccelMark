@@ -1787,8 +1787,16 @@ class BenchmarkRunner(ABC):
         try:
             with open(path) as f:
                 baselines = json.load(f)
-            key = f"{precision.lower()}_baseline_score"
-            return baselines.get(model_id, {}).get(key)
+            entry = baselines.get(model_id, {})
+            prec_lower = precision.lower()
+            key = f"{prec_lower}_baseline_score"
+            if key in entry:
+                return entry[key]
+            # Full-precision FP16/FP32 runs share the BF16 reference quality bar
+            # when no separate fp16_baseline_score is recorded.
+            if prec_lower in ("fp16", "fp32") and "bf16_baseline_score" in entry:
+                return entry["bf16_baseline_score"]
+            return None
         except Exception:
             return None
 

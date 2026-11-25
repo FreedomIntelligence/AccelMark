@@ -196,6 +196,88 @@ def check_soft_warnings(result: dict) -> list[str]:
     return warnings
 
 
+def check_protocol_integrity(result: dict) -> tuple[list[str], list[str]]:
+    """Lightweight protocol-integrity checks ported from AccelMark-Agent audits.
+
+    Returns (hard_errors, soft_warnings).
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+
+    # 1. Accuracy gate bypass guard: flag suspiciously low scores (<0.25, below
+    #    4-choice random guess) that passed only because baseline_delta was null.
+    acc = result.get("accuracy")
+    if isinstance(acc, dict):
+        score = acc.get("subset_score")
+        if (
+            acc.get("valid") is True
+            and acc.get("baseline_delta") is None
+            and isinstance(score, (int, float))
+            and score < 0.25
+        ):
+            warnings.append(
+                f"accuracy.subset_score is {score:.2f} with baseline_delta=null "
+                "(below 0.25 random-guess floor) — verify model weights and precision."
+            )
+
+    # 2. Offline throughput & token accounting sanity (output-only vs total).
+    metrics = result.get("metrics") or {}
+    offline = metrics.get("offline")
+    if isinstance(offline, dict):
+        rows = (
+            offline.get("results_by_concurrency")
+            or offline.get("results_by_batch_size")
+            or []
+        )
+        suite_id = result.get("suite_id", "")
+        for idx, row in enumerate(rows):
+            if not isinstance(row, dict) or row.get("oom"):
+                continue
+            out_tps = row.get("throughput_tokens_per_sec")
+            tot_tps = row.get("throughput_tokens_per_sec_total")
+            if (
+                isinstance(out_tps, (int, float))
+                and isinstance(tot_tps, (int, float))
+                and tot_tps > 0
+                and out_tps > tot_tps * 1.05
+            ):
+                errors.append(
+                    f"metrics.offline row {idx}: throughput_tokens_per_sec ({out_tps}) "
+                    f"exceeds throughput_tokens_per_sec_total ({tot_tps}) — "
+                    "output-only and total throughput metrics appear swapped."
+                )
+
+            tot_out = row.get("total_output_tokens")
+            if (
+                isinstance(tot_out, (int, float))
+                and tot_out == 0
+                and isinstance(out_tps, (int, float))
+                and out_tps > 0
+            ):
+                errors.append(
+                    f"metrics.offline row {idx}: total_output_tokens is 0 "
+                    f"but throughput_tokens_per_sec is {out_tps}."
+                )
+
+            # Long-context truncation sanity check for Suite D (~28K prompts).
+            tot_in = row.get("total_input_tokens")
+            n_req = row.get("num_requests")
+            if (
+                suite_id == "suite_D"
+                and isinstance(tot_in, (int, float))
+                and isinstance(n_req, (int, float))
+                and n_req > 0
+            ):
+                avg_in = tot_in / n_req
+                if avg_in < 8000:
+                    warnings.append(
+                        f"metrics.offline row {idx}: Suite D average input length is "
+                        f"{avg_in:.0f} tokens (< 8,000) — check for silent prompt truncation."
+                    )
+
+    return errors, warnings
+
+
 def check_run_id_integrity(result: dict) -> list[str]:
     """
     Verify meta.run_id matches a recomputation from the result's own fields.
@@ -397,6 +479,9 @@ def main():
         all_warnings.extend(check_soft_warnings(result))
         all_errors.extend(check_run_id_integrity(result))
         all_errors.extend(check_suite_e(result))
+        proto_errors, proto_warnings = check_protocol_integrity(result)
+        all_errors.extend(proto_errors)
+        all_warnings.extend(proto_warnings)
         result = compute_derived(result)
         # Write back computed fields
         with open(result_path, "w") as f:

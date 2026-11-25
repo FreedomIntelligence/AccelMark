@@ -10,6 +10,7 @@
   ],
   "notes": "Experimental runner; the benchmark harness fills the content-hashed id in its isolated workspace.",
   "created": "2026-07-29",
+  "runner_tier": "optimized",
   "hardware_label": "NVIDIA A100-SXM4-80GB",
   "suite_support": {
     "A": "pending",
