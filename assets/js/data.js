@@ -356,6 +356,12 @@ function _fmtTokenCount(n) {
   return `~${Math.round(v)}`;
 }
 
+// Returns all indexed leaderboard rows (read-only shallow copy).
+export function allRows() {
+  if (!_ready) init();
+  return [..._rows];
+}
+
 // Returns rows in a given suite, sorted by suite primary metric.
 export function rowsForSuite(suiteId) {
   if (!_ready) init();

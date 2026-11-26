@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 310" width="880" height="310" role="img" aria-label="AccelMark 8-Suite Roofline Spectrum">
+<title>AccelMark 8-Suite Roofline Spectrum</title>
+<style>
+  .f { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', 'Segoe UI', sans-serif; }
+  .m { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace; }
+</style>
+<defs>
+  <linearGradient id="rfArea" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#2563EB" stop-opacity="0.10"/>
+    <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+  </linearGradient>
+</defs>
+<rect x="0.5" y="0.5" width="879" height="309" rx="12" fill="#FFFFFF" stroke="#E4E4E7"/>
+<text x="28" y="32" class="f" font-size="14.5" font-weight="700" fill="#09090B" letter-spacing="-0.015em">The 8-Suite Roofline Spectrum</text>
+<text x="852" y="32" text-anchor="end" class="f" font-size="11.5" fill="#71717A">Each suite isolates a distinct hardware or serving bottleneck</text>
+<line x1="28" y1="46" x2="852" y2="46" stroke="#F1F1F4" stroke-width="1"/>
+<line x1="56" y1="96" x2="844" y2="96" stroke="#F1F1F4" stroke-width="1"/>
+<line x1="56" y1="136" x2="844" y2="136" stroke="#F1F1F4" stroke-width="1"/>
+<line x1="56" y1="176" x2="844" y2="176" stroke="#F1F1F4" stroke-width="1"/>
+<line x1="56" y1="216" x2="844" y2="216" stroke="#F1F1F4" stroke-width="1"/>
+<line x1="548" y1="60" x2="548" y2="260" stroke="#E4E4E7" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="64" y="74" class="m" font-size="9.5" font-weight="600" fill="#2563EB" letter-spacing="0.08em">MEMORY-BANDWIDTH BOUND</text>
+<text x="836" y="74" text-anchor="end" class="m" font-size="9.5" font-weight="600" fill="#71717A" letter-spacing="0.08em">COMPUTE &amp; INTERCONNECT BOUND</text>
+<path d="M 80 260 L 80 250 L 548 144 L 832 144 L 832 260 Z" fill="url(#rfArea)"/>
+<path d="M 80 250 L 548 144 L 832 144" fill="none" stroke="#2563EB" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="56" y1="260" x2="844" y2="260" stroke="#E4E4E7" stroke-width="1.2"/>
+<line x1="56" y1="60" x2="56" y2="260" stroke="#E4E4E7" stroke-width="1.2"/>
+<line x1="114" y1="242.3" x2="114" y2="192" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="114" cy="242.3" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="64" y="156" width="102" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="70" y="163" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="80" y="177.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">F</text>
+<text x="96" y="172.5" class="f" font-size="11" font-weight="650" fill="#09090B">Edge</text>
+<text x="96" y="185" class="m" font-size="9.2" fill="#71717A">Qwen-0.5B</text>
+<line x1="198" y1="223.3" x2="198" y2="150" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="198" cy="223.3" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="144" y="114" width="118" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="150" y="121" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="160" y="135.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">G</text>
+<text x="176" y="130.5" class="f" font-size="11" font-weight="650" fill="#09090B">Sparse MoE</text>
+<text x="176" y="143" class="m" font-size="9.2" fill="#71717A">Mixtral-8x7B</text>
+<line x1="286" y1="203.3" x2="286" y2="214" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="286" cy="203.3" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="234" y="214" width="114" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="240" y="221" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="250" y="235.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">A</text>
+<text x="266" y="230.5" class="f" font-size="11" font-weight="650" fill="#09090B">Short Chat</text>
+<text x="266" y="243" class="m" font-size="9.2" fill="#71717A">8B + SLA</text>
+<line x1="374" y1="183.4" x2="374" y2="138" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="374" cy="183.4" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="314" y="102" width="118" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="320" y="109" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="330" y="123.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">H</text>
+<text x="346" y="118.5" class="f" font-size="11" font-weight="650" fill="#09090B">Sliding Win</text>
+<text x="346" y="131" class="m" font-size="9.2" fill="#71717A">Mistral-7B</text>
+<line x1="462" y1="163.5" x2="462" y2="198" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="462" cy="163.5" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="384" y="198" width="116" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="390" y="205" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="400" y="219.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">C</text>
+<text x="416" y="214.5" class="f" font-size="11" font-weight="650" fill="#09090B">Quantize</text>
+<text x="416" y="227" class="m" font-size="9.2" fill="#71717A">5 precisions</text>
+<line x1="548" y1="144.0" x2="548" y2="178" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="548" cy="144.0" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="516" y="178" width="112" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="522" y="185" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="532" y="199.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">B</text>
+<text x="548" y="194.5" class="f" font-size="11" font-weight="650" fill="#09090B">70B Multi</text>
+<text x="548" y="207" class="m" font-size="9.2" fill="#71717A">Llama-70B</text>
+<line x1="668" y1="144.0" x2="668" y2="126" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="668" cy="144.0" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="614" y="90" width="112" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="620" y="97" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="630" y="111.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">E</text>
+<text x="646" y="106.5" class="f" font-size="11" font-weight="650" fill="#09090B">TP Scaling</text>
+<text x="646" y="119" class="m" font-size="9.2" fill="#71717A">1/2/4/8×</text>
+<line x1="782" y1="144.0" x2="782" y2="178" stroke="#D4D4D8" stroke-width="1.2"/>
+<circle cx="782" cy="144.0" r="3.5" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+<rect x="722" y="178" width="114" height="36" rx="7" fill="#FFFFFF" stroke="#E4E4E7" stroke-width="1"/>
+<rect x="728" y="185" width="20" height="22" rx="4.5" fill="#EFF6FF"/>
+<text x="738" y="199.5" text-anchor="middle" class="m" font-size="11" font-weight="700" fill="#1D4ED8">D</text>
+<text x="754" y="194.5" class="f" font-size="11" font-weight="650" fill="#09090B">28K Prefill</text>
+<text x="754" y="207" class="m" font-size="9.2" fill="#71717A">Long ctx</text>
+<text x="450" y="292" text-anchor="middle" class="f" font-size="11" fill="#71717A">Arithmetic Intensity (FLOPs / Byte)  →  short decode to 28K prefill</text>
+<text x="24" y="160" text-anchor="middle" class="f" font-size="11" fill="#71717A" transform="rotate(-90 24 160)">Throughput</text>
+</svg>

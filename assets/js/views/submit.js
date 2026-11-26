@@ -1,336 +1,206 @@
-// submit.js — Submit wizard.
-import { esc } from "../utils.js";
+// views/submit.js — PyTorch-style one-screen interactive benchmark command builder.
+// Zero multi-step wizards: pick ecosystem × suite × submit mode, copy 4 lines, run.
+
 import { SUITE_ORDER, SUITE_META } from "../data.js";
-import {
-  VENDORS, chipsForVendor, vendorById, chipOptionsHtml,
-  recommendedSuites,
-} from "../hardware-catalog.js";
-const _i = (k, r) => (window._i ? window._i(k, r) : k);
+import { esc, copyToClipboard, flashButtonLabel } from "../utils.js";
+import { suiteIcon, icon } from "../icons.js";
 
-const STEPS = ["Hardware", "Suite", "Run", "Submit"];
+const isZh = () => typeof window._lang === "function" && window._lang() === "cn";
 
-const SUITE_HINTS = {
-  suite_A: { mins: 11, noteKey: 'submit.suiteHint.A' },
-  suite_F: { mins: 10, noteKey: 'submit.suiteHint.F' },
-  suite_B: { mins: 20, noteKey: 'submit.suiteHint.B' },
-  suite_C: { mins: 22, noteKey: 'submit.suiteHint.C' },
-  suite_D: { mins: 22, noteKey: 'submit.suiteHint.D' },
-  suite_E: { mins: 9, noteKey: 'submit.suiteHint.E' },
-  suite_G: { mins: 35, noteKey: 'submit.suiteHint.G' },
-  suite_H: { mins: 14, noteKey: 'submit.suiteHint.H' },
+const ECOSYSTEMS = [
+  { id: "nvidia_vllm",   label: "NVIDIA (vLLM)",      alias: "vllm",     req: "runners/nvidia_vllm_47f5d58e/requirements.txt",            note: "Default reference stack for CUDA GPUs (Ampere / Ada / Hopper / Blackwell)." },
+  { id: "nvidia_sglang", label: "NVIDIA (SGLang)",    alias: "sglang",   req: "runners/nvidia_sglang_c43a8309/requirements.txt",          note: "High-throughput RadixAttention serving stack on CUDA GPUs." },
+  { id: "amd",           label: "AMD ROCm",           alias: "rocm",     req: "runners/amd_vllm_rocm_6c18cd8f/requirements.txt",          note: "vLLM-ROCm for Instinct MI210 / MI250X / MI300X / MI325X / Radeon." },
+  { id: "ascend",        label: "Huawei Ascend",      alias: "ascend",   req: "runners/ascend_vllm_ascend_d4aa9fda/requirements.txt",     note: "vllm-ascend on CANN for Ascend 910B / 910C NPUs." },
+  { id: "iluvatar",      label: "Iluvatar CoreX",     alias: "iluvatar", req: "runners/iluvatar_vllm_ixuca_4d3befc9/requirements.txt",    note: "vllm-ixuca for MR-V100 / BI-V150 (Suites A–H supported)." },
+  { id: "moorethreads",  label: "Moore Threads",      alias: "musa",     req: "runners/moorethreads_vllm_musa_6607740b/requirements.txt", note: "vllm-musa for MTT S4000 / S5000 GPUs." },
+  { id: "google",        label: "Google TPU",         alias: "tpu",      req: "runners/google_vllm_tpu_68cc9ffa/requirements.txt",        note: "vllm-tpu (JAX/XLA) on Cloud TPU v5e / v6e." },
+  { id: "apple",         label: "Apple Silicon",      alias: "mlx",      req: "runners/apple_mlx_lm_9546b8b5/requirements.txt",           note: "mlx-lm on macOS M1 / M2 / M3 / M4 unified memory." },
+];
+
+const SUITE_TIMES = {
+  suite_F: { time: "~10 min", badge: "Starter", shortEn: "Edge & Consumer", shortZh: "边缘/消费级", multi: false },
+  suite_A: { time: "~11 min", badge: "Core",    shortEn: "Single-Chip Chat", shortZh: "单卡对话", multi: false },
+  suite_D: { time: "~22 min", badge: "",        shortEn: "28K Long Context", shortZh: "28K 长上下文", multi: false },
+  suite_C: { time: "~22 min", badge: "",        shortEn: "Quantization", shortZh: "量化效率", multi: false },
+  suite_H: { time: "~14 min", badge: "",        shortEn: "Sliding Window", shortZh: "滑动窗口 SWA", multi: false },
+  suite_B: { time: "~20 min", badge: "Multi",   shortEn: "70B Multi-Chip", shortZh: "70B 多卡 TP", multi: true },
+  suite_E: { time: "~9 min",  badge: "Multi",   shortEn: "TP Scaling", shortZh: "多卡扩展", multi: true },
+  suite_G: { time: "~35 min", badge: "Multi",   shortEn: "Sparse MoE", shortZh: "稀疏 MoE", multi: true },
 };
 
-const FLOW = ["Detect", "Run", "Validate", "Preview", "Submit", "Published"];
+const SUITE_DISPLAY_ORDER = ["suite_F", "suite_A", "suite_D", "suite_C", "suite_H", "suite_B", "suite_E", "suite_G"];
+const ISSUE_ZIP_URL = "https://github.com/FreedomIntelligence/AccelMark/issues/new?template=result_submission.yml";
 
-function parsePrefill(query) {
-  if (!query) return { vendor: "", chip: "" };
-  return {
-    vendor: query.vendor || "",
-    chip: query.chip || "",
-  };
+function buildCommands(state) {
+  const eco = ECOSYSTEMS.find((e) => e.id === state.eco) || ECOSYSTEMS[0];
+  const sInfo = SUITE_TIMES[state.suite] || SUITE_TIMES.suite_F;
+  const lines = [
+    "# 1. Clone & install framework + runner deps",
+    "git clone https://github.com/FreedomIntelligence/AccelMark.git",
+    `cd AccelMark && pip install -e .`,
+    `pip install -r ${eco.req}`,
+    "",
+  ];
+  if (state.cnMirror) {
+    lines.push("# Mainland China HuggingFace mirror");
+    lines.push("export HF_ENDPOINT=https://hf-mirror.com");
+    lines.push("");
+  }
+  lines.push("# 2. Handle setup & 10s pre-flight check (no download)");
+  lines.push("python run.py --init");
+  lines.push("");
+  lines.push(`# 3. Run ${state.suite} (${sInfo.time}) — MMLU gate runs first`);
+  const tpFlag = sInfo.multi ? " --tensor-parallel-size 4" : "";
+  lines.push(`python run.py --runner ${eco.alias} --suite ${state.suite}${tpFlag}`);
+  lines.push("");
+  if (state.mode === "zip") {
+    lines.push("# 4. Validate & package no-git ZIP for GitHub Issue");
+    lines.push("python run.py --submit results/community/<run_dir> --zip");
+  } else {
+    lines.push("# 4. Validate, preview rank & get exact PR command");
+    lines.push("python run.py --submit results/community/<run_dir>");
+  }
+  return lines.join("\n");
 }
 
-export function render({ query, el }) {
-  const prefill = parsePrefill(query);
-
-  el.innerHTML = `
-    <section class="page-hero">
-      <span class="eyebrow">${_i('submit.eyebrow')}</span>
-      <h1>${_i('submit.hero')}</h1>
-      <p class="page-lead">${_i('submit.heroSub')}</p>
-      <div class="card" style="margin-top:0.9rem;padding:0.75rem 1rem;border-left:3px solid var(--accent,#2563eb);text-align:left">
-        <strong>${_i('submit.noSotaTitle')}</strong> — ${_i('submit.noSotaBody')}
-        <code style="margin-left:0.35rem">python run.py --check-env</code>
-      </div>
-    </section>
-
-    <div class="flow-bar" aria-label="${_i('submit.flowBarAria')}">
-      ${FLOW.map((s, i) => `
-        <span class="flow-step${i < 4 ? " active" : ""}"><span class="flow-num">${i + 1}</span>${esc(_i('submit.flow_' + s.toLowerCase(), s))}</span>
-        ${i < FLOW.length - 1 ? '<span class="flow-arrow" aria-hidden="true">→</span>' : ""}
-      `).join("")}
-    </div>
-
-    <div class="wizard-shell card" id="submit-wizard">
-      <nav class="wizard-tabs" role="tablist">
-        ${STEPS.map((s, i) => `<button type="button" class="wizard-tab${i === 0 ? " active" : ""}" data-step="${i}" role="tab">${i + 1}. ${esc(_i('submit.step_' + s.toLowerCase(), s))}</button>`).join("")}
-      </nav>
-
-      <div class="wizard-panel active" data-panel="0">
-        <h2>${_i('submit.chooseHardware')}</h2>
-        <p class="muted">${_i('submit.chooseHardwareSub')}</p>
-        <label class="wizard-field wizard-field-wide"><span>${_i('submit.searchCatalog')}</span>
-          <input type="search" id="sw-search" placeholder="${_i('submit.searchPlaceholder')}" autocomplete="off">
-        </label>
-        <div class="wizard-grid">
-          <label class="wizard-field"><span>${_i('submit.vendor')}</span>
-            <select id="sw-vendor">${VENDORS.map((v) => `<option value="${esc(v.id)}">${esc(v.label)}</option>`).join("")}</select>
-          </label>
-          <label class="wizard-field wizard-field-wide"><span>${_i('submit.gpuAccelerator')}</span>
-            <select id="sw-chip"></select>
-          </label>
-          <label class="wizard-field"><span>${_i('submit.customName')}</span>
-            <input type="text" id="sw-custom" placeholder="${_i('submit.customPlaceholder')}">
-          </label>
-          <label class="wizard-field"><span>${_i('submit.chipCount')}</span>
-            <select id="sw-count"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option></select>
-          </label>
-        </div>
-        <p class="muted catalog-hint" id="sw-chip-hint"></p>
-      </div>
-
-      <div class="wizard-panel" data-panel="1">
-        <h2>${_i('submit.pickSuite')}</h2>
-        <p class="muted">${_i('submit.pickSuiteHint')}</p>
-        <div class="suite-pick-grid" id="sw-suites"></div>
-      </div>
-
-      <div class="wizard-panel" data-panel="2">
-        <h2>${_i('submit.runValidate')}</h2>
-        <p class="muted" id="sw-time-hint">${_i('submit.firstBenchmark')}</p>
-        <div class="cmd-block">
-          <div class="cmd-head"><span>${_i('submit.install')}</span><button type="button" class="btn small copy-btn" data-copy="install">${_i('submit.copy')}</button></div>
-          <pre id="sw-cmd-install">git clone https://github.com/FreedomIntelligence/AccelMark.git
-cd AccelMark
-pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"</pre>
-        </div>
-        <div class="cmd-block">
-          <div class="cmd-head"><span>${_i('submit.benchmark')}</span><button type="button" class="btn small copy-btn" data-copy="run">${_i('submit.copy')}</button></div>
-          <pre id="sw-cmd-run"></pre>
-        </div>
-        <div class="cmd-block">
-          <div class="cmd-head"><span>${_i('submit.validateLocally')}</span><button type="button" class="btn small copy-btn" data-copy="validate">${_i('submit.copy')}</button></div>
-          <pre id="sw-cmd-validate"></pre>
-        </div>
-      </div>
-
-      <div class="wizard-panel" data-panel="3">
-        <h2>${_i('submit.submitForPublication')}</h2>
-        <p class="muted">${_i('submit.submitForPublicationSub')}</p>
-        <div class="submit-options">
-          <a class="submit-option card is-link" href="https://github.com/FreedomIntelligence/AccelMark/blob/main/CONTRIBUTING.md#submitting-a-result" target="_blank" rel="noopener">
-            <strong>${_i('submit.prRecommended')}</strong>
-            <span class="muted">${_i('submit.prRecommendedSub')}</span>
-          </a>
-          <a class="submit-option card is-link" href="https://github.com/FreedomIntelligence/AccelMark/issues/new?template=result_submission.md" target="_blank" rel="noopener">
-            <strong>${_i('submit.uploadIssue')}</strong>
-            <span class="muted">${_i('submit.uploadIssueSub')}</span>
-          </a>
-          <a class="submit-option card is-link" href="https://github.com/FreedomIntelligence/AccelMark/discussions/new?category=show-and-tell" target="_blank" rel="noopener">
-            <strong>${_i('submit.shareDiscussions')}</strong>
-            <span class="muted">${_i('submit.shareDiscussionsSub')}</span>
-          </a>
-        </div>
-        <div class="trust-evidence compact">
-          <span>${_i('submit.artifactsPerRun')}</span>
-          <code>result.json</code><code>env_info.json</code><code>runner hash</code><code>accuracy receipt</code>
-        </div>
-      </div>
-
-      <div class="wizard-nav">
-        <button type="button" class="btn" id="sw-prev" disabled>← ${_i('submit.back')}</button>
-        <button type="button" class="btn primary" id="sw-next">${_i('submit.next')} →</button>
-      </div>
-    </div>
-  `;
-
-  let step = 0;
-  const defaultVendor = prefill.vendor && VENDORS.some((v) => v.id === prefill.vendor)
-    ? prefill.vendor
-    : "NVIDIA";
+export function render({ el }) {
+  const zh = isZh();
   const state = {
-    vendor: defaultVendor,
-    chip: chipsForVendor(defaultVendor)[0]?.name || "Custom accelerator",
-    custom: "",
-    count: "1",
-    suite: "suite_A",
+    eco: "nvidia_vllm",
+    suite: "suite_F",
+    mode: "pr",
+    cnMirror: zh,
   };
 
-  function effectiveChip() {
-    return state.custom.trim() || state.chip;
+  function paint() {
+    const eco = ECOSYSTEMS.find((e) => e.id === state.eco) || ECOSYSTEMS[0];
+    const sInfo = SUITE_TIMES[state.suite] || SUITE_TIMES.suite_F;
+    const cmdText = buildCommands(state);
+
+    el.innerHTML = `
+      <header class="page-head-left">
+        <span class="eyebrow">${zh ? "参与贡献" : "Contribute"}</span>
+        <h1>${zh ? "10 分钟提交你的硬件实测" : "Submit a benchmark in ~10 minutes"}</h1>
+        <p class="page-lead">${zh
+          ? "无需极致调优。消费卡、老架构和国产卡的诚实默认配置（Closed Reference）同样宝贵。点选下方配置，直接复制右侧命令开跑。"
+          : "No SOTA tuning required. Honest out-of-the-box reference baselines on consumer, older, or emerging chips are just as valuable. Select your setup and copy the commands."}</p>
+      </header>
+
+      <div class="sub-builder">
+        <div class="sub-config">
+          <div class="sub-group">
+            <div class="sub-group-label mono">${zh ? "1 · 选择硬件与推理栈" : "1 · Hardware & Stack"}</div>
+            <div class="sub-pills">
+              ${ECOSYSTEMS.map((e) => `
+                <button type="button" class="sub-pill${state.eco === e.id ? " active" : ""}" data-sub-eco="${esc(e.id)}">
+                  ${esc(e.label)}
+                </button>
+              `).join("")}
+            </div>
+            <div class="sub-hint">${esc(eco.note)}</div>
+          </div>
+
+          <div class="sub-group">
+            <div class="sub-group-label mono">${zh ? "2 · 选择基准套件" : "2 · Benchmark Suite"}</div>
+            <div class="sub-suite-grid">
+              ${SUITE_DISPLAY_ORDER.map((sid) => {
+                const m = SUITE_META[sid];
+                const info = SUITE_TIMES[sid];
+                return `
+                  <button type="button" class="sub-suite-btn${state.suite === sid ? " active" : ""}" data-sub-suite="${esc(sid)}">
+                    <span class="sub-sb-top">
+                      <span class="sub-sb-ic">${suiteIcon(sid, 14)}</span>
+                      <span class="mono"><strong>${esc(m.letter)}</strong></span>
+                      <span class="sub-sb-time mono">${esc(info.time)}</span>
+                    </span>
+                    <span class="sub-sb-name">${esc(zh ? info.shortZh : info.shortEn)}</span>
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+
+          <div class="sub-group">
+            <div class="sub-group-label mono">${zh ? "3 · 提交方式与网络" : "3 · Delivery & Network"}</div>
+            <div class="sub-row-opts">
+              <div class="sub-seg">
+                <button type="button" class="sub-seg-btn${state.mode === "pr" ? " active" : ""}" data-sub-mode="pr">
+                  ${icon("gitPullRequest", 13)} ${zh ? "GitHub PR (推荐)" : "GitHub PR"}
+                </button>
+                <button type="button" class="sub-seg-btn${state.mode === "zip" ? " active" : ""}" data-sub-mode="zip">
+                  ${icon("download", 13)} ${zh ? "免 Git 打包上传 (--zip)" : "No-Git ZIP Upload"}
+                </button>
+              </div>
+
+              <label class="sub-check">
+                <input type="checkbox" id="sub-cn-mirror" ${state.cnMirror ? "checked" : ""}>
+                <span>${zh ? "使用国内 HuggingFace 镜像 (hf-mirror.com)" : "Use China HF mirror (hf-mirror.com)"}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-terminal-col">
+          <div class="sub-terminal">
+            <div class="sub-term-head">
+              <span class="sub-term-title mono">${icon("terminal", 14)} Quick Start · ${esc(state.suite)} (${esc(sInfo.time)})</span>
+              <button type="button" class="sub-copy-btn" id="sub-copy-cmd">
+                ${icon("copy", 13)} <span>${zh ? "复制命令" : "Copy"}</span>
+              </button>
+            </div>
+            <pre class="sub-term-pre mono" id="sub-cmd-pre">${esc(cmdText)}</pre>
+            <div class="sub-term-foot">
+              ${state.mode === "zip"
+                ? `<span>${zh ? "生成 zip 后直接上传至" : "Attach the generated zip on"} <a href="${ISSUE_ZIP_URL}" target="_blank" rel="noopener">${zh ? "GitHub 提交表单 →" : "GitHub Submission Issue →"}</a></span>`
+                : `<span>${zh ? "CI 自动校验 schema、MMLU 精度与 run_id 完整性，合并后即刻上榜。" : "CI automatically verifies schema, MMLU gate, and run_id integrity on PR."}</span>`}
+            </div>
+          </div>
+
+          <div class="sub-quick-links">
+            <a class="sub-qlink" href="#/wanted">
+              <strong>${zh ? "查看征集硬件列表" : "Wanted Hardware"}</strong>
+              <span>${zh ? "优先提交榜上空缺的芯片，获得首发归属标记 →" : "Fill missing chips for First-Result attribution →"}</span>
+            </a>
+            <a class="sub-qlink" href="#/reproduce">
+              <strong>${zh ? "参与 ±5% 复现验证" : "Reproduction Quests"}</strong>
+              <span>${zh ? "复现已有 community 提交并晋升为 Verified →" : "Independently rerun a community entry within ±5% →"}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
-  function selectedChipEntry() {
-    const list = chipsForVendor(state.vendor);
-    return list.find((c) => c.name === state.chip) || list[0];
-  }
+  paint();
 
-  function fillChips(keepSelection) {
-    const sel = el.querySelector("#sw-chip");
-    const prev = keepSelection ? state.chip : null;
-    sel.innerHTML = chipOptionsHtml(state.vendor, prev || state.chip);
-    const chips = chipsForVendor(state.vendor);
-    if (prefill.chip && chips.some((c) => c.name === prefill.chip)) {
-      state.chip = prefill.chip;
-      sel.value = prefill.chip;
-      prefill.chip = "";
-    } else if (prev && chips.some((c) => c.name === prev)) {
-      state.chip = prev;
-      sel.value = prev;
-    } else {
-      state.chip = chips[0]?.name || "Custom accelerator";
-      sel.value = state.chip;
-    }
-    updateChipHint();
-  }
-
-  function updateChipHint() {
-    const entry = selectedChipEntry();
-    const hint = el.querySelector("#sw-chip-hint");
-    if (!entry || !hint) return;
-    const mem = entry.memoryGb ? `${entry.memoryGb} GB · ` : "";
-    const suites = (entry.suites || recommendedSuites(entry, state.count)).join(", ");
-    hint.textContent = `${mem}${entry.tier || "accelerator"} · ${_i('submit.suggestedPrefix')}: ${suites}`;
-  }
-
-  function fillSuites() {
-    const grid = el.querySelector("#sw-suites");
-    const entry = selectedChipEntry();
-    const rec = recommendedSuites(entry, state.count);
-    grid.innerHTML = SUITE_ORDER.map((id) => {
-      const meta = SUITE_META[id];
-      const hint = SUITE_HINTS[id];
-      const isRec = rec.includes(id);
-      return `
-        <label class="suite-pick${state.suite === id ? " selected" : ""}${isRec ? " recommended" : ""}">
-          <input type="radio" name="suite" value="${esc(id)}"${state.suite === id ? " checked" : ""}>
-          <span class="suite-pick-letter">Suite ${esc(meta?.letter || "?")}</span>
-          <span class="suite-pick-title">${esc(_i('suite.' + id + '.title', meta?.title || id))}</span>
-          <span class="suite-pick-time">~${hint?.mins || "?"} min</span>
-          ${isRec ? `<span class="suite-pick-badge">${_i('submit.recommended')}</span>` : ""}
-        </label>`;
-    }).join("");
-  }
-
-  function vendorRunner() {
-    return vendorById(state.vendor)?.runner || VENDORS[0].runner;
-  }
-
-  function slugify(s) {
-    return s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
-  }
-
-  function updateCommands() {
-    const runner = vendorRunner();
-    const chipName = effectiveChip();
-    const runName = `${slugify(state.vendor)}_${slugify(chipName)}_${state.count}x1_${state.suite}_${runner.slice(0, 12)}`;
-    const hint = SUITE_HINTS[state.suite];
-    el.querySelector("#sw-time-hint").textContent =
-      hint ? `${_i('submit.estimatedRuntime')}: ~${hint.mins} min · ${_i(hint.noteKey)}` : "";
-
-    el.querySelector("#sw-cmd-install").textContent =
-      `git clone https://github.com/FreedomIntelligence/AccelMark.git\n` +
-      `cd AccelMark\n` +
-      `pip install "jsonschema>=4.0" "numpy>=1.24" "pyyaml>=6.0"\n` +
-      `pip install -r runners/${runner}/requirements.txt\n` +
-      `python run.py --init --runner ${runner}`;
-
-    el.querySelector("#sw-cmd-run").textContent =
-      `python run.py --runner ${runner} --suite ${state.suite}` +
-      (state.count !== "1" ? ` --tensor-parallel-size ${state.count}` : "");
-
-    el.querySelector("#sw-cmd-validate").textContent =
-      `python run.py --submit results/community/${runName}`;
-  }
-
-  function showStep(n) {
-    step = Math.max(0, Math.min(STEPS.length - 1, n));
-    el.querySelectorAll(".wizard-tab").forEach((t, i) => t.classList.toggle("active", i === step));
-    el.querySelectorAll(".wizard-panel").forEach((p, i) => p.classList.toggle("active", i === step));
-    el.querySelector("#sw-prev").disabled = step === 0;
-    el.querySelector("#sw-next").textContent = step === STEPS.length - 1 ? _i('submit.done') : `${_i('submit.next')} →`;
-    if (step === 2) updateCommands();
-  }
-
-  function applySearch(q) {
-    const needle = q.trim().toLowerCase();
-    if (!needle) return;
-    outer: for (const v of VENDORS) {
-      for (const c of chipsForVendor(v.id)) {
-        const hay = `${v.label} ${c.name} ${c.memoryGb || ""}`.toLowerCase();
-        if (hay.includes(needle)) {
-          state.vendor = v.id;
-          el.querySelector("#sw-vendor").value = v.id;
-          fillChips(false);
-          state.chip = c.name;
-          el.querySelector("#sw-chip").value = c.name;
-          state.custom = "";
-          el.querySelector("#sw-custom").value = "";
-          fillSuites();
-          updateCommands();
-          updateChipHint();
-          break outer;
+  if (!el.__subBound) {
+    el.__subBound = true;
+    el.addEventListener("click", async (ev) => {
+      if (!location.hash.startsWith("#/submit")) return;
+      const ecoBtn = ev.target.closest("[data-sub-eco]");
+      if (ecoBtn) { state.eco = ecoBtn.dataset.subEco; paint(); return; }
+      const suiteBtn = ev.target.closest("[data-sub-suite]");
+      if (suiteBtn) { state.suite = suiteBtn.dataset.subSuite; paint(); return; }
+      const modeBtn = ev.target.closest("[data-sub-mode]");
+      if (modeBtn) { state.mode = modeBtn.dataset.subMode; paint(); return; }
+      const copyBtn = ev.target.closest("#sub-copy-cmd");
+      if (copyBtn) {
+        const pre = el.querySelector("#sub-cmd-pre");
+        if (pre) {
+          const ok = await copyToClipboard(pre.textContent);
+          flashButtonLabel(copyBtn, ok ? (isZh() ? "已复制" : "Copied!") : "Failed", {
+            holdMs: 1400,
+            labelSelector: "span",
+          });
         }
       }
-    }
-  }
-
-  if (prefill.vendor) {
-    el.querySelector("#sw-vendor").value = state.vendor;
-  }
-
-  fillChips(false);
-  fillSuites();
-  updateCommands();
-
-  el.querySelector("#sw-vendor").addEventListener("change", (e) => {
-    state.vendor = e.target.value;
-    fillChips(false);
-    fillSuites();
-    updateCommands();
-  });
-  el.querySelector("#sw-chip").addEventListener("change", (e) => {
-    state.chip = e.target.value;
-    state.custom = "";
-    el.querySelector("#sw-custom").value = "";
-    fillSuites();
-    updateCommands();
-    updateChipHint();
-  });
-  el.querySelector("#sw-custom").addEventListener("input", (e) => {
-    state.custom = e.target.value;
-    updateCommands();
-  });
-  el.querySelector("#sw-count").addEventListener("change", (e) => {
-    state.count = e.target.value;
-    fillSuites();
-    updateCommands();
-    updateChipHint();
-  });
-  el.querySelector("#sw-suites").addEventListener("change", (e) => {
-    if (e.target.name === "suite") {
-      state.suite = e.target.value;
-      fillSuites();
-      updateCommands();
-    }
-  });
-  el.querySelector("#sw-search").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      applySearch(e.target.value);
-    }
-  });
-  el.querySelector("#sw-prev").addEventListener("click", () => showStep(step - 1));
-  el.querySelector("#sw-next").addEventListener("click", () => {
-    if (step < STEPS.length - 1) showStep(step + 1);
-    else location.hash = "#/rankings";
-  });
-  el.querySelectorAll(".wizard-tab").forEach((t) => {
-    t.addEventListener("click", () => showStep(Number(t.dataset.step)));
-  });
-
-  el.addEventListener("click", async (e) => {
-    const btn = e.target.closest("[data-copy]");
-    if (!btn) return;
-    const key = btn.dataset.copy;
-    const pre = el.querySelector(key === "install" ? "#sw-cmd-install" : key === "run" ? "#sw-cmd-run" : "#sw-cmd-validate");
-    if (!pre) return;
-    const { copyToClipboard, flashButtonLabel } = await import("../utils.js");
-    const ok = await copyToClipboard(pre.textContent);
-    flashButtonLabel(btn, ok ? _i('submit.flashCopied') : _i('submit.flashFailed'), 1400, ok ? "is-copied" : "is-copy-failed");
-  });
-
-  if (prefill.chip || prefill.vendor) {
-    applySearch(prefill.chip || prefill.vendor);
+    });
+    el.addEventListener("change", (ev) => {
+      if (ev.target?.id === "sub-cn-mirror") {
+        state.cnMirror = ev.target.checked;
+        paint();
+      }
+    });
   }
 }

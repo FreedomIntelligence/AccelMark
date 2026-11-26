@@ -69,7 +69,20 @@ export function dispatch() {
     }
   }
 
+  // Legacy / friendly route aliases — zero broken links.
+  if (path === "/leaderboard" || path === "/results") {
+    const qs = location.hash.includes("?") ? "?" + location.hash.split("?").slice(1).join("?") : "";
+    history.replaceState(null, "", location.pathname + location.search + `#/rankings${qs}`);
+    return dispatch();
+  }
+  if (path === "/methodology") {
+    const qs = location.hash.includes("?") ? "?" + location.hash.split("?").slice(1).join("?") : "";
+    history.replaceState(null, "", location.pathname + location.search + `#/suites${qs}`);
+    return dispatch();
+  }
+
   const match = matchRoute(path);
+  mountEl.classList.toggle("wide-view", path.startsWith("/rankings"));
   // Reset scroll on route change.
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
 
@@ -113,6 +126,7 @@ function syncNav(path) {
   //   • everything else falls through to its obvious top-level link.
   let active = "/";
   if (path.startsWith("/rankings"))        active = "/rankings";
+  else if (path.startsWith("/findings"))   active = "/findings";
   else if (path.startsWith("/compare"))    active = "/compare";
   else if (path.startsWith("/suites"))     active = "/suites";
   else if (path.startsWith("/agent"))      active = "/agent";
@@ -123,7 +137,8 @@ function syncNav(path) {
   else if (path.startsWith("/wanted"))       active = "/contributors";
   else if (path.startsWith("/citation"))     active = null;
   else if (path.startsWith("/chip"))       active = null;
-  for (const a of links) {
+  const allNav = document.querySelectorAll(".topnav .nav-link, .topnav .nav-submit-btn");
+  for (const a of allNav) {
     const href = a.getAttribute("href") || "";
     a.classList.toggle("active", active !== null && href === `#${active}`);
   }

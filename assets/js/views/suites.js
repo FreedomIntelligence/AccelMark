@@ -13,10 +13,10 @@ const SUITE_FINDINGS = {
   suite_A: {
     headline: "Offline winner is not the SLA winner",
     body:
-      "H200 leads Suite A offline at 5,731 tokens/sec, but on the same suite's " +
-      "online tier A100 and A800 sustain 25 queries/sec while H200 caps " +
-      "at 10. The 500 ms p99 TTFT SLA binds well before the throughput " +
-      "ceiling, so the chip that leads offline loses the production tier.",
+      "H200 leads Suite A offline at 5,731 tokens/sec, but under the 500 ms " +
+      "p99 TTFT SLA it sustains only 5 queries/sec while H100 sustains 25 " +
+      "on the same vLLM stack. The latency SLA binds well before the " +
+      "throughput ceiling, so the chip that leads offline loses the production tier.",
   },
   suite_B: {
     headline: "Bottom tier is decided by software stack, not VRAM",
@@ -86,9 +86,9 @@ const INVERSION_CARDS = [
     eyebrow: "Offline vs Online",
     title: "The throughput winner loses the SLA tier",
     body:
-      "Suite A: H200 leads offline at 5,731 tokens/sec, but caps at 10 queries/sec " +
-      "once the 500 ms p99 TTFT SLA is enforced. A100 and A800 sustain " +
-      "25 queries/sec on the same hardware tier. Offline and online are not the " +
+      "Suite A: H200 leads offline at 5,731 tokens/sec, but caps at 5 queries/sec " +
+      "once the 500 ms p99 TTFT SLA is enforced. H100 sustains " +
+      "25 queries/sec on the same vLLM stack. Offline and online are not the " +
       "same race.",
     suite: "A",
   },

@@ -143,6 +143,21 @@ const TIER_LABELS = {
   edge: "Edge",
 };
 
+const NOISE_TOKENS = new Set([
+  "nvidia", "geforce", "tesla", "amd", "radeon", "instinct",
+  "huawei", "google", "apple", "intel", "iluvatar", "corex", "moore", "threads",
+  "sxm", "sxm4", "sxm5", "pcie", "nvl", "hbm", "hbm2", "hbm2e", "hbm3", "hbm3e",
+  "generation", "trillium", "gpu", "npu",
+]);
+
+function chipTokens(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .split(/[^a-z0-9]+/)
+    .filter((t) => t && !NOISE_TOKENS.has(t));
+}
+
 /** Normalize chip name for fuzzy matching against leaderboard labels. */
 export function normChipKey(s) {
   return String(s || "")
@@ -152,11 +167,23 @@ export function normChipKey(s) {
 }
 
 /** True if catalog chip appears covered by any live leaderboard chip label. */
-export function chipIsCovered(catalogChip, liveChipKeys) {
+export function chipIsCovered(catalogChip, liveChipKeys, liveTokenSets) {
   const key = normChipKey(catalogChip);
   if (!key) return false;
   for (const live of liveChipKeys) {
     if (live === key || live.includes(key) || key.includes(live)) return true;
+  }
+  if (liveTokenSets && liveTokenSets.length) {
+    const tokens = chipTokens(catalogChip);
+    if (tokens.length > 0) {
+      for (const liveSet of liveTokenSets) {
+        // Every meaningful token in the catalog chip must appear in the live label
+        // (e.g. ["a100", "80gb"] matches "NVIDIA A100-SXM4-80GB"; ["tpu", "v6e"] matches "Google TPU v6e").
+        if (tokens.every((t) => liveSet.has(t) || [...liveSet].some((lt) => lt.startsWith(t) && lt.length <= t.length + 2))) {
+          return true;
+        }
+      }
+    }
   }
   return false;
 }
@@ -193,9 +220,11 @@ export function flattenCatalog() {
 
 /** Catalog entries not yet represented on the live leaderboard. */
 export function wantedFromCatalog(liveChipLabels) {
-  const liveKeys = (liveChipLabels || []).map(normChipKey);
+  const labels = liveChipLabels || [];
+  const liveKeys = labels.map(normChipKey);
+  const liveTokenSets = labels.map((l) => new Set(chipTokens(l)));
   return flattenCatalog()
-    .filter((w) => !chipIsCovered(w.name, liveKeys))
+    .filter((w) => !chipIsCovered(w.name, liveKeys, liveTokenSets))
     .sort((a, b) => {
       const tierOrder = { datacenter: 0, cloud: 1, workstation: 2, consumer: 3, edge: 4 };
       const ta = tierOrder[a.tier] ?? 5;

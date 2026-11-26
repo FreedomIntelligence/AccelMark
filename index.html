@@ -3,21 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AccelMark — Reproducible LLM Inference Benchmarks</title>
-  <meta name="description" content="Run your accelerator. Publish reproducible LLM inference results. Compare NVIDIA, AMD, Ascend, Apple Silicon, TPU and more under the same workload suites.">
-  <meta property="og:title" content="AccelMark — Reproducible LLM Inference Benchmarks">
-  <meta property="og:description" content="Community-submitted, verifiable benchmark results with result.json, env_info.json, runner hash, and reproduction instructions.">
+  <title>AccelMark — Open LLM Inference Benchmarks</title>
+  <meta name="description" content="No single fastest accelerator — only the best serving recipe for your workload. Open, reproducible LLM inference benchmarks across 7 hardware ecosystems.">
+  <meta property="og:title" content="AccelMark — Open LLM Inference Benchmarks">
+  <meta property="og:description" content="No single fastest chip — only the best serving recipe for your workload. Compare NVIDIA, AMD, Ascend, Apple Silicon, Google TPU, Moore Threads &amp; Iluvatar.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://freedomintelligence.github.io/AccelMark/">
   <meta property="og:image" content="https://freedomintelligence.github.io/AccelMark/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AccelMark — Reproducible LLM Inference Benchmarks">
-  <meta name="twitter:description" content="Open, community-driven LLM inference leaderboard across NVIDIA, AMD, Huawei Ascend, Apple Silicon, Google TPU, Moore Threads &amp; Iluvatar.">
+  <meta name="twitter:title" content="AccelMark — Open LLM Inference Benchmarks">
+  <meta name="twitter:description" content="No single fastest chip — only the best serving recipe for your workload.">
   <meta name="twitter:image" content="https://freedomintelligence.github.io/AccelMark/og-image.png">
-  <meta name="theme-color" content="#0b0c10" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#faf8f3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <script>
+  // Theme bootstrap (zero flash)
+  (function(){
+    var saved = null;
+    try { saved = localStorage.getItem('accelmark-theme'); } catch(e) {}
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+    window._theme = function() {
+      var cur = document.documentElement.getAttribute('data-theme');
+      if (cur === 'dark' || cur === 'light') return cur;
+      return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    };
+    window._toggleTheme = function() {
+      var next = window._theme() === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('accelmark-theme', next); } catch(e) {}
+      window.dispatchEvent(new CustomEvent('accelmark:theme', { detail: { theme: next } }));
+      return next;
+    };
+  })();
+
   // i18n bootstrap — must be available before any module loads
   window._i18n = (function(){
     var lang = 'en';
@@ -26,7 +47,7 @@
     return {
       set: function(data) { t = data; },
       lang: function(l) { if(l) { lang = l; try { localStorage.setItem('accelmark-lang', l); } catch(e) {} } return lang; },
-      i: function(k, r) { var dict = t[lang] || t.en || {}; var v = dict[k]; if (v === undefined) v = (t.en && t.en[k]) || k; if (r) { for (var key in r) v = v.split('{'+key+'}').join(r[key]); } return v; }
+      i: function(k, r) { var dict = t[lang] || t.en || {}; var v = dict[k]; var fb = (typeof r === 'string') ? r : null; if (v === undefined) v = (t.en && t.en[k]); if (v === undefined) v = (fb !== null ? fb : k); if (r && typeof r === 'object') { for (var key in r) v = v.split('{'+key+'}').join(r[key]); } return v; }
     };
   })();
   window._i = function(k, r) { return window._i18n.i(k, r); };
@@ -34,136 +55,181 @@
   window._toggleLang = function() { var n = window._i18n.lang() === 'en' ? 'cn' : 'en'; window._i18n.lang(n); return n; };
   </script>
 
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/layout.css">
-  <link rel="stylesheet" href="assets/css/components.css?v=20260709e">
-  <link rel="stylesheet" href="assets/css/home.css?v=20260709g">
-  <link rel="stylesheet" href="assets/css/suites.css">
-  <link rel="stylesheet" href="assets/css/rankings.css">
-  <link rel="stylesheet" href="assets/css/chip-detail.css">
-  <link rel="stylesheet" href="assets/css/modal.css">
-<link rel="stylesheet" href="assets/css/distribution.css">
-  <link rel="stylesheet" href="assets/css/pages.css?v=20260709l">
+  <link rel="stylesheet" href="assets/css/base.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/layout.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/components.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/home.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/suites.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/rankings.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/compare.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/chip-detail.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/modal.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/distribution.css?v=20261126b">
+  <link rel="stylesheet" href="assets/css/pages.css?v=20261126b">
 </head>
 <body>
   <nav class="topnav" aria-label="Primary">
     <a class="brand" href="#/" aria-label="AccelMark home">
-      <svg width="24" height="24" viewBox="0 0 72 72" aria-hidden="true">
-        <defs>
-          <linearGradient id="navBolt" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#FBBF24"/>
-            <stop offset="100%" stop-color="#F59E0B"/>
-          </linearGradient>
-          <linearGradient id="navGauge" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#60A5FA"/>
-            <stop offset="100%" stop-color="#2563EB"/>
-          </linearGradient>
-        </defs>
-        <path d="M 10 50 A 26 26 0 1 1 62 50" fill="none" stroke="url(#navGauge)" stroke-width="6" stroke-linecap="round"/>
-        <path d="M 40 14 L 24 42 L 33 42 L 28 58 L 50 30 L 41 30 Z" fill="url(#navBolt)" stroke-width="0"/>
+      <svg class="brand-mark" width="24" height="24" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+        <polygon points="30.03,10.5 59.0,10.5 54.55,16.71 33.05,16.71 13.57,53.41 5.0,53.41" fill="currentColor"/>
+        <polygon points="34.81,19.57 37.92,19.57 59.0,53.41 50.27,53.41 43.63,41.66 21.8,41.66 39.26,34.01 33.13,22.68" fill="currentColor"/>
+        <path d="M 31.58 26.2 C 31.58 26.2 34.14 29.73 34.14 31.37 A 2.56 2.56 0 1 1 29.02 31.37 C 29.02 29.73 31.58 26.2 31.58 26.2 Z" fill="var(--accent)"/>
       </svg>
       <span>AccelMark</span>
     </a>
 
     <div class="nav-links">
-      <a class="nav-link" href="#/">Home</a>
-      <a class="nav-link" href="#/rankings">Results</a>
+      <a class="nav-link" href="#/rankings">Leaderboard</a>
+      <a class="nav-link" href="#/findings">Findings</a>
       <a class="nav-link" href="#/compare">Compare</a>
-      <a class="nav-link" href="#/suites">Suites</a>
+      <a class="nav-link" href="#/suites">Methodology</a>
       <a class="nav-link" href="#/agent">Agent Track</a>
       <a class="nav-link nav-community" href="#/contributors">Community</a>
-      <a class="nav-link nav-submit" href="#/submit">Submit</a>
     </div>
 
     <div class="nav-right">
-      <button id="lang-toggle" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:0.85rem" title="Switch language / 切换语言">中文</button>
-      <a class="gh-link" href="https://github.com/FreedomIntelligence/AccelMark" target="_blank" rel="noopener" aria-label="GitHub">
-        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <button id="cmdk-trigger" class="nav-cmdk" type="button" title="Quick search (⌘K)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="nav-cmdk-text">Search</span>
+        <kbd>⌘K</kbd>
+      </button>
+      <a class="nav-docs-link" href="docs/" title="Documentation">
+        <span class="nav-docs-label">Docs</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </a>
+      <button id="lang-toggle" class="nav-icon-btn" type="button" title="Switch language / 切换语言">中文</button>
+      <button id="theme-toggle" class="nav-icon-btn" type="button" aria-label="Toggle theme" title="Toggle light / dark theme"></button>
+      <a class="nav-icon-btn gh-link" href="https://github.com/FreedomIntelligence/AccelMark" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.32c-2.22.48-2.69-1.07-2.69-1.07-.36-.93-.89-1.18-.89-1.18-.73-.49.06-.48.06-.48.8.06 1.23.82 1.23.82.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82a7.58 7.58 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
         </svg>
       </a>
+      <a class="nav-submit-btn nav-submit" href="#/submit">Submit</a>
     </div>
   </nav>
 
   <main id="view" aria-live="polite">
     <noscript>
-      <section class="hero" style="padding:2rem;text-align:center">
-        <h1>AccelMark — Reproducible LLM Inference Benchmarks</h1>
-        <p>Compare NVIDIA, AMD, Ascend, Apple Silicon, TPU and emerging chips. Every result links to result.json, env_info.json, runner hash, and reproduction instructions.</p>
-        <p><a href="#/submit">Submit a result</a> · <a href="#/rankings">Browse results</a> · <a href="#/citation">Cite the dataset</a></p>
+      <section class="state">
+        <h1>AccelMark — Open LLM Inference Benchmarks</h1>
+        <p>No single fastest chip — only the best serving recipe for your workload.</p>
       </section>
     </noscript>
     <div class="state">Loading…</div>
   </main>
 
-  <footer>
-    <p>
-      <span class="footer-tagline">AccelMark · Open-source LLM inference benchmarking.</span><br>
-      <a href="#/submit" class="footer-submit">Submit</a> ·
-      <a href="#/wanted" class="footer-wanted">Wanted</a> ·
-      <a href="#/reproduce" class="footer-reproduce">Reproduce</a> ·
-      <a href="#/contributors" class="footer-contributors">Contributors</a> ·
-      <a href="#/citation" class="footer-cite">Cite dataset</a> ·
-      <a href="api/manifest.json" class="footer-api">API manifest</a> ·
-      <a href="https://github.com/FreedomIntelligence/AccelMark" class="footer-source">Source code</a> ·
-      <a href="https://github.com/FreedomIntelligence/AccelMark/discussions" class="footer-discuss">Discussions</a>
-    </p>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand-col">
+        <div class="footer-brand-row">
+          <svg width="20" height="20" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+            <polygon points="30.03,10.5 59.0,10.5 54.55,16.71 33.05,16.71 13.57,53.41 5.0,53.41" fill="currentColor"/>
+            <polygon points="34.81,19.57 37.92,19.57 59.0,53.41 50.27,53.41 43.63,41.66 21.8,41.66 39.26,34.01 33.13,22.68" fill="currentColor"/>
+            <path d="M 31.58 26.2 C 31.58 26.2 34.14 29.73 34.14 31.37 A 2.56 2.56 0 1 1 29.02 31.37 C 29.02 29.73 31.58 26.2 31.58 26.2 Z" fill="var(--accent)"/>
+          </svg>
+          <span>AccelMark</span>
+        </div>
+        <p class="footer-desc footer-tagline">Open, reproducible multi-regime LLM inference benchmarking across heterogeneous AI accelerators.</p>
+        <div class="footer-license">Code: Apache 2.0 · Data: CC BY 4.0</div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#/rankings" class="footer-leaderboard">Leaderboard</a></li>
+          <li><a href="#/findings" class="footer-findings">Key Findings</a></li>
+          <li><a href="#/compare" class="footer-compare">Compare Recipes</a></li>
+          <li><a href="#/suites" class="footer-methodology">Methodology (A–H)</a></li>
+          <li><a href="#/agent" class="footer-agent">Agent Track</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contribute</h4>
+        <ul>
+          <li><a href="#/submit" class="footer-submit">Submit a Result</a></li>
+          <li><a href="#/wanted" class="footer-wanted">Wanted Hardware</a></li>
+          <li><a href="#/reproduce" class="footer-reproduce">Reproduction Quests</a></li>
+          <li><a href="#/contributors" class="footer-contributors">Contributors</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Research &amp; API</h4>
+        <ul>
+          <li><a href="docs/" class="footer-docs">Documentation</a></li>
+          <li><a href="#/citation" class="footer-cite">Cite Dataset (BibTeX)</a></li>
+          <li><a href="api/manifest.json" class="footer-api">Open JSON API</a></li>
+          <li><a href="https://github.com/FreedomIntelligence/AccelMark" target="_blank" rel="noopener" class="footer-source">GitHub Repository</a></li>
+          <li><a href="https://github.com/FreedomIntelligence/AccelMark/discussions" target="_blank" rel="noopener" class="footer-discuss">Discussions</a></li>
+        </ul>
+      </div>
+    </div>
   </footer>
 
-  <!-- Generated by leaderboard/generate.py.  Sets window.LEADERBOARD_DATA. -->
-  <script src="leaderboard.js?v=ab166ad6"></script>
-  <!-- Generated by leaderboard/generate.py. Sets window.DISTRIBUTION_SUBMISSIONS. -->
-  <script src="distribution.js?v=4a4c9058"></script>
-
-  <script src="assets/js/i18n.js"></script>
-<script>
-// Language toggle
-(function(){
-  function applyLang() {
-    var lang = window._lang();
-    var btn = document.getElementById('lang-toggle');
-    if (btn) btn.textContent = (lang === 'en') ? '中文' : 'English';
-    var navMap = {
-      '.nav-links [href="#/"]': 'nav.home',
-      '.nav-links [href="#/rankings"]': 'nav.results',
-      '.nav-links [href="#/compare"]': 'nav.compare',
-      '.nav-links [href="#/suites"]': 'nav.suites',
-      '.nav-links [href="#/agent"]': 'nav.agent',
-      '.nav-community': 'nav.community',
-      '.nav-submit': 'nav.submit',
-      '.footer-tagline': 'footer.tagline',
-      '.footer-submit': 'nav.submit',
-      '.footer-wanted': 'nav.wanted',
-      '.footer-reproduce': 'nav.reproduce',
-      '.footer-contributors': 'nav.contributors',
-      '.footer-cite': 'footer.cite',
-      '.footer-api': 'footer.api',
-      '.footer-source': 'footer.source',
-      '.footer-discuss': 'footer.discuss',
-    };
-    for (var sel in navMap) {
-      var el = document.querySelector(sel);
-      if (el) el.textContent = window._i(navMap[sel]);
+  <!-- Generated by leaderboard/generate.py -->
+  <script src="leaderboard.js?v=bea03d26"></script>
+  <script src="distribution.js?v=9c108d15"></script>
+  <script src="assets/js/i18n.js?v=20261126b"></script>
+  <script>
+  (function(){
+    var SUN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+    var MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    function syncThemeIcon() {
+      var btn = document.getElementById('theme-toggle');
+      if (btn) btn.innerHTML = window._theme() === 'dark' ? SUN : MOON;
     }
-  }
-  applyLang();
-  window.addEventListener('hashchange', function(){ setTimeout(applyLang, 50); });
-  var btn = document.getElementById('lang-toggle');
-  if (btn) btn.addEventListener('click', function() {
-    window._toggleLang();
-    applyLang();
-    // Save scroll position before re-render
-    var scrollY = window.scrollY || window.pageYOffset;
-    if (window.router && window.router.refresh) window.router.refresh();
-    // Restore scroll position after DOM update
-    requestAnimationFrame(function() { window.scrollTo(0, scrollY); });
-  });
-})();
-</script>
-<script type="module" src="assets/js/main.js?v=20260709m"></script>
+    syncThemeIcon();
+    var tbtn = document.getElementById('theme-toggle');
+    if (tbtn) tbtn.addEventListener('click', function(){
+      window._toggleTheme();
+      syncThemeIcon();
+    });
 
-  <!-- Local vendor copies — avoid blocking on external CDN when sharing via tunnel. -->
-  <script src="assets/vendor/chart.umd.min.js" defer></script>
-  <script src="assets/vendor/echarts.min.js" defer></script>
+    function applyLang() {
+      var lang = window._lang();
+      var btn = document.getElementById('lang-toggle');
+      if (btn) btn.textContent = (lang === 'en') ? '中文' : 'EN';
+      var navMap = {
+        '.nav-links [href="#/rankings"]': 'nav.results',
+        '.nav-links [href="#/findings"]': 'nav.findings',
+        '.nav-links [href="#/compare"]': 'nav.compare',
+        '.nav-links [href="#/suites"]': 'nav.suites',
+        '.nav-links [href="#/agent"]': 'nav.agent',
+        '.nav-community': 'nav.community',
+        '.nav-submit': 'nav.submit',
+        '.footer-tagline': 'footer.tagline',
+        '.footer-leaderboard': 'nav.results',
+        '.footer-findings': 'nav.findings',
+        '.footer-compare': 'nav.compare',
+        '.footer-methodology': 'nav.suites',
+        '.footer-agent': 'nav.agent',
+        '.footer-submit': 'nav.submit',
+        '.footer-wanted': 'nav.wanted',
+        '.footer-reproduce': 'nav.reproduce',
+        '.footer-contributors': 'nav.contributors',
+        '.footer-cite': 'footer.cite',
+        '.footer-api': 'footer.api',
+        '.footer-source': 'footer.source',
+        '.footer-discuss': 'footer.discuss',
+      };
+      for (var sel in navMap) {
+        var el = document.querySelector(sel);
+        if (el) el.textContent = window._i(navMap[sel]);
+      }
+    }
+    applyLang();
+    window.addEventListener('hashchange', function(){ setTimeout(applyLang, 50); });
+    var lbtn = document.getElementById('lang-toggle');
+    if (lbtn) lbtn.addEventListener('click', function() {
+      window._toggleLang();
+      applyLang();
+      var scrollY = window.scrollY || window.pageYOffset;
+      if (window.router && window.router.refresh) window.router.refresh();
+      requestAnimationFrame(function() { window.scrollTo(0, scrollY); });
+    });
+  })();
+  </script>
+  <script type="module" src="assets/js/main.js?v=20261126b"></script>
 </body>
 </html>

@@ -26,12 +26,13 @@
 import {
   SUITE_ORDER, SUITE_META, SUITE_COLUMNS, formatMetric,
   rowByRunId, bestRowForRunInSuite, chipCloudData,
-  representativeRunForChip, rowsForChip, vendorColor,
+  representativeRunForChip, rowsForChip, vendorColor, allRows,
 } from "../data.js";
 import {
   esc, fmtNum, buildHash, chipHref, parseHash, shortVersion,
   copyToClipboard, flashButtonLabel, downloadCanvasAsPng,
 } from "../utils.js";
+import { downloadCompareShareCard } from "../share-card.js";
 import {
   basketGet, basketHas, basketToggle, basketOnChange,
 } from "../router.js";
@@ -84,6 +85,7 @@ export function render({ el, query }) {
           ${_i('compare.sub3')}
         </p>
       </section>
+      ${renderPresetComparisons()}
       ${renderChipCloudBlock({
         title: _i('compare.quickadd'),
         hint: _i('compare.quickaddHint'),
@@ -187,6 +189,20 @@ export function render({ el, query }) {
       <span class="cmp-basket-label">${_i('compare.comparing')}</span>
       ${chips.map((c) => renderBasketChip(c)).join("")}
       <div class="cmp-basket-actions">
+        <button class="copy-btn cmp-basket-share"
+                data-basket-png="1"
+                type="button"
+                title="Download 1200×630 PNG comparison share card">
+          <span class="copy-btn-icon" aria-hidden="true">↓</span>
+          <span class="copy-btn-label">Share PNG</span>
+        </button>
+        <button class="copy-btn cmp-basket-share"
+                data-basket-md="1"
+                type="button"
+                title="Copy Markdown comparison table">
+          <span class="copy-btn-icon" aria-hidden="true">⊞</span>
+          <span class="copy-btn-label">Markdown</span>
+        </button>
         <button class="copy-btn cmp-basket-share"
                 data-basket-share="1"
                 type="button"
@@ -942,6 +958,120 @@ function renderCmpCell(value, col, isWinner, frac) {
   `;
 }
 
+async function _exportComparePng(btn, suiteId) {
+  const rows = basketGet()
+    .map((rid) => bestRowForRunInSuite(rid, suiteId) || rowByRunId(rid))
+    .filter(Boolean);
+  const meta = SUITE_META[suiteId];
+  const cols = SUITE_COLUMNS[suiteId] || [];
+  const primary = cols.find((c) => c.primary) || cols[0];
+  const ok = await downloadCompareShareCard(rows, {
+    title: meta ? `Suite ${meta.letter} · ${meta.title}` : suiteId,
+    metricLabel: primary?.unit || primary?.label || "tokens/sec",
+    metricFn: primary ? ((r) => Number(r[primary.key] || 0)) : undefined,
+    filename: `accelmark-compare-${suiteId}.png`,
+  });
+  flashButtonLabel(btn, ok ? "Saved PNG" : "Failed", { holdMs: 1600, labelSelector: ".copy-btn-label" });
+}
+
+async function _copyCompareMarkdown(btn, suiteId) {
+  const rows = basketGet()
+    .map((rid) => bestRowForRunInSuite(rid, suiteId) || rowByRunId(rid))
+    .filter(Boolean);
+  if (!rows.length) return;
+  const cols = SUITE_COLUMNS[suiteId] || [];
+  const meta = SUITE_META[suiteId];
+  const headers = ["Chip", "Framework", "Precision", ...cols.map((c) => c.unit ? `${c.label} (${c.unit})` : c.label), "Tier"];
+  const lines = [
+    `### AccelMark Comparison — ${meta ? `Suite ${meta.letter} · ${meta.title}` : suiteId}`,
+    "",
+    `| ${headers.join(" | ")} |`,
+    `| ${headers.map(() => "---").join(" | ")} |`,
+    ...rows.map((r) => {
+      const cells = [
+        r._chip_label || r.chip,
+        [r.framework, shortVersion(r.framework_version)].filter(Boolean).join(" "),
+        r.precision || "—",
+        ...cols.map((c) => formatMetric(r[c.key], c) ?? "—"),
+        r.tier || "community",
+      ];
+      return `| ${cells.join(" | ")} |`;
+    }),
+    "",
+    `_Source: https://freedomintelligence.github.io/AccelMark/#/compare_`,
+  ];
+  const ok = await copyToClipboard(lines.join("\n"));
+  flashButtonLabel(btn, ok ? "Copied MD" : "Failed", { holdMs: 1600, labelSelector: ".copy-btn-label" });
+}
+
+function renderPresetComparisons() {
+  const rows = allRows().filter((r) => !r.flagged && (r.runner_tier || "reference") === "reference");
+  const pick = (pred) => rows.find(pred)?.run_id || null;
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
+
+  const presets = [
+    {
+      tag: "Suite A ↔ D",
+      title: zh ? "RTX 5090 vs A100-80GB" : "RTX 5090 vs A100-80GB",
+      desc: zh ? "同为 vLLM：短对话领先 +29%，28K 预填充反输 −23%" : "Same vLLM stack: +29% faster on chat, −23% slower on 28K prefill",
+      suite: "suite_A",
+      runs: [
+        pick((r) => r.suite === "suite_A" && r.chip.includes("5090") && r.framework === "vLLM"),
+        pick((r) => r.suite === "suite_A" && r.chip === "NVIDIA A100-SXM4-80GB" && r.framework === "vLLM"),
+      ].filter(Boolean),
+    },
+    {
+      tag: "500ms SLA",
+      title: zh ? "H200 vs H100 80GB" : "H200 vs H100 80GB",
+      desc: zh ? "H200 离线吞吐更高，H100 生产 SLA 容量高 5 倍" : "H200 leads offline throughput; H100 sustains 5× higher SLA QPS",
+      suite: "suite_A",
+      runs: [
+        pick((r) => r.suite === "suite_A" && r.chip === "NVIDIA H200" && r.framework === "vLLM"),
+        pick((r) => r.suite === "suite_A" && r.chip.includes("H100") && r.framework === "vLLM"),
+      ].filter(Boolean),
+    },
+    {
+      tag: "Engine > Chip",
+      title: zh ? "H20-3e：SGLang vs vLLM" : "H20-3e: SGLang vs vLLM",
+      desc: zh ? "同一张 H20-3e 切换推理引擎，吞吐直接暴涨 +89%" : "Identical H20-3e silicon, switching engine lifts throughput +89%",
+      suite: "suite_A",
+      runs: [
+        pick((r) => r.suite === "suite_A" && r.chip === "NVIDIA H20-3e" && r.framework === "SGLang"),
+        pick((r) => r.suite === "suite_A" && r.chip === "NVIDIA H20-3e" && r.framework === "vLLM"),
+      ].filter(Boolean),
+    },
+    {
+      tag: "5 Ecosystems",
+      title: zh ? "跨生态单卡横评" : "Cross-Ecosystem Chat",
+      desc: zh ? "A100 · Google TPU v6e · 昇腾 910B2 · 摩尔线程 · 天数智芯" : "NVIDIA A100 · Google TPU v6e · Ascend 910B2 · MTT · Iluvatar",
+      suite: "suite_A",
+      runs: [
+        pick((r) => r.suite === "suite_A" && r.chip === "NVIDIA A100-SXM4-80GB" && r.framework === "vLLM"),
+        pick((r) => r.suite === "suite_A" && r.vendor === "Google"),
+        pick((r) => r.suite === "suite_A" && r.vendor === "Huawei"),
+        pick((r) => r.suite === "suite_A" && r.vendor === "Moore Threads"),
+        pick((r) => r.suite === "suite_A" && r.vendor === "Iluvatar"),
+      ].filter(Boolean),
+    },
+  ].filter((p) => p.runs.length >= 2);
+
+  if (!presets.length) return "";
+  return `
+    <section class="cmp-presets">
+      <div class="cmp-presets-head mono">${zh ? "一键对比精选实测故事" : "CURATED HEAD-TO-HEAD COMPARISONS"}</div>
+      <div class="cmp-presets-grid">
+        ${presets.map((p) => `
+          <a class="cmp-preset-card" href="#/compare?runs=${encodeURIComponent(p.runs.join(","))}&suite=${encodeURIComponent(p.suite)}">
+            <span class="cmp-preset-tag mono">${esc(p.tag)}</span>
+            <strong class="cmp-preset-title">${esc(p.title)}</strong>
+            <span class="cmp-preset-desc">${esc(p.desc)}</span>
+          </a>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 // ── Share-link copy ───────────────────────────────────────────
 //
 // Build a self-contained URL that, when opened, restores the current
@@ -1007,6 +1137,20 @@ function bindClicks(el) {
     if (shareBtn) {
       ev.preventDefault();
       _copyShareLink(shareBtn, suiteId);
+      return;
+    }
+
+    const pngBtn = t.closest("[data-basket-png]");
+    if (pngBtn) {
+      ev.preventDefault();
+      _exportComparePng(pngBtn, suiteId);
+      return;
+    }
+
+    const mdBtn = t.closest("[data-basket-md]");
+    if (mdBtn) {
+      ev.preventDefault();
+      _copyCompareMarkdown(mdBtn, suiteId);
       return;
     }
 
