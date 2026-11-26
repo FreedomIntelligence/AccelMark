@@ -65,6 +65,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install jsonschema mkdocs-material --quiet
+          sudo apt-get update -qq && sudo apt-get install -y -qq librsvg2-bin
 
       - name: Generate leaderboard & visuals
         run: |
