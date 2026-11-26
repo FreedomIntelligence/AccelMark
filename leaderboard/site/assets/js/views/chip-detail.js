@@ -80,13 +80,13 @@ export function render({ el, params }) {
 
   const memoryStr = sample.memory_gb ? `${sample.memory_gb} GB` : "";
   const factPills = [
-    `${activeSuites.length} ${_i('chipDetail.suiteUnit', activeSuites.length === 1 ? 'suite' : 'suites')}`,
-    `${rs.length} ${_i('chipDetail.runUnit', rs.length === 1 ? 'run' : 'runs')}`,
-    `${frameworks.size} ${_i('chipDetail.frameworkUnit', frameworks.size === 1 ? 'framework' : 'frameworks')}`,
-    `${precisions.size} ${_i('chipDetail.precisionUnit', precisions.size === 1 ? 'precision' : 'precisions')}`,
+    `${activeSuites.length} ${_i(activeSuites.length === 1 ? 'chipDetail.suiteUnit' : 'chipDetail.suiteUnitPlural')}`,
+    `${rs.length} ${_i(rs.length === 1 ? 'chipDetail.runUnit' : 'chipDetail.runUnitPlural')}`,
+    `${frameworks.size} ${_i(frameworks.size === 1 ? 'chipDetail.frameworkUnit' : 'chipDetail.frameworkUnitPlural')}`,
+    `${precisions.size} ${_i(precisions.size === 1 ? 'chipDetail.precisionUnit' : 'chipDetail.precisionUnitPlural')}`,
   ];
   if (chipCounts.length > 1) {
-    factPills.push(`${chipCounts.length} ${_i('chipDetail.chipCountVariants', 'chip-count variants')} (${chipCounts.map((c) => `×${c}`).join(", ")})`);
+    factPills.push(`${chipCounts.length} ${_i('chipDetail.chipCountVariants')} (${chipCounts.map((c) => `×${c}`).join(", ")})`);
   } else if (chipCounts.length === 1 && chipCounts[0] > 1) {
     factPills.push(`${_i('chipDetail.deployedAt')} ×${chipCounts[0]}`);
   }
@@ -134,7 +134,7 @@ export function render({ el, params }) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">${runsNum}${_i('chipDetail.everySubEyebrow')}</span>
+          <span class="eyebrow">${_i('chipDetail.everySubEyebrow')}</span>
           <h2>${rs.length} ${_i('chipDetail.runsOnFile', rs.length === 1 ? 'run on file' : 'runs on file')}</h2>
         </div>
         <p class="section-sub">${_i('chipDetail.runsOnFileSub')}</p>
@@ -291,7 +291,7 @@ function renderFingerprintSection(slug, sample) {
         <p class="section-sub">
           ${_i('chipDetail.fingerprintSub1')}
           ${missing.length
-            ? _i('chipDetail.fingerprintSubMissing', `Suites without a submission collapse to the centre (${missing.map((sid) => SUITE_META[sid]?.letter).filter(Boolean).join(", ")}).`)
+            ? _i('chipDetail.fingerprintSubMissing', { missing: missing.map((sid) => SUITE_META[sid]?.letter).filter(Boolean).join(", ") })
             : ""}
         </p>
       </div>
@@ -629,7 +629,7 @@ function renderSimilarChipsSection(slug, latestRid, sectionNum = "04") {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">${sectionNum}${_i('chipDetail.peersEyebrow')}</span>
+          <span class="eyebrow">${_i('chipDetail.peersEyebrow')}</span>
           <h2>${_i('chipDetail.peersTitle')}</h2>
         </div>
         <p class="section-sub">${_i('chipDetail.peersSub')}</p>

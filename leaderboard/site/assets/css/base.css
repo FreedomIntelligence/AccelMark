@@ -1,248 +1,250 @@
-/* base.css — design tokens, reset, typography
- *
- * Palette philosophy (after "feels monotone" feedback):
- *   • Avoid pure black / pure white — dark uses off-black charcoal,
- *     light uses warm parchment (#faf8f3, Anthropic-ish).
- *   • Single accent (blue) for links / primary CTA stays — but each
- *     suite gets its own per-category color, surfaced on the card head,
- *     letter chip, and the featured #1 row.
- *   • Type pairs serif headline + system sans body for editorial feel.
- */
+/* base.css — Developer-tool minimalist design tokens (Zinc Light/Dark + Cobalt Blue) */
 
 :root {
-  /* ── Dark theme (default) ─────────────────────────────── */
-  --bg:           #0b0c10;
-  --bg-elev:      #14161c;
-  --bg-elev-2:    #1c1f27;
-  --bg-tinted:    #181a22;            /* slightly cooler tint for hero */
-  --border:       #2a2d36;
-  --border-soft:  #20232b;
+  /* ── Light theme (default, crisp neutral Zinc) ──────────────── */
+  --bg:           #ffffff;
+  --bg-subtle:    #fafafa;
+  --bg-elev:      #ffffff;
+  --bg-elev-2:    #f4f4f5;
+  --bg-tinted:    #fafafa;
+  --border:       #e4e4e7;
+  --border-soft:  #f0f0f3;
+
+  --fg:           #3f3f46;
+  --fg-strong:    #09090b;
+  --fg-muted:     #71717a;
+  --fg-faint:     #a1a1aa;
+
+  /* Single Brand Accent — Cobalt Blue */
+  --accent:       #2563eb;
+  --accent-2:     #1d4ed8;
+  --accent-3:     #1e40af;
+  --accent-soft:  rgba(37, 99, 235, 0.09);
+  --on-accent:    #ffffff;
+
+  /* Strict Semantic Status Colors (never used for decoration) */
+  --good:         #16a34a;
+  --good-soft:    rgba(22, 163, 74, 0.10);
+  --warn:         #d97706;
+  --warn-soft:    rgba(217, 119, 6, 0.10);
+  --bad:          #dc2626;
+  --bad-soft:     rgba(220, 38, 38, 0.09);
+
+  --gold:         #b45309;
+  --silver:       #52525b;
+  --bronze:       #9a3412;
+
+  /* Restrained Suite Category Dots (used ONLY for 6px dots & chart series, never card banners) */
+  --suite-A: #2563eb;
+  --suite-B: #7c3aed;
+  --suite-C: #0d9488;
+  --suite-D: #ea580c;
+  --suite-E: #16a34a;
+  --suite-F: #db2777;
+  --suite-G: #4f46e5;
+  --suite-H: #d97706;
+
+  /* Hairline shadows — minimal, crisp */
+  --shadow-card: 0 1px 2px rgba(9, 9, 11, 0.04);
+  --shadow-lift: 0 10px 28px -10px rgba(9, 9, 11, 0.12);
+
+  /* Radii */
+  --r-sm: 5px;
+  --r-md: 8px;
+  --r-lg: 12px;
+
+  /* Layout */
+  --max-w:   1200px;
+  --max-w-lg: 1320px;
+  --gap:     1rem;
+  --gap-lg:  1.5rem;
+
+  /* Typography — zero external CDN fonts, crisp native Inter/SF + tabular mono */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", "PingFang SC", "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  color-scheme: light;
+}
+
+/* ── Dark theme (via explicit toggle OR OS preference when no manual override) ── */
+:root[data-theme="dark"] {
+  --bg:           #09090b;
+  --bg-subtle:    #111114;
+  --bg-elev:      #111114;
+  --bg-elev-2:    #18181d;
+  --bg-tinted:    #111114;
+  --border:       #27272a;
+  --border-soft:  #1c1c21;
 
   --fg:           #d4d4d8;
-  --fg-strong:    #f4f4f5;
+  --fg-strong:    #fafafa;
   --fg-muted:     #a1a1aa;
   --fg-faint:     #71717a;
 
-  --accent:       #93c5fd;             /* link color — readable on bg */
-  --accent-2:     #3b82f6;             /* primary button / strong link */
-  --accent-3:     #1e3a8a;             /* deep blue — fallback header */
-  --accent-soft:  rgba(59, 130, 246, 0.14);
+  --accent:       #3b82f6;
+  --accent-2:     #60a5fa;
+  --accent-3:     #1d4ed8;
+  --accent-soft:  rgba(59, 130, 246, 0.15);
   --on-accent:    #ffffff;
 
-  --good:         #34d399;
+  --good:         #4ade80;
+  --good-soft:    rgba(74, 222, 128, 0.14);
   --warn:         #fbbf24;
-  --bad:          #fb7185;
+  --warn-soft:    rgba(251, 191, 36, 0.14);
+  --bad:          #f87171;
+  --bad-soft:     rgba(248, 113, 113, 0.14);
 
-  --gold:         #f5b50a;
-  --silver:       #c2c2c8;
-  --bronze:       #d4844a;
+  --gold:         #fbbf24;
+  --silver:       #d4d4d8;
+  --bronze:       #fb923c;
 
-  /* Per-suite category colors (chosen perceptually distinct, deep
-     enough that --on-accent white reads cleanly on top). */
-  --suite-A: #4f6bed;   /* cobalt — Single-chip throughput */
-  --suite-B: #7c4ddb;   /* violet — Multi-chip throughput */
-  --suite-C: #14b8a6;   /* teal — Quantization efficiency */
-  --suite-D: #d97757;   /* terracotta — Interactive latency */
-  --suite-E: #16a34a;   /* emerald — Scaling efficiency */
-  --suite-F: #db2777;   /* rose — Edge / low-power */
-  --suite-G: #6366f1;   /* indigo — Sustained load */
-  --suite-H: #f59e0b;   /* amber — Sliding Window Attention */
+  --suite-A: #3b82f6;
+  --suite-B: #a78bfa;
+  --suite-C: #2dd4bf;
+  --suite-D: #fb923c;
+  --suite-E: #4ade80;
+  --suite-F: #f472b6;
+  --suite-G: #818cf8;
+  --suite-H: #fbbf24;
 
-  /* Vendor colour table now lives in data.js (`VENDOR_COLORS`) and is
-   * injected at runtime as `[data-vendor="<name>"] { --vendor-color: ... }`
-   * — adding a new vendor is one line in JS instead of 70 lines spread
-   * across 6 CSS files.  Components keep consuming `var(--vendor-color)`. */
-
-  /* Card shadow (soft on dark) */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5);
-  --shadow-lift: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
-
-  /* Radii */
-  --r-sm: 4px;
-  --r-md: 8px;
-  --r-lg: 14px;
-
-  /* Layout */
-  --max-w:  1200px;
-  --gap:    1rem;
-  --gap-lg: 1.5rem;
-
-  /* Type — single sans family used everywhere; mono is kept only for
-     the `.mono` utility class and for the optional `font-variant-numeric`
-     tabular figures.  Serif token removed (was inconsistent feedback). */
-  --font-sans:  -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-  --font-mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 12px 32px -10px rgba(0, 0, 0, 0.65);
 
   color-scheme: dark;
 }
 
-/* ── Light theme (auto, follows OS) ───────────────────── */
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg:          #faf8f3;            /* warm parchment, not pure white */
-    --bg-elev:     #ffffff;
-    --bg-elev-2:   #f3efe6;
-    --bg-tinted:   #f5f1e8;
-    --border:      #e6e1d4;
-    --border-soft: #efeadd;
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:           #09090b;
+    --bg-subtle:    #111114;
+    --bg-elev:      #111114;
+    --bg-elev-2:    #18181d;
+    --bg-tinted:    #111114;
+    --border:       #27272a;
+    --border-soft:  #1c1c21;
 
-    --fg:          #44403c;
-    --fg-strong:   #1c1917;
-    --fg-muted:    #78716c;
-    --fg-faint:    #a8a29e;
+    --fg:           #d4d4d8;
+    --fg-strong:    #fafafa;
+    --fg-muted:     #a1a1aa;
+    --fg-faint:     #71717a;
 
-    --accent:      #2563eb;
-    --accent-2:    #2563eb;
-    --accent-3:    #1e40af;
-    --accent-soft: rgba(37, 99, 235, 0.10);
-    --on-accent:   #ffffff;
+    --accent:       #3b82f6;
+    --accent-2:     #60a5fa;
+    --accent-3:     #1d4ed8;
+    --accent-soft:  rgba(59, 130, 246, 0.15);
+    --on-accent:    #ffffff;
 
-    --good:        #15803d;
-    --warn:        #b45309;
-    --bad:         #b91c1c;
+    --good:         #4ade80;
+    --good-soft:    rgba(74, 222, 128, 0.14);
+    --warn:         #fbbf24;
+    --warn-soft:    rgba(251, 191, 36, 0.14);
+    --bad:          #f87171;
+    --bad-soft:     rgba(248, 113, 113, 0.14);
 
-    --gold:        #b8860b;
-    --silver:      #6b7280;
-    --bronze:      #b45a30;
+    --gold:         #fbbf24;
+    --silver:       #d4d4d8;
+    --bronze:       #fb923c;
 
-    /* Suite colors — slight darken for white bg so white text on the
-       filled header keeps WCAG AA. */
-    --suite-A: #3b5bdb;
-    --suite-B: #6d28d9;
-    --suite-C: #0f766e;
-    --suite-D: #c2410c;
-    --suite-E: #15803d;
-    --suite-F: #be185d;
-    --suite-G: #4338ca;
-    --suite-H: #d97706;
+    --suite-A: #3b82f6;
+    --suite-B: #a78bfa;
+    --suite-C: #2dd4bf;
+    --suite-D: #fb923c;
+    --suite-E: #4ade80;
+    --suite-F: #f472b6;
+    --suite-G: #818cf8;
+    --suite-H: #fbbf24;
 
-    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
-    --shadow-lift: 0 8px 24px -10px rgba(15, 23, 42, 0.14);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.45);
+    --shadow-lift: 0 12px 32px -10px rgba(0, 0, 0, 0.65);
 
-    color-scheme: light;
+    color-scheme: dark;
   }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-
 html, body { margin: 0; padding: 0; }
 
 body {
   font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  position: relative;
-  isolation: isolate;
+  overflow-x: clip;
 }
-/* Ambient page-top wash — soft multi-stop radial that fades into the
-   page background.  Pinned to the top of the document (absolute, not
-   fixed) so it scrolls away with the hero; no rounded clip, no hard
-   edge. */
+
+/* Subtle single-hue top wash — ultra restrained */
 body::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 720px;
+  height: 440px;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(60% 80% at 12% 0%, color-mix(in srgb, var(--suite-A) 13%, transparent), transparent 70%),
-    radial-gradient(55% 70% at 90% -4%, color-mix(in srgb, var(--suite-D) 11%, transparent), transparent 65%),
-    radial-gradient(70% 55% at 50% 0%,  color-mix(in srgb, var(--suite-B) 6%,  transparent), transparent 75%);
-  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 100%);
-          mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 100%);
+  background: radial-gradient(65% 65% at 50% -12%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 72%);
 }
 
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; }
+svg.ic { display: inline-block; vertical-align: middle; flex-shrink: 0; }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-
-/* Keyboard focus ring.  We rely on `:focus-visible` so mouse users
-   don't see the ring on click; tab navigation gets a two-layer halo:
-   a 2px solid accent outline (the crisp boundary) plus a 4px
-   translucent box-shadow ring underneath (the "halo" that survives
-   busy backgrounds — hero radial gradients, suite-color-tinted rows,
-   in-basket banners — where a single 2px line gets lost).
-   `outline-offset: 2px` keeps the line clear of rounded corners,
-   while the halo uses `0 0 0 4px` so it traces the element's own
-   shape (including any border-radius) without needing per-element
-   tuning.  `[tabindex="-1"]:focus-visible` is suppressed because we
-   use that pattern for programmatic focus targets (modal panel) where
-   the focus is intentional, not a keyboard navigation step. */
 :focus { outline: none; }
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: inherit;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 [tabindex="-1"]:focus-visible { outline: none; box-shadow: none; }
-.btn:focus-visible,
-.copy-btn:focus-visible {
-  outline-offset: 2px;
-}
-/* Pills with their own border and tight radius look better with the
-   ring snugged in tighter — anything with a `*-pill` suffix opts in.
-   Halo width also dialled down so it doesn't dwarf the pill itself. */
-.rk-suite-pill:focus-visible,
-.rk-facet-pill:focus-visible,
-.scn-suite-letter:focus-visible {
-  outline-offset: 1px;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
-}
-/* Table rows: `<tr>` doesn't render a box-shadow reliably across the
-   td borders, and the halo would clip mid-row when the table is in
-   `border-collapse: collapse` mode (which the data-table is).  Drop
-   the halo for rows so users still get the crisp 2px outline without
-   a chopped-off ghost ring. */
 tr:focus-visible { box-shadow: none; }
 
 ::selection { background: var(--accent-soft); color: var(--fg-strong); }
 
-/* Scrollbar (webkit only) */
-::-webkit-scrollbar       { width: 10px; height: 10px; }
+::-webkit-scrollbar       { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--fg-faint); }
 
-/* Utility */
+/* Utilities */
 .muted     { color: var(--fg-muted); }
 .faint     { color: var(--fg-faint); }
 .mono      { font-family: var(--font-mono); }
 .tnum      { font-variant-numeric: tabular-nums; }
-.text-xs   { font-size: 0.75rem; }
-.text-sm   { font-size: 0.85rem; }
-.text-lg   { font-size: 1.1rem; }
+.text-xs   { font-size: 0.78rem; }
+.text-sm   { font-size: 0.875rem; }
+.text-lg   { font-size: 1.05rem; }
 .text-xl   { font-size: 1.35rem; }
 .text-2xl  { font-size: 1.8rem; }
 .bold      { font-weight: 600; }
 .no-wrap   { white-space: nowrap; }
-.hide-mobile { /* set in layout.css responsive block */ }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
 
-/* ── Editorial eyebrow ──────────────────────────────────── */
+/* Unified section eyebrow — used ONLY at major section breaks */
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.7rem;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--fg-muted);
+  color: var(--accent);
 }
-.eyebrow::before {
-  content: "";
-  width: 1.5rem;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.5;
+
+/* Override any legacy serif page titles across sub-views */
+h1, h2, h3, h4 {
+  font-family: var(--font-sans) !important;
+  color: var(--fg-strong);
+  letter-spacing: -0.025em;
 }

@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Live leaderboard
+  - name: Live Leaderboard
     url: https://freedomintelligence.github.io/AccelMark
-    about: View all submitted benchmark results
-  - name: Contributing guide
-    url: https://github.com/FreedomIntelligence/AccelMark/blob/main/CONTRIBUTING.md
-    about: How to run and submit a benchmark
+    about: Browse rankings, interactive comparisons, and verified receipts
+  - name: Documentation
+    url: https://freedomintelligence.github.io/AccelMark/docs/
+    about: Installation, first submission guide, suite specs, and FAQ
+  - name: GitHub Discussions
+    url: https://github.com/FreedomIntelligence/AccelMark/discussions
+    about: Ask questions, share serving tips, or discuss new hardware stacks

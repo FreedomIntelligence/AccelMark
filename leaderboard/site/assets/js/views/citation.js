@@ -5,12 +5,26 @@ import { PROJECT_BIBTEX, datasetBibTeX } from "../cite.js";
 import { copyToClipboard, flashButtonLabel } from "../utils.js";
 const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
-const DATASET_VERSION = "2026.07.08";
-const API_BASE = typeof location !== "undefined" ? `${location.origin}${location.pathname}` : "";
+const CANONICAL_SITE = "https://freedomintelligence.github.io/AccelMark/";
+
+function datasetVersion() {
+  const m = typeof window !== "undefined" ? window.DATASET_META : null;
+  if (m && m.version) return m.version;
+  // Fall back to latest date across loaded submissions
+  const rows = typeof window !== "undefined" && Array.isArray(window.LEADERBOARD_DATA)
+    ? window.LEADERBOARD_DATA : [];
+  let maxDate = "";
+  for (const r of rows) {
+    if (r.date && String(r.date) > maxDate) maxDate = String(r.date);
+  }
+  return maxDate ? maxDate.slice(0, 10).replace(/-/g, ".") : "2026.11.26";
+}
 
 export function render({ el }) {
-  const dsBib = datasetBibTeX(DATASET_VERSION, `${API_BASE}api/manifest.json`);
-  const plainDataset = `AccelMark Results Dataset v${DATASET_VERSION}. AccelMark Contributors. ${DATASET_VERSION.slice(0, 4)}. ${API_BASE}api/manifest.json (CC BY 4.0).`;
+  const version = datasetVersion();
+  const manifestUrl = `${CANONICAL_SITE}api/manifest.json`;
+  const dsBib = datasetBibTeX(version, manifestUrl);
+  const plainDataset = `AccelMark Results Dataset v${version}. AccelMark Contributors. ${version.slice(0, 4)}. ${manifestUrl} (CC BY 4.0).`;
 
   el.innerHTML = `
     <section class="page-hero">
@@ -33,7 +47,7 @@ export function render({ el }) {
             <button type="button" class="btn small copy-btn" data-copy-target="ds-plain">Plain text</button>
           </span>
         </div>
-        <p class="muted">Cite a specific leaderboard export (<code>v${esc(DATASET_VERSION)}</code>). Checksums in <a href="api/manifest.json">manifest.json</a>.</p>
+        <p class="muted">Cite a specific leaderboard export (<code>v${esc(version)}</code>). Checksums in <a href="api/manifest.json">manifest.json</a>.</p>
         <pre class="cite-pre" id="ds-bib">${esc(dsBib)}</pre>
         <pre class="cite-pre faint" id="ds-plain">${esc(plainDataset)}</pre>
       </article>

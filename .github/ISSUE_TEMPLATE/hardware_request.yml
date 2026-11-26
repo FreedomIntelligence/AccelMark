@@ -1,0 +1,46 @@
+name: Hardware Benchmark Request
+description: Request AccelMark benchmark coverage for a specific GPU, NPU, TPU, or accelerator
+title: "[Hardware Request] "
+labels: ["hardware-request"]
+body:
+  - type: dropdown
+    id: vendor
+    attributes:
+      label: Hardware Ecosystem
+      options:
+        - NVIDIA
+        - AMD ROCm
+        - Huawei Ascend
+        - Iluvatar CoreX
+        - Moore Threads
+        - Google TPU
+        - Apple Silicon
+        - Intel
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: chip
+    attributes:
+      label: Accelerator Model & Memory
+      placeholder: e.g. AMD Instinct MI325X (256 GB), Ascend 910C (96 GB), RTX 5080 (16 GB)
+    validations:
+      required: true
+  - type: checkboxes
+    id: suites
+    attributes:
+      label: Suites of Interest
+      options:
+        - label: Suite A · Single-Chip Chat (Llama-3-8B + 500ms SLA)
+        - label: Suite B · 70B Multi-Chip TP
+        - label: Suite C · Quantization Efficiency
+        - label: Suite D · 28K Long-Context Prefill
+        - label: Suite E · Multi-Chip TP Scaling
+        - label: Suite F · Edge / Consumer (Qwen2.5-0.5B)
+        - label: Suite G · Sparse MoE (Mixtral-8x7B)
+        - label: Suite H · Sliding Window Attention (Mistral-7B)
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context (optional)
+      placeholder: Target serving engine (vLLM / SGLang / TRT-LLM / vendor fork), workload priority, or whether you can help run it.

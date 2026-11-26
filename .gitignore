@@ -45,6 +45,7 @@ configs/submitter.yaml
 configs/runner_configs/*.yaml
 leaderboard/site/leaderboard.js
 leaderboard/site/api/
+leaderboard/site/docs/
 
 # ── Benchmark artifacts (local-only — not part of submissions) ──────────────
 samples.jsonl

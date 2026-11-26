@@ -1,1140 +1,604 @@
-/* rankings.css — Rankings + Compare views.
- *
- * Shared primitives:
- *   • .rk-suite-pill   — per-suite pill row, used as both the rankings
- *                        suite filter and the compare suite switcher.
- *   • .rk-facet-pill   — multi-select facet pills (vendor / precision /
- *                        framework).
- *   • .data-table      — sortable, scrollable data table with sticky-ish
- *                        header (relative to the table container, not the
- *                        viewport — the toolbar above is already sticky).
- *
- * Per-suite color tokens are bound via [data-suite="A"..G"] on the hero,
- * table, and any pill that needs to render in suite color.
- */
+/* rankings.css — Compact developer-tool Leaderboard + Landscape + Findings shared styles */
 
-/* ── Per-suite color binding ───────────────────────────────── */
-.rk-hero[data-suite="A"],        .data-table[data-suite="A"],   .rk-chip-focus[data-suite="A"] { --suite-color: var(--suite-A); }
-.rk-hero[data-suite="B"],        .data-table[data-suite="B"],   .rk-chip-focus[data-suite="B"] { --suite-color: var(--suite-B); }
-.rk-hero[data-suite="C"],        .data-table[data-suite="C"],   .rk-chip-focus[data-suite="C"] { --suite-color: var(--suite-C); }
-.rk-hero[data-suite="D"],        .data-table[data-suite="D"],   .rk-chip-focus[data-suite="D"] { --suite-color: var(--suite-D); }
-.rk-hero[data-suite="E"],        .data-table[data-suite="E"],   .rk-chip-focus[data-suite="E"] { --suite-color: var(--suite-E); }
-.rk-hero[data-suite="F"],        .data-table[data-suite="F"],   .rk-chip-focus[data-suite="F"] { --suite-color: var(--suite-F); }
-.rk-hero[data-suite="G"],        .data-table[data-suite="G"],   .rk-chip-focus[data-suite="G"] { --suite-color: var(--suite-G); }
-.rk-hero[data-suite="H"],        .data-table[data-suite="H"],   .rk-chip-focus[data-suite="H"] { --suite-color: var(--suite-H); }
-
-.rk-suite-pill[data-suite="suite_A"] { --suite-color: var(--suite-A); }
-.rk-suite-pill[data-suite="suite_B"] { --suite-color: var(--suite-B); }
-.rk-suite-pill[data-suite="suite_C"] { --suite-color: var(--suite-C); }
-.rk-suite-pill[data-suite="suite_D"] { --suite-color: var(--suite-D); }
-.rk-suite-pill[data-suite="suite_E"] { --suite-color: var(--suite-E); }
-.rk-suite-pill[data-suite="suite_F"] { --suite-color: var(--suite-F); }
-.rk-suite-pill[data-suite="suite_G"] { --suite-color: var(--suite-G); }
-
-.rk-hero, .data-table, .rk-suite-pill { --suite-color: var(--accent-2); }
-
-/* Vendor dots inside rankings / compare scopes inherit the global
- * `--vendor-color` set on `[data-vendor="<name>"]` by data.js. */
-.rk-facet-pill .vendor-dot,
-.data-table .vendor-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--vendor-color, var(--fg-faint));
-  flex: 0 0 auto;
-}
-
-/* ── Hero (compact, suite-tinted) ──────────────────────────── */
-.rk-hero {
-  text-align: center;
-  padding: 2.25rem 1rem 1.5rem;
-  margin-bottom: 0.5rem;
-  position: relative;
-}
-.rk-hero::after {
-  content: "";
-  display: block;
-  width: 2.25rem;
-  height: 2px;
-  background: var(--suite-color);
-  margin: 1rem auto 0;
-  border-radius: 2px;
-  opacity: 0.85;
-}
-.rk-hero .eyebrow { justify-content: center; color: var(--suite-color); }
-/* Centered heroes don't need the leading rule that .eyebrow::before draws
-   for left-aligned section labels — it looks like a stray hyphen next to
-   the centered text. */
-.rk-hero .eyebrow::before { display: none; }
-.rk-hero-title {
-  margin: 0.55rem auto 0.4rem;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--fg-strong);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-/* Aligns with .hero .hero-sub on Home / Suites so cross-page typography
-   stays consistent — same size, weight, and (strong) foreground. */
-.rk-hero-sub {
-  margin: 0 auto;
-  color: var(--fg-strong);
-  font-weight: 400;
-  font-size: 1.15rem;
-  line-height: 1.4;
-  letter-spacing: -0.005em;
-  max-width: 56ch;
-}
-
-/* ── Sticky toolbar ────────────────────────────────────────── */
-.rk-toolbar {
-  position: sticky;
-  top: 3.5rem;             /* clears topnav (~56–58 px) */
-  z-index: 20;
-  background: var(--bg);
-  padding: 0.85rem 0 0.65rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--border-soft);
-}
-@supports (backdrop-filter: blur(6px)) {
-  .rk-toolbar {
-    background: color-mix(in srgb, var(--bg) 92%, transparent);
-    backdrop-filter: saturate(160%) blur(8px);
-    -webkit-backdrop-filter: saturate(160%) blur(8px);
-  }
-}
-
-.rk-suite-pills {
+/* ── Compact Page Header (puts table immediately above the fold) ── */
+.lb-head {
   display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 1rem;
 }
-.rk-suite-pill {
+.lb-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.lb-head h1 {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+.lb-suite-pill-active {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.32rem 0.85rem 0.32rem 0.4rem;
+  gap: 0.4rem;
+  padding: 0.22rem 0.65rem;
   border-radius: 999px;
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+.lb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.lb-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  font-size: 0.84rem;
+  color: var(--fg-muted);
+  flex-wrap: wrap;
+}
+.lb-count { font-weight: 600; color: var(--fg-strong); }
+.lb-meta-sep { color: var(--border); }
+
+/* Segmented Table / Landscape switch */
+.lb-view-switch {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  gap: 2px;
+}
+.lb-vtab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  height: 30px;
+  padding: 0 0.72rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
   color: var(--fg-muted);
   font-size: 0.82rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  transition: background 0.14s, color 0.14s;
 }
-.rk-suite-pill .rk-suite-letter {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in srgb, var(--suite-color) 18%, transparent);
-  color: var(--suite-color);
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.01em;
-}
-.rk-suite-pill .rk-suite-name {
-  white-space: nowrap;
-}
-.rk-suite-pill:hover {
-  border-color: color-mix(in srgb, var(--suite-color) 55%, transparent);
+.lb-vtab:hover { color: var(--fg-strong); }
+.lb-vtab.active {
+  background: var(--bg);
   color: var(--fg-strong);
-}
-.rk-suite-pill.active {
-  background: var(--suite-color);
-  border-color: var(--suite-color);
-  color: var(--on-accent);
-}
-.rk-suite-pill.active .rk-suite-letter {
-  background: rgba(255, 255, 255, 0.25);
-  color: var(--on-accent);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.rk-filter-row {
+/* ── Single-Row Suite Segmented Tabs ───────────────────────── */
+.lb-tabs-bar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1.25rem;
-  margin-bottom: 0.55rem;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.65rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
 }
-.rk-facet {
+.lb-tabs-bar::-webkit-scrollbar { display: none; }
+
+.lb-stab {
   display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  height: 34px;
+  padding: 0 0.72rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.14s, color 0.14s, background 0.14s;
+}
+.lb-stab:hover { border-color: var(--fg-faint); color: var(--fg-strong); }
+.lb-stab.active {
+  background: var(--fg-strong);
+  border-color: var(--fg-strong);
+  color: var(--bg);
+  font-weight: 600;
+}
+.lb-stab-ic { display: inline-flex; opacity: 0.82; }
+.lb-stab.active .lb-stab-ic { opacity: 1; }
+.lb-stab-letter {
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.65;
+}
+.lb-stab.active .lb-stab-letter { opacity: 0.85; }
+
+/* ── Compact Single-Line Controls Strip ────────────────────── */
+.lb-controls {
+  display: flex;
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-  min-width: 0;
+  margin-bottom: 0.85rem;
 }
-.rk-facet-label {
-  font-size: 0.68rem;
+.lb-search-wrap {
+  position: relative;
+  flex: 1 1 220px;
+  max-width: 320px;
+}
+.lb-search-ic {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--fg-faint);
+  pointer-events: none;
+  display: inline-flex;
+}
+.lb-search {
+  width: 100%;
+  height: 34px;
+  padding: 0 0.75rem 0 2.05rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-strong);
+  font-size: 0.84rem;
+  font-family: inherit;
+}
+.lb-search:focus { border-color: var(--accent); outline: none; }
+.lb-search::placeholder { color: var(--fg-faint); }
+
+.lb-select {
+  height: 34px;
+  padding: 0 0.65rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+.lb-select:hover { border-color: var(--fg-faint); }
+
+.lb-division-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 34px;
+  padding: 0 0.75rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--fg-strong);
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  margin-left: auto;
+  transition: border-color 0.14s, background 0.14s;
+}
+.lb-division-btn:hover { border-color: var(--accent); }
+.lb-division-btn.is-open {
+  border-color: color-mix(in srgb, var(--warn) 50%, var(--border));
+  background: var(--warn-soft);
+  color: var(--fg-strong);
+}
+.lb-div-badge {
+  font-size: 0.7rem;
+  padding: 0.08rem 0.4rem;
+  border-radius: 999px;
+  background: var(--bg-elev-2);
   color: var(--fg-muted);
 }
-.rk-facet-pills {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-.rk-facet-pill {
+
+.lb-info-btn, .lb-clear-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.22rem 0.6rem;
-  border-radius: 999px;
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  color: var(--fg-muted);
-  font-size: 0.76rem;
-  cursor: pointer;
-  transition: background 100ms ease, border-color 100ms ease, color 100ms ease;
-  text-decoration: none;
-}
-.rk-facet-pill:hover {
-  border-color: var(--accent);
-  color: var(--fg-strong);
-  text-decoration: none;
-}
-.rk-facet-pill.active {
-  background: var(--accent-soft);
-  border-color: var(--accent);
-  color: var(--fg-strong);
-  font-weight: 600;
-}
-
-.rk-clear-all {
-  margin-left: auto;
-  background: transparent;
-  border: 1px solid var(--border-soft);
-  color: var(--fg-muted);
-  padding: 0.25rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: color 100ms, border-color 100ms;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-}
-.rk-clear-all:hover {
-  color: var(--fg-strong);
-  border-color: var(--accent);
-  text-decoration: none;
-}
-
-.rk-status {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.78rem;
-  color: var(--fg-muted);
-  flex-wrap: wrap;
-  gap: 0.5rem 1rem;
-}
-.rk-status strong { color: var(--fg-strong); font-weight: 600; }
-.rk-sort-arrow { color: var(--suite-color, var(--fg-strong)); font-weight: 700; }
-
-/* Hidden-columns toggle.  Visually paired with the sort-by line — same
-   font scale, same muted base colour — but readable as an action via
-   the chevron + accent-on-hover treatment.  Anchor (not button) so
-   middle/Cmd-click open the alternate ?cols= state in a new tab. */
-.rk-cols-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.18rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  background: var(--bg-elev);
-  color: var(--fg-muted);
-  font-size: 0.74rem;
-  font-weight: 500;
-  text-decoration: none;
-  margin-left: auto;
-  white-space: nowrap;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-}
-.rk-cols-toggle:hover {
-  border-color: var(--accent);
-  color: var(--fg-strong);
-  background: var(--bg-elev-2);
-  text-decoration: none;
-}
-.rk-cols-toggle-icon {
-  font-size: 0.85em;
-  line-height: 1;
-  display: inline-block;
-  color: var(--accent);
-}
-
-/* ── Compare basket banner ─────────────────────────────────── */
-.rk-basket-bar {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.6rem 0.9rem;
-  margin-bottom: 1rem;
-  background: color-mix(in srgb, var(--accent-2) 8%, var(--bg-elev));
-  border: 1px solid color-mix(in srgb, var(--accent-2) 35%, var(--border-soft));
+  height: 34px;
+  padding: 0 0.7rem;
   border-radius: var(--r-md);
-  font-size: 0.85rem;
-  color: var(--fg-strong);
-}
-.rk-basket-bar.show { display: flex; }
-.rk-basket-bar strong { color: var(--accent-2); font-weight: 700; }
-.rk-basket-actions { display: inline-flex; gap: 0.5rem; flex-wrap: wrap; }
-
-/* Chip focus banner: shown when rankings was deep-linked from a
-   chip-detail KPI card (`?chip=<slug>`).  Sits above the basket bar
-   so the "soft filter set externally" callout reads before any
-   in-progress compare state. */
-.rk-chip-focus {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 0.55rem 0.9rem;
-  margin-bottom: 0.75rem;
-  background: color-mix(in srgb, var(--suite-color, var(--accent-2)) 8%, var(--bg-elev));
-  border: 1px solid color-mix(in srgb, var(--suite-color, var(--accent-2)) 35%, var(--border-soft));
-  border-radius: var(--r-md);
-  font-size: 0.85rem;
-  color: var(--fg-strong);
-}
-.rk-chip-focus-msg strong {
-  color: var(--suite-color, var(--accent-2));
-  font-weight: 700;
-}
-.rk-chip-focus-variants {
+  border: 1px solid var(--border);
+  background: var(--bg);
   color: var(--fg-muted);
-  font-size: 0.78rem;
-  margin-left: 0.15rem;
-}
-.rk-chip-focus-actions { display: inline-flex; gap: 0.4rem; flex-wrap: wrap; }
-
-/* ── Data table ────────────────────────────────────────────── */
-.data-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--r-lg);
-  background: var(--bg-elev);
-  box-shadow: var(--shadow-card);
-}
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.86rem;
-}
-.data-table thead th {
-  background: var(--bg-elev);
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  font-weight: 600;
-  padding: 0.7rem 0.75rem 0.6rem;
-  color: var(--fg-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 0.68rem;
-  white-space: nowrap;
-  vertical-align: bottom;
-}
-.data-table thead th.col-compare { width: 2.8rem; padding-right: 0; }
-.data-table thead th.col-rank    { width: 2.5rem; text-align: right; padding-right: 0.5rem; }
-.data-table thead th.col-vendor,
-.data-table thead th.col-precision,
-.data-table thead th.col-fw,
-.data-table thead th.col-tier,
-.data-table thead th.col-date { white-space: nowrap; }
-.data-table thead th.col-metric { text-align: right; }
-.data-table thead th.col-primary {
-  color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-strong));
-}
-.data-table thead th.sortable { cursor: pointer; user-select: none; }
-.data-table thead th.sortable:hover { color: var(--fg-strong); }
-/* Sorted column tint: just enough to lead the eye, not a column wash.
- * Header gets a hint of suite color; body cells stay neutral so the
- * column doesn't visually compete with featured-row / in-basket rows. */
-.data-table thead th.is-sort {
-  color: var(--fg-strong);
-  background: color-mix(in srgb, var(--suite-color) 4%, var(--bg-elev));
-}
-.data-table thead th .th-unit {
-  display: block;
-  font-size: 0.6rem;
-  color: var(--fg-faint);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  margin-top: 0.15rem;
-  text-transform: none;
-}
-.data-table thead th .th-sort-icon {
-  display: inline-block;
-  margin-left: 0.25rem;
-  color: var(--fg-faint);
-  font-size: 0.78rem;
-  vertical-align: -1px;
-}
-.data-table thead th.is-sort .th-sort-icon { color: var(--suite-color); }
-
-.data-table tbody tr {
-  border-bottom: 1px solid var(--border-soft);
-  cursor: pointer;
-  transition: background 100ms ease;
-}
-.data-table tbody tr:last-child { border-bottom: none; }
-.data-table tbody tr:hover { background: color-mix(in srgb, var(--fg) 4%, transparent); }
-.data-table tbody tr.in-basket {
-  background: color-mix(in srgb, var(--accent-2) 8%, transparent);
-}
-.data-table tbody tr.in-basket:hover {
-  background: color-mix(in srgb, var(--accent-2) 14%, transparent);
-}
-
-.data-table td {
-  padding: 0.6rem 0.75rem;
-  vertical-align: middle;
-  color: var(--fg);
-}
-.data-table td.col-rank {
-  text-align: right;
-  font-weight: 700;
-  color: var(--fg-muted);
-  padding-right: 0.5rem;
-  width: 2.5rem;
-}
-/* The whole .col-compare cell is the hit-target for toggling a run
- * into the compare basket — not the tiny checkbox.  This widens the
- * forgiveness zone so the user doesn't have to land on the input
- * pixel-perfectly and accidentally activate the row's chip-detail
- * navigation instead. */
-.data-table td.col-compare {
-  width: 2.8rem;
-  padding-right: 0;
-  cursor: pointer;
-  position: relative;
-}
-.data-table td.col-compare:hover {
-  background: color-mix(in srgb, var(--accent-2) 12%, transparent);
-}
-.data-table tbody tr.in-basket td.col-compare {
-  background: color-mix(in srgb, var(--accent-2) 16%, transparent);
-}
-.data-table .compare-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-height: 1.6rem;
-  padding: 0.5rem 0.4rem;
-  cursor: pointer;
-}
-.data-table .compare-checkbox {
-  width: 15px;
-  height: 15px;
-  cursor: pointer;
-  accent-color: var(--accent-2);
-  pointer-events: none;
-}
-
-.data-table td.col-chip { min-width: 11rem; }
-/* The whole chip cell (name + memory meta) is a single link so users
-   don't accidentally hit the row's run-modal handler when aiming for
-   the memory affordance.  We render it as a block so the meta line
-   keeps its stacked layout below the name. */
-.data-table td.col-chip .rk-chip-link {
-  display: block;
-  color: var(--fg-strong);
-  text-decoration: none;
-}
-.data-table td.col-chip .rk-chip-name {
-  font-weight: 600;
-  color: var(--fg-strong);
-  transition: color 100ms ease;
-}
-.data-table td.col-chip .rk-chip-link:hover .rk-chip-name {
-  color: var(--suite-color);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-.data-table td.col-chip .rk-chip-fw {
-  font-weight: 500;
-  color: var(--fg-muted);
-}
-.data-table td.col-chip .rk-chip-fw .fw-ver {
-  font-size: 0.85em;
-  color: var(--fg-faint);
-}
-.data-table td.col-chip .rk-chip-fw .fw-ops {
-  font-size: 0.82em;
-  color: var(--accent);
-  font-weight: 500;
-}
-.data-table td.col-chip .rk-chip-meta {
-  display: block;
-  margin-top: 0.1rem;
-  font-size: 0.7rem;
-  color: var(--fg-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.data-table td.col-vendor {
-  white-space: nowrap;
-  display: table-cell;
-}
-.data-table td.col-vendor .vendor-dot {
-  margin-right: 0.45rem;
-  vertical-align: 1px;
-}
-.data-table td.col-vendor .vendor-name { color: var(--fg); }
-
-.data-table td.col-fw .fw-ver {
-  color: var(--fg-faint);
-  font-size: 0.78rem;
-  margin-left: 0.15rem;
-}
-.data-table td.col-precision {
-  color: var(--fg-muted);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.data-table td.col-metric {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.data-table td.col-metric .metric-empty { color: var(--fg-faint); }
-.data-table td.col-primary { color: var(--fg-strong); font-weight: 600; }
-.data-table td.col-primary .metric-val {
-  color: color-mix(in srgb, var(--suite-color) 60%, var(--fg-strong));
-  letter-spacing: -0.005em;
-}
-/* Body cells deliberately have no sort-column tint — only the header
- * carries the cue.  A vertical band of color across every row was too
- * loud and competed with the in-basket / featured row highlights. */
-.data-table td.col-metric.is-sort { background: transparent; }
-
-.data-table td.col-date {
-  color: var(--fg-muted);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
   font-size: 0.8rem;
+  font-weight: 500;
 }
-.data-table td.col-date.is-sort { background: transparent; }
-.data-table td.col-tier { white-space: nowrap; }
+.lb-info-btn:hover, .lb-info-btn.active { border-color: var(--accent); color: var(--accent); }
+.lb-clear-btn:hover { border-color: var(--bad); color: var(--bad); }
 
-/* Empty state */
-.rk-empty {
-  text-align: center;
-  padding: 3rem 1.5rem;
-  color: var(--fg-muted);
-  background: var(--bg-elev);
-  border: 1px dashed var(--border);
-  border-radius: var(--r-lg);
+/* Collapsible Protocol Drawer */
+.lb-protocol-drawer {
+  margin-bottom: 0.85rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
 }
-.rk-empty .rk-empty-icon {
-  display: block;
-  font-size: 2rem;
-  color: var(--fg-faint);
-  margin-bottom: 0.6rem;
+.lb-protocol-drawer[hidden] { display: none; }
+.lb-proto-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
 }
-.rk-empty p { margin: 0.3rem 0 1rem; }
-.rk-empty .rk-empty-sub {
-  font-size: 0.85rem;
-  color: var(--fg-faint);
-  margin-bottom: 0;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px; height: 1px;
-  margin: -1px; padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-
-/* ── Compare view ─────────────────────────────────────────── */
-.cmp-hero {
-  text-align: center;
-  padding: 2.25rem 1rem 1.25rem;
-  margin-bottom: 0.5rem;
-}
-.cmp-hero .eyebrow { justify-content: center; }
-/* Mirror .rk-hero: drop the leading rule so the centered eyebrow text
-   isn't preceded by a stray hyphen. */
-.cmp-hero .eyebrow::before { display: none; }
-.cmp-hero-title {
-  margin: 0.55rem auto 0.4rem;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--fg-strong);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-/* Matches .hero .hero-sub on Home / Suites — same size, weight, color —
-   so the Compare landing reads like its siblings. */
-.cmp-hero-sub {
-  margin: 0 auto;
-  color: var(--fg-strong);
-  font-weight: 400;
-  font-size: 1.15rem;
-  line-height: 1.4;
-  letter-spacing: -0.005em;
-  max-width: 56ch;
-}
-
-/* Selected chips strip */
-.cmp-basket {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-  margin: 0.5rem 0 1.5rem;
-  padding: 0.85rem 1rem;
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--r-lg);
-  align-items: center;
-}
-.cmp-basket-label {
-  font-size: 0.7rem;
+.lb-proto-lbl {
+  font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--fg-muted);
-  margin-right: 0.4rem;
+  color: var(--fg-faint);
+  margin-bottom: 0.2rem;
 }
-/* Stale-link variant: basket has entries but every run resolves to
- * null.  We render the basket strip with just a count label (italic,
- * muted) so it's obvious the chips themselves can't be shown.
- */
-.cmp-basket--empty .cmp-basket-stale {
-  font-size: 0.85rem;
-  font-style: italic;
-  color: var(--fg-muted);
-  margin-right: auto;
-}
-.cmp-basket-chip {
-  display: inline-flex;
+.lb-proto-val { font-size: 0.82rem; color: var(--fg); line-height: 1.45; }
+.lb-proto-val strong { color: var(--fg-strong); }
+
+.lb-chip-banner {
+  display: flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.4rem 0.5rem 0.4rem 0.7rem;
-  background: var(--bg);
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  color: var(--fg-strong);
+  justify-content: space-between;
+  padding: 0.6rem 0.95rem;
+  margin-bottom: 0.85rem;
+  border-radius: var(--r-md);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: var(--accent-soft);
+  font-size: 0.84rem;
+}
+.lb-chip-banner-actions { display: flex; gap: 0.9rem; font-weight: 500; }
+
+/* ── Data Table ────────────────────────────────────────────── */
+.lb-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  overflow-x: auto;
+  box-shadow: var(--shadow-card);
+}
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.lb-table thead th {
+  text-align: left;
+  padding: 0.72rem 0.85rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--fg-muted);
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+.lb-table thead th.col-metric,
+.lb-table thead th.col-date,
+.lb-table thead th.col-trust { text-align: right; }
+.lb-table thead th.sortable { cursor: pointer; }
+.lb-table thead th.sortable:hover { color: var(--fg-strong); }
+.lb-table thead th.is-sort { color: var(--accent); }
+.th-unit { font-weight: 400; color: var(--fg-faint); margin-left: 0.25rem; font-size: 0.7rem; }
+.th-sort-arrow { margin-left: 0.2rem; font-size: 0.75rem; }
+
+.lb-table tbody tr {
+  border-bottom: 1px solid var(--border-soft);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.lb-table tbody tr:last-child { border-bottom: none; }
+.lb-table tbody tr:hover { background: var(--bg-subtle); }
+.lb-table tbody tr.in-basket { background: var(--accent-soft); }
+
+.lb-table td {
+  padding: 0.72rem 0.85rem;
+  vertical-align: middle;
+}
+.lb-table td.col-compare { width: 38px; padding-right: 0.2rem; text-align: center; }
+.compare-cell { display: inline-flex; align-items: center; justify-content: center; padding: 0.25rem; cursor: pointer; }
+.compare-checkbox { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
+
+.lb-table td.col-rank {
+  width: 42px;
   font-size: 0.82rem;
   font-weight: 600;
+  color: var(--fg-faint);
 }
-.cmp-basket-name {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.05rem;
-  color: var(--fg-strong);
-  text-decoration: none;
-  line-height: 1.15;
-}
-.cmp-basket-name:hover .cmp-basket-chip-name {
-  color: var(--accent-2);
-}
-.cmp-basket-chip-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-}
-.cmp-basket-chip-meta {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--fg-muted);
-  letter-spacing: 0.005em;
-}
-.cmp-basket-chip-select {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--fg-muted);
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--r-sm, 4px);
-  padding: 0.1rem 0.25rem;
-  cursor: pointer;
-  max-width: 20ch;
-  font-family: inherit;
-}
-.cmp-basket-chip-select:focus-visible {
-  outline: 2px solid var(--accent-2);
-  outline-offset: 1px;
-}
-.cmp-basket-chip .vendor-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--vendor-color, var(--fg-faint));
-}
-/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
+.lb-table td.col-rank.is-top-1 { color: var(--accent); font-weight: 750; }
+.lb-table td.col-rank.is-top-2,
+.lb-table td.col-rank.is-top-3 { color: var(--fg-strong); font-weight: 700; }
 
-.cmp-basket-remove {
+.lb-chip-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.14rem;
+  color: inherit;
+  text-decoration: none;
+}
+.lb-chip-link:hover { text-decoration: none; }
+.lb-chip-link:hover .lb-chip-name { color: var(--accent); }
+.lb-chip-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+.lb-chip-name { font-weight: 650; color: var(--fg-strong); font-size: 0.9rem; }
+.lb-chip-mem { font-size: 0.72rem; color: var(--fg-faint); }
+.lb-chip-sub {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: var(--fg-faint);
-  cursor: pointer;
-  font-size: 0.95rem;
-  line-height: 1;
-  padding: 0;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
 }
-.cmp-basket-remove:hover {
-  background: color-mix(in srgb, var(--bad) 20%, transparent);
+.lb-tier-tag {
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 0.04rem 0.36rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  color: var(--fg-muted);
+  text-transform: uppercase;
+}
+.lb-tier-tag.is-experimental {
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+/* Vendor column (Option V2: clean crisp typography, zero clutter dots) */
+.lb-table td.col-vendor {
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+  white-space: nowrap;
+}
+
+/* Metrics + inline proportional bar */
+.lb-table td.col-metric {
+  text-align: right;
+  white-space: nowrap;
+  font-size: 0.86rem;
+}
+.lb-table td.col-primary { min-width: 150px; }
+.metric-bar-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.24rem;
+}
+.col-primary .metric-val {
+  font-weight: 700;
+  color: var(--fg-strong);
+  font-size: 0.92rem;
+}
+.metric-bar-track {
+  width: 112px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--bg-elev-2);
+  overflow: hidden;
+}
+.metric-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.metric-empty { color: var(--fg-faint); }
+.sla-fail {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  background: var(--bad-soft);
   color: var(--bad);
 }
 
-.cmp-basket-actions {
-  margin-left: auto;
+.lb-table td.col-date {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--fg-faint);
+  white-space: nowrap;
+}
+.lb-table td.col-trust {
+  text-align: right;
+  white-space: nowrap;
+}
+.trust-verified {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-.cmp-basket-clear {
-  background: transparent;
-  border: 1px solid var(--border-soft);
-  color: var(--fg-muted);
-  padding: 0.25rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  cursor: pointer;
-}
-.cmp-basket-clear:hover { color: var(--fg-strong); border-color: var(--accent); }
-
-/* Compare basket "Copy share link" pill — mirrors the clear pill's
-   silhouette so the two read as a paired actions group.  Success /
-   failure styling lives on the shared `.copy-btn` class (components.css)
-   so chip-detail and any future share button get the same flash chrome
-   for free. */
-.cmp-basket-share {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: transparent;
-  border: 1px solid var(--border-soft);
-  color: var(--fg-muted);
-  padding: 0.25rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-}
-.cmp-basket-share:hover {
-  color: var(--fg-strong);
-  border-color: var(--accent);
-}
-
-/* Compare empty state */
-.cmp-empty {
-  text-align: center;
-  padding: 3rem 1.5rem;
-  color: var(--fg-muted);
-  background: var(--bg-elev);
-  border: 1px dashed var(--border);
-  border-radius: var(--r-lg);
-}
-.cmp-empty .state-icon {
-  display: block;
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-  color: var(--fg-faint);
-}
-.cmp-empty p { margin: 0.3rem 0 1rem; }
-
-/* Per-suite empty banner: shown when ALL chips in the basket have zero
-   data for the currently active suite — saves users from staring at a
-   table of dashes by surfacing which suites DO have data. */
-.cmp-suite-empty {
-  text-align: center;
-  padding: 2.5rem 1.5rem;
-  color: var(--fg-muted);
-  background: var(--bg-elev);
-  border: 1px dashed var(--border);
-  border-radius: var(--r-lg);
-}
-.cmp-suite-empty .state-icon {
-  display: block;
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-  color: var(--fg-faint);
-}
-.cmp-suite-empty p { margin: 0.3rem 0; }
-.cmp-suite-empty-sub {
-  font-size: 0.85rem;
-  color: var(--fg-faint);
-}
-.cmp-suite-empty-link {
-  color: var(--accent-2);
-  text-decoration: none;
+  gap: 0.28rem;
+  font-size: 0.76rem;
   font-weight: 600;
+  color: var(--good);
 }
-.cmp-suite-empty-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
+.trust-community { color: var(--fg-faint); font-size: 0.8rem; }
 
-/* Suite switcher reuses .rk-suite-pill; just align it. */
-.cmp-suite-row {
-  display: flex;
+/* Floating Bottom Compare Bar */
+.lb-float-basket {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translate(-50%, 16px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 60;
+  display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
+  padding: 0.5rem 0.65rem 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--fg-strong);
+  color: var(--bg);
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.35);
+  transition: opacity 0.18s, transform 0.18s;
+}
+.lb-float-basket.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+.lb-basket-count { font-size: 0.84rem; }
+.lb-basket-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.38rem 0.85rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.lb-basket-go:hover { background: var(--accent-2); color: #ffffff; text-decoration: none; }
+.lb-basket-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.14);
+  color: inherit;
+}
+.lb-basket-clear:hover { background: rgba(255, 255, 255, 0.24); }
+
+/* Empty state */
+.rk-empty {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-subtle);
+  color: var(--fg-muted);
+}
+.rk-empty-actions { display: flex; gap: 0.65rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+
+/* ── Landscape SVG View ────────────────────────────────────── */
+.ls-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  padding: 1.25rem;
+}
+.ls-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1rem;
 }
-.cmp-suite-row .rk-facet-label { margin-right: 0.4rem; }
+.ls-title { font-size: 1rem; font-weight: 700; color: var(--fg-strong); }
+.ls-sub { font-size: 0.8rem; color: var(--fg-muted); margin-top: 0.2rem; }
+.ls-metric-tabs {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+.ls-mtab {
+  padding: 0.3rem 0.65rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.ls-mtab.active { background: var(--bg); color: var(--fg-strong); font-weight: 600; }
+.ls-svg-wrap { position: relative; }
+.ls-svg { width: 100%; height: auto; display: block; }
+.ls-grid { stroke: var(--border-soft); stroke-width: 1; }
+.ls-col-guide { stroke: var(--border-soft); stroke-width: 1; stroke-dasharray: 3 3; }
+.ls-axis { font-size: 10.5px; fill: var(--fg-faint); }
+.ls-suite-lbl { font-size: 12px; font-weight: 650; fill: var(--fg-strong); }
+.ls-suite-sub { font-size: 10px; fill: var(--fg-muted); }
+.ls-dot { cursor: pointer; stroke: var(--bg-elev); stroke-width: 1.2; transition: r 0.12s; }
+.ls-dot:hover { stroke: var(--fg-strong); stroke-width: 2; }
+.ls-tooltip {
+  position: absolute;
+  pointer-events: none;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--r-md);
+  background: var(--fg-strong);
+  color: var(--bg);
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+.ls-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-soft);
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+}
+.ls-leg-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.ls-leg-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-/* Metric comparison table */
-.cmp-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--border-soft);
+/* ── Findings Page & Procurement Matrix ────────────────────── */
+.page-head-left {
+  margin-bottom: 2.25rem;
+  max-width: 68ch;
+}
+.page-head-left h1 {
+  margin: 0.45rem 0 0.65rem;
+  font-size: clamp(1.85rem, 3vw, 2.45rem);
+  font-weight: 750;
+  line-height: 1.12;
+}
+.page-head-left .page-lead {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--fg-muted);
+  line-height: 1.6;
+}
+.matrix-card {
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   background: var(--bg-elev);
-  box-shadow: var(--shadow-card);
+  overflow-x: auto;
 }
-.cmp-table {
-  --suite-color: var(--accent-2);
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.86rem;
-}
-.cmp-table[data-suite="A"] { --suite-color: var(--suite-A); }
-.cmp-table[data-suite="B"] { --suite-color: var(--suite-B); }
-.cmp-table[data-suite="C"] { --suite-color: var(--suite-C); }
-.cmp-table[data-suite="D"] { --suite-color: var(--suite-D); }
-.cmp-table[data-suite="E"] { --suite-color: var(--suite-E); }
-.cmp-table[data-suite="F"] { --suite-color: var(--suite-F); }
-.cmp-table[data-suite="G"] { --suite-color: var(--suite-G); }
-.cmp-table[data-suite="H"] { --suite-color: var(--suite-H); }
-
-.cmp-table thead th {
-  background: var(--bg-elev);
-  border-bottom: 1px solid var(--border);
+.matrix-tbl { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.matrix-tbl th {
   text-align: left;
-  font-weight: 600;
-  padding: 0.7rem 0.75rem 0.55rem;
-  color: var(--fg-muted);
+  padding: 0.75rem 1rem;
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: 0.66rem;
-  vertical-align: bottom;
-  white-space: nowrap;
-}
-.cmp-table thead th.cmp-chip-head {
-  text-transform: none;
-  letter-spacing: -0.005em;
-  font-size: 0.85rem;
-  color: var(--fg-strong);
-  padding-bottom: 0.5rem;
-}
-.cmp-table thead th.cmp-chip-head .cmp-chip-name {
-  display: block;
-  font-weight: 700;
-  color: var(--fg-strong);
-  text-decoration: none;
-  transition: color 100ms ease;
-}
-.cmp-table thead th.cmp-chip-head .cmp-chip-name:hover {
-  color: var(--accent-2);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-.cmp-table thead th.cmp-chip-head .cmp-chip-meta {
-  display: block;
-  font-size: 0.72rem;
   color: var(--fg-muted);
-  font-weight: 500;
-  margin-top: 0.18rem;
-  text-transform: none;
-  letter-spacing: 0;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
 }
+.matrix-tbl td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+.matrix-tbl tr:last-child td { border-bottom: none; }
+.m-regime { font-weight: 650; color: var(--fg-strong); }
+.m-bn { font-size: 0.78rem; color: var(--fg-muted); margin-top: 0.15rem; }
+.m-best { font-weight: 600; color: var(--good); }
+.m-watch { color: var(--fg-muted); font-size: 0.84rem; }
+.m-link { font-size: 0.8rem; font-weight: 600; white-space: nowrap; }
 
-.cmp-table thead th.cmp-chip-head .vendor-dot {
-  display: inline-block;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  margin-right: 0.4rem;
-  vertical-align: 1px;
-  background: var(--vendor-color, var(--fg-faint));
-}
-/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
-
-.cmp-table tbody tr { border-bottom: 1px solid var(--border-soft); }
-.cmp-table tbody tr:last-child { border-bottom: none; }
-
-.cmp-table td {
-  padding: 0.75rem 0.75rem;
-  vertical-align: middle;
-  color: var(--fg);
-}
-.cmp-table td.cmp-metric-label {
-  font-size: 0.85rem;
-  color: var(--fg-strong);
-  font-weight: 600;
-  white-space: nowrap;
-  min-width: 11rem;
-}
-.cmp-table td.cmp-metric-label.is-primary {
-  color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-strong));
-}
-.cmp-table td.cmp-metric-label .cmp-metric-unit {
-  display: block;
-  font-size: 0.7rem;
-  color: var(--fg-muted);
-  font-weight: 500;
-  margin-top: 0.15rem;
-}
-.cmp-table td.cmp-metric-label .cmp-metric-dir {
-  display: inline-block;
-  margin-left: 0.5rem;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--fg-faint);
-}
-
-.cmp-table td.cmp-cell { position: relative; min-width: 9rem; }
-.cmp-bar {
-  position: relative;
-  height: 8px;
-  background: color-mix(in srgb, var(--fg) 6%, transparent);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 0.32rem;
-}
-.cmp-bar .cmp-bar-fill {
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  background: linear-gradient(90deg,
-    color-mix(in srgb, var(--suite-color) 75%, var(--fg-strong)),
-    var(--suite-color));
-  border-radius: 4px;
-}
-.cmp-bar.is-winner .cmp-bar-fill {
-  background: linear-gradient(90deg,
-    var(--suite-color),
-    color-mix(in srgb, var(--suite-color) 75%, var(--good)));
-}
-.cmp-cell-value {
-  font-size: 0.94rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--fg-strong);
-}
-.cmp-cell-value .cmp-cell-unit {
-  font-size: 0.7rem;
-  font-weight: 500;
-  color: var(--fg-muted);
-  margin-left: 0.25rem;
-  letter-spacing: 0.02em;
-}
-.cmp-cell.is-winner .cmp-cell-value::after {
-  content: "★";
-  margin-left: 0.35rem;
-  color: var(--suite-color);
-  font-size: 0.8rem;
-}
-.cmp-cell.is-missing .cmp-cell-value {
-  color: var(--fg-faint);
-  font-weight: 400;
-}
-
-/* ── Compare head-to-head charts ─────────────────────────────── */
-.cmp-charts-wrap:not(:empty) {
-  max-width: var(--page-max, 1100px);
-  margin: 1.8rem auto 0;
-  padding: 0 1rem;
-}
-.cmp-charts-head {
-  margin-bottom: 1rem;
-}
-.cmp-charts-title {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--fg-strong);
-  letter-spacing: -0.005em;
-}
-.cmp-charts-hint {
-  margin: 0.25rem 0 0;
-  font-size: 0.82rem;
-  color: var(--fg-muted);
-}
-.cmp-chart-card {
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--r-lg);
-  padding: 1rem 1.1rem 1.1rem;
-  margin-bottom: 1rem;
-}
-.cmp-chart-card-head { margin-bottom: 0.55rem; }
-.cmp-chart-card-title {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--fg-strong);
-  letter-spacing: 0.005em;
-}
-.cmp-chart-card-sub {
-  margin: 0.2rem 0 0;
-  font-size: 0.75rem;
-  color: var(--fg-muted);
-}
-.cmp-chart-canvas { width: 100%; position: relative; }
-.cmp-chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1rem;
-  margin-top: 0.65rem;
-  font-size: 0.74rem;
-  color: var(--fg);
-}
-.cmp-chart-legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
-.cmp-chart-legend-swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  display: inline-block;
-  flex: 0 0 auto;
-}
-.cmp-chart-empty {
-  padding: 1.5rem;
-  text-align: center;
-  color: var(--fg-faint);
-  font-size: 0.82rem;
-}
-.cmp-charts-missing {
-  font-size: 0.76rem;
-  color: var(--fg-faint);
-  margin: 0.45rem 0 0;
-  padding: 0.45rem 0.7rem;
-  border-left: 2px solid var(--border-soft);
-}
-.cmp-charts-missing strong {
-  color: var(--fg-muted);
-  font-weight: 600;
-}
-
-/* ── Compare chip cloud (quick-add affordance) ──────────────────
- *
- * Reuses .chip-cloud / .chip-tile from home.css; only the wrapping
- * section, headline copy, and selected-chip styling live here.
- * In the empty state (cmp-cloud without .is-compact) the block is the
- * page's main content; in the populated state it sits below the table
- * as a compact "add another chip" footer.
- */
-.cmp-cloud {
-  max-width: var(--page-max, 1100px);
-  margin: 1.4rem auto 0;
-  padding: 1.4rem 1rem 1.5rem;
-  background: var(--bg-elev);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--r-lg);
-}
-.cmp-cloud.is-compact {
-  background: transparent;
-  border: 1px dashed var(--border-soft);
-  margin-top: 2rem;
-  padding: 1rem 0.85rem 1.1rem;
-}
-.cmp-cloud-head {
-  text-align: center;
-  margin-bottom: 0.85rem;
-  padding: 0 0.5rem;
-}
-.cmp-cloud-title {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--fg-strong);
-  letter-spacing: -0.005em;
-}
-.cmp-cloud.is-compact .cmp-cloud-title {
-  font-size: 0.92rem;
-  color: var(--fg-muted);
-  font-weight: 600;
-  letter-spacing: 0.005em;
-}
-.cmp-cloud-hint {
-  margin: 0.3rem 0 0;
-  font-size: 0.82rem;
-  color: var(--fg-muted);
-  line-height: 1.45;
-}
-.cmp-cloud.is-compact .cmp-cloud-hint {
-  font-size: 0.74rem;
-  color: var(--fg-faint);
-}
-
-/* "In-basket" affordance on cloud tiles — a filled pill in the chip's
- * vendor color, with a checkmark prefixed to the name so the state is
- * obvious without relying on color alone.  Clicking again removes
- * every basket entry whose chip matches the tile name. */
-.chip-tile.in-basket {
-  background: color-mix(in srgb, var(--vendor-color) 38%, var(--bg-elev));
-  border-color: color-mix(in srgb, var(--vendor-color) 60%, var(--border));
-  color: var(--fg-strong);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--vendor-color) 30%, transparent);
-}
-.chip-tile.in-basket::before {
-  content: "✓";
-  display: inline-block;
-  margin-right: 0.35rem;
-  font-size: 0.8em;
-  color: color-mix(in srgb, var(--vendor-color) 75%, var(--fg-strong));
-  font-weight: 700;
-}
-.chip-tile.in-basket .chip-tile-count {
-  color: color-mix(in srgb, var(--vendor-color) 65%, var(--fg-strong));
-  font-weight: 600;
-}
-
-.cmp-hero-link {
-  color: var(--accent-2);
-  text-decoration: none;
-  border-bottom: 1px dashed color-mix(in srgb, var(--accent-2) 50%, transparent);
-}
-.cmp-hero-link:hover {
-  color: color-mix(in srgb, var(--accent-2) 70%, var(--fg-strong));
-  border-bottom-color: var(--accent-2);
-}
-
-/* ── Responsive ─────────────────────────────────────────────── */
-@media (max-width: 880px) {
-  .rk-hero-title, .cmp-hero-title { font-size: 1.6rem; }
-  .rk-toolbar { top: 3rem; }
-  .data-table, .cmp-table { font-size: 0.8rem; }
-  .data-table td, .data-table thead th { padding: 0.5rem 0.55rem; }
-  .data-table td.col-rank { width: 2rem; }
-}
-@media (max-width: 640px) {
-  .rk-hero, .cmp-hero { padding: 1.25rem 0.5rem 0.85rem; }
-  .rk-hero-title, .cmp-hero-title { font-size: 1.35rem; }
-  .rk-hero-sub, .cmp-hero-sub { font-size: 0.9rem; }
-  .rk-toolbar { top: 2.85rem; padding-top: 0.55rem; }
-  .rk-suite-pill { font-size: 0.76rem; padding: 0.28rem 0.6rem 0.28rem 0.3rem; }
-  .rk-suite-pill .rk-suite-letter { width: 18px; height: 18px; font-size: 0.66rem; }
+@media (max-width: 820px) {
+  .lb-proto-grid { grid-template-columns: 1fr; }
+  .lb-division-btn { margin-left: 0; }
+  .metric-bar-track { width: 68px; }
 }

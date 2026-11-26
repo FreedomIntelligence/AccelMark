@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+title: "AccelMark: Beyond NVIDIA! A Multi-Regime Framework for Benchmarking Heterogeneous AI Accelerators"
+message: "If you use AccelMark benchmark results, runners, or methodology in your research, please cite it using the metadata below."
+type: software
+authors:
+  - family-names: Liang
+    given-names: Juhao
+  - family-names: Zhang
+    given-names: Zhiyuan
+  - family-names: Li
+    given-names: Siyu
+  - family-names: Lin
+    given-names: Zhihang
+  - family-names: Yu
+    given-names: Minchen
+  - family-names: Zeng
+    given-names: Li
+  - family-names: Chen
+    given-names: Zizhong
+  - family-names: Sun
+    given-names: Ruoyu
+  - family-names: Wang
+    given-names: Benyou
+repository-code: "https://github.com/FreedomIntelligence/AccelMark"
+url: "https://freedomintelligence.github.io/AccelMark"
+license: Apache-2.0
+version: "0.2.0"
+date-released: "2026-11-26"
+keywords:
+  - llm-inference
+  - benchmark
+  - ai-accelerators
+  - roofline
+  - vllm
+  - sglang
+  - leaderboard

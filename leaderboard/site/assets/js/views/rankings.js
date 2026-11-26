@@ -1,315 +1,319 @@
-// views/rankings.js — Per-suite rankings table with filters and compare basket.
-//
-// Page anatomy:
-//   • Compact hero with the active suite's eyebrow + title + tagline.
-//   • Sticky toolbar:
-//       row 1 — 8 suite filter pills (color-bound to --suite-X).
-//       row 2 — multi-select vendor / precision / framework facet pills,
-//               populated from the rows in the active suite (filters that
-//               would empty the set get hidden, not greyed).
-//       row 3 — status line: "N of M results · sorted by …"
-//   • Data table:
-//       columns: ☐ · # · Chip · Vendor · Framework · Precision · primary
-//                metric · secondary metrics · Date · Tier.
-//       Basket key is run_id so every row toggles independently — same
-//       chip with vLLM vs SGLang (or a different precision / version)
-//       never share state.  The whole leftmost cell wraps the checkbox
-//       so the hit-area is generous and the user doesn't have to land
-//       on the tiny input itself.
-//       click chip link → chip detail; click checkbox cell → toggle
-//       compare basket; click sortable header → toggle / set sort
-//       order; click any other inert area on the row → chip detail.
-//   • Empty state appears when filters return no rows.
-//
-// All state (suite, sort, vendor/precision/framework filters) lives in the
-// URL hash so views are bookmarkable and shareable.
+// views/rankings.js — Developer-tool minimalist Leaderboard (Table + Landscape).
+// Defaults to Closed (reference-only) division with one-click Open toggle.
+// Compact header puts the ranked table directly above the fold.
 
 import {
   SUITE_ORDER, SUITE_META, VENDOR_ORDER,
-  SUITE_COLUMNS, formatMetric,
-  rowsForSuite, implOpsLabel,
+  SUITE_COLUMNS, formatMetric, rowsForSuite,
 } from "../data.js";
-const _i = (k, r) => (window._i ? window._i(k, r) : k);
 import {
   esc, fmtNum, fmtDate, chipHref, buildHash, parseHash,
-  shortVersion,
+  shortVersion, shortModel,
 } from "../utils.js";
 import {
   basketHas, basketToggle, basketGet, basketOnChange,
 } from "../router.js";
+import { suiteIcon, icon } from "../icons.js";
+import { renderLandscape } from "../components/landscape.js";
+
+const _i = (k, r) => (window._i ? window._i(k, r) : k);
+const isZh = () => typeof window._lang === "function" && window._lang() === "cn";
+
+const TAB_SHORT_EN = {
+  suite_A: "Chat",
+  suite_B: "70B TP",
+  suite_C: "Quant",
+  suite_D: "28K Ctx",
+  suite_E: "Scaling",
+  suite_F: "Edge",
+  suite_G: "MoE",
+  suite_H: "SWA",
+};
+const TAB_SHORT_ZH = {
+  suite_A: "短对话",
+  suite_B: "70B 多卡",
+  suite_C: "量化",
+  suite_D: "28K 长文",
+  suite_E: "多卡扩展",
+  suite_F: "边缘/消费",
+  suite_G: "MoE",
+  suite_H: "滑动窗口",
+};
 
 export function render({ el, query }) {
   const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
   const meta = SUITE_META[suiteId];
   const cols = SUITE_COLUMNS[suiteId];
   const primary = cols.find((c) => c.primary) || cols[0];
+  const viewMode = query.view === "landscape" ? "landscape" : "table";
+  const zh = isZh();
 
-  const vendorFilter    = parseCsv(query.vendor);
-  const precisionFilter = parseCsv(query.precision);
-  const frameworkFilter = parseCsv(query.framework);
-  const runnerTierFilter = parseCsv(query.runner_tier);
-  // `?chip=<slug>` lets the chip-detail KPI cards deep-link straight to
-  // a rankings view scoped to that chip variant.  We don't expose it as
-  // a facet pill — it's a soft filter set externally and announced via
-  // a banner that offers a one-click "show all chips" escape.
-  const chipFilter      = (query.chip || "").trim();
+  const vendorFilter = (query.vendor || "").trim();
+  const frameworkFilter = (query.framework || "").trim();
+  const precisionFilter = (query.precision || "").trim();
+  const chipFilter = (query.chip || "").trim();
+  const searchQuery = (query.q || "").trim();
+  const searchNeedle = searchQuery.toLowerCase();
 
-  // Sort: ?sort=key:dir, validated against the active suite's columns.
+  // Closed (reference-only) by default; `?division=open` (or legacy runner_tier param) shows all.
+  const openDivision = query.division === "open" || (query.runner_tier && query.runner_tier !== "reference");
+  const closedOnly = !openDivision;
+
   let sortKey = primary.key;
   let sortDir = primary.direction;
   if (query.sort) {
     const [k, d] = String(query.sort).split(":");
-    if (cols.some((c) => c.key === k)) {
+    if (cols.some((c) => c.key === k) || k === "date") {
       sortKey = k;
       sortDir = d === "asc" ? "asc" : "desc";
     }
   }
 
-  // Column-visibility mode: ?cols=auto (default) hides metric columns
-  // that are empty for every visible row — suite_C's quant_quality
-  // and suite_E's scaling_efficiency end up null on most chips, and
-  // a wall of "—" reads as a regression.  ?cols=all forces every
-  // declared column to render so power users can inspect what's
-  // sparse vs. what's genuinely zero.
-  const colsMode = query.cols === "all" ? "all" : "auto";
+  const suiteAllRows = rowsForSuite(suiteId);
+  const nonRefCount = suiteAllRows.filter((r) => (r.runner_tier || "reference") !== "reference").length;
+  const divisionRows = closedOnly
+    ? suiteAllRows.filter((r) => (r.runner_tier || "reference") === "reference")
+    : suiteAllRows;
 
-  // Facet sets are derived from the suite's rows (not the post-filter
-  // subset) so toggling one filter doesn't erase the others.
-  const allRows = rowsForSuite(suiteId);
-  const facets = buildFacets(allRows);
+  const facets = buildFacets(divisionRows);
 
-  const filtered = allRows.filter((r) =>
-    matchSet(vendorFilter,     r.vendor) &&
-    matchSet(precisionFilter,  r.precision) &&
-    matchSet(frameworkFilter,  r.framework) &&
-    matchSet(runnerTierFilter, r.runner_tier || "reference") &&
-    (!chipFilter || r._chip_slug === chipFilter)
-  );
+  const filtered = divisionRows.filter((r) => {
+    if (vendorFilter && r.vendor !== vendorFilter) return false;
+    if (frameworkFilter && r.framework !== frameworkFilter) return false;
+    if (precisionFilter && r.precision !== precisionFilter) return false;
+    if (chipFilter && r._chip_slug !== chipFilter) return false;
+    if (searchNeedle) {
+      const hay = `${r._chip_label || ""} ${r.vendor || ""} ${r.framework || ""} ${r.precision || ""} ${r.implementation_id || ""} ${r.submitted_by || ""}`.toLowerCase();
+      if (!hay.includes(searchNeedle)) return false;
+    }
+    return true;
+  });
 
   const sorted = [...filtered].sort((a, b) => safeCompare(a[sortKey], b[sortKey], sortDir));
 
-  // Compute which metric columns are entirely empty in the current
-  // post-filter slice.  Always keep the primary metric and the active
-  // sort column visible — hiding either would make the table read as
-  // broken (primary is the headline number; sort would dangle a sort
-  // indicator on a missing column).  In ?cols=all mode we still
-  // *track* the empty list so the toggle label can advertise the
-  // count even when nothing is hidden.
-  const emptyMetricKeys = cols
-    .filter((c) => !c.primary && c.key !== sortKey)
-    .filter((c) => sorted.length > 0 && sorted.every((r) => r[c.key] == null))
-    .map((c) => c.key);
-  const colsAreHideable = emptyMetricKeys.length > 0;
-  const displayCols = colsMode === "auto" && colsAreHideable
-    ? cols.filter((c) => !emptyMetricKeys.includes(c.key))
-    : cols;
+  // Hide empty secondary metric columns automatically
+  const displayCols = cols.filter((c) => {
+    if (c.primary || c.key === sortKey) return true;
+    return sorted.length === 0 || sorted.some((r) => r[c.key] != null);
+  });
 
-  const filtersActive = !!(query.vendor || query.precision || query.framework || query.runner_tier || chipFilter);
+  // Leader value for inline proportional bar on primary metric
+  const primaryNums = sorted.map((r) => Number(r[primary.key])).filter((n) => Number.isFinite(n) && n > 0);
+  const maxPrimary = primaryNums.length ? Math.max(...primaryNums) : 0;
 
-  // Banner label for the chip-focus mode: now that `?chip=<slug>`
-  // matches every chip_count variant of a single chip model (×1 / ×4 /
-  // ×8 share a slug), use the bare chip name rather than `_chip_label`
-  // — the latter carries "×N" which would mislabel the banner as
-  // scoped to a specific fan-out.  We also surface how many distinct
-  // chip-count variants the filter is showing so the count isn't
-  // surprising.
+  const filtersActive = !!(vendorFilter || frameworkFilter || precisionFilter || chipFilter || searchQuery);
+  const countText = filtered.length === divisionRows.length
+    ? `${fmtNum(sorted.length)} ${closedOnly ? (zh ? "条参考基线" : "reference runs") : (zh ? "条结果" : "runs")}`
+    : `${fmtNum(sorted.length)} ${zh ? "/" : "of"} ${fmtNum(divisionRows.length)} ${zh ? "条结果" : "runs"}`;
+
+  const suiteTitle = _i("suite." + suiteId + ".title", meta.title);
   const chipFocusLabel = chipFilter
-    ? (filtered[0]?.chip || allRows.find((r) => r._chip_slug === chipFilter)?.chip || chipFilter)
+    ? (filtered[0]?.chip || suiteAllRows.find((r) => r._chip_slug === chipFilter)?.chip || chipFilter)
     : "";
-  const chipFocusVariants = chipFilter
-    ? new Set(filtered.map((r) => r.chip_count || 1)).size
-    : 0;
+
+  const basketN = basketGet().length;
 
   el.innerHTML = `
-    <section class="rk-hero" data-suite="${esc(meta.letter)}">
-      <span class="eyebrow">${_i('rankings.eyebrow',{letter:esc(meta.letter)})}</span>
-      <h1 class="rk-hero-title">${esc(_i('suite.' + suiteId + '.title', meta.title))}</h1>
-      <p class="rk-hero-sub">${esc(_i('suite.' + suiteId + '.tagline', meta.tagline))} ${_i('rankings.subtitle')}</p>
-    </section>
-
-    <section class="rk-toolbar">
-      <div class="rk-suite-pills" role="tablist" aria-label="Workload suite">
-        ${SUITE_ORDER.map((sid) => renderSuitePill(sid, sid === suiteId)).join("")}
+    <header class="lb-head">
+      <div class="lb-head-left">
+        <div class="lb-title-row">
+          <h1>${zh ? "排行榜" : "Leaderboard"}</h1>
+          <span class="lb-suite-pill-active mono">
+            <span class="lb-dot" style="background:var(--suite-${esc(meta.letter)})"></span>
+            Suite ${esc(meta.letter)} · ${esc(suiteTitle)}
+          </span>
+        </div>
+        <div class="lb-meta-row">
+          <span class="lb-count mono tnum" id="lb-count">${esc(countText)}</span>
+          <span class="lb-meta-sep">·</span>
+          <span class="lb-meta-sub">${esc(_i("suite." + suiteId + ".tagline", meta.tagline))}</span>
+        </div>
       </div>
 
-      <div class="rk-filter-row">
-        ${renderFacetGroup("vendor",      _i('rankings.table.vendor'),     facets.vendor,     vendorFilter,     suiteId, query)}
-        ${renderFacetGroup("precision",   _i('rankings.table.precision'),  facets.precision,  precisionFilter,  suiteId, query)}
-        ${renderFacetGroup("framework",   _i('rankings.table.framework'),  facets.framework,  frameworkFilter,  suiteId, query)}
-        ${facets.runnerTier.length > 1
-          ? renderFacetGroup("runner_tier", _i('rankings.table.runnerTier', 'Runner'), facets.runnerTier, runnerTierFilter, suiteId, query)
-          : ""}
-        ${filtersActive
-          ? `<a class="rk-clear-all" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(suiteId)))}">${_i('rankings.clear')}</a>`
-          : ""}
+      <div class="lb-view-switch" role="tablist" aria-label="View mode">
+        <button type="button" class="lb-vtab${viewMode === "table" ? " active" : ""}" data-view-mode="table" role="tab" aria-selected="${viewMode === "table"}">
+          ${icon("table", 14)} <span>${zh ? "榜单" : "Table"}</span>
+        </button>
+        <button type="button" class="lb-vtab${viewMode === "landscape" ? " active" : ""}" data-view-mode="landscape" role="tab" aria-selected="${viewMode === "landscape"}">
+          ${icon("scatter", 14)} <span>${zh ? "全景图" : "Landscape"}</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="lb-tabs-bar" role="tablist" aria-label="Workload suite">
+      ${SUITE_ORDER.map((sid) => {
+        const m = SUITE_META[sid];
+        const active = sid === suiteId && viewMode === "table";
+        const shortName = (zh ? TAB_SHORT_ZH : TAB_SHORT_EN)[sid] || m.title;
+        return `
+          <button type="button"
+                  class="lb-stab${active ? " active" : ""}"
+                  data-suite="${esc(sid)}"
+                  role="tab"
+                  aria-selected="${active}"
+                  title="Suite ${esc(m.letter)} · ${esc(_i("suite." + sid + ".title", m.title))}">
+            <span class="lb-stab-ic">${suiteIcon(sid, 14)}</span>
+            <span class="lb-stab-letter mono">${esc(m.letter)}</span>
+            <span class="lb-stab-name">${esc(shortName)}</span>
+          </button>
+        `;
+      }).join("")}
+    </div>
+
+    <div class="lb-controls">
+      <div class="lb-search-wrap">
+        <span class="lb-search-ic">${icon("search", 14)}</span>
+        <input id="rk-search"
+               class="lb-search"
+               type="search"
+               value="${esc(searchQuery)}"
+               placeholder="${zh ? "搜索芯片、框架或 @提交者…" : "Filter by chip, framework, or @submitter…"}"
+               aria-label="Filter results">
       </div>
 
-      <div class="rk-status">
-        <span class="rk-count">
-          <strong class="tnum">${fmtNum(sorted.length)}</strong>
-          ${_i('rankings.of')} <span class="tnum">${fmtNum(allRows.length)}</span> ${_i('rankings.results')}
-        </span>
-        <span class="rk-sortby">
-          ${_i('rankings.sorted')}
-          <strong>${esc(colLabel(cols, sortKey))}</strong>
-          <span class="rk-sort-arrow">${sortDir === "asc" ? "↑" : "↓"}</span>
-        </span>
-        ${colsAreHideable ? renderColsToggle(suiteId, query, colsMode, emptyMetricKeys.length) : ""}
-      </div>
-    </section>
+      <select class="lb-select" id="lb-filter-vendor" aria-label="Vendor">
+        <option value="">${zh ? "全部厂商" : "All vendors"}</option>
+        ${facets.vendor.map((v) => `<option value="${esc(v)}"${v === vendorFilter ? " selected" : ""}>${esc(v)}</option>`).join("")}
+      </select>
+
+      <select class="lb-select" id="lb-filter-framework" aria-label="Framework">
+        <option value="">${zh ? "全部框架" : "All frameworks"}</option>
+        ${facets.framework.map((f) => `<option value="${esc(f)}"${f === frameworkFilter ? " selected" : ""}>${esc(f)}</option>`).join("")}
+      </select>
+
+      ${facets.precision.length > 1 ? `
+        <select class="lb-select" id="lb-filter-precision" aria-label="Precision">
+          <option value="">${zh ? "全部精度" : "All precisions"}</option>
+          ${facets.precision.map((p) => `<option value="${esc(p)}"${p === precisionFilter ? " selected" : ""}>${esc(p)}</option>`).join("")}
+        </select>
+      ` : ""}
+
+      <button type="button"
+              class="lb-division-btn${closedOnly ? " is-closed" : " is-open"}"
+              id="lb-division-toggle"
+              title="${zh ? "Closed 仅含开箱即用参考栈；Open 含优化与实验栈" : "Closed shows out-of-the-box reference stacks; Open includes optimized & experimental forks"}">
+        ${closedOnly ? icon("lock", 13) : icon("flask", 13)}
+        <span>${closedOnly
+          ? (zh ? "仅参考栈 (Closed)" : "Closed (Ref)")
+          : (zh ? "全部栈 (Open)" : "Open (All)")}</span>
+        ${closedOnly && nonRefCount > 0 ? `<span class="lb-div-badge mono">+${nonRefCount}</span>` : ""}
+      </button>
+
+      ${viewMode === "table" ? `
+        <button type="button" class="lb-info-btn" id="lb-protocol-toggle" aria-expanded="false">
+          ${icon("info", 14)} <span>${zh ? "协议" : "Protocol"}</span>
+        </button>
+      ` : ""}
+
+      ${filtersActive ? `
+        <button type="button" class="lb-clear-btn" data-clear-all="1">
+          ${icon("x", 13)} ${zh ? "重置" : "Reset"}
+        </button>
+      ` : ""}
+    </div>
+
+    ${renderProtocolDrawer(suiteId, meta)}
 
     ${chipFilter ? `
-      <div class="rk-chip-focus" data-suite="${esc(meta.letter)}">
-        <span class="rk-chip-focus-msg">
-          Showing only <strong>${esc(chipFocusLabel)}</strong>${chipFocusVariants > 1 ? ` <span class="rk-chip-focus-variants">(across ${chipFocusVariants} chip-count variants)</span>` : ""} in Suite ${esc(meta.letter)}.
-        </span>
-        <span class="rk-chip-focus-actions">
-          <a class="btn ghost small" href="#/chip/${esc(chipFilter)}">${_i('rankings.viewchip')}</a>
-          <a class="btn ghost small" href="${esc(buildHash("/rankings", { ...query, chip: undefined }))}">${_i('rankings.showall')}</a>
+      <div class="lb-chip-banner">
+        <span>${zh ? "当前仅展示芯片：" : "Filtered to chip:"} <strong>${esc(chipFocusLabel)}</strong></span>
+        <span class="lb-chip-banner-actions">
+          <a href="#/chip/${esc(chipFilter)}">${zh ? "查看芯片档案" : "Chip profile"} →</a>
+          <a href="${esc(rebuildHash(suiteId, query, { chip: undefined }))}">${zh ? "显示全部" : "Show all"}</a>
         </span>
       </div>
     ` : ""}
 
-    <div class="rk-basket-bar ${basketGet().length ? "show" : ""}">
-      <span class="rk-basket-msg">
-        <strong class="tnum">${fmtNum(basketGet().length)}</strong>
-        ${basketGet().length === 1 ? _i('rankings.basket.run') : _i('rankings.basket.runs')} ${_i('rankings.basket.msg')}
-      </span>
-      <span class="rk-basket-actions">
-        <a class="btn primary small" href="#/compare">${_i('rankings.basket.compare')}</a>
-        <button class="btn ghost small" data-basket-clear="1" type="button">${_i('rankings.basket.clear')}</button>
-      </span>
-    </div>
-
-    <section class="rk-table-section">
-      ${sorted.length === 0
-        ? renderEmpty(meta, filtersActive)
-        : renderTable(suiteId, sorted, displayCols, sortKey, sortDir)}
+    <section class="lb-body">
+      ${viewMode === "landscape"
+        ? `<div id="lb-landscape-mount"></div>`
+        : (sorted.length === 0
+            ? renderEmpty(meta, filtersActive, nonRefCount, closedOnly)
+            : renderTable(suiteId, sorted, displayCols, sortKey, sortDir, primary, maxPrimary, openDivision))}
     </section>
+
+    <div class="lb-float-basket${basketN ? " show" : ""}" id="lb-float-basket">
+      <span class="lb-basket-count mono tnum"><strong>${fmtNum(basketN)}</strong> ${zh ? "项已选" : (basketN === 1 ? "selected" : "selected")}</span>
+      <a class="lb-basket-go" href="#/compare">${zh ? "开始对比" : "Compare"} ${icon("arrowRight", 14)}</a>
+      <button type="button" class="lb-basket-clear" data-basket-clear="1" aria-label="Clear selection">${icon("x", 14)}</button>
+    </div>
   `;
 
-  bindClicks(el);
+  if (viewMode === "landscape") {
+    const mount = el.querySelector("#lb-landscape-mount");
+    const metric = query.ls_metric || "offline";
+    renderLandscape(mount, { closedOnly, vendor: vendorFilter, framework: frameworkFilter, metric });
+    mount.addEventListener("click", (ev) => {
+      const btn = ev.target.closest("[data-ls-metric]");
+      if (!btn) return;
+      location.hash = rebuildHash(suiteId, query, { view: "landscape", ls_metric: btn.dataset.lsMetric });
+    });
+  }
 
-  // Keep the table's checked state, the basket banner, and the in-basket
-  // row highlight in sync with the shared basket store.  Attach once per
-  // mounted view container to avoid stacking listeners across re-renders.
+  bindInteractions(el);
+
   if (!el.__rkBasketAttached) {
     basketOnChange(() => {
-      const tbody = el.querySelector(".data-table tbody");
+      const tbody = el.querySelector(".lb-table tbody");
       if (tbody) {
         for (const tr of tbody.querySelectorAll("tr[data-run-id]")) {
-          const rid = tr.dataset.runId;
-          const inBasket = basketHas(rid);
-          tr.classList.toggle("in-basket", inBasket);
+          const inB = basketHas(tr.dataset.runId);
+          tr.classList.toggle("in-basket", inB);
           const cb = tr.querySelector(".compare-checkbox");
-          if (cb) cb.checked = inBasket;
+          if (cb) cb.checked = inB;
         }
       }
-      const bar = el.querySelector(".rk-basket-bar");
+      const bar = el.querySelector("#lb-float-basket");
       if (bar) {
         const n = basketGet().length;
         bar.classList.toggle("show", n > 0);
-        const msg = bar.querySelector(".rk-basket-msg");
-        if (msg) {
-          msg.innerHTML = `
-            <strong class="tnum">${fmtNum(n)}</strong>
-            ${n === 1 ? "run" : "runs"} in your compare basket
-          `;
-        }
+        const cnt = bar.querySelector(".lb-basket-count");
+        if (cnt) cnt.innerHTML = `<strong>${fmtNum(n)}</strong> ${isZh() ? "项已选" : "selected"}`;
       }
     });
     el.__rkBasketAttached = true;
   }
 }
 
-// ── Toolbar bits ──
+function renderProtocolDrawer(suiteId, meta) {
+  const wl = meta.workload || {};
+  const model = wl.model ? shortModel(wl.model) : "—";
+  const tokens = wl.inputTokens && wl.outputTokens ? `${wl.inputTokens} → ${wl.outputTokens} tok` : "";
+  const bn = _i(`rankings.bn.${suiteId}`, meta.tagline);
+  const takeaway = _i(`suite.${suiteId}.finding.headline`, "");
+  const zh = isZh();
 
-// "N empty columns hidden" pill in the status row.  Anchor (not button)
-// so middle-click / Cmd-click open the alternate view in a new tab —
-// same affordance every other rankings filter uses.  We rebuild the
-// hash via rebuildHash so the suite + every other filter survive the
-// toggle.
-function renderColsToggle(suiteId, query, colsMode, hiddenCount) {
-  const isHiding = colsMode === "auto";
-  const next = isHiding ? "all" : undefined; // undefined drops the param
-  const href = rebuildHash(suiteId, query, { cols: next });
-  const label = isHiding
-    ? `${hiddenCount} ${hiddenCount === 1 ? "column" : "columns"} hidden — show all`
-    : "Hide empty columns";
   return `
-    <a class="rk-cols-toggle"
-       href="${esc(href)}"
-       title="${esc(isHiding ? "Show every metric column declared by this suite" : "Hide metric columns that are empty for every visible row")}">
-      <span class="rk-cols-toggle-icon" aria-hidden="true">${isHiding ? "▸" : "▾"}</span>
-      ${esc(label)}
-    </a>
-  `;
-}
-
-function renderSuitePill(sid, active) {
-  const m = SUITE_META[sid];
-  return `
-    <button class="rk-suite-pill ${active ? "active" : ""}"
-            data-suite="${esc(sid)}"
-            data-suite-letter="${esc(m.letter)}"
-            type="button"
-            aria-pressed="${active ? "true" : "false"}"
-            title="${esc(m.tagline)}">
-      <span class="rk-suite-letter">${esc(m.letter)}</span>
-      <span class="rk-suite-name">${esc(m.title)}</span>
-    </button>
-  `;
-}
-
-function renderFacetGroup(facetKey, label, options, selected, suiteId, query) {
-  if (options.length === 0) return "";
-  const sel = new Set(selected);
-  // Each pill is an anchor whose `href` is the URL the click would
-  // navigate to (toggling this value into the comma-separated facet
-  // CSV).  That gives middle-click and Cmd/Ctrl-click native open-in-
-  // new-tab semantics for free; the listener still preventDefaults on
-  // plain left-clicks and routes through the SPA in-place.
-  return `
-    <div class="rk-facet" data-facet-group="${esc(facetKey)}">
-      <span class="rk-facet-label">${esc(label)}</span>
-      <div class="rk-facet-pills">
-        ${options.map((opt) => {
-          const next = toggleInCsv(query[facetKey], opt);
-          const href = rebuildHash(suiteId, query, { [facetKey]: next || undefined });
-          const active = sel.has(opt);
-          return `
-            <a class="rk-facet-pill ${active ? "active" : ""}"
-               href="${esc(href)}"
-               data-toggle-facet="${esc(facetKey)}"
-               data-value="${esc(opt)}"
-               role="button"
-               aria-pressed="${active ? "true" : "false"}">
-              ${facetKey === "vendor"
-                ? `<span class="vendor-dot" data-vendor="${esc(opt)}"></span>`
-                : ""}
-              <span>${esc(opt)}</span>
-            </a>
-          `;
-        }).join("")}
+    <aside class="lb-protocol-drawer" id="lb-protocol-drawer" hidden>
+      <div class="lb-proto-grid">
+        <div>
+          <div class="lb-proto-lbl mono">${zh ? "隔离瓶颈" : "BOTTLENECK"}</div>
+          <div class="lb-proto-val">${esc(bn)}</div>
+        </div>
+        <div>
+          <div class="lb-proto-lbl mono">${zh ? "固定负载" : "WORKLOAD"}</div>
+          <div class="lb-proto-val mono"><strong>${esc(model)}</strong>${wl.precision ? ` · ${esc(wl.precision)}` : ""}${tokens ? ` · ${esc(tokens)}` : ""}</div>
+        </div>
+        <div>
+          <div class="lb-proto-lbl mono">${zh ? "关键发现" : "KEY TAKEAWAY"}</div>
+          <div class="lb-proto-val">${esc(takeaway || meta.tagline)} <a href="#/suites">${zh ? "完整协议 →" : "Full protocol →"}</a></div>
+        </div>
       </div>
-    </div>
+    </aside>
   `;
 }
 
-// ── Table ──
-
-function renderTable(suiteId, rows, cols, sortKey, sortDir) {
-  const meta = SUITE_META[suiteId];
+function renderTable(suiteId, rows, cols, sortKey, sortDir, primary, maxPrimary, openDivision) {
+  const zh = isZh();
   return `
-    <div class="data-table-wrap">
-      <table class="data-table" data-suite="${esc(meta.letter)}">
+    <div class="lb-table-wrap">
+      <table class="lb-table data-table">
         <thead>
           <tr>
-            <th class="col-compare" scope="col"><span class="visually-hidden">Compare</span></th>
+            <th class="col-compare" scope="col" title="${zh ? "勾选对比" : "Select to compare"}"><span class="visually-hidden">Compare</span></th>
             <th class="col-rank" scope="col">#</th>
-            <th class="col-chip" scope="col">${_i('rankings.table.recipe')}</th>
-            <th class="col-vendor" scope="col">${_i('rankings.table.vendor')}</th>
-            <th class="col-precision" scope="col">${_i('rankings.table.precision')}</th>
+            <th class="col-chip" scope="col">${zh ? "推理方案 (芯片 · 框架)" : "Recipe"}</th>
+            <th class="col-vendor" scope="col">${zh ? "厂商" : "Vendor"}</th>
             ${cols.map((c) => `
               <th class="col-metric sortable${c.primary ? " col-primary" : ""}${sortKey === c.key ? " is-sort" : ""}"
                   data-sort-key="${esc(c.key)}"
@@ -317,129 +321,129 @@ function renderTable(suiteId, rows, cols, sortKey, sortDir) {
                   aria-sort="${sortKey === c.key ? (sortDir === "asc" ? "ascending" : "descending") : "none"}"
                   scope="col">
                 <span class="th-label">${esc(c.label)}</span>
-                ${c.unit ? `<span class="th-unit">${esc(c.unit)}</span>` : ""}
-                <span class="th-sort-icon">${sortKey === c.key ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
+                ${c.unit ? `<span class="th-unit mono">${esc(c.unit)}</span>` : ""}
+                <span class="th-sort-arrow">${sortKey === c.key ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
               </th>
             `).join("")}
-            <th class="col-date sortable${sortKey === "date" ? " is-sort" : ""}"
+            <th class="col-date sortable hide-mobile${sortKey === "date" ? " is-sort" : ""}"
                 data-sort-key="date" data-sort-dir-default="desc"
                 aria-sort="${sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}"
                 scope="col">
-              <span class="th-label">${_i('rankings.table.date')}</span>
-              <span class="th-sort-icon">${sortKey === "date" ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
+              <span class="th-label">${zh ? "日期" : "Date"}</span>
+              <span class="th-sort-arrow">${sortKey === "date" ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
             </th>
-            <th class="col-tier" scope="col">${_i('rankings.table.tier')}</th>
+            <th class="col-trust" scope="col" title="${zh ? "±5% 独立复现验证" : "Independent ±5% verification"}">${zh ? "验证" : "Trust"}</th>
           </tr>
         </thead>
         <tbody>
-          ${rows.map((r, i) => renderRow(suiteId, r, cols, sortKey, i + 1)).join("")}
+          ${rows.map((r, i) => renderRow(r, cols, sortKey, primary, maxPrimary, i + 1, openDivision)).join("")}
         </tbody>
       </table>
     </div>
   `;
 }
 
-function renderRow(suiteId, row, cols, sortKey, rank) {
-  const slug = row._chip_slug;
+function renderRow(row, cols, sortKey, primary, maxPrimary, rank, openDivision) {
   const runId = row.run_id || row.submission || "";
   const inBasket = basketHas(runId);
   const ver = shortVersion(row.framework_version);
-  const fw = row.framework || "";
-  const ops = implOpsLabel(row);
-  // a11y: tabindex on the row makes the run-detail trigger reachable
-  // via keyboard.  We deliberately keep the native `<tr>` role so
-  // assistive tech still announces row context (column → cell mapping
-  // would break under role="button").  modal.js's keydown handler
-  // turns Enter / Space on a focused row into the same openModal call
-  // a click would make.
-  const a11yLabel = `Open run details for ${row._chip_label}${fw ? " on " + fw : ""}`;
+  const fw = [row.framework, ver].filter(Boolean).join(" ");
+  const subParts = [fw, row.precision].filter(Boolean).join(" · ");
+  const rTier = row.runner_tier || "reference";
+  const isVerified = row.tier === "verified";
+  const zh = isZh();
+
   return `
     <tr data-run-id="${esc(runId)}"
-        data-chip-slug="${esc(slug)}"
+        data-chip-slug="${esc(row._chip_slug)}"
         data-open-run="${esc(runId)}"
         tabindex="0"
-        aria-label="${esc(a11yLabel)}"
         class="${inBasket ? "in-basket" : ""}">
-      <td class="col-compare" title="Add to compare basket">
-        <label class="compare-cell" aria-label="Add ${esc(row._chip_label)} run to compare basket">
+      <td class="col-compare" title="${zh ? "加入对比" : "Toggle compare"}">
+        <label class="compare-cell">
           <input type="checkbox" class="compare-checkbox" tabindex="-1" ${inBasket ? "checked" : ""}>
         </label>
       </td>
-      <td class="col-rank tnum">${rank}</td>
+      <td class="col-rank mono tnum${rank <= 3 ? ` is-top-${rank}` : ""}">${rank}</td>
       <td class="col-chip">
-        <a class="rk-chip-link" href="${chipHref(row)}">
-          <span class="rk-chip-name">${esc(row._chip_label)}${fw ? ` · <span class="rk-chip-fw"><span style="white-space:nowrap">${esc(fw)}${ver ? ` <span class="fw-ver">${esc(ver)}</span>` : ""}</span>${ops ? ` <span class="fw-ops">${esc(ops)}</span>` : ""}</span>` : ""}</span>
-          ${row.memory_gb
-            ? `<span class="rk-chip-meta">${esc(fmtNum(row.memory_gb))} GB</span>`
-            : ""}
+        <a class="lb-chip-link" href="${chipHref(row)}">
+          <span class="lb-chip-line">
+            <span class="lb-chip-name">${esc(row._chip_label)}</span>
+            ${row.memory_gb ? `<span class="lb-chip-mem mono">${esc(fmtNum(row.memory_gb))}GB</span>` : ""}
+          </span>
+          <span class="lb-chip-sub mono">
+            ${esc(subParts)}
+            ${openDivision && rTier !== "reference" ? `<span class="lb-tier-tag is-${esc(rTier)}">${esc(rTier === "experimental" ? "exp" : "opt")}</span>` : ""}
+          </span>
         </a>
       </td>
-      <td class="col-vendor">
-        <span class="vendor-dot" data-vendor="${esc(row.vendor)}"></span>
-        <span class="vendor-name">${esc(row.vendor || "-")}</span>
-      </td>
-      <td class="col-precision">${esc(row.precision || "-")}</td>
-      ${cols.map((c) => {
-        const v = formatMetric(row[c.key], c);
-        const isSort = sortKey === c.key;
-        return `
-          <td class="col-metric${c.primary ? " col-primary" : ""}${isSort ? " is-sort" : ""} tnum">
-            ${v !== null
-              ? `<span class="metric-val">${esc(v)}</span>`
-              : `<span class="metric-empty">-</span>`}
-          </td>
-        `;
-      }).join("")}
-      <td class="col-date tnum${sortKey === "date" ? " is-sort" : ""}">${esc(fmtDate(row.date))}</td>
-      <td class="col-tier">
-        <span class="badge tier-${esc(row.tier || "community")}">${esc(row.tier || "community")}</span>
-        ${row.runner_tier && row.runner_tier !== "reference"
-          ? `<span class="badge" style="margin-left:0.25rem;opacity:0.85" title="Specialized ${esc(row.runner_tier)} runner">${esc(row.runner_tier)}</span>`
-          : ""}
+      <td class="col-vendor">${esc(row.vendor || "—")}</td>
+      ${cols.map((c) => renderMetricCell(row, c, sortKey, primary, maxPrimary)).join("")}
+      <td class="col-date mono tnum hide-mobile">${esc(fmtDate(row.date))}</td>
+      <td class="col-trust">
+        ${isVerified
+          ? `<span class="trust-verified" title="${zh ? "已通过 ±5% 独立复现验证" : "Independently verified within ±5%"}">${icon("shieldCheck", 14)}<span>${zh ? "已验证" : "Verified"}</span></span>`
+          : `<span class="trust-community" title="${zh ? "CI 已通过，等待独立复现" : "CI validated · community submission"}">—</span>`}
       </td>
     </tr>
   `;
 }
 
-function renderEmpty(meta, filtersActive) {
-  if (!filtersActive) {
+function renderMetricCell(row, col, sortKey, primary, maxPrimary) {
+  const raw = row[col.key];
+  const isSort = sortKey === col.key;
+
+  // Special semantic rendering for Online SLA QPS
+  if (col.key === "online_max_qps") {
+    if (raw == null) {
+      return `<td class="col-metric${isSort ? " is-sort" : ""} mono tnum"><span class="metric-empty">—</span></td>`;
+    }
+    const n = Number(raw);
+    if (n === 0) {
+      return `<td class="col-metric${isSort ? " is-sort" : ""} mono"><span class="sla-fail" title="Failed 500ms p99 TTFT SLA under Poisson load">${isZh() ? "未达 SLA" : "SLA fail"}</span></td>`;
+    }
+    const disp = n >= 10 ? Math.round(n).toString() : n.toFixed(n % 1 === 0 ? 0 : 1);
+    return `<td class="col-metric${isSort ? " is-sort" : ""} mono tnum"><span class="metric-val">${esc(disp)}</span></td>`;
+  }
+
+  const formatted = formatMetric(raw, col);
+  if (formatted === null) {
+    return `<td class="col-metric${col.primary ? " col-primary" : ""}${isSort ? " is-sort" : ""} mono tnum"><span class="metric-empty">—</span></td>`;
+  }
+
+  if (col.primary && !col.textual && maxPrimary > 0 && Number.isFinite(Number(raw)) && Number(raw) > 0) {
+    const pct = Math.max(4, Math.min(100, Math.round((Number(raw) / maxPrimary) * 100)));
     return `
-      <div class="rk-empty">
-        <span class="rk-empty-icon" aria-hidden="true">∅</span>
-        <p>${_i('rankings.noSubmissionsFor')} <strong>Suite ${esc(meta.letter)} · ${esc(meta.title)}</strong>.</p>
-        <p class="rk-empty-sub">${esc(meta.tagline)}</p>
-      </div>
+      <td class="col-metric col-primary${isSort ? " is-sort" : ""} mono tnum">
+        <div class="metric-bar-cell">
+          <span class="metric-val">${esc(formatted)}</span>
+          <div class="metric-bar-track"><div class="metric-bar-fill" style="width:${pct}%"></div></div>
+        </div>
+      </td>
     `;
   }
-  // Resolve the active suite from the URL so the "${_i('rankings.clearFilters')}" href
-  // strips facets while keeping the user on this same suite.
-  const { params: q } = parseHash(location.hash);
-  const sid = SUITE_ORDER.includes(q.suite) ? q.suite : SUITE_ORDER[0];
+
+  return `<td class="col-metric${col.primary ? " col-primary" : ""}${isSort ? " is-sort" : ""} mono tnum"><span class="metric-val">${esc(formatted)}</span></td>`;
+}
+
+function renderEmpty(meta, filtersActive, nonRefCount, closedOnly) {
+  const zh = isZh();
   return `
     <div class="rk-empty">
-      <span class="rk-empty-icon" aria-hidden="true">∅</span>
-      <p>No submissions match the current filters in Suite ${esc(meta.letter)}.</p>
-      <a class="btn" data-clear-all="1" href="${esc(buildHash("/rankings", suiteUrlParam(sid)))}">${_i('rankings.clearFilters')}</a>
+      <p>${filtersActive
+        ? (zh ? `Suite ${esc(meta.letter)} 下没有匹配当前筛选条件的结果。` : `No results match the current filters in Suite ${esc(meta.letter)}.`)
+        : (zh ? `Suite ${esc(meta.letter)} 暂无参考栈提交。` : `No reference submissions yet in Suite ${esc(meta.letter)}.`)}</p>
+      <div class="rk-empty-actions">
+        ${filtersActive ? `<button type="button" class="btn-outline" data-clear-all="1">${zh ? "清除筛选" : "Reset filters"}</button>` : ""}
+        ${closedOnly && nonRefCount > 0 ? `<button type="button" class="btn-solid" id="lb-open-empty">${zh ? `查看 ${nonRefCount} 条 Open 栈结果` : `Show ${nonRefCount} Open-division runs`}</button>` : ""}
+      </div>
     </div>
   `;
 }
 
-// ── Click delegation ──
-//
-// The listener is attached exactly once per mounted view container.
-// Stale closures (a re-render that re-attached the handler would
-// otherwise capture stale suite/query and double-fire updates) are
-// avoided by re-reading the URL hash on every click.
-//
-// The first thing the listener does is bail when the active route is
-// no longer /rankings.  Without that guard, navigating Rankings →
-// Compare leaves this listener subscribed to the same view container
-// and intercepts compare-page clicks (e.g. the suite pills, which
-// share a class name) and redirects them back to /rankings.
-
-function bindClicks(el) {
-  if (el.__rkClicksAttached) return;
-  el.__rkClicksAttached = true;
+function bindInteractions(el) {
+  if (el.__rkBound) return;
+  el.__rkBound = true;
 
   el.addEventListener("click", (ev) => {
     if (!location.hash.startsWith("#/rankings")) return;
@@ -447,69 +451,71 @@ function bindClicks(el) {
     const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
     const t = ev.target;
 
-    // Compare basket clear.
     if (t.closest("[data-basket-clear]")) {
       ev.preventDefault();
-      const ids = basketGet();
-      for (const id of ids) basketToggle(id);
+      for (const id of basketGet()) basketToggle(id);
       return;
     }
 
-    // Anchor-driven actions (clear filters, facet pills) are real <a>
-    // tags so middle-click / Cmd-click / Ctrl-click / Shift-click can
-    // open the toggled URL in a new tab.  The plain-click case still
-    // preventDefaults and routes through the SPA in-place.
-    const isModifiedNav = ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button !== 0;
-
-    // Clear all filters anchor.
     if (t.closest("[data-clear-all]")) {
-      if (isModifiedNav) return;
       ev.preventDefault();
       location.hash = buildHash("/rankings", suiteUrlParam(suiteId));
       return;
     }
 
-    // Suite pill (still a button — switching suite resets sort/filters
-    // so opening "the same suite with different filters" in a new tab
-    // doesn't make sense).
-    const suitePill = t.closest(".rk-suite-pill");
-    if (suitePill) {
+    const vtab = t.closest("[data-view-mode]");
+    if (vtab) {
       ev.preventDefault();
-      const sid = suitePill.dataset.suite;
-      if (sid && sid !== suiteId) {
-        location.hash = buildHash("/rankings", suiteUrlParam(sid));
+      const mode = vtab.dataset.viewMode;
+      location.hash = rebuildHash(suiteId, query, { view: mode === "table" ? undefined : mode });
+      return;
+    }
+
+    const stab = t.closest(".lb-stab");
+    if (stab) {
+      ev.preventDefault();
+      const sid = stab.dataset.suite;
+      if (sid) {
+        location.hash = buildHash("/rankings", {
+          ...suiteUrlParam(sid),
+          division: query.division === "open" ? "open" : undefined,
+        });
       }
       return;
     }
 
-    // Facet pill anchor.  Toggle the facet value in the CSV and update
-    // the URL — but only on plain left-click; modified clicks fall
-    // through to the browser so they open the precomputed href in a
-    // new tab.
-    const facetPill = t.closest("[data-toggle-facet]");
-    if (facetPill) {
-      if (isModifiedNav) return;
+    if (t.closest("#lb-division-toggle") || t.closest("#lb-open-empty")) {
       ev.preventDefault();
-      const facet = facetPill.dataset.toggleFacet;
-      const value = facetPill.dataset.value;
-      const next = toggleInCsv(query[facet], value);
-      location.hash = rebuildHash(suiteId, query, { [facet]: next || undefined });
+      const isOpen = query.division === "open" || (query.runner_tier && query.runner_tier !== "reference");
+      location.hash = rebuildHash(suiteId, query, {
+        division: isOpen ? undefined : "open",
+        runner_tier: undefined,
+      });
       return;
     }
 
-    // Compare cell.  Clicking anywhere inside .col-compare toggles the
-    // basket — not just the tiny checkbox itself — to forgive misclicks.
+    const protoBtn = t.closest("#lb-protocol-toggle");
+    if (protoBtn) {
+      ev.preventDefault();
+      const drawer = el.querySelector("#lb-protocol-drawer");
+      if (drawer) {
+        const nextHidden = !drawer.hidden;
+        drawer.hidden = nextHidden;
+        protoBtn.setAttribute("aria-expanded", String(!nextHidden));
+        protoBtn.classList.toggle("active", !nextHidden);
+      }
+      return;
+    }
+
     const compareCell = t.closest(".col-compare");
     if (compareCell) {
       ev.preventDefault();
       ev.stopPropagation();
       const tr = compareCell.closest("tr");
-      const rid = tr && tr.dataset.runId;
-      if (rid) basketToggle(rid);
+      if (tr?.dataset.runId) basketToggle(tr.dataset.runId);
       return;
     }
 
-    // Sort header.
     const th = t.closest("th.sortable");
     if (th) {
       ev.preventDefault();
@@ -518,46 +524,80 @@ function bindClicks(el) {
       const cur = String(query.sort || "");
       let nextDir = defaultDir;
       if (cur.startsWith(key + ":")) {
-        const curDir = cur.split(":")[1];
-        nextDir = curDir === "desc" ? "asc" : "desc";
+        nextDir = cur.split(":")[1] === "desc" ? "asc" : "desc";
       }
       location.hash = rebuildHash(suiteId, query, { sort: `${key}:${nextDir}` });
       return;
     }
+  });
 
-    // Plain row body clicks fall through to the document-level
-    // data-open-run handler in modal.js, which pops up the run detail.
+  el.addEventListener("change", (ev) => {
+    if (!location.hash.startsWith("#/rankings")) return;
+    const id = ev.target?.id;
+    if (!id || !id.startsWith("lb-filter-")) return;
+    const { params: query } = parseHash(location.hash);
+    const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
+    const key = id.replace("lb-filter-", "");
+    location.hash = rebuildHash(suiteId, query, { [key]: ev.target.value || undefined });
+  });
+
+  el.addEventListener("input", (ev) => {
+    const inp = ev.target?.id === "rk-search" ? ev.target : null;
+    if (!inp) return;
+    const needle = inp.value.trim().toLowerCase();
+    const tbody = el.querySelector(".lb-table tbody");
+    if (!tbody) return;
+    let visible = 0;
+    let total = 0;
+    for (const tr of tbody.querySelectorAll("tr[data-run-id]")) {
+      total += 1;
+      const match = !needle || tr.textContent.toLowerCase().includes(needle);
+      tr.style.display = match ? "" : "none";
+      if (match) visible += 1;
+    }
+    const cnt = el.querySelector("#lb-count");
+    if (cnt) {
+      const zh = isZh();
+      cnt.textContent = visible === total
+        ? `${fmtNum(total)} ${zh ? "条结果" : "runs"}`
+        : `${fmtNum(visible)} ${zh ? "/" : "of"} ${fmtNum(total)} ${zh ? "条结果" : "runs"}`;
+    }
+  });
+
+  el.addEventListener("keydown", (ev) => {
+    const inp = ev.target?.id === "rk-search" ? ev.target : null;
+    if (!inp || ev.key !== "Enter") return;
+    ev.preventDefault();
+    const { params: query } = parseHash(location.hash);
+    const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
+    location.hash = rebuildHash(suiteId, query, { q: inp.value.trim() || undefined });
   });
 }
 
-// ── Helpers ──
-
-function parseCsv(s) {
-  if (!s) return [];
-  return String(s).split(",").map((x) => x.trim()).filter(Boolean);
-}
-
-function toggleInCsv(csv, value) {
-  const arr = parseCsv(csv);
-  const idx = arr.indexOf(value);
-  if (idx >= 0) arr.splice(idx, 1);
-  else arr.push(value);
-  return arr.join(",");
-}
-
-function matchSet(filter, value) {
-  if (filter.length === 0) return true;
-  if (value === null || value === undefined) return false;
-  return filter.includes(value);
+function buildFacets(rows) {
+  const vendor = new Set();
+  const precision = new Set();
+  const framework = new Set();
+  for (const r of rows) {
+    if (r.vendor) vendor.add(r.vendor);
+    if (r.precision) precision.add(r.precision);
+    if (r.framework) framework.add(r.framework);
+  }
+  const sortedVendor = VENDOR_ORDER.filter((v) => vendor.has(v))
+    .concat(Array.from(vendor).filter((v) => !VENDOR_ORDER.includes(v)).sort());
+  return {
+    vendor: sortedVendor,
+    precision: Array.from(precision).sort(),
+    framework: Array.from(framework).sort(),
+  };
 }
 
 function safeCompare(a, b, dir) {
-  const aMissing = a === null || a === undefined || (typeof a === "number" && Number.isNaN(a));
-  const bMissing = b === null || b === undefined || (typeof b === "number" && Number.isNaN(b));
-  // Missing values always sink to the bottom regardless of direction.
-  if (aMissing && bMissing) return 0;
-  if (aMissing) return 1;
-  if (bMissing) return -1;
+  const aM = a === null || a === undefined || (typeof a === "number" && Number.isNaN(a));
+  const bM = b === null || b === undefined || (typeof b === "number" && Number.isNaN(b));
+  if (aM && bM) return 0;
+  if (aM) return 1;
+  if (bM) return -1;
   if (typeof a === "string" || typeof b === "string") {
     const c = String(a).localeCompare(String(b));
     return dir === "asc" ? c : -c;
@@ -565,38 +605,7 @@ function safeCompare(a, b, dir) {
   return dir === "asc" ? a - b : b - a;
 }
 
-function buildFacets(rows) {
-  const vendor = new Set();
-  const precision = new Set();
-  const framework = new Set();
-  const runnerTier = new Set();
-  for (const r of rows) {
-    if (r.vendor)    vendor.add(r.vendor);
-    if (r.precision) precision.add(r.precision);
-    if (r.framework) framework.add(r.framework);
-    runnerTier.add(r.runner_tier || "reference");
-  }
-  const tierOrder = ["reference", "optimized", "experimental"];
-  const sortedRunnerTier = tierOrder.filter((t) => runnerTier.has(t));
-  // Vendors follow the canonical order; precision/framework alphabetical.
-  const sortedVendor = VENDOR_ORDER.filter((v) => vendor.has(v))
-    .concat(Array.from(vendor).filter((v) => !VENDOR_ORDER.includes(v)).sort());
-  return {
-    vendor: sortedVendor,
-    precision: Array.from(precision).sort(),
-    framework: Array.from(framework).sort(),
-    runnerTier: sortedRunnerTier,
-  };
-}
-
-function colLabel(cols, key) {
-  if (key === "date") return "Date";
-  const c = cols.find((x) => x.key === key);
-  return c ? c.label : key;
-}
-
 function suiteUrlParam(suiteId) {
-  // suite_A is the default so we omit it from the URL for tidiness.
   return suiteId === SUITE_ORDER[0] ? {} : { suite: suiteId };
 }
 

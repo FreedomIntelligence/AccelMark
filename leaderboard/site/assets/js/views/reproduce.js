@@ -79,11 +79,11 @@ function renderCriteria(ex) {
 
       <p class="repro-criteria-stats">
 
-        <span class="repro-stat"><strong>${fmtNum(ex.openQuestCount)}</strong> ${_i('reproduce.statOpen', {n: fmtNum(ex.openQuestCount), w: questWord})}</span>
+        <span class="repro-stat">${_i('reproduce.statOpen', {n: `<strong>${fmtNum(ex.openQuestCount)}</strong>`, w: questWord})}</span>
 
         <span class="repro-stat-sep">·</span>
 
-        <span class="repro-stat"><strong>${fmtNum(ex.crossVerifiedRecordCount)}</strong>${_i("reproduce.statLinked", {n: fmtNum(ex.crossVerifiedRecordCount), w: recordWord})}</span>
+        <span class="repro-stat">${_i("reproduce.statLinked", {n: `<strong>${fmtNum(ex.crossVerifiedRecordCount)}</strong>`, w: recordWord})}</span>
 
         <span class="repro-stat-sep">·</span>
 
@@ -125,7 +125,7 @@ function renderCrossVerified(records) {
 
           </p>
 
-          <pre class="repro-cmd-hint"><code>python runners/.../runner.py --suite suite_A --reproduces-run-id &lt;original_run_id&gt; --tier verified</code></pre>
+          <pre class="repro-cmd-hint"><code>python run.py --runner auto --suite suite_A --reproduces-run-id &lt;original_run_id&gt; --tier verified</code></pre>
 
           <p class="repro-verified-empty muted">
 
@@ -353,8 +353,6 @@ export function render({ el }) {
 
                 <th>${_i("reproduce.thDate")}</th>
 
-                <th>${_i("reproduce.thTier")}</th>
-
                 <th></th>
 
               </tr>
@@ -389,9 +387,7 @@ export function render({ el }) {
 
                     <td>${q.submitted_by ? `<a class="text-link" href="#/contributor/${esc(q.submitted_by)}">@${esc(q.submitted_by)}</a>` : "—"}</td>
 
-                    <td class="muted">${esc(fmtDate(q.date))}</td>
-
-                    <td><span class="tier-pill community">${esc(q.tier)}</span></td>
+                    <td class="muted mono no-wrap">${esc(fmtDate(q.date))}</td>
 
                     <td class="repro-actions">
                       ${(() => {

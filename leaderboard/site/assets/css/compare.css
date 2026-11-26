@@ -1,0 +1,714 @@
+/* compare.css — Compare view & quick-add chip selector */
+
+.rk-suite-pill[data-suite="suite_A"] { --suite-color: var(--suite-A); }
+.rk-suite-pill[data-suite="suite_B"] { --suite-color: var(--suite-B); }
+.rk-suite-pill[data-suite="suite_C"] { --suite-color: var(--suite-C); }
+.rk-suite-pill[data-suite="suite_D"] { --suite-color: var(--suite-D); }
+.rk-suite-pill[data-suite="suite_E"] { --suite-color: var(--suite-E); }
+.rk-suite-pill[data-suite="suite_F"] { --suite-color: var(--suite-F); }
+.rk-suite-pill[data-suite="suite_G"] { --suite-color: var(--suite-G); }
+
+.rk-hero, .data-table, .rk-suite-pill { --suite-color: var(--accent-2); }
+
+
+.rk-suite-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+}
+.rk-suite-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.85rem 0.32rem 0.4rem;
+  border-radius: 999px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.rk-suite-pill .rk-suite-letter {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--suite-color) 18%, transparent);
+  color: var(--suite-color);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+}
+.rk-suite-pill .rk-suite-name {
+  white-space: nowrap;
+}
+.rk-suite-pill:hover {
+  border-color: color-mix(in srgb, var(--suite-color) 55%, transparent);
+  color: var(--fg-strong);
+}
+.rk-suite-pill.active {
+  background: var(--suite-color);
+  border-color: var(--suite-color);
+  color: var(--on-accent);
+}
+.rk-suite-pill.active .rk-suite-letter {
+  background: rgba(255, 255, 255, 0.25);
+  color: var(--on-accent);
+}
+/* ── Compare view ─────────────────────────────────────────── */
+.cmp-hero {
+  text-align: center;
+  padding: 2.25rem 1rem 1.25rem;
+  margin-bottom: 0.5rem;
+}
+.cmp-hero .eyebrow { justify-content: center; }
+/* Mirror .rk-hero: drop the leading rule so the centered eyebrow text
+   isn't preceded by a stray hyphen. */
+.cmp-hero .eyebrow::before { display: none; }
+.cmp-hero-title {
+  margin: 0.55rem auto 0.4rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+/* Matches .hero .hero-sub on Home / Suites — same size, weight, color —
+   so the Compare landing reads like its siblings. */
+.cmp-hero-sub {
+  margin: 0 auto;
+  color: var(--fg-strong);
+  font-weight: 400;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  max-width: 56ch;
+}
+
+/* Selected chips strip */
+.cmp-basket {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0.5rem 0 1.5rem;
+  padding: 0.85rem 1rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  align-items: center;
+}
+.cmp-basket-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-right: 0.4rem;
+}
+/* Stale-link variant: basket has entries but every run resolves to
+ * null.  We render the basket strip with just a count label (italic,
+ * muted) so it's obvious the chips themselves can't be shown.
+ */
+.cmp-basket--empty .cmp-basket-stale {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--fg-muted);
+  margin-right: auto;
+}
+.cmp-basket-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.5rem 0.4rem 0.7rem;
+  background: var(--bg);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  color: var(--fg-strong);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.cmp-basket-name {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  color: var(--fg-strong);
+  text-decoration: none;
+  line-height: 1.15;
+}
+.cmp-basket-name:hover .cmp-basket-chip-name {
+  color: var(--accent-2);
+}
+.cmp-basket-chip-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.cmp-basket-chip-meta {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  letter-spacing: 0.005em;
+}
+.cmp-basket-chip-select {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-sm, 4px);
+  padding: 0.1rem 0.25rem;
+  cursor: pointer;
+  max-width: 20ch;
+  font-family: inherit;
+}
+.cmp-basket-chip-select:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 1px;
+}
+.cmp-basket-chip .vendor-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vendor-color, var(--fg-faint));
+}
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
+
+.cmp-basket-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--fg-faint);
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0;
+}
+.cmp-basket-remove:hover {
+  background: color-mix(in srgb, var(--bad) 20%, transparent);
+  color: var(--bad);
+}
+
+.cmp-basket-actions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.cmp-basket-clear {
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.cmp-basket-clear:hover { color: var(--fg-strong); border-color: var(--accent); }
+
+/* Compare basket "Copy share link" pill — mirrors the clear pill's
+   silhouette so the two read as a paired actions group.  Success /
+   failure styling lives on the shared `.copy-btn` class (components.css)
+   so chip-detail and any future share button get the same flash chrome
+   for free. */
+.cmp-basket-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  color: var(--fg-muted);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.cmp-basket-share:hover {
+  color: var(--fg-strong);
+  border-color: var(--accent);
+}
+
+/* Compare empty state */
+.cmp-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+.cmp-empty .state-icon {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--fg-faint);
+}
+.cmp-empty p { margin: 0.3rem 0 1rem; }
+
+/* Per-suite empty banner: shown when ALL chips in the basket have zero
+   data for the currently active suite — saves users from staring at a
+   table of dashes by surfacing which suites DO have data. */
+.cmp-suite-empty {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  color: var(--fg-muted);
+  background: var(--bg-elev);
+  border: 1px dashed var(--border);
+  border-radius: var(--r-lg);
+}
+.cmp-suite-empty .state-icon {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--fg-faint);
+}
+.cmp-suite-empty p { margin: 0.3rem 0; }
+.cmp-suite-empty-sub {
+  font-size: 0.85rem;
+  color: var(--fg-faint);
+}
+.cmp-suite-empty-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  font-weight: 600;
+}
+.cmp-suite-empty-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Suite switcher reuses .rk-suite-pill; just align it. */
+.cmp-suite-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.cmp-suite-row .rk-facet-label { margin-right: 0.4rem; }
+
+/* Metric comparison table */
+.cmp-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow-card);
+}
+.cmp-table {
+  --suite-color: var(--accent-2);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+.cmp-table[data-suite="A"] { --suite-color: var(--suite-A); }
+.cmp-table[data-suite="B"] { --suite-color: var(--suite-B); }
+.cmp-table[data-suite="C"] { --suite-color: var(--suite-C); }
+.cmp-table[data-suite="D"] { --suite-color: var(--suite-D); }
+.cmp-table[data-suite="E"] { --suite-color: var(--suite-E); }
+.cmp-table[data-suite="F"] { --suite-color: var(--suite-F); }
+.cmp-table[data-suite="G"] { --suite-color: var(--suite-G); }
+.cmp-table[data-suite="H"] { --suite-color: var(--suite-H); }
+
+.cmp-table thead th {
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-weight: 600;
+  padding: 0.7rem 0.75rem 0.55rem;
+  color: var(--fg-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.66rem;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+.cmp-table thead th.cmp-chip-head {
+  text-transform: none;
+  letter-spacing: -0.005em;
+  font-size: 0.85rem;
+  color: var(--fg-strong);
+  padding-bottom: 0.5rem;
+}
+.cmp-table thead th.cmp-chip-head .cmp-chip-name {
+  display: block;
+  font-weight: 700;
+  color: var(--fg-strong);
+  text-decoration: none;
+  transition: color 100ms ease;
+}
+.cmp-table thead th.cmp-chip-head .cmp-chip-name:hover {
+  color: var(--accent-2);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.cmp-table thead th.cmp-chip-head .cmp-chip-meta {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--fg-muted);
+  font-weight: 500;
+  margin-top: 0.18rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.cmp-table thead th.cmp-chip-head .vendor-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  vertical-align: 1px;
+  background: var(--vendor-color, var(--fg-faint));
+}
+/* `--vendor-color` set globally by data.js via `[data-vendor="<name>"]`. */
+
+.cmp-table tbody tr { border-bottom: 1px solid var(--border-soft); }
+.cmp-table tbody tr:last-child { border-bottom: none; }
+
+.cmp-table td {
+  padding: 0.75rem 0.75rem;
+  vertical-align: middle;
+  color: var(--fg);
+}
+.cmp-table td.cmp-metric-label {
+  font-size: 0.85rem;
+  color: var(--fg-strong);
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 11rem;
+}
+.cmp-table td.cmp-metric-label.is-primary {
+  color: color-mix(in srgb, var(--suite-color) 70%, var(--fg-strong));
+}
+.cmp-table td.cmp-metric-label .cmp-metric-unit {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--fg-muted);
+  font-weight: 500;
+  margin-top: 0.15rem;
+}
+.cmp-table td.cmp-metric-label .cmp-metric-dir {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+
+.cmp-table td.cmp-cell { position: relative; min-width: 9rem; }
+.cmp-bar {
+  position: relative;
+  height: 8px;
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.32rem;
+}
+.cmp-bar .cmp-bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--suite-color) 75%, var(--fg-strong)),
+    var(--suite-color));
+  border-radius: 4px;
+}
+.cmp-bar.is-winner .cmp-bar-fill {
+  background: linear-gradient(90deg,
+    var(--suite-color),
+    color-mix(in srgb, var(--suite-color) 75%, var(--good)));
+}
+.cmp-cell-value {
+  font-size: 0.94rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-strong);
+}
+.cmp-cell-value .cmp-cell-unit {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--fg-muted);
+  margin-left: 0.25rem;
+  letter-spacing: 0.02em;
+}
+.cmp-cell.is-winner .cmp-cell-value::after {
+  content: "★";
+  margin-left: 0.35rem;
+  color: var(--suite-color);
+  font-size: 0.8rem;
+}
+.cmp-cell.is-missing .cmp-cell-value {
+  color: var(--fg-faint);
+  font-weight: 400;
+}
+
+/* ── Compare head-to-head charts ─────────────────────────────── */
+.cmp-charts-wrap:not(:empty) {
+  max-width: var(--page-max, 1100px);
+  margin: 1.8rem auto 0;
+  padding: 0 1rem;
+}
+.cmp-charts-head {
+  margin-bottom: 1rem;
+}
+.cmp-charts-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.005em;
+}
+.cmp-charts-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+}
+.cmp-chart-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  padding: 1rem 1.1rem 1.1rem;
+  margin-bottom: 1rem;
+}
+.cmp-chart-card-head { margin-bottom: 0.55rem; }
+.cmp-chart-card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg-strong);
+  letter-spacing: 0.005em;
+}
+.cmp-chart-card-sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+}
+.cmp-chart-canvas { width: 100%; position: relative; }
+.cmp-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 0.65rem;
+  font-size: 0.74rem;
+  color: var(--fg);
+}
+.cmp-chart-legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.cmp-chart-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.cmp-chart-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--fg-faint);
+  font-size: 0.82rem;
+}
+.cmp-charts-missing {
+  font-size: 0.76rem;
+  color: var(--fg-faint);
+  margin: 0.45rem 0 0;
+  padding: 0.45rem 0.7rem;
+  border-left: 2px solid var(--border-soft);
+}
+.cmp-charts-missing strong {
+  color: var(--fg-muted);
+  font-weight: 600;
+}
+
+/* ── Compare chip cloud (quick-add affordance) ──────────────────
+ *
+ * Reuses .chip-cloud / .chip-tile from home.css; only the wrapping
+ * section, headline copy, and selected-chip styling live here.
+ * In the empty state (cmp-cloud without .is-compact) the block is the
+ * page's main content; in the populated state it sits below the table
+ * as a compact "add another chip" footer.
+ */
+.cmp-cloud {
+  max-width: var(--page-max, 1100px);
+  margin: 1.4rem auto 0;
+  padding: 1.4rem 1rem 1.5rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+}
+.cmp-cloud.is-compact {
+  background: transparent;
+  border: 1px dashed var(--border-soft);
+  margin-top: 2rem;
+  padding: 1rem 0.85rem 1.1rem;
+}
+.cmp-cloud-head {
+  text-align: center;
+  margin-bottom: 0.85rem;
+  padding: 0 0.5rem;
+}
+.cmp-cloud-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fg-strong);
+  letter-spacing: -0.005em;
+}
+.cmp-cloud.is-compact .cmp-cloud-title {
+  font-size: 0.92rem;
+  color: var(--fg-muted);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+.cmp-cloud-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+  line-height: 1.45;
+}
+.cmp-cloud.is-compact .cmp-cloud-hint {
+  font-size: 0.74rem;
+  color: var(--fg-faint);
+}
+
+/* "In-basket" affordance on cloud tiles — a filled pill in the chip's
+ * vendor color, with a checkmark prefixed to the name so the state is
+ * obvious without relying on color alone.  Clicking again removes
+ * every basket entry whose chip matches the tile name. */
+.chip-tile.in-basket {
+  background: color-mix(in srgb, var(--vendor-color) 38%, var(--bg-elev));
+  border-color: color-mix(in srgb, var(--vendor-color) 60%, var(--border));
+  color: var(--fg-strong);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--vendor-color) 30%, transparent);
+}
+.chip-tile.in-basket::before {
+  content: "✓";
+  display: inline-block;
+  margin-right: 0.35rem;
+  font-size: 0.8em;
+  color: color-mix(in srgb, var(--vendor-color) 75%, var(--fg-strong));
+  font-weight: 700;
+}
+.chip-tile.in-basket .chip-tile-count {
+  color: color-mix(in srgb, var(--vendor-color) 65%, var(--fg-strong));
+  font-weight: 600;
+}
+
+.cmp-hero-link {
+  color: var(--accent-2);
+  text-decoration: none;
+  border-bottom: 1px dashed color-mix(in srgb, var(--accent-2) 50%, transparent);
+}
+.cmp-hero-link:hover {
+  color: color-mix(in srgb, var(--accent-2) 70%, var(--fg-strong));
+  border-bottom-color: var(--accent-2);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 880px) {
+  .rk-hero-title, .cmp-hero-title { font-size: 1.6rem; }
+  .rk-toolbar { top: 3rem; }
+  .data-table, .cmp-table { font-size: 0.8rem; }
+  .data-table td, .data-table thead th { padding: 0.5rem 0.55rem; }
+  .data-table td.col-rank { width: 2rem; }
+}
+@media (max-width: 640px) {
+  .rk-hero, .cmp-hero { padding: 1.25rem 0.5rem 0.85rem; }
+  .rk-hero-title, .cmp-hero-title { font-size: 1.35rem; }
+  .rk-hero-sub, .cmp-hero-sub { font-size: 0.9rem; }
+  .rk-toolbar { top: 2.85rem; padding-top: 0.55rem; }
+  .rk-suite-pill { font-size: 0.76rem; padding: 0.28rem 0.6rem 0.28rem 0.3rem; }
+  .rk-suite-pill .rk-suite-letter { width: 18px; height: 18px; font-size: 0.66rem; }
+}
+
+
+/* ── Minimalist Zinc + Cobalt overrides for Compare ────────────────── */
+.cmp-hero { text-align: left; padding: 0.5rem 0 1.5rem; margin-bottom: 0.75rem; }
+.cmp-hero .eyebrow { justify-content: flex-start; }
+.cmp-hero-title { margin: 0.45rem 0 0.5rem; font-size: clamp(1.8rem, 3vw, 2.35rem); font-weight: 750; letter-spacing: -0.03em; }
+.cmp-hero-sub { margin: 0; font-size: 0.96rem; color: var(--fg-muted); max-width: 62ch; line-height: 1.55; }
+.rk-suite-pill[data-suite="suite_H"] { --suite-color: var(--suite-H); }
+.rk-suite-pill {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-muted);
+  border-radius: var(--r-md);
+}
+.rk-suite-pill.active {
+  background: var(--fg-strong);
+  border-color: var(--fg-strong);
+  color: var(--bg);
+}
+.rk-suite-pill.active .rk-suite-letter { background: rgba(255,255,255,0.18); color: var(--bg); }
+.cmp-basket { border: 1px solid var(--border); background: var(--bg-elev); }
+
+/* Quick-add chip pill cloud on Compare page */
+.cmp-cloud-section, .cmp-cloud {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-elev);
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1.25rem;
+}
+.cmp-cloud-section h2, .cmp-cloud-head h2, .cmp-cloud h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.cmp-cloud-hint, .cmp-cloud-sub {
+  margin: 0 0 0.9rem;
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+}
+.chip-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+.chip-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.36rem 0.72rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  color: var(--fg-strong);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.14s, background 0.14s, color 0.14s;
+}
+.chip-tile:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--fg-strong);
+  text-decoration: none;
+}
+.chip-tile.in-basket {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+.chip-tile.in-basket .chip-tile-count { color: rgba(255, 255, 255, 0.8); }
+.chip-tile-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--fg-faint);
+}

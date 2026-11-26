@@ -1,0 +1,76 @@
+/* Match AccelMark Leaderboard's Zinc Neutral + Cobalt Blue (#2563EB / #3B82F6) design system */
+
+:root {
+  --md-text-font: -apple-system, BlinkMacSystemFont, "Inter", "SF Pro Text", "PingFang SC", "Segoe UI", Roboto, sans-serif;
+  --md-code-font: ui-monospace, SFMono-Regular, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #09090b;
+  --md-primary-fg-color--light: #27272a;
+  --md-primary-fg-color--dark: #000000;
+  --md-primary-bg-color: #ffffff;
+  --md-accent-fg-color: #2563eb;
+  --md-typeset-a-color: #2563eb;
+  --md-default-bg-color: #ffffff;
+  --md-default-fg-color: #3f3f46;
+  --md-code-bg-color: #fafafa;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #09090b;
+  --md-primary-fg-color--light: #18181d;
+  --md-primary-fg-color--dark: #000000;
+  --md-primary-bg-color: #fafafa;
+  --md-accent-fg-color: #3b82f6;
+  --md-typeset-a-color: #60a5fa;
+  --md-default-bg-color: #09090b;
+  --md-default-fg-color: #d4d4d8;
+  --md-code-bg-color: #111114;
+}
+
+.md-header {
+  border-bottom: 1px solid rgba(113, 113, 122, 0.2);
+  box-shadow: none !important;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.35rem;
+  width: auto;
+  filter: invert(1);
+}
+
+.md-typeset h1, .md-typeset h2, .md-typeset h3 {
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+.md-typeset table:not([class]) {
+  font-size: 0.82rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Role entry cards on Docs Home */
+.am-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+.am-card {
+  display: block;
+  padding: 1.15rem 1.2rem;
+  border: 1px solid rgba(113, 113, 122, 0.25);
+  border-radius: 10px;
+  text-decoration: none !important;
+  transition: border-color 0.14s, transform 0.14s;
+}
+.am-card:hover {
+  border-color: var(--md-accent-fg-color);
+  transform: translateY(-2px);
+}
+.am-card strong { display: block; font-size: 0.98rem; margin-bottom: 0.35rem; }
+.am-card span { display: block; font-size: 0.84rem; opacity: 0.78; line-height: 1.5; }
+@media (max-width: 760px) { .am-cards { grid-template-columns: 1fr; } }

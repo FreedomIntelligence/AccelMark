@@ -144,7 +144,7 @@ a.chip-suite-card:hover {
   gap: 0.4rem;
 }
 .chip-suite-val {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 1.7rem;
   font-weight: 700;
   letter-spacing: -0.015em;

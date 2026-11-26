@@ -1,0 +1,87 @@
+site_name: AccelMark Docs
+site_description: Open, reproducible multi-regime LLM inference benchmarks across 7 AI accelerator ecosystems.
+site_url: https://freedomintelligence.github.io/AccelMark/docs/
+repo_url: https://github.com/FreedomIntelligence/AccelMark
+repo_name: FreedomIntelligence/AccelMark
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  # Disable Google Fonts CDN so mainland China visitors load instantly with zero blocked requests.
+  font: false
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/FreedomIntelligence/AccelMark
+      name: GitHub
+    - icon: fontawesome/solid/chart-simple
+      link: https://freedomintelligence.github.io/AccelMark/
+      name: Live Leaderboard
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/install.md
+      - First Submission (~10 min): getting-started/first-submission.md
+  - Guides:
+      - Submit Without Git (--zip): guides/submit-without-git.md
+      - Reproduce & Verify (±5%): guides/reproduce-a-result.md
+      - Multi-Chip & Scaling (B / E / G): guides/multi-chip-and-scaling.md
+      - Add a New Runner: guides/add-a-runner.md
+      - Zero-GPU Advisor & JSON API: guides/api-and-advisor.md
+  - Reference:
+      - Workload Suites (A–H): reference/suites.md
+      - CLI Reference: reference/cli.md
+      - Glossary: reference/glossary.md
+  - Research:
+      - Key Empirical Findings: key-findings.md
+      - Methodology & Integrity: methodology.md
+      - FAQ: faq.md
+  - 中文文档:
+      - 快速上手与国内镜像: zh/getting-started.md
+      - 常见问题 FAQ: zh/faq.md

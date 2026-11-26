@@ -13,7 +13,10 @@ on:
       - 'leaderboard/**'
       - 'suites/**'
       - 'schema/**'
+      - 'docs/**'
+      - 'mkdocs.yml'
       - 'tools/generate_platforms_matrix.py'
+      - 'tools/generate_visuals.py'
       - 'runners/*/meta.json'
 
   # Allow manual trigger from Actions tab (useful for first deploy or to
@@ -61,11 +64,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install jsonschema --quiet
+          pip install jsonschema mkdocs-material --quiet
 
-      - name: Generate leaderboard
+      - name: Generate leaderboard & visuals
         run: |
           python leaderboard/generate.py
+          python tools/generate_visuals.py
+
+      - name: Build MkDocs Material documentation site
+        run: |
+          mkdocs build --site-dir leaderboard/site/docs
 
       - name: Verify output files exist
         run: |

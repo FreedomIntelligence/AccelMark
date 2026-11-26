@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+<style>
+  .f { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Segoe UI', sans-serif; }
+  .m { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace; }
+</style>
+<defs>
+  <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#18181D" stroke-width="1"/></pattern>
+  <radialGradient id="glow" cx="78%" cy="35%" r="55%"><stop offset="0%" stop-color="#2563EB" stop-opacity="0.22"/><stop offset="100%" stop-color="#09090B" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1200" height="630" fill="#09090B"/>
+<rect width="1200" height="630" fill="url(#g)"/>
+<rect width="1200" height="630" fill="url(#glow)"/>
+<g transform="translate(64,62) scale(0.78)">
+  <polygon points="30.03,10.5 59.0,10.5 54.55,16.71 33.05,16.71 13.57,53.41 5.0,53.41" fill="#FAFAFA"/>
+  <polygon points="34.81,19.57 37.92,19.57 59.0,53.41 50.27,53.41 43.63,41.66 21.8,41.66 39.26,34.01 33.13,22.68" fill="#FAFAFA"/>
+  <path d="M 31.58 26.2 C 31.58 26.2 34.14 29.73 34.14 31.37 A 2.56 2.56 0 1 1 29.02 31.37 C 29.02 29.73 31.58 26.2 31.58 26.2 Z" fill="#3B82F6"/>
+</g>
+<text x="124" y="96" class="f" font-size="28" font-weight="700" fill="#FAFAFA" letter-spacing="-0.03em">AccelMark</text>
+<text x="64" y="218" class="f" font-size="52" font-weight="750" fill="#FAFAFA" letter-spacing="-0.03em">No single fastest</text>
+<text x="64" y="278" class="f" font-size="52" font-weight="750" fill="#FAFAFA" letter-spacing="-0.03em">accelerator.</text>
+<text x="64" y="346" class="f" font-size="30" font-weight="600" fill="#3B82F6" letter-spacing="-0.02em">Only the best serving recipe.</text>
+<text x="64" y="408" class="f" font-size="20" fill="#A1A1AA">Open, reproducible LLM inference benchmarks across</text>
+<text x="64" y="438" class="f" font-size="20" fill="#A1A1AA">NVIDIA · AMD · Ascend · Apple · TPU · MTT · Iluvatar</text>
+<rect x="64" y="492" width="516" height="72" rx="12" fill="#111114" stroke="#27272A"/>
+<text x="124" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">169</text>
+<text x="124" y="549" text-anchor="middle" class="m" font-size="10.5" font-weight="600" fill="#A1A1AA" letter-spacing="0.08em">RUNS</text>
+<line x1="188" y1="508" x2="188" y2="548" stroke="#27272A" stroke-width="1"/>
+<text x="252" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">26</text>
+<text x="252" y="549" text-anchor="middle" class="m" font-size="10.5" font-weight="600" fill="#A1A1AA" letter-spacing="0.08em">CHIPS</text>
+<line x1="316" y1="508" x2="316" y2="548" stroke="#27272A" stroke-width="1"/>
+<text x="380" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">7</text>
+<text x="380" y="549" text-anchor="middle" class="m" font-size="10.5" font-weight="600" fill="#A1A1AA" letter-spacing="0.08em">ECOSYSTEMS</text>
+<line x1="444" y1="508" x2="444" y2="548" stroke="#27272A" stroke-width="1"/>
+<text x="508" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">95</text>
+<text x="508" y="549" text-anchor="middle" class="m" font-size="10.5" font-weight="600" fill="#A1A1AA" letter-spacing="0.08em">VERIFIED</text>
+<rect x="624" y="96" width="516" height="468" rx="16" fill="#111114" stroke="#27272A"/>
+<text x="654" y="138" class="m" font-size="12" font-weight="600" fill="#3B82F6" letter-spacing="0.08em">LIVE RANK INVERSION · vLLM</text>
+<text x="654" y="164" class="f" font-size="16" font-weight="600" fill="#E4E4E7">RTX 5090 wins Chat &amp; Tok/$, loses SLA &amp; 28K</text>
+<line x1="718" y1="208" x2="718" y2="480" stroke="#22222A" stroke-width="1" stroke-dasharray="3 4"/>
+<text x="718" y="198" text-anchor="middle" class="m" font-size="12" font-weight="600" fill="#A1A1AA">Chat</text>
+<line x1="836" y1="208" x2="836" y2="480" stroke="#22222A" stroke-width="1" stroke-dasharray="3 4"/>
+<text x="836" y="198" text-anchor="middle" class="m" font-size="12" font-weight="600" fill="#A1A1AA">SLA</text>
+<line x1="954" y1="208" x2="954" y2="480" stroke="#22222A" stroke-width="1" stroke-dasharray="3 4"/>
+<text x="954" y="198" text-anchor="middle" class="m" font-size="12" font-weight="600" fill="#A1A1AA">28K</text>
+<line x1="1072" y1="208" x2="1072" y2="480" stroke="#22222A" stroke-width="1" stroke-dasharray="3 4"/>
+<text x="1072" y="198" text-anchor="middle" class="m" font-size="12" font-weight="600" fill="#A1A1AA">Tok/$</text>
+<path d="M 718 232 C 777.0 232, 777.0 286, 836 286 C 895.0 286, 895.0 232, 954 232 C 1013.0 232, 1013.0 448, 1072 448" fill="none" stroke="#111114" stroke-width="7.8" stroke-linecap="round"/>
+<path d="M 718 232 C 777.0 232, 777.0 286, 836 286 C 895.0 286, 895.0 232, 954 232 C 1013.0 232, 1013.0 448, 1072 448" fill="none" stroke="#FAFAFA" stroke-width="2.8" stroke-linecap="round"/>
+<circle cx="718" cy="232" r="5.5" fill="#111114" stroke="#FAFAFA" stroke-width="2.5"/>
+<circle cx="836" cy="286" r="5.5" fill="#111114" stroke="#FAFAFA" stroke-width="2.5"/>
+<circle cx="954" cy="232" r="5.5" fill="#111114" stroke="#FAFAFA" stroke-width="2.5"/>
+<circle cx="1072" cy="448" r="5.5" fill="#111114" stroke="#FAFAFA" stroke-width="2.5"/>
+<text x="706" y="236" text-anchor="end" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">H200</text>
+<text x="1084" y="452" text-anchor="start" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">H200</text>
+<path d="M 718 286 C 777.0 286, 777.0 232, 836 232 C 895.0 232, 895.0 286, 954 286 C 1013.0 286, 1013.0 394, 1072 394" fill="none" stroke="#111114" stroke-width="8.0" stroke-linecap="round"/>
+<path d="M 718 286 C 777.0 286, 777.0 232, 836 232 C 895.0 232, 895.0 286, 954 286 C 1013.0 286, 1013.0 394, 1072 394" fill="none" stroke="#34D399" stroke-width="3.0" stroke-linecap="round"/>
+<circle cx="718" cy="286" r="5.5" fill="#111114" stroke="#34D399" stroke-width="2.5"/>
+<circle cx="836" cy="232" r="5.5" fill="#111114" stroke="#34D399" stroke-width="2.5"/>
+<circle cx="954" cy="286" r="5.5" fill="#111114" stroke="#34D399" stroke-width="2.5"/>
+<circle cx="1072" cy="394" r="5.5" fill="#111114" stroke="#34D399" stroke-width="2.5"/>
+<text x="706" y="290" text-anchor="end" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">H100</text>
+<text x="1084" y="398" text-anchor="start" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">H100</text>
+<path d="M 718 394 C 777.0 394, 777.0 340, 836 340 C 895.0 340, 895.0 340, 954 340 C 1013.0 340, 1013.0 340, 1072 340" fill="none" stroke="#111114" stroke-width="7.6" stroke-linecap="round"/>
+<path d="M 718 394 C 777.0 394, 777.0 340, 836 340 C 895.0 340, 895.0 340, 954 340 C 1013.0 340, 1013.0 340, 1072 340" fill="none" stroke="#F59E0B" stroke-width="2.6" stroke-linecap="round"/>
+<circle cx="718" cy="394" r="5.5" fill="#111114" stroke="#F59E0B" stroke-width="2.5"/>
+<circle cx="836" cy="340" r="5.5" fill="#111114" stroke="#F59E0B" stroke-width="2.5"/>
+<circle cx="954" cy="340" r="5.5" fill="#111114" stroke="#F59E0B" stroke-width="2.5"/>
+<circle cx="1072" cy="340" r="5.5" fill="#111114" stroke="#F59E0B" stroke-width="2.5"/>
+<text x="706" y="398" text-anchor="end" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">A100</text>
+<text x="1084" y="344" text-anchor="start" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">A100</text>
+<path d="M 718 448 C 777.0 448, 777.0 394, 836 394 C 895.0 394, 895.0 448, 954 448 C 1013.0 448, 1013.0 286, 1072 286" fill="none" stroke="#111114" stroke-width="7.2" stroke-linecap="round"/>
+<path d="M 718 448 C 777.0 448, 777.0 394, 836 394 C 895.0 394, 895.0 448, 954 448 C 1013.0 448, 1013.0 286, 1072 286" fill="none" stroke="#71717A" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="718" cy="448" r="5.5" fill="#111114" stroke="#71717A" stroke-width="2.5"/>
+<circle cx="836" cy="394" r="5.5" fill="#111114" stroke="#71717A" stroke-width="2.5"/>
+<circle cx="954" cy="448" r="5.5" fill="#111114" stroke="#71717A" stroke-width="2.5"/>
+<circle cx="1072" cy="286" r="5.5" fill="#111114" stroke="#71717A" stroke-width="2.5"/>
+<text x="706" y="452" text-anchor="end" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">RTX A6000</text>
+<text x="1084" y="290" text-anchor="start" class="f" font-size="11.5" font-weight="650" fill="#E4E4E7">RTX A6000</text>
+<path d="M 718 340 C 777.0 340, 777.0 448, 836 448 C 895.0 448, 895.0 394, 954 394 C 1013.0 394, 1013.0 232, 1072 232" fill="none" stroke="#111114" stroke-width="9.0" stroke-linecap="round"/>
+<path d="M 718 340 C 777.0 340, 777.0 448, 836 448 C 895.0 448, 895.0 394, 954 394 C 1013.0 394, 1013.0 232, 1072 232" fill="none" stroke="#3B82F6" stroke-width="4.0" stroke-linecap="round"/>
+<circle cx="718" cy="340" r="5.5" fill="#111114" stroke="#3B82F6" stroke-width="2.5"/>
+<circle cx="836" cy="448" r="5.5" fill="#111114" stroke="#3B82F6" stroke-width="2.5"/>
+<circle cx="954" cy="394" r="5.5" fill="#111114" stroke="#3B82F6" stroke-width="2.5"/>
+<circle cx="1072" cy="232" r="5.5" fill="#111114" stroke="#3B82F6" stroke-width="2.5"/>
+<text x="706" y="344" text-anchor="end" class="f" font-size="11.5" font-weight="650" fill="#3B82F6">RTX 5090</text>
+<text x="1084" y="236" text-anchor="start" class="f" font-size="11.5" font-weight="650" fill="#3B82F6">RTX 5090</text>
+<text x="654" y="534" class="m" font-size="12" fill="#71717A">freedomintelligence.github.io/AccelMark</text>
+</svg>
