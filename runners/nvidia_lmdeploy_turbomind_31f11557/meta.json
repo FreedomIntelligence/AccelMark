@@ -1,0 +1,23 @@
+{
+  "id": "nvidia_lmdeploy_turbomind_31f11557",
+  "platform": "nvidia",
+  "name": "LMDeploy (TurboMind) on NVIDIA",
+  "framework": "LMDeploy",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "AccelMark runner for NVIDIA GPUs using InternLM LMDeploy (C++/CUDA TurboMind backend). Supports continuous batching, streaming TTFT, and tensor parallelism.",
+  "supersedes_chain": [],
+  "notes": "Validated on NVIDIA RTX 6000D (SM120) with LMDeploy 0.18.0 TurboMind backend. Upstream: https://github.com/InternLM/lmdeploy",
+  "created": "2026-11-26",
+  "runner_tier": "reference",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "pending",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "validated",
+    "G": "pending",
+    "H": "pending"
+  }
+}

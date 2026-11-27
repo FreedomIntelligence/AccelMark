@@ -1,0 +1,23 @@
+{
+  "id": "nvidia_llamacpp_7c50deed",
+  "platform": "nvidia",
+  "name": "llama.cpp (CUDA llama-server) on NVIDIA",
+  "framework": "llama.cpp",
+  "submitted_by": "JuhaoLiang1997",
+  "description": "AccelMark runner for NVIDIA GPUs using llama.cpp llama-server (CUDA backend) with continuous batching and native SSE streaming TTFT/TPOT measurement.",
+  "supersedes_chain": [],
+  "notes": "Requires GGUF checkpoint (--gguf-path or runner_config.gguf_path; convert HF weights losslessly to BF16/F16 GGUF for Suite A/D/F/H accuracy gate). Upstream: https://github.com/ggml-org/llama.cpp",
+  "created": "2026-11-26",
+  "runner_tier": "reference",
+  "hardware_label": null,
+  "suite_support": {
+    "A": "validated",
+    "B": "pending",
+    "C": "pending",
+    "D": "pending",
+    "E": "pending",
+    "F": "validated",
+    "G": "pending",
+    "H": "pending"
+  }
+}

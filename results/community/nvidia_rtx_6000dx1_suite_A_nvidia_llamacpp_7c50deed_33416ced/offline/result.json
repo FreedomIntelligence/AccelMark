@@ -1,0 +1,192 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "suite_A",
+  "implementation_id": "nvidia_llamacpp_7c50deed",
+  "chip": {
+    "name": "NVIDIA RTX 6000D",
+    "vendor": "NVIDIA",
+    "count": 1,
+    "card_count": 1,
+    "dies_per_card": 1,
+    "memory_gb": 83.6,
+    "interconnect_intra_node": null,
+    "interconnect_inter_node": null
+  },
+  "environment": {
+    "collected_at": "2026-11-26T17:24:46.510146+00:00",
+    "accelerators": [
+      {
+        "index": 0,
+        "name": "NVIDIA RTX 6000D",
+        "vendor": "NVIDIA",
+        "memory_gb": 83.6,
+        "driver_version": "595.91.07",
+        "firmware_version": null,
+        "compute_capability": "12.0",
+        "supports_bf16": true
+      }
+    ],
+    "accelerator_platform": "nvidia",
+    "accelerator_topology": "\tGPU0\tCPU Affinity\tNUMA Affinity\tGPU NUMA ID\nGPU0\t X \t0-51,104-155\t0\t\tN/A\n\nLegend:\n\n  X    = Self\n  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)\n  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node\n  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)\n  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)\n  PIX  = Connection traversing at most a single PCIe bridge\n  NV#  = Connection traversing a bonded set of # NVLinks\n",
+    "intra_node_interconnect": null,
+    "cpu": {
+      "model": "Intel(R) Xeon(R) Platinum 8470Q",
+      "physical_cores": 104,
+      "logical_cores": 208,
+      "numa_nodes": 2
+    },
+    "system_memory_gb": 754.5,
+    "pcie_generation": "PCIe Gen 1",
+    "cpu_accelerator_bandwidth_gbs": null,
+    "network_interfaces": null,
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.3",
+    "kernel_version": "5.15.0-78-generic",
+    "runtime_version": "CUDA 13.0",
+    "pytorch_version": "2.12.1+cu130"
+  },
+  "software": {
+    "framework": "llama.cpp",
+    "framework_version": "1.1.0-dev",
+    "driver_version": "595.91.07",
+    "runtime_version": "CUDA 13.0",
+    "os": "Ubuntu 22.04.5 LTS",
+    "python_version": "3.12.3"
+  },
+  "model": {
+    "model_id": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "model_revision": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+    "model_name": null,
+    "model_note": null,
+    "model_source": "local",
+    "architecture": "dense",
+    "parameter_count_b": 8.0,
+    "precision": "BF16",
+    "effective_dtype": "bf16",
+    "quantization_method": null,
+    "model_format": "HuggingFace original"
+  },
+  "task": {
+    "scenario": "offline",
+    "num_runs": 3,
+    "warmup_runs": 1,
+    "parallelism": {
+      "tensor_parallel_size": 1,
+      "pipeline_parallel_size": 1,
+      "expert_parallel_size": 1,
+      "data_parallel_size": 1
+    },
+    "extra_config": {
+      "parallel_slots": 32,
+      "ctx_size": 131072,
+      "startup_timeout_s": 900,
+      "threads": 16
+    },
+    "runtime_metrics": null
+  },
+  "metrics": {
+    "offline": {
+      "results_by_concurrency": [
+        {
+          "client_concurrency": 8,
+          "throughput_tokens_per_sec": 506.16,
+          "throughput_tokens_per_sec_per_chip": 506.16,
+          "throughput_tokens_per_sec_total": 883.97,
+          "elapsed_seconds_median": 67.9,
+          "peak_memory_gb": 30.68,
+          "power_watts_avg": 267.53,
+          "power_watts_peak": 349.6,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 506.17,
+            "std": 22.3,
+            "cv_pct": 4.41,
+            "stability": "noisy",
+            "runs": [
+              483.87,
+              506.16,
+              528.47
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 32,
+          "throughput_tokens_per_sec": 521.12,
+          "throughput_tokens_per_sec_per_chip": 521.12,
+          "throughput_tokens_per_sec_total": 909.31,
+          "elapsed_seconds_median": 66.1,
+          "peak_memory_gb": 30.68,
+          "power_watts_avg": 273.16,
+          "power_watts_peak": 345.4,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 531.68,
+            "std": 46.43,
+            "cv_pct": 8.73,
+            "stability": "high-variance",
+            "runs": [
+              582.48,
+              491.44,
+              521.12
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        },
+        {
+          "client_concurrency": 128,
+          "throughput_tokens_per_sec": 510.2,
+          "throughput_tokens_per_sec_per_chip": 510.2,
+          "throughput_tokens_per_sec_total": 891.48,
+          "elapsed_seconds_median": 67.3,
+          "peak_memory_gb": 30.68,
+          "power_watts_avg": 272.76,
+          "power_watts_peak": 338.7,
+          "oom": false,
+          "throughput_tokens_per_sec_reliability": {
+            "n": 3,
+            "mean": 530.22,
+            "std": 44.35,
+            "cv_pct": 8.36,
+            "stability": "high-variance",
+            "runs": [
+              581.05,
+              510.2,
+              499.41
+            ]
+          },
+          "_throughput_note": "output_only",
+          "_concurrency_note": "client_concurrency is the number of requests sent simultaneously. The inference engine batches internally; this does not directly set engine parameters like max_num_seqs."
+        }
+      ]
+    }
+  },
+  "accuracy": {
+    "subset_score": null,
+    "baseline_delta": null,
+    "valid": false,
+    "notes": "Run --scenario accuracy to check model accuracy."
+  },
+  "meta": {
+    "submitted_by": "JuhaoLiang1997",
+    "submission_type": "individual",
+    "date": "2026-11-27",
+    "time": "01:39:37",
+    "run_id": "33416ced",
+    "run_name": "nvidia_rtx_6000dx1_suite_A_nvidia_llamacpp_7c50deed_33416ced",
+    "flagged": null,
+    "reproduce_script": "runners/nvidia_llamacpp_7c50deed/runner.py",
+    "env_info_file": "../env_info.json",
+    "log_file": "run.log",
+    "samples_file": "samples.jsonl",
+    "notes": null,
+    "benchmark_start_time": "2026-11-26T17:26:11.543310+00:00",
+    "benchmark_end_time": "2026-11-26T17:39:37.434877+00:00",
+    "benchmark_elapsed_minutes": 13.4,
+    "model_load_seconds": 6.9
+  }
+}

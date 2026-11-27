@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.36,
+  "baseline_delta": -0.02,
+  "valid": true,
+  "framework": "LMDeploy",
+  "precision": "BF16",
+  "notes": "Integrated accuracy check \u2014 used same LMDeploy instance as benchmark."
+}

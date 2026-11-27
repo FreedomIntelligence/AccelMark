@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.59,
+  "baseline_delta": 0.01,
+  "valid": true,
+  "framework": "SGLang",
+  "precision": "FP8",
+  "notes": "Integrated accuracy check \u2014 used same SGLang instance as benchmark."
+}

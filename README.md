@@ -133,6 +133,8 @@ Every row is backed by a **content-hashed runner** (`{platform}_{name}_{hash8}`)
 <!-- platforms-matrix:start -->
 | Hardware | Runner folder | Framework | A | B | C | D | E | F | G | H |
 |---|---|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| NVIDIA GPU | `nvidia_llamacpp_7c50deed` | llama.cpp | ✓ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ | ⋯ |
+| NVIDIA GPU | `nvidia_lmdeploy_turbomind_31f11557` | LMDeploy | ⋯ | ⋯ | ⋯ | ⋯ | ⋯ | ✓ | ⋯ | ⋯ |
 | NVIDIA GPU | `nvidia_sglang_c43a8309` | SGLang | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ⋯ |
 | NVIDIA GPU | `nvidia_tensorrt_llm_21323970` | TensorRT-LLM | ✓ | ⋯ | ✓ | — | ⋯ | ✓ | ⋯ | ⋯ |
 | NVIDIA GPU | `nvidia_vllm_47f5d58e` | vLLM | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
