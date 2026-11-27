@@ -88,6 +88,6 @@
 <rect x="724.0" y="121" width="48" height="22" rx="11" fill="#18181D" stroke="#3B82F6" stroke-width="1.35"/>
 <text x="748" y="135.5" text-anchor="middle" class="m" font-size="10" font-weight="650" fill="#FAFAFA">20.4k</text>
 <line x1="28" y1="348" x2="852" y2="348" stroke="#27272A" stroke-width="1"/>
-<text x="28" y="369" class="f" font-size="11" fill="#A1A1AA">Source: AccelMark live dataset (161 runs · 26 chips · 97 verified) · Reference vLLM stack</text>
+<text x="28" y="369" class="f" font-size="11" fill="#A1A1AA">Source: AccelMark live dataset (174 runs · 27 chips · 97 verified) · Reference vLLM stack</text>
 <text x="852" y="369" text-anchor="end" class="m" font-size="10.5" fill="#71717A">freedomintelligence.github.io/AccelMark</text>
 </svg>

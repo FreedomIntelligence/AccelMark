@@ -22,10 +22,10 @@
 <text x="64" y="408" class="f" font-size="20" fill="#A1A1AA">Open, reproducible LLM inference benchmarks across</text>
 <text x="64" y="438" class="f" font-size="20" fill="#A1A1AA">NVIDIA · AMD · Ascend · Apple · TPU · MTT · Iluvatar</text>
 <rect x="64" y="492" width="516" height="72" rx="12" fill="#111114" stroke="#27272A"/>
-<text x="124" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">161</text>
+<text x="124" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">174</text>
 <text x="124" y="549" text-anchor="middle" class="m" font-size="10.5" font-weight="600" fill="#A1A1AA" letter-spacing="0.08em">RUNS</text>
 <line x1="188" y1="508" x2="188" y2="548" stroke="#27272A" stroke-width="1"/>
-<text x="252" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">26</text>
+<text x="252" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">27</text>
 <text x="252" y="549" text-anchor="middle" class="m" font-size="10.5" font-weight="600" fill="#A1A1AA" letter-spacing="0.08em">CHIPS</text>
 <line x1="316" y1="508" x2="316" y2="548" stroke="#27272A" stroke-width="1"/>
 <text x="380" y="527" text-anchor="middle" class="m" font-size="24" font-weight="700" fill="#FAFAFA">7</text>

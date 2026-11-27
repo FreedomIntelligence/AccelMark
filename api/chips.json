@@ -12,6 +12,12 @@
     "median_throughput_tokens_per_sec": 3263.4
   },
   {
+    "name": "NVIDIA RTX 6000D",
+    "submission_count": 13,
+    "best_throughput_tokens_per_sec": 46278.61,
+    "median_throughput_tokens_per_sec": 2773.6
+  },
+  {
     "name": "NVIDIA A800-SXM4-80GB",
     "submission_count": 16,
     "best_throughput_tokens_per_sec": 36713.29,

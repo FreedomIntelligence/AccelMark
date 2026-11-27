@@ -1,28 +1,28 @@
 {
   "schema_version": "1.0",
-  "dataset_version": "2026.11.26",
-  "generated_at": "2026-11-26T13:26:52Z",
+  "dataset_version": "2026.11.27",
+  "generated_at": "2026-11-27T03:53:19Z",
   "license": "CC-BY-4.0",
   "repository": "https://github.com/FreedomIntelligence/AccelMark",
   "leaderboard_url": "https://freedomintelligence.github.io/AccelMark/",
   "counts": {
-    "submissions": 161,
-    "chips": 26,
+    "submissions": 174,
+    "chips": 27,
     "suites": 8,
     "verified": 97
   },
   "files": {
     "chips.json": {
-      "bytes": 4266,
-      "sha256": "2dc5abf21a360f9c7deb8dc9d06950d6828c4f50edb22dcb7a4975cc21b59bdb"
+      "bytes": 4430,
+      "sha256": "f51743a302465f1b0e5267faf1d6f5029902cb9fd165e1903e12836cd58220e6"
     },
     "index.json": {
-      "bytes": 26502,
-      "sha256": "5eb5f6eb8de4f9a03522fd908f04d0426f9e1dcc5e234c30629d62c31cd51908"
+      "bytes": 27179,
+      "sha256": "f9768453070e5416676509338c7dd0e96f834c3561a15acaad8de11b66d678ce"
     },
     "rank.json": {
-      "bytes": 58003,
-      "sha256": "8d2fd7b6e2c378d6522e8b1870787fc044495fb1d9d4c6aeddd04e9fbdf3db04"
+      "bytes": 62660,
+      "sha256": "e2da5b5111dd51e0cff311c8624f04bcfa8cfe5f44975f4adae3ca8ebcc65a87"
     },
     "suites.json": {
       "bytes": 4749,
