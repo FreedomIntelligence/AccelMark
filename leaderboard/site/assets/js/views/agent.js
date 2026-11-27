@@ -191,7 +191,7 @@ export function render({ el }) {
                 <td>${esc(c.setup)}</td>
                 <td class="tnum"><code>${esc(c.naive)}</code></td>
                 <td><span class="agent-badge agent-badge-${esc(c.severity)}">${esc(c.outcome)}</span></td>
-                <td class="muted">${esc(c.gate)}</td>
+                <td class="muted">${esc(t(c.gate, c.gateZh || c.gate))}</td>
               </tr>
             `).join("")}
           </tbody>

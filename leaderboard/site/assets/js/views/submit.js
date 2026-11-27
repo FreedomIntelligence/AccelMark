@@ -51,7 +51,7 @@ function buildCommands(state) {
   lines.push("# 2. Handle setup & 10s pre-flight check (no download)");
   lines.push("python run.py --init");
   lines.push("");
-  lines.push(`# 3. Benchmark this serving recipe on ${state.suite} (${sInfo.time}) — MMLU gate runs first`);
+  lines.push(`# 3. Run ${state.suite} (${sInfo.time}, MMLU gate first)`);
   const tpFlag = sInfo.multi ? " --tensor-parallel-size 4" : "";
   const trackFlag = state.track && state.track !== "default" ? ` --model-track ${state.track}` : "";
   lines.push(`python run.py --runner ${eco.alias} --suite ${state.suite}${trackFlag}${tpFlag}`);

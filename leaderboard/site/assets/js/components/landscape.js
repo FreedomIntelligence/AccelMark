@@ -1,15 +1,16 @@
 // components/landscape.js — Zero-CDN interactive SVG multi-suite Recipe Landscape.
 // Mounted inside Leaderboard → Landscape view; adapts instantly to light/dark theme.
 
-import { SUITE_ORDER, SUITE_META, VENDOR_ORDER, VENDOR_COLORS, allRows } from "../data.js";
+import { SUITE_META, VENDOR_ORDER, VENDOR_COLORS, allRows, baseSuiteId, modelTrackId } from "../data.js";
 import { esc, fmtNum, chipHref } from "../utils.js";
 
 const LANDSCAPE_SUITES = ["suite_A", "suite_B", "suite_C", "suite_D", "suite_F", "suite_G", "suite_H"];
 
 function getMetric(row, mode) {
+  const base = row.base_suite || baseSuiteId(row.suite);
   if (mode === "qps") return row.online_max_qps != null && row.online_max_qps > 0 ? row.online_max_qps : null;
   if (mode === "value") return row.cost_efficiency_toks_per_dollar_hr > 0 ? row.cost_efficiency_toks_per_dollar_hr : null;
-  if (row.suite === "suite_C") return row.quant_best_throughput > 0 ? row.quant_best_throughput : (row.primary_metric > 0 ? row.primary_metric : null);
+  if (base === "suite_C") return row.quant_best_throughput > 0 ? row.quant_best_throughput : (row.primary_metric > 0 ? row.primary_metric : null);
   return row.offline_throughput > 0 ? row.offline_throughput : (row.primary_metric > 0 ? row.primary_metric : null);
 }
 
@@ -22,20 +23,45 @@ function deterministicJitter(str, span) {
   return (((h >>> 0) % 1000) / 1000 - 0.5) * span;
 }
 
-export function renderLandscape(container, { closedOnly = true, vendor = "", framework = "", metric = "offline" } = {}) {
+export function renderLandscape(container, { closedOnly = true, vendor = "", framework = "", metric = "offline", track = "classic" } = {}) {
   if (!container) return;
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
+  const trackMode = track === "2026" ? "2026" : "classic";
+
   const rows = allRows().filter((r) => {
     if (r.flagged) return false;
-    if (!LANDSCAPE_SUITES.includes(r.suite)) return false;
+    const base = r.base_suite || baseSuiteId(r.suite);
+    if (!LANDSCAPE_SUITES.includes(base)) return false;
+    const trk = r.model_track || modelTrackId(r.suite);
+    if (trackMode === "2026" && trk === "default") return false;
+    if (trackMode === "classic" && trk !== "default") return false;
     if (closedOnly && (r.runner_tier || "reference") !== "reference") return false;
     if (vendor && r.vendor !== vendor) return false;
     if (framework && r.framework !== framework) return false;
     return getMetric(r, metric) !== null;
   });
 
-  const suites = LANDSCAPE_SUITES.filter((s) => rows.some((r) => r.suite === s));
+  const suites = LANDSCAPE_SUITES.filter((s) => rows.some((r) => (r.base_suite || baseSuiteId(r.suite)) === s));
+  const trackToggleHtml = `
+    <div class="ls-metric-tabs" role="group" aria-label="Model track">
+      <button type="button" class="ls-mtab${trackMode === "classic" ? " active" : ""}" data-ls-track="classic">${zh ? "经典基线" : "Classic"}</button>
+      <button type="button" class="ls-mtab${trackMode === "2026" ? " active" : ""}" data-ls-track="2026">${zh ? "2026 新轨" : "2026 Track"}</button>
+    </div>
+  `;
+
   if (!rows.length || !suites.length) {
-    container.innerHTML = `<div class="rk-empty"><p>No recipes match the current Landscape filters.</p></div>`;
+    container.innerHTML = `
+      <div class="ls-card">
+        <div class="ls-head">
+          <div>
+            <div class="ls-title">${zh ? "全景分布图" : "Recipe Landscape"}</div>
+            <div class="ls-sub">${zh ? "按模型代际严格隔离对比，不混排不同参数量模型。" : "Strictly isolated by model track — never mixes different model sizes on one axis."}</div>
+          </div>
+          <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">${trackToggleHtml}</div>
+        </div>
+        <div class="rk-empty"><p>${zh ? "当前模型代际与筛选条件下暂无全景数据。" : "No recipes match the current Landscape track & filters."}</p></div>
+      </div>
+    `;
     return;
   }
 
@@ -57,12 +83,12 @@ export function renderLandscape(container, { closedOnly = true, vendor = "", fra
     return padT + plotH * (1 - t);
   };
 
-  // Highlight best per (suite, vendor) with a slightly larger ring
+  // Highlight best per (base_suite, vendor) with a slightly larger ring
   const bestKeys = new Set();
   for (const s of suites) {
     const byV = new Map();
     for (const r of rows) {
-      if (r.suite !== s) continue;
+      if ((r.base_suite || baseSuiteId(r.suite)) !== s) continue;
       const v = getMetric(r, metric);
       const cur = byV.get(r.vendor);
       if (!cur || v > cur.v) byV.set(r.vendor, { r, v });
@@ -94,15 +120,20 @@ export function renderLandscape(container, { closedOnly = true, vendor = "", fra
   const colLabels = suites.map((sid, i) => {
     const m = SUITE_META[sid];
     const cx = padL + colW * (i + 0.5);
+    const sampleRow = rows.find((r) => (r.base_suite || baseSuiteId(r.suite)) === sid);
+    const subText = trackMode === "2026" && sampleRow?.model_track_label
+      ? sampleRow.model_track_label
+      : (SHORT_SUB[sid] || m.title);
     return `
       <line x1="${cx.toFixed(1)}" y1="${padT}" x2="${cx.toFixed(1)}" y2="${padT + plotH}" class="ls-col-guide"/>
       <text x="${cx.toFixed(1)}" y="${H - 34}" text-anchor="middle" class="ls-suite-lbl">Suite ${esc(m.letter)}</text>
-      <text x="${cx.toFixed(1)}" y="${H - 18}" text-anchor="middle" class="ls-suite-sub">${esc(SHORT_SUB[sid] || m.title)}</text>
+      <text x="${cx.toFixed(1)}" y="${H - 18}" text-anchor="middle" class="ls-suite-sub">${esc(subText)}</text>
     `;
   });
 
   const dots = rows.map((r) => {
-    const idx = suites.indexOf(r.suite);
+    const base = r.base_suite || baseSuiteId(r.suite);
+    const idx = suites.indexOf(base);
     const cx = padL + colW * (idx + 0.5);
     const v = getMetric(r, metric);
     const key = r.run_id || r.submission || r.chip;
@@ -112,32 +143,40 @@ export function renderLandscape(container, { closedOnly = true, vendor = "", fra
     const isBest = bestKeys.has(key);
     const rad = isBest ? 6.2 : 4.2;
     const unit = metric === "qps" ? "QPS" : (metric === "value" ? "tok/$/hr" : "tok/s");
-    const tip = `${r._chip_label || r.chip} · ${r.framework || ""} · ${r.precision || ""} — ${fmtNum(Math.round(v))} ${unit}`;
+    const modelTag = r.model_track_label ? ` [${r.model_track_label}]` : "";
+    const tip = `${r.framework || ""} · ${r.precision || ""} on ${r._chip_label || r.chip}${modelTag} — ${fmtNum(Math.round(v))} ${unit}`;
     return `
       <circle class="ls-dot${isBest ? " is-best" : ""}"
               cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad}"
               fill="${col}" fill-opacity="${isBest ? "0.92" : "0.62"}"
               data-tip="${esc(tip)}"
               data-href="${esc(chipHref(r))}"
-              data-run-id="${esc(r.run_id || "")}"
+              data-open-run="${esc(r.run_id || "")}"
+              data-open-tab="deploy"
               tabindex="0" role="button" aria-label="${esc(tip)}"/>
     `;
   });
 
   const activeVendors = VENDOR_ORDER.filter((v) => rows.some((r) => r.vendor === v));
   const metricLabel = metric === "qps" ? "Online 500ms SLA (QPS)" : (metric === "value" ? "Cost Efficiency (tok/$/hr)" : "Offline Throughput (tok/s)");
+  const trackLabel = trackMode === "2026" ? (zh ? "2026 新模型轨道" : "2026 Model Track") : (zh ? "经典基线轨道" : "Classic Baseline Track");
 
   container.innerHTML = `
     <div class="ls-card">
       <div class="ls-head">
         <div>
-          <div class="ls-title">${esc(metricLabel)} across ${suites.length} Suites</div>
-          <div class="ls-sub">Log scale · ${fmtNum(rows.length)} recipes · Larger dots mark best-in-class per vendor. Hover to inspect, click to open run.</div>
+          <div class="ls-title">${esc(metricLabel)} · ${esc(trackLabel)}</div>
+          <div class="ls-sub">${zh
+            ? `对数坐标 · ${fmtNum(rows.length)} 套方案 · 严格按模型轨道隔离，大圆点为各厂商最优。点击圆点直接部署。`
+            : `Log scale · ${fmtNum(rows.length)} recipes · Isolated by model track (no mixed model sizes). Click any dot to deploy.`}</div>
         </div>
-        <div class="ls-metric-tabs" role="group" aria-label="Landscape metric">
-          <button type="button" class="ls-mtab${metric === "offline" ? " active" : ""}" data-ls-metric="offline">Throughput</button>
-          <button type="button" class="ls-mtab${metric === "qps" ? " active" : ""}" data-ls-metric="qps">SLA QPS</button>
-          <button type="button" class="ls-mtab${metric === "value" ? " active" : ""}" data-ls-metric="value">Tok / $</button>
+        <div style="display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center;">
+          ${trackToggleHtml}
+          <div class="ls-metric-tabs" role="group" aria-label="Landscape metric">
+            <button type="button" class="ls-mtab${metric === "offline" ? " active" : ""}" data-ls-metric="offline">${zh ? "吞吐" : "Throughput"}</button>
+            <button type="button" class="ls-mtab${metric === "qps" ? " active" : ""}" data-ls-metric="qps">SLA QPS</button>
+            <button type="button" class="ls-mtab${metric === "value" ? " active" : ""}" data-ls-metric="value">Tok / $</button>
+          </div>
         </div>
       </div>
       <div class="ls-svg-wrap">
@@ -174,9 +213,4 @@ export function renderLandscape(container, { closedOnly = true, vendor = "", fra
     tipEl.style.top = `${y}px`;
   });
   wrap.addEventListener("mouseleave", () => { tipEl.hidden = true; });
-  wrap.addEventListener("click", (e) => {
-    const dot = e.target.closest(".ls-dot");
-    if (!dot) return;
-    if (dot.dataset.href) location.hash = dot.dataset.href;
-  });
 }

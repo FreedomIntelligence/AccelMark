@@ -144,13 +144,13 @@ function renderHeroRankShift(rows) {
     const d = cmds.join(" ");
     const vals = [
       fmtShortK(item.A),
-      item.QPS === 0 ? "SLA ✗" : `${Math.round(item.QPS)}`,
+      item.QPS === 0 ? "SLA fail" : `${Math.round(item.QPS)}`,
       fmtShortK(item.D),
       fmtShortK(item.F_val),
     ];
     const nodes = pts.map(([px, py], i) => {
       const fail = i === 1 && item.QPS === 0;
-      const pw = fail ? 44 : 40;
+      const pw = fail ? 54 : 40;
       return `
         <rect x="${px - pw / 2}" y="${py - 10}" width="${pw}" height="20" rx="10" class="rs-pill${fail ? " is-fail" : ""}"/>
         <text x="${px}" y="${py + 3.5}" text-anchor="middle" class="rs-val mono${fail ? " is-fail" : ""}">${esc(vals[i])}</text>
@@ -455,6 +455,7 @@ function renderTop3Findings(rows) {
     if (f.id === "engine_gap") {
       const cS = f.chip.replace(/^NVIDIA\s+/, "");
       const gain = Math.round(f.gain * 100);
+      const mult = (f.fast.throughput / Math.max(f.slow.throughput, 1)).toFixed(1);
       const href = `#/compare?runs=${encodeURIComponent([f.fast.run_id, f.slow.run_id].filter(Boolean).join(","))}`;
       return `
         <a class="f-card" href="${esc(href)}">
@@ -463,13 +464,13 @@ function renderTop3Findings(rows) {
             <span class="f-tag mono">Suite A</span>
           </div>
           <div class="f-stat mono tnum">+${gain}%</div>
-          <div class="f-head">${zh ? "同一张卡换推理引擎，提升近一倍" : "Software stack moves more than silicon"}</div>
+          <div class="f-head">${zh ? `同一张卡换推理引擎，吞吐最高 ${mult}×` : `Switching engine lifts throughput ${mult}×`}</div>
           <p class="f-body">${zh
-            ? `同一张 ${esc(cS)} 上，将 ${esc(f.slow.framework)}（${fmtNum(Math.round(f.slow.throughput))} tok/s）切换为 ${esc(f.fast.framework)}（${fmtNum(Math.round(f.fast.throughput))} tok/s）直接带来 +${gain}% 吞吐提升。`
-            : `On the exact same ${esc(cS)}, switching ${esc(f.slow.framework)} (${fmtNum(Math.round(f.slow.throughput))}) → ${esc(f.fast.framework)} (${fmtNum(Math.round(f.fast.throughput))} tok/s) lifts throughput by +${gain}%.`}</p>
+            ? `同一张 ${esc(cS)} 上，将 ${esc(f.slow.framework)}（${fmtNum(Math.round(f.slow.throughput))} tok/s）切换为 ${esc(f.fast.framework)}（${fmtNum(Math.round(f.fast.throughput))} tok/s）直接带来 +${gain}%（${mult}×）吞吐提升。`
+            : `On the exact same ${esc(cS)}, switching ${esc(f.slow.framework)} (${fmtNum(Math.round(f.slow.throughput))}) → ${esc(f.fast.framework)} (${fmtNum(Math.round(f.fast.throughput))} tok/s) lifts throughput by +${gain}% (${mult}×).`}</p>
           <div class="f-bars">
             <div class="f-bar-row"><span class="mono">${esc(f.fast.framework)}</span><div class="f-track"><div class="f-fill accent" style="width:100%"></div></div><span class="mono">${fmtNum(Math.round(f.fast.throughput))}</span></div>
-            <div class="f-bar-row"><span class="mono">${esc(f.slow.framework)}</span><div class="f-track"><div class="f-fill muted" style="width:${Math.round(f.slow.throughput / f.fast.throughput * 100)}%"></div></div><span class="mono">${fmtNum(Math.round(f.slow.throughput))}</span></div>
+            <div class="f-bar-row"><span class="mono">${esc(f.slow.framework)}</span><div class="f-track"><div class="f-fill muted" style="width:${Math.max(6, Math.round(f.slow.throughput / f.fast.throughput * 100))}%"></div></div><span class="mono">${fmtNum(Math.round(f.slow.throughput))}</span></div>
           </div>
           <span class="f-cta">${zh ? "对比两个引擎" : "Compare engines"} ${icon("arrowRight", 13)}</span>
         </a>
@@ -508,7 +509,7 @@ export function render({ el }) {
         </div>
         <h1 class="hero-h1">
           ${zh
-            ? "没有唯一的“最快芯片”。<br>只有最适合你负载的<span>部署方案</span>。"
+            ? '没有唯一的“最快芯片”。<br>只有最适合的<span style="white-space:nowrap">部署方案</span>。'
             : "No single fastest chip.<br>Only the best <span>serving recipe</span>."}
         </h1>
         <p class="hero-lead">

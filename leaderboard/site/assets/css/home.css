@@ -626,6 +626,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: auto;
 }
 .rc-prompt { color: #60a5fa; font-weight: 700; }
 
@@ -633,7 +634,6 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  margin-top: auto;
 }
 .rc-deploy-btn {
   flex: 1;

@@ -2,7 +2,7 @@
 
 import { esc, fmtNum, fmtDate, shortVersion, copyToClipboard, flashButtonLabel } from "../utils.js";
 
-import { rowByRunId, SUITE_META } from "../data.js";
+import { rowByRunId, SUITE_META, suiteMetaFor, modelTrackId, tracksForSuite, baseSuiteId } from "../data.js";
 
 import {
 
@@ -20,11 +20,13 @@ import { communityHeader, communityFilterRow, wireTableFilters } from "../commun
 const _i = (k, r) => (window._i ? window._i(k, r) : k);
 
 function suiteLabel(id) {
-
-  const m = SUITE_META[id];
-
-  return m ? `Suite ${m.letter}` : id;
-
+  const m = suiteMetaFor(id);
+  if (!m) return id;
+  const track = modelTrackId(id);
+  if (track === "default") return `Suite ${m.letter}`;
+  const info = tracksForSuite(baseSuiteId(id)).find((t) => t.suite_id === id);
+  const label = info?.label || track;
+  return `Suite ${m.letter} · ${label}`;
 }
 
 function recipeLabel(row) {

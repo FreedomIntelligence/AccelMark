@@ -1,6 +1,6 @@
 // views/suites.js — Suites explainer.
 import {
-  SUITE_ORDER, SUITE_META, suiteFacts, bestRowByMetric,
+  SUITE_ORDER, SUITE_META, suiteFacts, bestRowByMetric, tracksForSuite,
 } from "../data.js";
 import { esc, fmtNum, buildHash, shortModel } from "../utils.js";
 const _i = (k, r) => (window._i ? window._i(k, r) : k);
@@ -391,6 +391,11 @@ export function render({ el }) {
       <p class="section-lede">
         ${_i('suites.s3.lede')}
       </p>
+      <div class="suite-tracks-note" style="margin:0 0 1.25rem;padding:0.9rem 1.1rem;border-radius:10px;border:1px solid var(--border);background:var(--bg-subtle);font-size:0.86rem;line-height:1.6;color:var(--fg-muted);">
+        ${(typeof window._lang === "function" && window._lang() === "cn")
+          ? `<strong style="color:var(--fg-strong)">固定 8 套负载 × 模型代际轨道（Model Tracks）：</strong>每个 Suite 锁定一套负载特征（提示词分布、并发梯度与 500ms SLA），而模型会随社区演进在 Suite 内划分轨道——<strong style="color:var(--fg)">经典轨（Classic）</strong>保留 Llama-3-8B / Qwen2.5-0.5B 等历史跨芯片可比基线，<strong style="color:var(--accent)">2026 新轨</strong>引入 Qwen3.8-27B / Qwen3-0.6B 等新模型，各轨道独立排榜、绝不混比。`
+          : `<strong style="color:var(--fg-strong)">8 Fixed Workload Regimes × Model Tracks:</strong> Each suite pins a workload contract (prompt shape, concurrency sweep, and 500 ms SLA) while evolving models via tracks inside the suite — <strong style="color:var(--fg)">Classic</strong> tracks preserve longitudinal cross-hardware baselines (Llama-3-8B, Qwen2.5-0.5B) and <strong style="color:var(--accent)">2026</strong> tracks evaluate newer models (Qwen3.8-27B, Qwen3-0.6B) on separate, never-mixed leaderboards.`}
+      </div>
       <div class="suite-spec-list">
         ${SUITE_ORDER.map(renderSuiteSpec).join("")}
       </div>
@@ -574,6 +579,8 @@ function renderSuiteSpec(suiteId) {
     : "Higher is better";
 
   const leaderScenarios = scenarios.filter((s) => s.metric);
+  const tracks = tracksForSuite(suiteId);
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
 
   return `
     <article class="suite-spec" data-suite="${esc(meta.letter)}" id="suite-${esc(meta.letter)}">
@@ -610,6 +617,24 @@ function renderSuiteSpec(suiteId) {
           <li><span class="strip-k">${_i('suites.wlTokens')}</span><span class="strip-v tnum">${esc(wl.inputTokens || "-")} / ${esc(wl.outputTokens || "-")}</span></li>
           <li><span class="strip-k">${_i('suites.coverage')}</span><span class="strip-v tnum">${fmtNum(facts.submissions)} results &middot; ${fmtNum(facts.chips)} chips</span></li>
         </ul>
+
+        ${tracks.length > 1 ? `
+          <div class="suite-scns" style="margin-top:0.65rem;">
+            <span class="suite-scns-label">${zh ? "模型轨道" : "Model Tracks"}</span>
+            <ul class="suite-scns-list">
+              ${tracks.map((tr) => `
+                <li>
+                  <a class="scn-pill ${tr.track_id !== "default" ? "scn-default" : "scn-extra"}"
+                     href="${esc(buildHash("/rankings", { suite: tr.suite_id }))}"
+                     style="text-decoration:none;">
+                    ${esc(tr.label)}
+                    <span class="scn-extra-tag">${tr.track_id !== "default" ? (zh ? "2026 新轨" : "2026") : (zh ? "经典" : "Classic")} · ${fmtNum(tr.count)}</span>
+                  </a>
+                </li>
+              `).join("")}
+            </ul>
+          </div>
+        ` : ""}
 
         <div class="suite-scns">
           <span class="suite-scns-label">${_i('suites.protocols')}</span>

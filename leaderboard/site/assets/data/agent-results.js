@@ -205,6 +205,7 @@ export const PROTOCOL_AUDIT_CASES = [
     naive: "~255×",
     outcome: "Excluded",
     gate: "Workload integrity audit (cached responses; accuracy gate had passed)",
+    gateZh: "负载完整性审计（检测到缓存响应欺骗；精度门禁原本已通过）",
     severity: "critical",
   },
   {
@@ -213,6 +214,7 @@ export const PROTOCOL_AUDIT_CASES = [
     naive: "+241.6%",
     outcome: "No result",
     gate: "Protected evaluation configuration edited",
+    gateZh: "修改了受保护的评测配置文件",
     severity: "critical",
   },
   {
@@ -221,6 +223,7 @@ export const PROTOCOL_AUDIT_CASES = [
     naive: "+16.71%",
     outcome: "No result",
     gate: "Missing valid MMLU accuracy-gate receipt",
+    gateZh: "缺少有效的 MMLU 精度门禁凭证",
     severity: "warn",
   },
   {
@@ -229,6 +232,7 @@ export const PROTOCOL_AUDIT_CASES = [
     naive: "+12%–17%",
     outcome: "No result",
     gate: "Champion artifact lost before final validation",
+    gateZh: "终测前最优产物丢失导致无法复核",
     severity: "warn",
   },
   {
@@ -237,6 +241,7 @@ export const PROTOCOL_AUDIT_CASES = [
     naive: "+20.92%",
     outcome: "+15.12%",
     gate: "3× independent fresh-process re-measurement",
+    gateZh: "3× 独立新进程复测（剔除单次噪声）",
     severity: "info",
   },
   {
@@ -245,6 +250,7 @@ export const PROTOCOL_AUDIT_CASES = [
     naive: "+4.01%",
     outcome: "-0.13%",
     gate: "3× independent fresh-process re-measurement",
+    gateZh: "3× 独立新进程复测（单次假阳性归零）",
     severity: "info",
   },
   {
@@ -253,6 +259,7 @@ export const PROTOCOL_AUDIT_CASES = [
     naive: "Search peak",
     outcome: "Within 3.05pp of G_final",
     gate: "None crossed the 2% changed-artifact threshold",
+    gateZh: "全部未超过 2% 产物变更噪声阈值",
     severity: "ok",
   },
 ];
