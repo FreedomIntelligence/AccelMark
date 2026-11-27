@@ -46,5 +46,14 @@
   "burst_steady_qps": 5,
   "burst_peak_qps": 25,
   "burst_duration_seconds": 30,
-  "burst_interval_seconds": 120
+  "burst_interval_seconds": 120,
+  "model_tracks": {
+    "qwen38_27b": {
+      "label": "Qwen3.8-27B",
+      "model_id": "Qwen/Qwen3.8-27B",
+      "model_revision": "master",
+      "status": "current",
+      "notes": "2026 dense single-chip chat track (27B BF16, >=64 GB VRAM). Shares Suite A ShareGPT workload and 500 ms TTFT SLA."
+    }
+  }
 }

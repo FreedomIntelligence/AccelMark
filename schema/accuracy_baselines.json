@@ -49,5 +49,16 @@
     "revision": "26bca36bde8333b5d7f72e9ed20ccda6a618af24",
     "bf16_baseline_score": 0.43,
     "notes": "Measured on A800 SXM4 80GB, TRT-LLM 0.21.0 PyTorch backend, CUDA 12.6. Two independent runs both scored 0.43 on the 100-question subset — consistent with other models' subset-vs-full-MMLU offset (e.g. Qwen2.5-0.5B 0.39 vs 0.38)."
+  },
+  "Qwen/Qwen3-0.6B": {
+    "revision": "master",
+    "bf16_baseline_score": 0.29,
+    "fp16_baseline_score": 0.29,
+    "notes": "Measured on NVIDIA RTX 6000D across 4 engines (vLLM 0.29, SGLang 0.30, LMDeploy 0.29, llama.cpp 0.29) on the 100-question MMLU subset."
+  },
+  "Qwen/Qwen3.8-27B": {
+    "revision": "master",
+    "bf16_baseline_score": 0.51,
+    "notes": "Measured on NVIDIA RTX 6000D, SGLang, BF16 on the 100-question MMLU subset."
   }
 }

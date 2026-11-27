@@ -12,8 +12,13 @@ import hashlib
 import json
 import re
 import statistics
+import sys
 from collections import defaultdict
 from pathlib import Path
+
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 # Load cloud pricing table once at module level
 _pricing_cache: dict = {}
@@ -42,17 +47,22 @@ def _precision_to_dtype(precision: str) -> str:
 
 
 def _get_suite_precision_required(suite_id: str) -> str:
-    """Read precision_required from suite.json. Returns 'BF16' if not found."""
-    path = Path("suites") / suite_id / "suite.json"
+    """Read precision_required from suite.json (supporting model track suite_ids)."""
     try:
-        with open(path, encoding='utf-8') as f:
-            return json.load(f).get("precision_required", "BF16")
+        from suites.resolver import load_suite
+        return load_suite(suite_id, suites_dir=Path("suites")).get("precision_required", "BF16")
     except Exception:
-        return "BF16"
+        path = Path("suites") / suite_id / "suite.json"
+        try:
+            with open(path, encoding='utf-8') as f:
+                return json.load(f).get("precision_required", "BF16")
+        except Exception:
+            return "BF16"
 
 
 def _collect_suite_specs() -> dict:
-    """Collect UI-relevant per-suite spec from suites/suite_*/suite.json."""
+    """Collect UI-relevant per-suite spec (plus model_tracks) from suites/suite_*/suite.json."""
+    from suites.resolver import list_model_tracks
     out: dict = {}
     suites_dir = Path("suites")
     if not suites_dir.exists():
@@ -85,6 +95,9 @@ def _collect_suite_specs() -> dict:
         ):
             if k in data and data[k] is not None:
                 spec[k] = data[k]
+        tracks = list_model_tracks(sid, suites_dir=suites_dir)
+        if tracks:
+            spec["model_tracks"] = tracks
         if rd.get("input_tokens_p50") is not None:
             spec["input_tokens_p50"] = rd["input_tokens_p50"]
         if rd.get("output_tokens_p50") is not None:
@@ -353,7 +366,9 @@ def extract_impl(result: dict) -> dict | None:
 
 def extract_viz(result: dict, metrics: dict) -> dict:
     """Chart-ready data for the per-suite visualization panel."""
-    suite = result.get("suite_id", "")
+    from suites.resolver import parse_suite_id
+    raw_suite = result.get("suite_id", "")
+    suite, _ = parse_suite_id(raw_suite)
 
     def _offline_rows():
         off = metrics.get("offline", {})
@@ -671,8 +686,10 @@ def extract_row(result: dict) -> dict:
     accuracy = result.get("accuracy") or {}
     meta     = result.get("meta") or {}
     derived  = metrics.get("derived") or {}
+    from suites.resolver import parse_suite_id, short_model_label
     is_suite_level = result.get("_is_suite_level", False)
     suite_id       = result.get("suite_id", "")
+    base_suite, model_track = parse_suite_id(suite_id)
 
     offline_throughput      = None
     tokens_per_sec_per_chip = None
@@ -740,7 +757,7 @@ def extract_row(result: dict) -> dict:
         burst_sla_met     = burst.get("sla_met_during_burst")
 
     scenario = task.get("scenario", "offline")
-    if is_suite_level and suite_id not in ("suite_E", "suite_C", "suite_F"):
+    if is_suite_level and base_suite not in ("suite_E", "suite_C", "suite_F"):
         primary_metric       = offline_throughput
         primary_metric_label = "tokens/sec (offline)"
     elif scenario == "offline":
@@ -883,6 +900,9 @@ def extract_row(result: dict) -> dict:
         "model_format":  model.get("model_format"),
         "architecture":  model.get("architecture"),
         "suite":              suite_id,
+        "base_suite":         base_suite or suite_id,
+        "model_track":        model_track or "default",
+        "model_track_label":  short_model_label(model.get("model_id")) or model.get("model_id", "").split("/")[-1],
         "scenario":           "all" if is_suite_level else scenario,
         "primary_metric":          primary_metric,
         "primary_metric_label":    primary_metric_label,
@@ -1249,14 +1269,16 @@ def generate_distribution_data(results: list[dict], output_dir: Path) -> None:
         rid = meta.get("run_id")
         if not rid:
             continue
+        from suites.resolver import parse_suite_id as _parse_sid
         suite_id = r.get("suite_id", "")
+        _base_s, _ = _parse_sid(suite_id)
         # 计算去重用的指标值
-        if suite_id == "suite_C":
+        if _base_s == "suite_C":
             quant = (r.get("metrics") or {}).get("quantization", {})
             qes = [e.get("quality_efficiency") for e in quant.get("results_by_precision", [])
                    if e.get("quality_efficiency")]
             metric = max(qes) if qes else 0
-        elif suite_id == "suite_E":
+        elif _base_s == "suite_E":
             scaling = (r.get("metrics") or {}).get("scaling", {})
             metric = 0
             for e in scaling.get("results_by_chip_count", []):
@@ -1599,7 +1621,7 @@ def main():
             _deduped.append(row)
             continue
 
-        suite_id = row.get("suite", "")
+        suite_id = row.get("base_suite") or row.get("suite", "")
         if suite_id == "suite_C":
             metric = row.get("quant_quality_eff") or 0
         elif suite_id == "suite_E":

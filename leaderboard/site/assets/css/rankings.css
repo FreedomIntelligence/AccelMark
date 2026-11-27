@@ -716,3 +716,66 @@
   color: var(--fg-faint);
   margin-top: 0.08rem;
 }
+
+
+/* ── Model Track Switcher Bar (in-suite model generations) ─── */
+.lb-track-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-soft);
+  background: var(--bg-subtle);
+}
+.lb-track-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--fg-faint);
+  margin-right: 0.25rem;
+}
+.lb-track-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 28px;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.14s, color 0.14s, background 0.14s;
+}
+.lb-track-pill:hover { border-color: var(--fg-faint); color: var(--fg-strong); }
+.lb-track-pill.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  color: var(--accent);
+  font-weight: 650;
+}
+.lb-track-tag {
+  padding: 0.04rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.lb-track-tag.is-new {
+  background: var(--accent);
+  color: #ffffff;
+}
+.lb-track-tag.is-legacy {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--fg-faint);
+}
+.lb-track-cnt {
+  font-size: 0.7rem;
+  opacity: 0.72;
+}

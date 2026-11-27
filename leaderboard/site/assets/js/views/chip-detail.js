@@ -19,7 +19,7 @@
 // from the global stylesheet; per-page tweaks live in chip-detail.css.
 
 import {
-  SUITE_ORDER, SUITE_META,
+  SUITE_ORDER, SUITE_META, suiteMetaFor,
   rowsForChip, bestPerSuiteForChip, formatPrimary,
   rankChipInSuite, similarChipsTo, chipCountsForChip,
   suiteFingerprint, chipCountScaling, vendorColor,
@@ -779,7 +779,7 @@ function renderRunsTable(rs) {
 }
 
 function renderRunRow(row, showChipCol) {
-  const meta = SUITE_META[row.suite];
+  const meta = suiteMetaFor(row.suite);
   const rid = row.run_id || row.submission || "";
   const ver = shortVersion(row.framework_version);
   const fwLine = ver

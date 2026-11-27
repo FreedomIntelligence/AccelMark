@@ -109,6 +109,17 @@ def validate_suite(folder: Path, schema: dict | None) -> list[str]:
                 f"'dataset' field."
             )
 
+    for track_id, track_cfg in (data.get("model_tracks") or {}).items():
+        if not isinstance(track_cfg, dict):
+            continue
+        t_ds = track_cfg.get("dataset")
+        if t_ds:
+            t_ds_path = DATASETS_DIR / t_ds / "requests.jsonl"
+            if not t_ds_path.exists():
+                errors.append(
+                    f"model_tracks.{track_id}.dataset '{t_ds}' does not exist at {t_ds_path}"
+                )
+
     return errors
 
 

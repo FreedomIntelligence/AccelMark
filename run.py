@@ -306,6 +306,7 @@ def cmd_serve(
     host: str,
     workers: int,
     api_key: str | None,
+    model_track: str | None = None,
 ) -> int:
     """
     Launch the OpenAI-compatible inference server for the given runner.
@@ -328,14 +329,12 @@ def cmd_serve(
 
     # ── Build suite dict ──────────────────────────────────────────────────────
     if suite_id:
-        suite_path = SUITES_DIR / suite_id / "suite.json"
-        if not suite_path.exists():
-            print(f"Error: suite '{suite_id}' not found at {suite_path}")
-            return 1
+        from suites.resolver import compose_suite_id, load_suite
+        suite_id = compose_suite_id(suite_id, model_track)
         try:
-            suite = json.loads(suite_path.read_text())
+            suite = load_suite(suite_id, suites_dir=SUITES_DIR)
         except Exception as e:
-            print(f"Error reading suite.json: {e}")
+            print(f"Error loading suite '{suite_id}': {e}")
             return 1
         # --model overrides the suite's model_id if provided
         effective_model_id = model_id or suite.get("model_id")
@@ -450,6 +449,8 @@ def _parse_serve_args(runner_args: list[str]) -> argparse.Namespace:
                              "overrides suite model_id if both are given)")
     parser.add_argument("--model-path",           default=None, dest="model_path",
                         help="Local path to model weights (overrides HF download)")
+    parser.add_argument("--model-track",          default=None, dest="model_track",
+                        help="Optional model track within the suite (e.g. qwen3_06b, qwen38_27b)")
     parser.add_argument("--max-tokens",           type=int, default=_SERVE_DEFAULT_MAX_TOKENS,
                         dest="max_tokens",
                         help=f"Max output tokens per request (default: {_SERVE_DEFAULT_MAX_TOKENS})")
@@ -709,9 +710,9 @@ def _print_usage() -> None:
     print("  python run.py --list [--all]")
     print("  python run.py --init [--name <github_user>] [--runner <id|alias|auto>]")
     print("  python run.py --check-env [--runner <id|alias|auto>]")
-    print("  python run.py --runner <id|alias|auto> --suite <suite> [--scenario <scenario> ...]")
+    print("  python run.py --runner <id|alias|auto> --suite <suite> [--model-track <track>] [--scenario <scenario> ...]")
     print("  python run.py --submit [results/community/<run_name>] [--zip]")
-    print("  python run.py --runner <id|alias|auto> --serve --suite <suite> [--model <id>] [--model-path <path>]")
+    print("  python run.py --runner <id|alias|auto> --serve --suite <suite> [--model-track <track>] [--model <id>] [--model-path <path>]")
     print("  python run.py --runner <id|alias|auto> --serve --model <model_id>")
     print("  Serve options: --port N  --host H  --workers N  --max-tokens N  --max-model-len N  --api-key K")
     print("\nRunner aliases: auto, vllm, sglang, trtllm, amd/rocm, ascend/npu, apple/mlx, tpu, musa")
@@ -786,6 +787,7 @@ def main() -> int:
             host=args.host,
             workers=args.workers,
             api_key=args.api_key,
+            model_track=args.model_track,
         )
 
     return cmd_run(runner_id, runner_args)

@@ -3,7 +3,7 @@
 // optional runner YAML config, OpenAI-compatible `--serve` launch, native engine
 // CLI, and reproduction commands.
 
-import { SUITE_META } from "./data.js";
+import { suiteMetaFor, baseSuiteId, modelTrackId } from "./data.js";
 import { shortVersion } from "./utils.js";
 
 function shellQuote(val) {
@@ -105,7 +105,12 @@ export function buildDeployRecipe(row, opts = {}) {
   const d = row?.detail || {};
   const impl = row?.impl || {};
   const suiteId = row?.suite || "suite_A";
-  const suiteMeta = SUITE_META[suiteId] || {};
+  const baseSuite = row?.base_suite || baseSuiteId(suiteId);
+  const trackSlug = row?.model_track && row.model_track !== "default"
+    ? row.model_track
+    : (modelTrackId(suiteId) !== "default" ? modelTrackId(suiteId) : null);
+  const suiteMeta = suiteMetaFor(suiteId) || {};
+  const trackFlag = trackSlug ? ` --model-track ${trackSlug}` : "";
 
   const runnerId = row?.implementation_id || impl.id || "auto";
   const framework = row?.framework || d.sw_framework || "vLLM";
@@ -145,13 +150,13 @@ export function buildDeployRecipe(row, opts = {}) {
   const tpFlag = tp > 1 ? ` --tensor-parallel-size ${tp}` : "";
   const serveCmd = usingCustomModel
     ? `python run.py --runner ${runnerId} --model ${shellQuote(modelId)}${tpFlag} --serve --port ${port}`
-    : `python run.py --runner ${runnerId} --suite ${suiteId}${tpFlag} --serve --port ${port}`;
+    : `python run.py --runner ${runnerId} --suite ${baseSuite}${trackFlag}${tpFlag} --serve --port ${port}`;
 
   const nativeInfo = buildNativeCommand({
     framework, modelId, tp, precision, extraConfig, port, runnerId, suiteId,
   });
 
-  const reproduceCmd = `python run.py --runner ${runnerId} --suite ${suiteId}${tpFlag}`;
+  const reproduceCmd = `python run.py --runner ${runnerId} --suite ${baseSuite}${trackFlag}${tpFlag}`;
 
   const launchCmd = mode === "native"
     ? nativeInfo.cmd

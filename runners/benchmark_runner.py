@@ -789,11 +789,13 @@ class BenchmarkRunner(ABC):
         self._validate_scenario_for_suite(args.scenario, suite)
 
         # ── Suite plugin dispatch ──────────────────────────────────────────
-        # If suites/{suite_id}/suite.py exists, delegate to it.
-        # The plugin receives the full runner instance and calls base class
-        # methods as needed (e.g. br._merge_scenario_results()).
-        # Suites without a suite.py (A, B, D, F, stress) use the generic path.
+        # If suites/{suite_id}/suite.py or suites/{base_suite}/suite.py exists,
+        # delegate to it so model tracks inherit their base suite's plugin.
+        from suites.resolver import parse_suite_id
+        _base_suite, _ = parse_suite_id(args.suite)
         suite_script = _REPO_ROOT / "suites" / args.suite / "suite.py"
+        if not suite_script.exists() and _base_suite:
+            suite_script = _REPO_ROOT / "suites" / _base_suite / "suite.py"
         if suite_script.exists():
             import importlib.util
             spec   = importlib.util.spec_from_file_location(
@@ -897,7 +899,9 @@ class BenchmarkRunner(ABC):
             description="AccelMark benchmark runner"
         )
         parser.add_argument("--suite", required=True,
-            help="Suite ID e.g. suite_A")
+            help="Suite ID e.g. suite_A or suite_F_qwen3_06b")
+        parser.add_argument("--model-track", default=None, dest="model_track",
+            help="Optional model track within the suite (e.g. --suite suite_F --model-track qwen3_06b)")
         parser.add_argument(
             "--scenario",
             default="default",
@@ -962,6 +966,11 @@ class BenchmarkRunner(ABC):
         )
 
         args, _ = parser.parse_known_args()
+
+        # Compose canonical suite_id when --model-track is passed separately
+        if getattr(args, "model_track", None):
+            from suites.resolver import compose_suite_id
+            args.suite = compose_suite_id(args.suite, args.model_track)
 
         # Suite-specific scenario validation happens in main() after suite is loaded.
         # See _validate_scenario_for_suite().
@@ -2440,9 +2449,8 @@ class BenchmarkRunner(ABC):
             sys.exit(1)
 
     def _load_suite(self, suite_id: str) -> dict:
-        suite_path = _REPO_ROOT / f"suites/{suite_id}/suite.json"
-        with open(suite_path) as f:
-            return json.load(f)
+        from suites.resolver import load_suite
+        return load_suite(suite_id, suites_dir=_REPO_ROOT / "suites")
 
     def _setup_logging(self, output_dir: str) -> None:
         """Tee stdout/stderr to run.log and capture Python logging (vLLM INFO msgs)."""
@@ -2521,18 +2529,23 @@ class BenchmarkRunner(ABC):
         # Global defaults — all top-level keys except 'suites'
         config = {k: v for k, v in raw.items() if k != "suites"}
 
-        # Suite-specific overrides
+        # Suite-specific overrides (merge base_suite -> canonical suite_id so
+        # model tracks automatically inherit base suite runner settings)
         if suite_id:
-            suite_overrides = (raw.get("suites") or {}).get(suite_id) or {}
-            # Merge engine_kwargs specially: combine global + suite dicts,
-            # suite-specific keys win on collision
-            global_engine_kwargs = config.get("engine_kwargs") or {}
-            suite_engine_kwargs  = suite_overrides.get("engine_kwargs") or {}
-            # Apply all suite overrides (including engine_kwargs temporarily)
-            config.update(suite_overrides)
-            # Re-apply properly merged engine_kwargs
-            if global_engine_kwargs or suite_engine_kwargs:
-                config["engine_kwargs"] = {**global_engine_kwargs, **suite_engine_kwargs}
+            from suites.resolver import parse_suite_id
+            base_suite, _ = parse_suite_id(suite_id)
+            suites_map = raw.get("suites") or {}
+            layers = []
+            if base_suite and base_suite != suite_id and base_suite in suites_map:
+                layers.append(suites_map.get(base_suite) or {})
+            if suite_id in suites_map:
+                layers.append(suites_map.get(suite_id) or {})
+            for suite_overrides in layers:
+                global_engine_kwargs = config.get("engine_kwargs") or {}
+                suite_engine_kwargs  = suite_overrides.get("engine_kwargs") or {}
+                config.update(suite_overrides)
+                if global_engine_kwargs or suite_engine_kwargs:
+                    config["engine_kwargs"] = {**global_engine_kwargs, **suite_engine_kwargs}
 
         return config
 

@@ -40,5 +40,14 @@
   "request_count": 200,
   "_request_count_note": "offline uses request_count (200; Qwen2.5-0.5B is fast, runtime is negligible), online uses online_request_count (300, robust p99), interactive uses interactive_request_count (150, robust p95)",
   "online_request_count": 300,
-  "interactive_request_count": 150
+  "interactive_request_count": 150,
+  "model_tracks": {
+    "qwen3_06b": {
+      "label": "Qwen3-0.6B",
+      "model_id": "Qwen/Qwen3-0.6B",
+      "model_revision": "master",
+      "status": "current",
+      "notes": "2026 edge/consumer single-chip track (0.6B BF16). Shares Suite F edge workload and 500 ms TTFT SLA."
+    }
+  }
 }

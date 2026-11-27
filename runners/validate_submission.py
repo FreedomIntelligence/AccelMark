@@ -17,7 +17,9 @@ import jsonschema
 
 
 # Repo root — runners/validate_submission.py is two levels down from root
-REPO_ROOT = Path(__file__).parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 SCHEMA_DIR = REPO_ROOT / "schema"
 MAX_VARIANCE_PCT = 15.0
@@ -78,12 +80,17 @@ def check_hard_failures(result: dict, result_dir: Path) -> tuple[list[str], list
 
     # num_runs >= 3
     suite_id = result.get("suite_id")
-    suite_path = REPO_ROOT / f"suites/{suite_id}/suite.json"
     min_runs = 3
-    if suite_path.exists():
-        with open(suite_path) as f:
-            suite_config = json.load(f)
+    try:
+        from suites.resolver import load_suite
+        suite_config = load_suite(suite_id) if suite_id else {}
         min_runs = suite_config.get("num_runs", 3)
+    except Exception:
+        suite_path = REPO_ROOT / f"suites/{suite_id}/suite.json"
+        if suite_path.exists():
+            with open(suite_path) as f:
+                suite_config = json.load(f)
+            min_runs = suite_config.get("num_runs", 3)
 
     if result.get("task", {}).get("num_runs", 0) < min_runs:
         failures.append(f"task.num_runs must be >= {min_runs} (required by {suite_id})")
@@ -263,7 +270,7 @@ def check_protocol_integrity(result: dict) -> tuple[list[str], list[str]]:
             tot_in = row.get("total_input_tokens")
             n_req = row.get("num_requests")
             if (
-                suite_id == "suite_D"
+                (suite_id == "suite_D" or suite_id.startswith("suite_D_"))
                 and isinstance(tot_in, (int, float))
                 and isinstance(n_req, (int, float))
                 and n_req > 0

@@ -202,6 +202,24 @@
       "patternProperties": {
         "^[A-Z][A-Z0-9]*$": { "type": "number" }
       }
+    },
+    "model_tracks": {
+      "type": "object",
+      "description": "Optional newer model tracks that share this suite's workload contract without creating separate suite folders. Invoked via `--suite suite_X --model-track <key>` or `--suite suite_X_<key>`.",
+      "patternProperties": {
+        "^[a-z0-9][a-z0-9_]*$": {
+          "type": "object",
+          "required": ["model_id"],
+          "additionalProperties": true,
+          "properties": {
+            "label":          { "type": "string", "minLength": 1 },
+            "model_id":       { "type": "string", "minLength": 1 },
+            "model_revision": { "type": "string", "minLength": 1 },
+            "status":         { "type": "string", "enum": ["current", "legacy", "preview"] },
+            "notes":          { "type": "string" }
+          }
+        }
+      }
     }
   },
 
