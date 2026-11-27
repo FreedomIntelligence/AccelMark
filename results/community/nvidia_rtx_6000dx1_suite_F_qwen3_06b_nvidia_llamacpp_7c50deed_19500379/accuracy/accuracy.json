@@ -1,0 +1,8 @@
+{
+  "subset_score": 0.29,
+  "baseline_delta": null,
+  "valid": true,
+  "framework": "llama.cpp",
+  "precision": "BF16",
+  "notes": "Integrated accuracy check \u2014 used same llama.cpp instance as benchmark."
+}
