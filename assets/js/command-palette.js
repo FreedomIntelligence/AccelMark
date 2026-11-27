@@ -1,7 +1,7 @@
 // command-palette.js — Global ⌘K / Ctrl+K quick-jump palette for chips, suites, and pages.
 
-import { SUITE_ORDER, SUITE_META, chipCloudData } from "./data.js";
-import { esc } from "./utils.js";
+import { SUITE_ORDER, SUITE_META, chipCloudData, allRows } from "./data.js";
+import { esc, shortVersion } from "./utils.js";
 import { suiteIcon, icon } from "./icons.js";
 
 const _i = (k, r) => (window._i ? window._i(k, r) : k);
@@ -39,16 +39,35 @@ function buildIndex() {
     };
   });
 
+  const recipeRows = allRows()
+    .filter((r) => !r.flagged)
+    .slice(0, 60)
+    .map((r) => {
+      const m = SUITE_META[r.suite];
+      const fw = [r.framework, shortVersion(r.framework_version)].filter(Boolean).join(" ");
+      const prec = r.precision ? ` · ${r.precision}` : "";
+      const tp = (r.detail?.run_tp || r.chip_count || 1) > 1 ? ` · TP${r.detail?.run_tp || r.chip_count}` : "";
+      const hw = r._chip_label || r.chip || "";
+      return {
+        group: isZh ? "部署方案 (Recipes)" : "Serving Recipes",
+        label: `${fw}${prec}${tp}`,
+        sub: `on ${hw}${m ? ` · Suite ${m.letter}` : ""}`,
+        href: `#/rankings?suite=${encodeURIComponent(r.suite)}&run=${encodeURIComponent(r.run_id)}&tab=deploy`,
+        iconHtml: icon("terminal", 14),
+        hay: `${fw} ${r.precision || ""} ${hw} ${r.vendor || ""} ${r.suite || ""} ${r.implementation_id || ""} ${r.detail?.model_id || ""}`.toLowerCase(),
+      };
+    });
+
   const chips = chipCloudData().map((c) => ({
-    group: isZh ? "芯片 / 加速器" : "Accelerators",
+    group: isZh ? "按硬件查方案" : "Hardware Playbooks",
     label: c.label,
-    sub: `${c.vendor} · ${c.count} ${c.count === 1 ? "run" : "runs"}`,
+    sub: `${c.vendor} · ${c.count} ${isZh ? "套方案" : (c.count === 1 ? "recipe" : "recipes")}`,
     href: `#/chip/${c.slug}`,
     iconHtml: icon("cpu", 15),
     hay: `${c.label} ${c.vendor} ${c.slug}`.toLowerCase(),
   }));
 
-  return [...suites, ...chips, ...pages].map((item) => ({
+  return [...recipeRows, ...chips, ...suites, ...pages].map((item) => ({
     ...item,
     hay: item.hay || `${item.label} ${item.sub}`.toLowerCase(),
   }));

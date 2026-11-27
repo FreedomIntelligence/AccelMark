@@ -91,19 +91,20 @@ export function render({ el, params }) {
     factPills.push(`${_i('chipDetail.deployedAt')} ×${chipCounts[0]}`);
   }
 
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
   el.innerHTML = `
     <section class="hero chip-hero" data-vendor="${esc(sample.vendor)}">
       <span class="eyebrow chip-hero-eyebrow">
         <span class="vendor-dot" data-vendor="${esc(sample.vendor)}"></span>
-        ${esc(sample.vendor)}${memoryStr ? " · " + esc(memoryStr) : ""}
+        ${zh ? "硬件部署方案手册" : "Hardware Recipe Playbook"} · ${esc(sample.vendor)}${memoryStr ? " · " + esc(memoryStr) : ""}
       </span>
       <h1>${esc(sample.chip)}</h1>
       <p class="hero-sub">${factPills.map(esc).join(" · ")}</p>
       <div class="hero-cta">
         ${latestRid
-          ? `<a class="btn primary" href="#/compare?runs=${encodeURIComponent(latestRid)}">${_i('chipDetail.compareConfigs')}</a>`
+          ? `<a class="btn primary" href="#/compare?runs=${encodeURIComponent(latestRid)}">${zh ? "横向对比方案" : "Compare recipes"}</a>`
           : ""}
-        <a class="btn" href="#/rankings?vendor=${encodeURIComponent(sample.vendor)}">${_i('chipDetail.browseVendor')} ${esc(sample.vendor)} ${_i('chipDetail.results')}</a>
+        <a class="btn" href="#/rankings?chip=${encodeURIComponent(slug)}">${zh ? "在方案榜筛选此硬件" : "Filter recipes on this hardware"}</a>
         <button class="btn copy-btn chip-share-btn"
                 type="button"
                 data-chip-share="1"
@@ -117,10 +118,10 @@ export function render({ el, params }) {
     <section class="section">
       <div class="section-header section-header--stacked">
         <div class="section-title">
-          <span class="eyebrow">${_i('chipDetail.bestPerSuiteEyebrow')}</span>
-          <h2>${_i('chipDetail.bestPerSuiteTitle')}</h2>
+          <span class="eyebrow">${zh ? "01 · 各场景最优部署方案" : "01 · Best Serving Recipe per Workload"}</span>
+          <h2>${zh ? `${esc(sample.chip)} 上实测最快的推理配方` : `Top verified recipes on ${esc(sample.chip)}`}</h2>
         </div>
-        <p class="section-sub">${_i('chipDetail.bestPerSuiteSub')}</p>
+        <p class="section-sub">${zh ? "点击任意场景卡片直接打开一键部署命令（含隔离环境安装与 --serve 启动）。" : "Click any workload card to open copy-ready isolated install & --serve deployment commands."}</p>
       </div>
       <div class="chip-suite-grid">
         ${SUITE_ORDER.map((sid) => renderSuiteCard(sid, bestPerSuite.get(sid), slug)).join("")}
@@ -733,7 +734,7 @@ function renderSuiteCard(sid, row, chipSlug) {
         ${fwLine}${row.precision ? ` · ${esc(row.precision)}` : ""}${row.date ? ` · ${esc(fmtDate(row.date))}` : ""}
       </div>
       <div class="chip-suite-hint" aria-hidden="true">
-        <span class="chip-suite-hint-primary">${_i('chipDetail.openRun')}</span>
+        <span class="chip-suite-hint-primary">${(typeof window._lang === "function" && window._lang() === "cn") ? "一键部署此方案 →" : "Deploy recipe →"}</span>
         <span class="chip-suite-hint-sep">·</span>
         <span class="chip-suite-hint-secondary"><kbd>⌘</kbd>${_i('chipDetail.cmdClickAllInSuite')}</span>
       </div>
@@ -755,18 +756,19 @@ function renderRunsTable(rs) {
   // adding a column that only ever reads "×1" is just visual debt.
   const counts = new Set(rs.map((r) => r.chip_count || 1));
   const showChipCol = counts.size > 1;
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
   return `
     <table class="data-table chip-runs">
       <thead>
         <tr>
+          <th class="col-framework">${zh ? "部署方案 (引擎 · 精度)" : "Serving Recipe"}</th>
           <th class="col-suite">${_i('chipDetail.thSuite')}</th>
           ${showChipCol ? `<th class="col-chips">${_i('chipDetail.thChips')}</th>` : ""}
-          <th class="col-framework">${_i('chipDetail.thFramework')}</th>
-          <th class="col-precision">${_i('chipDetail.thPrecision')}</th>
           <th class="col-primary">${_i('chipDetail.thPrimaryMetric')}</th>
           <th class="col-date">${_i('chipDetail.thDate')}</th>
           <th class="col-submitter">${_i('chipDetail.thSubmitter')}</th>
           <th class="col-tier">${_i('chipDetail.thTier')}</th>
+          <th class="col-deploy">${zh ? "部署" : "Deploy"}</th>
         </tr>
       </thead>
       <tbody>
@@ -781,24 +783,23 @@ function renderRunRow(row, showChipCol) {
   const rid = row.run_id || row.submission || "";
   const ver = shortVersion(row.framework_version);
   const fwLine = ver
-    ? `${esc(row.framework)} <span class="fw-ver">${esc(ver)}</span>`
-    : esc(row.framework || "");
+    ? `<strong>${esc(row.framework)}</strong> <span class="fw-ver mono">${esc(ver)}</span>`
+    : `<strong>${esc(row.framework || "—")}</strong>`;
   const v = meta ? row[meta.primary.key] : row.primary_metric;
   const display = meta ? formatPrimary(v, row.suite) : (v != null ? String(v) : "");
   const handle = submitterHandle(row.submitted_by);
   const tierClass = row.tier ? ` tier-${esc(row.tier)}` : "";
   const cnt = row.chip_count || 1;
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
 
-  // a11y: tabindex makes the row keyboard-reachable; modal.js's
-  // keydown delegate fires openModal on Enter/Space.  Native <tr>
-  // semantics stay so screen-reader column headers still pair with
-  // each cell.
   const a11yLabel = `${_i('chipDetail.openRunDetails')} ${meta ? meta.title + " · " : ""}${row.framework || ""} ${display || ""}`.trim();
   return `
     <tr data-open-run="${esc(rid)}"
+        data-open-tab="deploy"
         data-suite="${meta ? esc(meta.letter) : ""}"
         tabindex="0"
         aria-label="${esc(a11yLabel)}">
+      <td class="col-framework">${fwLine}${row.precision ? ` <span class="lb-recipe-pill mono">${esc(row.precision)}</span>` : ""}</td>
       <td class="col-suite">
         <span class="chip-runs-suite">
           <span class="chip-suite-letter chip-suite-letter--inline">${meta ? esc(meta.letter) : "·"}</span>
@@ -806,12 +807,15 @@ function renderRunRow(row, showChipCol) {
         </span>
       </td>
       ${showChipCol ? `<td class="col-chips tnum"><span class="chip-runs-count">×${cnt}</span></td>` : ""}
-      <td class="col-framework">${fwLine}</td>
-      <td class="col-precision">${esc(row.precision || "—")}</td>
       <td class="col-primary"><span class="chip-runs-metric">${esc(display || "—")}</span></td>
       <td class="col-date">${esc(fmtDate(row.date))}</td>
       <td class="col-submitter">${handle ? `@${esc(handle)}` : "—"}</td>
       <td class="col-tier"><span class="badge${tierClass}">${esc(row.tier || "—")}</span></td>
+      <td class="col-deploy">
+        <button type="button" class="lb-deploy-btn" data-open-run="${esc(rid)}" data-open-tab="deploy">
+          ${zh ? "部署" : "Deploy"}
+        </button>
+      </td>
     </tr>
   `;
 }

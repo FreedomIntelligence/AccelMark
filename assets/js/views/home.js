@@ -9,7 +9,7 @@ import {
   rowsForSuite, allRows, formatMetric, summary,
 } from "../data.js";
 import { computeInsights } from "../insights.js";
-import { esc, fmtNum, buildHash } from "../utils.js";
+import { esc, fmtNum, buildHash, shortVersion, shortModel, chipHref } from "../utils.js";
 import { suiteIcon, icon } from "../icons.js";
 
 const _i = (k, r) => (window._i ? window._i(k, r) : k);
@@ -194,46 +194,207 @@ function renderHeroRankShift(rows) {
   `;
 }
 
-function bestClosedRow(suiteId) {
-  const rows = rowsForSuite(suiteId).filter((r) => !r.flagged && (r.runner_tier || "reference") === "reference");
-  const pool = rows.length ? rows : rowsForSuite(suiteId).filter((r) => !r.flagged);
-  if (!pool.length) return null;
-  const cols = SUITE_COLUMNS[suiteId] || [];
-  const primary = cols.find((c) => c.primary) || cols[0];
-  if (!primary) return pool[0];
-  const valid = pool.filter((r) => r[primary.key] != null);
-  if (!valid.length) return pool[0];
-  valid.sort((a, b) => primary.direction === "asc" ? a[primary.key] - b[primary.key] : b[primary.key] - a[primary.key]);
-  return { row: valid[0], col: primary };
+const RECIPE_TABS = [
+  { id: "featured", en: "Featured",        zh: "精选方案" },
+  { id: "suite_A",  en: "8B Chat",         zh: "单卡对话" },
+  { id: "sla",      en: "500ms SLA",       zh: "500ms SLA" },
+  { id: "suite_D",  en: "28K Long Ctx",    zh: "28K 长上下文" },
+  { id: "suite_B",  en: "70B Multi-Chip",  zh: "70B 多卡" },
+  { id: "suite_C",  en: "Quantization",    zh: "量化加速" },
+  { id: "suite_F",  en: "Edge & Value",    zh: "边缘 / 性价比" },
+  { id: "suite_G",  en: "Sparse MoE",      zh: "稀疏 MoE" },
+];
+
+function cleanRows(rows) {
+  const ref = rows.filter((r) => !r.flagged && (r.runner_tier || "reference") === "reference");
+  return ref.length ? ref : rows.filter((r) => !r.flagged);
 }
 
-function renderWorkloadTile(suiteId) {
-  const m = SUITE_META[suiteId];
+function topBy(rows, key, dir = "desc") {
+  const valid = rows.filter((r) => r[key] != null && Number.isFinite(Number(r[key])) && Number(r[key]) > 0);
+  valid.sort((a, b) => (dir === "asc" ? a[key] - b[key] : b[key] - a[key]));
+  return valid;
+}
+
+function pickFeaturedRecipes(rows) {
   const zh = isZh();
-  const title = (zh ? SHORT_SUITE_NAMES_ZH : SHORT_SUITE_NAMES_EN)[suiteId] || m.title;
-  const bn = _i(`rankings.bn.${suiteId}`, m.tagline);
-  const allSuiteRows = rowsForSuite(suiteId).filter((r) => !r.flagged);
-  const refCount = allSuiteRows.filter((r) => (r.runner_tier || "reference") === "reference").length;
-  const leader = bestClosedRow(suiteId);
-  const leaderVal = leader ? formatMetric(leader.row[leader.col.key], leader.col) : "—";
-  const leaderUnit = leader?.col?.unit || "";
-  const leaderChip = leader ? (leader.row._chip_label || leader.row.chip).replace(/^NVIDIA\s+(GeForce\s+)?/, "") : "—";
-  const href = suiteId === SUITE_ORDER[0] ? "#/rankings" : buildHash("/rankings", { suite: suiteId });
+  const pool = cleanRows(rows);
+  const picks = [];
+  const used = new Set();
+  const add = (row, badgeEn, badgeZh, metricKey, metricLabel, metricUnit) => {
+    if (!row) return;
+    const rid = row.run_id || row.submission;
+    if (!rid || used.has(rid)) return;
+    used.add(rid);
+    picks.push({ row, badge: zh ? badgeZh : badgeEn, metricKey, metricLabel, metricUnit });
+  };
+
+  // 1. Single-chip chat #1
+  add(topBy(pool.filter((r) => r.suite === "suite_A"), "offline_throughput")[0],
+    "Chat · #1 Throughput", "单卡对话 · 吞吐冠军", "offline_throughput", zh ? "离线吞吐" : "Offline", "tok/s");
+  // 2. 500ms SLA #1 (prefer distinct from #1 if possible)
+  const slaSorted = topBy(pool.filter((r) => r.suite === "suite_A"), "online_max_qps");
+  add(slaSorted.find((r) => !used.has(r.run_id)) || slaSorted[0],
+    "500ms SLA · #1 Capacity", "500ms SLA · 并发冠军", "online_max_qps", "Max QPS", "QPS");
+  // 3. 28K Long Context #1
+  add(topBy(pool.filter((r) => r.suite === "suite_D"), "offline_throughput")[0],
+    "28K Prefill · #1", "28K 长上下文 · 最强", "offline_throughput", zh ? "预填充吞吐" : "Long Ctx", "tok/s");
+  // 4. 70B Multi-Chip TP #1
+  add(topBy(pool.filter((r) => r.suite === "suite_B"), "offline_throughput")[0],
+    "70B TP · #1", "70B 多卡并行 · 最强", "offline_throughput", zh ? "70B 吞吐" : "70B TPS", "tok/s");
+  // 5. Best Value (Tok / $)
+  add(topBy(pool.filter((r) => r.suite === "suite_F"), "cost_efficiency_toks_per_dollar_hr")[0],
+    "Best Value · Tok/$", "性价比之王 · Tok/$", "cost_efficiency_toks_per_dollar_hr", "Value", "tok/$/hr");
+  // 6. Non-NVIDIA / Multi-Ecosystem Spotlight
+  const nonNv = topBy(pool.filter((r) => r.suite === "suite_A" && r.vendor !== "NVIDIA"), "offline_throughput");
+  add(nonNv[0],
+    "Non-NVIDIA · #1", "非 NVIDIA 生态 · 最强", "offline_throughput", zh ? "离线吞吐" : "Offline", "tok/s");
+
+  return picks;
+}
+
+function pickRecipesForTab(tabId, rows) {
+  if (tabId === "featured") return pickFeaturedRecipes(rows);
+  const zh = isZh();
+  const pool = cleanRows(rows);
+  if (tabId === "sla") {
+    return topBy(pool.filter((r) => r.suite === "suite_A"), "online_max_qps")
+      .slice(0, 6)
+      .map((row, idx) => ({
+        row,
+        badge: `#${idx + 1} · 500ms SLA`,
+        metricKey: "online_max_qps",
+        metricLabel: "Max QPS",
+        metricUnit: "QPS",
+      }));
+  }
+  const cols = SUITE_COLUMNS[tabId] || [];
+  const primary = cols.find((c) => c.primary) || cols[0];
+  const m = SUITE_META[tabId] || {};
+  const list = primary ? topBy(pool.filter((r) => r.suite === tabId), primary.key, primary.direction) : [];
+  return list.slice(0, 6).map((row, idx) => ({
+    row,
+    badge: `#${idx + 1} · Suite ${m.letter || ""}`,
+    metricKey: primary.key,
+    metricLabel: primary.label,
+    metricUnit: primary.unit || "",
+  }));
+}
+
+function renderRecipeCard(item) {
+  const { row, badge, metricKey, metricLabel, metricUnit } = item;
+  const zh = isZh();
+  const rid = row.run_id || row.submission || "";
+  const fw = row.framework || "vLLM";
+  const ver = shortVersion(row.framework_version);
+  const tp = Number(row.detail?.run_tp || row.chip_count || 1) || 1;
+  const prec = row.precision || "BF16";
+  const chip = (row._chip_label || row.chip || "—");
+  const mem = row.memory_gb ? `${fmtNum(row.memory_gb)}GB` : "";
+  const model = row.detail?.model_id ? shortModel(row.detail.model_id) : "";
+  const isVerified = row.tier === "verified";
+  const runnerId = row.implementation_id || row.impl?.id || "auto";
+  const cols = SUITE_COLUMNS[row.suite] || [];
+  const colSpec = cols.find((c) => c.key === metricKey) || cols.find((c) => c.primary) || { key: metricKey, format: "int" };
+  const valStr = formatMetric(row[metricKey], colSpec) || "—";
+  const acc = row.detail?.acc_score != null ? `MMLU ${(Number(row.detail.acc_score) * 100).toFixed(0)}%` : "";
+  const serveHint = `python run.py --runner ${runnerId}${tp > 1 ? ` --tensor-parallel-size ${tp}` : ""} --serve`;
 
   return `
-    <a class="wl-tile" href="${esc(href)}" data-suite="${esc(m.letter)}">
-      <div class="wl-tile-top">
-        <span class="wl-ic">${suiteIcon(suiteId, 16)}</span>
-        <span class="wl-code mono"><span class="wl-dot" style="background:var(--suite-${esc(m.letter)})"></span>${esc(m.letter)}</span>
-        <span class="wl-count mono">${fmtNum(refCount || allSuiteRows.length)} ${zh ? "条" : "runs"}</span>
+    <article class="rc-card" data-open-run="${esc(rid)}" data-open-tab="deploy" tabindex="0">
+      <div class="rc-card-top">
+        <span class="rc-badge mono">${esc(badge)}</span>
+        ${isVerified
+          ? `<span class="rc-trust is-verified">${icon("shieldCheck", 12)} ${zh ? "已验证" : "Verified"}</span>`
+          : `<span class="rc-trust mono">CI ✓</span>`}
       </div>
-      <div class="wl-title">${esc(title)}</div>
-      <div class="wl-bn">${esc(bn)}</div>
-      <div class="wl-foot">
-        <span class="wl-leader-chip">${esc(leaderChip)}</span>
-        <span class="wl-leader-val mono tnum">${esc(leaderVal)}${leaderUnit ? ` <small>${esc(leaderUnit)}</small>` : ""}</span>
+
+      <div class="rc-head">
+        <div class="rc-engine-row">
+          <span class="rc-engine">${esc(fw)}</span>
+          ${ver ? `<span class="rc-ver mono">${esc(ver)}</span>` : ""}
+          <span class="rc-pill mono">${esc(prec)}</span>
+          ${tp > 1 ? `<span class="rc-pill mono">TP${tp}</span>` : ""}
+        </div>
+        <div class="rc-hw-row">
+          <span class="rc-on">${zh ? "运行于" : "on"}</span>
+          <a class="rc-hw-link" href="${chipHref(row)}">${esc(chip)}${mem ? ` · ${esc(mem)}` : ""}</a>
+        </div>
       </div>
-    </a>
+
+      <div class="rc-metric-band">
+        <div class="rc-kpi">
+          <span class="rc-kpi-val mono tnum">${esc(valStr)}</span>
+          ${metricUnit ? `<span class="rc-kpi-unit mono">${esc(metricUnit)}</span>` : ""}
+        </div>
+        <div class="rc-kpi-sub mono">
+          <span>${esc(metricLabel)}</span>
+          ${acc ? `<span>· ${esc(acc)} ✓</span>` : ""}
+          ${model ? `<span>· ${esc(model)}</span>` : ""}
+        </div>
+      </div>
+
+      <div class="rc-cmd-preview mono" title="${esc(serveHint)}">
+        <span class="rc-prompt">$</span> ${esc(serveHint)}
+      </div>
+
+      <div class="rc-actions">
+        <button type="button" class="rc-deploy-btn" data-open-run="${esc(rid)}" data-open-tab="deploy">
+          ${icon("terminal", 13)} <span>${zh ? "一键部署此方案" : "Deploy Recipe"}</span>
+        </button>
+        <button type="button" class="rc-detail-btn" data-open-run="${esc(rid)}" data-open-tab="details">
+          ${zh ? "详情" : "Details"}
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function renderFeaturedRecipesSection(rows, activeTab = "featured") {
+  const zh = isZh();
+  const cards = pickRecipesForTab(activeTab, rows);
+  const suiteHref = activeTab === "featured"
+    ? "#/rankings"
+    : (activeTab === "sla" ? "#/rankings?suite=suite_A&sort=online_max_qps:desc" : buildHash("/rankings", { suite: activeTab }));
+
+  return `
+    <section class="section" id="home-recipes-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span class="eyebrow">${zh ? "01 · 精选部署方案" : "01 · Featured Serving Recipes"}</span>
+          <h2>${zh ? "按场景挑一套实测最强方案，直接复制上线" : "Battle-tested serving recipes, ready to deploy"}</h2>
+        </div>
+        <a class="section-action" href="${esc(suiteHref)}">
+          ${zh ? "查看全部方案榜" : "Browse all recipes"} ${icon("arrowRight", 14)}
+        </a>
+      </div>
+
+      <div class="rc-tabs" role="tablist" aria-label="Deployment scenarios">
+        ${RECIPE_TABS.map((t) => `
+          <button type="button"
+                  class="rc-tab${t.id === activeTab ? " active" : ""}"
+                  data-rc-tab="${esc(t.id)}"
+                  role="tab"
+                  aria-selected="${t.id === activeTab}">
+            ${esc(zh ? t.zh : t.en)}
+          </button>
+        `).join("")}
+      </div>
+
+      <div class="rc-grid" id="home-rc-grid">
+        ${cards.map(renderRecipeCard).join("")}
+      </div>
+
+      <div class="rc-suite-strip">
+        <span class="rc-strip-label mono">${zh ? "按 8 大评测负载直达：" : "JUMP BY SUITE:"}</span>
+        ${SUITE_ORDER.map((sid) => {
+          const m = SUITE_META[sid];
+          const shortName = (zh ? SHORT_SUITE_NAMES_ZH : SHORT_SUITE_NAMES_EN)[sid] || m.title;
+          const href = sid === SUITE_ORDER[0] ? "#/rankings" : buildHash("/rankings", { suite: sid });
+          return `<a class="rc-suite-chip" href="${esc(href)}"><span class="mono">${esc(m.letter)}</span> ${esc(shortName)}</a>`;
+        }).join("")}
+      </div>
+    </section>
   `;
 }
 
@@ -343,30 +504,30 @@ export function render({ el }) {
       <div class="hero-copy">
         <div class="hero-badge mono">
           <span class="hero-badge-dot"></span>
-          ${zh ? "开放、可复现的多负载 LLM 推理基准" : "Open Multi-Regime LLM Inference Leaderboard"}
+          ${zh ? "实测验证的 LLM 推理部署方案库 · 一键复现与上线" : "Verified LLM Serving Recipes · Benchmarked & Ready to Deploy"}
         </div>
         <h1 class="hero-h1">
           ${zh
-            ? "没有唯一的“最快芯片”。<br>只有最适合你负载的<span>推理方案</span>。"
+            ? "没有唯一的“最快芯片”。<br>只有最适合你负载的<span>部署方案</span>。"
             : "No single fastest chip.<br>Only the best <span>serving recipe</span>."}
         </h1>
         <p class="hero-lead">
           ${zh
-            ? "硬件排名会随上下文长度、SLA 延迟和并行度发生剧烈反转。AccelMark 以固定协议评测完整的芯片 × 框架 × 精度 × 并行配置，附带精度门禁与环境指纹。"
-            : "Hardware rankings reverse across short chat, 28K prefill, SLA load, and edge cost. AccelMark benchmarks auditable chip × framework × precision recipes across 7 ecosystems."}
+            ? "硬件排名会随上下文长度、SLA 延迟和引擎栈剧烈反转。按你的芯片与业务场景查找经过 MMLU 精度验证的完整推理方案，一键隔离装环境并拉起 OpenAI 兼容服务。"
+            : "Pick your hardware and workload to find MMLU-verified chip × engine × precision recipes — with isolated setup scripts and one-command OpenAI-compatible --serve deployment."}
         </p>
         <div class="hero-actions">
           <a class="btn-solid" href="#/rankings">
-            ${zh ? "浏览排行榜" : "Explore Leaderboard"} ${icon("arrowRight", 15)}
+            ${zh ? "查找部署方案" : "Browse Recipes"} ${icon("arrowRight", 15)}
           </a>
           <a class="btn-outline" href="#/submit">
-            ${icon("terminal", 14)} ${zh ? "10 分钟提交结果" : "Submit in 10 min"}
+            ${icon("terminal", 14)} ${zh ? "10 分钟贡献方案" : "Submit a Recipe"}
           </a>
         </div>
         <div class="hero-kpi-line mono tnum">
-          <span><strong>${fmtNum(stats.total)}</strong> ${zh ? "条实测" : "runs"}</span>
+          <span><strong>${fmtNum(stats.total)}</strong> ${zh ? "套实测方案" : "recipes"}</span>
           <span class="kpi-sep">·</span>
-          <span><strong>${fmtNum(stats.chips)}</strong> ${zh ? "款芯片" : "chips"}</span>
+          <span><strong>${fmtNum(stats.chips)}</strong> ${zh ? "款硬件" : "chips"}</span>
           <span class="kpi-sep">·</span>
           <span><strong>7</strong> ${zh ? "大生态" : "ecosystems"}</span>
           <span class="kpi-sep">·</span>
@@ -379,20 +540,7 @@ export function render({ el }) {
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-header">
-        <div class="section-title">
-          <span class="eyebrow">${zh ? "01 · 选择负载" : "01 · Pick Your Workload"}</span>
-          <h2>${zh ? "8 大 Roofline 基准套件" : "8 benchmark suites, one bottleneck each"}</h2>
-        </div>
-        <a class="section-action" href="#/suites">
-          ${zh ? "查看完整方法学" : "Read methodology"} ${icon("arrowRight", 14)}
-        </a>
-      </div>
-      <div class="wl-grid">
-        ${SUITE_ORDER.map(renderWorkloadTile).join("")}
-      </div>
-    </section>
+    ${renderFeaturedRecipesSection(rows, "featured")}
 
     ${renderTop3Findings(rows)}
 
@@ -448,6 +596,32 @@ export function render({ el }) {
       </div>
     </section>
   `;
+
+  // Wire scenario filter tabs on Featured Serving Recipes
+  const rcSection = el.querySelector("#home-recipes-section");
+  if (rcSection) {
+    rcSection.addEventListener("click", (ev) => {
+      const tabBtn = ev.target.closest("[data-rc-tab]");
+      if (!tabBtn) return;
+      ev.preventDefault();
+      const tabId = tabBtn.dataset.rcTab;
+      rcSection.querySelectorAll("[data-rc-tab]").forEach((b) => {
+        const on = b === tabBtn;
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", String(on));
+      });
+      const grid = rcSection.querySelector("#home-rc-grid");
+      if (grid) {
+        grid.innerHTML = pickRecipesForTab(tabId, rows).map(renderRecipeCard).join("");
+      }
+      const actionLink = rcSection.querySelector(".section-action");
+      if (actionLink) {
+        actionLink.href = tabId === "featured"
+          ? "#/rankings"
+          : (tabId === "sla" ? "#/rankings?suite=suite_A&sort=online_max_qps:desc" : buildHash("/rankings", { suite: tabId }));
+      }
+    });
+  }
 
   // Wire interactive hover highlighting & click-to-chip on the Hero Rank-Shift chart
   const svg = el.querySelector(".rs-svg");
