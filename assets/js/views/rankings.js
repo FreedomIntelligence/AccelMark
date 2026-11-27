@@ -120,15 +120,23 @@ export function render({ el, query }) {
   const maxPrimary = primaryNums.length ? Math.max(...primaryNums) : 0;
 
   const filtersActive = !!(vendorFilter || frameworkFilter || precisionFilter || chipFilter || searchQuery || bestPerChip);
+  const isOne = sorted.length === 1;
   const unitLabel = bestPerChip
-    ? (zh ? "款芯片最优方案" : "chips (best recipe)")
-    : (closedOnly ? (zh ? "套参考部署方案" : "reference recipes") : (zh ? "套部署方案" : "recipes"));
+    ? (zh ? "款芯片最优方案" : (isOne ? "chip (best recipe)" : "chips (best recipe)"))
+    : (closedOnly
+      ? (zh ? "套参考部署方案" : (isOne ? "reference recipe" : "reference recipes"))
+      : (zh ? "套部署方案" : (isOne ? "recipe" : "recipes")));
   const countText = !bestPerChip && totalFilteredCount === divisionRows.length
     ? `${fmtNum(sorted.length)} ${unitLabel}`
     : `${fmtNum(sorted.length)} ${zh ? "/" : "of"} ${fmtNum(divisionRows.length)} ${unitLabel}`;
 
   const suiteTitle = _i("suite." + baseSuite + ".title", meta.title);
   const activeModelBadge = activeTrack && tracks.length > 1 ? ` · ${activeTrack.label}` : "";
+  const dynamicTagline = activeTrack && activeTrack.track_id !== "default"
+    ? (zh
+      ? `${activeTrack.label}（2026 模型轨道）· 共享 Suite ${meta.letter} 负载与 500ms SLA 协议`
+      : (activeTrack.notes || `${activeTrack.label} (2026 track) · shares Suite ${meta.letter} workload & SLA contract`))
+    : _i("suite." + baseSuite + ".tagline", meta.tagline);
   const chipFocusLabel = chipFilter
     ? (filtered[0]?.chip || suiteAllRows.find((r) => r._chip_slug === chipFilter)?.chip || chipFilter)
     : "";
@@ -148,7 +156,7 @@ export function render({ el, query }) {
         <div class="lb-meta-row">
           <span class="lb-count mono tnum" id="lb-count">${esc(countText)}</span>
           <span class="lb-meta-sep">·</span>
-          <span class="lb-meta-sub">${esc(_i("suite." + baseSuite + ".tagline", meta.tagline))}</span>
+          <span class="lb-meta-sub">${esc(dynamicTagline)}</span>
         </div>
       </div>
 
@@ -305,11 +313,19 @@ export function render({ el, query }) {
   if (viewMode === "landscape") {
     const mount = el.querySelector("#lb-landscape-mount");
     const metric = query.ls_metric || "offline";
-    renderLandscape(mount, { closedOnly, vendor: vendorFilter, framework: frameworkFilter, metric });
+    const defaultLsTrack = activeTrack && activeTrack.track_id !== "default" ? "2026" : "classic";
+    const lsTrack = query.ls_track === "2026" || query.ls_track === "classic" ? query.ls_track : defaultLsTrack;
+    renderLandscape(mount, { closedOnly, vendor: vendorFilter, framework: frameworkFilter, metric, track: lsTrack });
     mount.addEventListener("click", (ev) => {
-      const btn = ev.target.closest("[data-ls-metric]");
-      if (!btn) return;
-      location.hash = rebuildHash(suiteId, query, { view: "landscape", ls_metric: btn.dataset.lsMetric });
+      const mBtn = ev.target.closest("[data-ls-metric]");
+      if (mBtn) {
+        location.hash = rebuildHash(suiteId, query, { view: "landscape", ls_metric: mBtn.dataset.lsMetric, ls_track: lsTrack });
+        return;
+      }
+      const tBtn = ev.target.closest("[data-ls-track]");
+      if (tBtn) {
+        location.hash = rebuildHash(suiteId, query, { view: "landscape", ls_metric: metric, ls_track: tBtn.dataset.lsTrack });
+      }
     });
   }
 

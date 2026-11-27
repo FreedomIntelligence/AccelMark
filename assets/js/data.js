@@ -296,16 +296,16 @@ function injectVendorStyles(vendors) {
 export const SUITE_COLUMNS = {
   suite_A: [
     { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
-    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+    { key: "online_max_qps",       label: "Online",         unit: "QPS",   direction: "desc" },
     { key: "interactive_ttft_p99", label: "TTFT p99",       unit: "ms",    direction: "asc", decimals: 0 },
   ],
   suite_B: [
     { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
-    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+    { key: "online_max_qps",       label: "Online",         unit: "QPS",   direction: "desc" },
   ],
   suite_C: [
     { key: "quant_quality_eff",    label: "Quality eff.",   unit: "",      direction: "desc", primary: true, decimals: 2 },
-    { key: "quant_best_throughput", label: "Best tok/s",    unit: "tok/s", direction: "desc" },
+    { key: "quant_best_throughput", label: "Best Speed",    unit: "tok/s", direction: "desc" },
     { key: "quant_best_precision", label: "Best format",    unit: "",      direction: "desc", textual: true },
   ],
   suite_D: [
@@ -318,7 +318,7 @@ export const SUITE_COLUMNS = {
   ],
   suite_F: [
     { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
-    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+    { key: "online_max_qps",       label: "Online",         unit: "QPS",   direction: "desc" },
     { key: "interactive_ttft_p99", label: "TTFT p99",       unit: "ms",    direction: "asc", decimals: 0 },
   ],
   suite_G: [
@@ -327,7 +327,7 @@ export const SUITE_COLUMNS = {
   ],
   suite_H: [
     { key: "offline_throughput",   label: "Offline",        unit: "tok/s", direction: "desc", primary: true },
-    { key: "online_max_qps",       label: "Online QPS",     unit: "qps",   direction: "desc" },
+    { key: "online_max_qps",       label: "Online",         unit: "QPS",   direction: "desc" },
     { key: "interactive_ttft_p99", label: "TTFT p99",       unit: "ms",    direction: "asc", decimals: 0 },
   ],
 };
