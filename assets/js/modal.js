@@ -17,7 +17,7 @@
 // silently falls back to "Charting library failed to load".  Modal
 // itself never crashes the app.
 
-import { rowByRunId, SUITE_META, SUITE_COLUMNS, formatMetric } from "./data.js";
+import { rowByRunId, suiteMetaFor, suiteColumnsFor, baseSuiteId, formatMetric } from "./data.js";
 import {
   esc, shortVersion, fmtDate, submitterHandle, chipSlug,
   downloadCanvasAsPng, flashButtonLabel, copyToClipboard,
@@ -358,10 +358,10 @@ async function _downloadSharePng(btn, row) {
 
 function _fillModal(row) {
   const d = row.detail || {};
-  const meta = SUITE_META[row.suite];
+  const meta = suiteMetaFor(row.suite);
 
   _modalEl.querySelector(".modal-shell").setAttribute(
-    "data-suite", SUITE_LETTERS[row.suite] || ""
+    "data-suite", SUITE_LETTERS[baseSuiteId(row.suite)] || meta?.letter || ""
   );
 
   const titleEl = _modalEl.querySelector(".modal-title");
@@ -463,7 +463,7 @@ function _renderDeploy(row, panel) {
   if (!panel) return;
   const zh = typeof window._lang === "function" && window._lang() === "cn";
   const recipe = buildDeployRecipe(row, _deployState);
-  const cols = SUITE_COLUMNS[row.suite] || [];
+  const cols = suiteColumnsFor(row.suite);
   const primary = cols.find((c) => c.primary) || cols[0];
   const primaryDisp = primary ? (formatMetric(row[primary.key], primary) || "—") : "—";
   const primaryUnit = primary?.unit || "";

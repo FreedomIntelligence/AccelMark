@@ -41,7 +41,7 @@ for (const meta of Object.values(SUITE_META)) {
 // in one place.  Returns "—" for null / missing values.
 export function formatPrimary(value, suiteId) {
   if (value === null || value === undefined || Number.isNaN(value)) return "-";
-  const meta = SUITE_META[suiteId];
+  const meta = suiteMetaFor(suiteId);
   if (!meta) return String(value);
   const p = meta.primary;
   const scaled = Number(value) * (p.scale || 1);
@@ -57,16 +57,110 @@ export function formatPrimary(value, suiteId) {
 
 export const SUITE_ORDER = ["suite_A", "suite_B", "suite_C", "suite_D", "suite_E", "suite_F", "suite_G", "suite_H"];
 
+/** Split a canonical suite_id like "suite_F_qwen3_06b" into its base suite ("suite_F"). */
+export function baseSuiteId(suiteId) {
+  const s = String(suiteId || "").trim();
+  const m = s.match(/^(suite_[A-Z])(?:_[a-z0-9][a-z0-9_]*)?$/);
+  return m ? m[1] : s;
+}
+
+/** Extract the model track slug ("qwen3_06b") or "default" for a base suite. */
+export function modelTrackId(suiteId) {
+  const s = String(suiteId || "").trim();
+  const m = s.match(/^suite_[A-Z]_([a-z0-9][a-z0-9_]*)$/);
+  return m ? m[1] : "default";
+}
+
+export function suiteMetaFor(suiteId) {
+  return SUITE_META[suiteId] || SUITE_META[baseSuiteId(suiteId)] || null;
+}
+
+export function suiteColumnsFor(suiteId) {
+  return SUITE_COLUMNS[suiteId] || SUITE_COLUMNS[baseSuiteId(suiteId)] || [];
+}
+
+/**
+ * Return all available model tracks under a base suite (e.g. "suite_F"),
+ * merging configured `SUITE_SPECS[base].model_tracks` with any live rows
+ * present in the dataset.
+ */
+export function tracksForSuite(baseSuite) {
+  init();
+  const base = baseSuiteId(baseSuite);
+  const specs = (typeof window !== "undefined" && window.SUITE_SPECS) || {};
+  const configured = Array.isArray(specs[base]?.model_tracks) ? specs[base].model_tracks : [];
+
+  const bySid = new Map();
+  for (const t of configured) {
+    bySid.set(t.suite_id, {
+      track_id: t.track_id || modelTrackId(t.suite_id),
+      suite_id: t.suite_id,
+      label: t.label || t.suite_id,
+      model_id: t.model_id || "",
+      status: t.status || "current",
+      notes: t.notes || "",
+      count: 0,
+      refCount: 0,
+    });
+  }
+  if (!bySid.has(base)) {
+    const baseModel = SUITE_META[base]?.workload?.model || "";
+    const shortM = baseModel ? baseModel.split("/").pop().replace(/^Meta-/, "").replace(/-Instruct.*$/, "") : base;
+    bySid.set(base, {
+      track_id: "default",
+      suite_id: base,
+      label: shortM,
+      model_id: baseModel,
+      status: configured.some((c) => c.track_id !== "default" && c.status === "current") ? "legacy" : "current",
+      notes: "",
+      count: 0,
+      refCount: 0,
+    });
+  }
+
+  for (const r of _rows) {
+    if ((r.base_suite || baseSuiteId(r.suite)) !== base) continue;
+    const sid = r.suite || base;
+    if (!bySid.has(sid)) {
+      bySid.set(sid, {
+        track_id: r.model_track || modelTrackId(sid),
+        suite_id: sid,
+        label: r.model_track_label || r.model || sid,
+        model_id: r.detail?.model_id || r.model || "",
+        status: sid === base ? "legacy" : "current",
+        notes: "",
+        count: 0,
+        refCount: 0,
+      });
+    }
+    const entry = bySid.get(sid);
+    entry.count += 1;
+    if ((r.runner_tier || "reference") === "reference") entry.refCount += 1;
+  }
+
+  const list = Array.from(bySid.values());
+  // Keep current/newer tracks first when they have data, followed by classic default, then preview/empty tracks
+  list.sort((a, b) => {
+    const aNewWithData = a.track_id !== "default" && a.count > 0 ? 0 : 1;
+    const bNewWithData = b.track_id !== "default" && b.count > 0 ? 0 : 1;
+    if (aNewWithData !== bNewWithData) return aNewWithData - bNewWithData;
+    if (a.track_id === "default" && b.track_id !== "default") return -1;
+    if (b.track_id === "default" && a.track_id !== "default") return 1;
+    return b.count - a.count;
+  });
+  return list;
+}
+
 /** Line 1 for charts: "Suite A" */
 export function suiteChartHead(suiteId) {
-  const meta = SUITE_META[suiteId];
+  const meta = suiteMetaFor(suiteId);
   if (!meta) return suiteId;
   return meta.letter ? `Suite ${meta.letter}` : suiteId;
 }
 
 /** Line 2 for charts: short purpose string */
 export function suiteChartPurpose(suiteId) {
-  const meta = SUITE_META[suiteId];
+  const meta = suiteMetaFor(suiteId);
   if (!meta) return "";
   return meta.chartPurpose || meta.title || "";
 }
@@ -81,7 +175,7 @@ export function suiteChartAxisLabel(suiteId, multiline = false) {
 
 /** Hover blurb for chart tooltips — uses existing tagline. */
 export function suiteChartBlurb(suiteId) {
-  const meta = SUITE_META[suiteId];
+  const meta = suiteMetaFor(suiteId);
   return meta?.tagline || "";
 }
 
@@ -362,10 +456,10 @@ export function allRows() {
   return [..._rows];
 }
 
-// Returns rows in a given suite, sorted by suite primary metric.
+// Returns rows in a given suite (or model track suite_id), sorted by suite primary metric.
 export function rowsForSuite(suiteId) {
   if (!_ready) init();
-  const suite = SUITE_META[suiteId];
+  const suite = suiteMetaFor(suiteId);
   if (!suite) return [];
   const raw = _bySuite.get(suiteId) || [];
   const direction = suite.primary.direction;

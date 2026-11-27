@@ -1,7 +1,7 @@
 // views/submit.js — PyTorch-style one-screen interactive benchmark command builder.
 // Zero multi-step wizards: pick ecosystem × suite × submit mode, copy 4 lines, run.
 
-import { SUITE_ORDER, SUITE_META } from "../data.js";
+import { SUITE_ORDER, SUITE_META, tracksForSuite } from "../data.js";
 import { esc, copyToClipboard, flashButtonLabel } from "../utils.js";
 import { suiteIcon, icon } from "../icons.js";
 
@@ -53,7 +53,8 @@ function buildCommands(state) {
   lines.push("");
   lines.push(`# 3. Benchmark this serving recipe on ${state.suite} (${sInfo.time}) — MMLU gate runs first`);
   const tpFlag = sInfo.multi ? " --tensor-parallel-size 4" : "";
-  lines.push(`python run.py --runner ${eco.alias} --suite ${state.suite}${tpFlag}`);
+  const trackFlag = state.track && state.track !== "default" ? ` --model-track ${state.track}` : "";
+  lines.push(`python run.py --runner ${eco.alias} --suite ${state.suite}${trackFlag}${tpFlag}`);
   lines.push("");
   if (state.mode === "zip") {
     lines.push("# 4. Validate & package no-git ZIP for GitHub Issue");
@@ -67,9 +68,15 @@ function buildCommands(state) {
 
 export function render({ el }) {
   const zh = isZh();
+  const defaultTrackFor = (sid) => {
+    const tr = tracksForSuite(sid);
+    const newer = tr.find((t) => t.track_id !== "default" && t.status === "current");
+    return newer ? newer.track_id : "default";
+  };
   const state = {
     eco: "nvidia_vllm",
     suite: "suite_F",
+    track: defaultTrackFor("suite_F"),
     mode: "pr",
     cnMirror: zh,
   };
@@ -77,6 +84,10 @@ export function render({ el }) {
   function paint() {
     const eco = ECOSYSTEMS.find((e) => e.id === state.eco) || ECOSYSTEMS[0];
     const sInfo = SUITE_TIMES[state.suite] || SUITE_TIMES.suite_F;
+    const tracks = tracksForSuite(state.suite);
+    if (!tracks.some((t) => t.track_id === state.track)) {
+      state.track = defaultTrackFor(state.suite);
+    }
     const cmdText = buildCommands(state);
 
     el.innerHTML = `
@@ -120,6 +131,18 @@ export function render({ el }) {
                 `;
               }).join("")}
             </div>
+            ${tracks.length > 1 ? `
+              <div class="sub-track-row" style="margin-top:0.7rem;display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                <span class="mono" style="font-size:0.7rem;color:var(--fg-faint);margin-right:0.2rem;">${zh ? "模型代际：" : "MODEL TRACK:"}</span>
+                ${tracks.map((t) => `
+                  <button type="button"
+                          class="sub-pill${state.track === t.track_id ? " active" : ""}"
+                          data-sub-track="${esc(t.track_id)}">
+                    ${esc(t.label)}${t.track_id !== "default" && t.status === "current" ? (zh ? " (新版推荐)" : " (2026)") : (t.status === "legacy" ? (zh ? " (经典)" : " (Classic)") : "")}
+                  </button>
+                `).join("")}
+              </div>
+            ` : ""}
           </div>
 
           <div class="sub-group">
@@ -182,7 +205,14 @@ export function render({ el }) {
       const ecoBtn = ev.target.closest("[data-sub-eco]");
       if (ecoBtn) { state.eco = ecoBtn.dataset.subEco; paint(); return; }
       const suiteBtn = ev.target.closest("[data-sub-suite]");
-      if (suiteBtn) { state.suite = suiteBtn.dataset.subSuite; paint(); return; }
+      if (suiteBtn) {
+        state.suite = suiteBtn.dataset.subSuite;
+        state.track = defaultTrackFor(state.suite);
+        paint();
+        return;
+      }
+      const trackBtn = ev.target.closest("[data-sub-track]");
+      if (trackBtn) { state.track = trackBtn.dataset.subTrack; paint(); return; }
       const modeBtn = ev.target.closest("[data-sub-mode]");
       if (modeBtn) { state.mode = modeBtn.dataset.subMode; paint(); return; }
       const copyBtn = ev.target.closest("#sub-copy-cmd");

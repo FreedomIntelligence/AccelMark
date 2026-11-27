@@ -5,6 +5,7 @@
 import {
   SUITE_ORDER, SUITE_META, VENDOR_ORDER,
   SUITE_COLUMNS, formatMetric, rowsForSuite,
+  baseSuiteId, suiteMetaFor, suiteColumnsFor, tracksForSuite,
 } from "../data.js";
 import {
   esc, fmtNum, fmtDate, chipHref, buildHash, parseHash,
@@ -41,9 +42,14 @@ const TAB_SHORT_ZH = {
 };
 
 export function render({ el, query }) {
-  const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
-  const meta = SUITE_META[suiteId];
-  const cols = SUITE_COLUMNS[suiteId];
+  const rawSuite = query.suite || SUITE_ORDER[0];
+  const candidateBase = baseSuiteId(rawSuite);
+  const baseSuite = SUITE_ORDER.includes(candidateBase) ? candidateBase : SUITE_ORDER[0];
+  const tracks = tracksForSuite(baseSuite);
+  const activeTrack = tracks.find((t) => t.suite_id === rawSuite) || tracks.find((t) => t.suite_id === baseSuite) || tracks[0];
+  const suiteId = activeTrack ? activeTrack.suite_id : baseSuite;
+  const meta = suiteMetaFor(suiteId) || SUITE_META[baseSuite];
+  const cols = suiteColumnsFor(suiteId);
   const primary = cols.find((c) => c.primary) || cols[0];
   const viewMode = query.view === "landscape" ? "landscape" : "table";
   const zh = isZh();
@@ -121,7 +127,8 @@ export function render({ el, query }) {
     ? `${fmtNum(sorted.length)} ${unitLabel}`
     : `${fmtNum(sorted.length)} ${zh ? "/" : "of"} ${fmtNum(divisionRows.length)} ${unitLabel}`;
 
-  const suiteTitle = _i("suite." + suiteId + ".title", meta.title);
+  const suiteTitle = _i("suite." + baseSuite + ".title", meta.title);
+  const activeModelBadge = activeTrack && tracks.length > 1 ? ` · ${activeTrack.label}` : "";
   const chipFocusLabel = chipFilter
     ? (filtered[0]?.chip || suiteAllRows.find((r) => r._chip_slug === chipFilter)?.chip || chipFilter)
     : "";
@@ -135,13 +142,13 @@ export function render({ el, query }) {
           <h1>${zh ? "推理部署方案榜" : "Serving Recipes"}</h1>
           <span class="lb-suite-pill-active mono">
             <span class="lb-dot" style="background:var(--suite-${esc(meta.letter)})"></span>
-            Suite ${esc(meta.letter)} · ${esc(suiteTitle)}
+            Suite ${esc(meta.letter)} · ${esc(suiteTitle)}${esc(activeModelBadge)}
           </span>
         </div>
         <div class="lb-meta-row">
           <span class="lb-count mono tnum" id="lb-count">${esc(countText)}</span>
           <span class="lb-meta-sep">·</span>
-          <span class="lb-meta-sub">${esc(_i("suite." + suiteId + ".tagline", meta.tagline))}</span>
+          <span class="lb-meta-sub">${esc(_i("suite." + baseSuite + ".tagline", meta.tagline))}</span>
         </div>
       </div>
 
@@ -158,7 +165,7 @@ export function render({ el, query }) {
     <div class="lb-tabs-bar" role="tablist" aria-label="Workload suite">
       ${SUITE_ORDER.map((sid) => {
         const m = SUITE_META[sid];
-        const active = sid === suiteId && viewMode === "table";
+        const active = sid === baseSuite && viewMode === "table";
         const shortName = (zh ? TAB_SHORT_ZH : TAB_SHORT_EN)[sid] || m.title;
         return `
           <button type="button"
@@ -174,6 +181,30 @@ export function render({ el, query }) {
         `;
       }).join("")}
     </div>
+
+    ${viewMode === "table" && tracks.length > 1 ? `
+      <div class="lb-track-bar" role="tablist" aria-label="Model track">
+        <span class="lb-track-label mono">${zh ? "模型代际：" : "MODEL TRACK:"}</span>
+        ${tracks.map((t) => {
+          const isCur = t.suite_id === suiteId;
+          const statusTag = t.track_id !== "default" && t.status === "current"
+            ? `<span class="lb-track-tag is-new mono">${zh ? "新版" : "2026"}</span>`
+            : (t.status === "legacy" ? `<span class="lb-track-tag is-legacy mono">${zh ? "经典" : "Classic"}</span>` : "");
+          return `
+            <button type="button"
+                    class="lb-track-pill${isCur ? " active" : ""}"
+                    data-track-suite="${esc(t.suite_id)}"
+                    role="tab"
+                    aria-selected="${isCur}"
+                    title="${esc(t.model_id || t.label)}">
+              <span class="lb-track-name">${esc(t.label)}</span>
+              ${statusTag}
+              <span class="lb-track-cnt mono tnum">${fmtNum(t.count)}</span>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    ` : ""}
 
     <div class="lb-controls">
       <div class="lb-search-wrap">
@@ -499,8 +530,23 @@ function bindInteractions(el) {
   el.addEventListener("click", (ev) => {
     if (!location.hash.startsWith("#/rankings")) return;
     const { params: query } = parseHash(location.hash);
-    const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
+    const rawS = query.suite || SUITE_ORDER[0];
+    const baseS = SUITE_ORDER.includes(baseSuiteId(rawS)) ? baseSuiteId(rawS) : SUITE_ORDER[0];
+    const suiteId = tracksForSuite(baseS).some((tr) => tr.suite_id === rawS) ? rawS : baseS;
     const t = ev.target;
+
+    const trackBtn = t.closest("[data-track-suite]");
+    if (trackBtn) {
+      ev.preventDefault();
+      const targetSuite = trackBtn.dataset.trackSuite;
+      if (targetSuite) {
+        location.hash = buildHash("/rankings", {
+          ...suiteUrlParam(targetSuite),
+          division: query.division === "open" ? "open" : undefined,
+        });
+      }
+      return;
+    }
 
     if (t.closest("[data-basket-clear]")) {
       ev.preventDefault();
@@ -595,7 +641,9 @@ function bindInteractions(el) {
     const id = ev.target?.id;
     if (!id || !id.startsWith("lb-filter-")) return;
     const { params: query } = parseHash(location.hash);
-    const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
+    const rawS = query.suite || SUITE_ORDER[0];
+    const baseS = SUITE_ORDER.includes(baseSuiteId(rawS)) ? baseSuiteId(rawS) : SUITE_ORDER[0];
+    const suiteId = tracksForSuite(baseS).some((tr) => tr.suite_id === rawS) ? rawS : baseS;
     const key = id.replace("lb-filter-", "");
     location.hash = rebuildHash(suiteId, query, { [key]: ev.target.value || undefined });
   });
@@ -628,7 +676,9 @@ function bindInteractions(el) {
     if (!inp || ev.key !== "Enter") return;
     ev.preventDefault();
     const { params: query } = parseHash(location.hash);
-    const suiteId = SUITE_ORDER.includes(query.suite) ? query.suite : SUITE_ORDER[0];
+    const rawS = query.suite || SUITE_ORDER[0];
+    const baseS = SUITE_ORDER.includes(baseSuiteId(rawS)) ? baseSuiteId(rawS) : SUITE_ORDER[0];
+    const suiteId = tracksForSuite(baseS).some((tr) => tr.suite_id === rawS) ? rawS : baseS;
     location.hash = rebuildHash(suiteId, query, { q: inp.value.trim() || undefined });
   });
 }
