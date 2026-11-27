@@ -58,6 +58,8 @@ export function render({ el, query }) {
   // Closed (reference-only) by default; `?division=open` (or legacy runner_tier param) shows all.
   const openDivision = query.division === "open" || (query.runner_tier && query.runner_tier !== "reference");
   const closedOnly = !openDivision;
+  // Grouping: default shows all serving recipes; `?group=chip` collapses to best recipe per chip.
+  const bestPerChip = query.group === "chip";
 
   let sortKey = primary.key;
   let sortDir = primary.direction;
@@ -89,7 +91,17 @@ export function render({ el, query }) {
     return true;
   });
 
-  const sorted = [...filtered].sort((a, b) => safeCompare(a[sortKey], b[sortKey], sortDir));
+  let sorted = [...filtered].sort((a, b) => safeCompare(a[sortKey], b[sortKey], sortDir));
+  const totalFilteredCount = sorted.length;
+  if (bestPerChip) {
+    const seen = new Set();
+    sorted = sorted.filter((r) => {
+      const k = r._chip_slug || r.chip || r.run_id;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
 
   // Hide empty secondary metric columns automatically
   const displayCols = cols.filter((c) => {
@@ -101,10 +113,13 @@ export function render({ el, query }) {
   const primaryNums = sorted.map((r) => Number(r[primary.key])).filter((n) => Number.isFinite(n) && n > 0);
   const maxPrimary = primaryNums.length ? Math.max(...primaryNums) : 0;
 
-  const filtersActive = !!(vendorFilter || frameworkFilter || precisionFilter || chipFilter || searchQuery);
-  const countText = filtered.length === divisionRows.length
-    ? `${fmtNum(sorted.length)} ${closedOnly ? (zh ? "条参考基线" : "reference runs") : (zh ? "条结果" : "runs")}`
-    : `${fmtNum(sorted.length)} ${zh ? "/" : "of"} ${fmtNum(divisionRows.length)} ${zh ? "条结果" : "runs"}`;
+  const filtersActive = !!(vendorFilter || frameworkFilter || precisionFilter || chipFilter || searchQuery || bestPerChip);
+  const unitLabel = bestPerChip
+    ? (zh ? "款芯片最优方案" : "chips (best recipe)")
+    : (closedOnly ? (zh ? "套参考部署方案" : "reference recipes") : (zh ? "套部署方案" : "recipes"));
+  const countText = !bestPerChip && totalFilteredCount === divisionRows.length
+    ? `${fmtNum(sorted.length)} ${unitLabel}`
+    : `${fmtNum(sorted.length)} ${zh ? "/" : "of"} ${fmtNum(divisionRows.length)} ${unitLabel}`;
 
   const suiteTitle = _i("suite." + suiteId + ".title", meta.title);
   const chipFocusLabel = chipFilter
@@ -117,7 +132,7 @@ export function render({ el, query }) {
     <header class="lb-head">
       <div class="lb-head-left">
         <div class="lb-title-row">
-          <h1>${zh ? "排行榜" : "Leaderboard"}</h1>
+          <h1>${zh ? "推理部署方案榜" : "Serving Recipes"}</h1>
           <span class="lb-suite-pill-active mono">
             <span class="lb-dot" style="background:var(--suite-${esc(meta.letter)})"></span>
             Suite ${esc(meta.letter)} · ${esc(suiteTitle)}
@@ -132,7 +147,7 @@ export function render({ el, query }) {
 
       <div class="lb-view-switch" role="tablist" aria-label="View mode">
         <button type="button" class="lb-vtab${viewMode === "table" ? " active" : ""}" data-view-mode="table" role="tab" aria-selected="${viewMode === "table"}">
-          ${icon("table", 14)} <span>${zh ? "榜单" : "Table"}</span>
+          ${icon("table", 14)} <span>${zh ? "方案列表" : "Recipes"}</span>
         </button>
         <button type="button" class="lb-vtab${viewMode === "landscape" ? " active" : ""}" data-view-mode="landscape" role="tab" aria-selected="${viewMode === "landscape"}">
           ${icon("scatter", 14)} <span>${zh ? "全景图" : "Landscape"}</span>
@@ -171,13 +186,8 @@ export function render({ el, query }) {
                aria-label="Filter results">
       </div>
 
-      <select class="lb-select" id="lb-filter-vendor" aria-label="Vendor">
-        <option value="">${zh ? "全部厂商" : "All vendors"}</option>
-        ${facets.vendor.map((v) => `<option value="${esc(v)}"${v === vendorFilter ? " selected" : ""}>${esc(v)}</option>`).join("")}
-      </select>
-
       <select class="lb-select" id="lb-filter-framework" aria-label="Framework">
-        <option value="">${zh ? "全部框架" : "All frameworks"}</option>
+        <option value="">${zh ? "全部推理框架 / 引擎" : "All engines"}</option>
         ${facets.framework.map((f) => `<option value="${esc(f)}"${f === frameworkFilter ? " selected" : ""}>${esc(f)}</option>`).join("")}
       </select>
 
@@ -186,6 +196,28 @@ export function render({ el, query }) {
           <option value="">${zh ? "全部精度" : "All precisions"}</option>
           ${facets.precision.map((p) => `<option value="${esc(p)}"${p === precisionFilter ? " selected" : ""}>${esc(p)}</option>`).join("")}
         </select>
+      ` : ""}
+
+      <select class="lb-select" id="lb-filter-chip" aria-label="Hardware">
+        <option value="">${zh ? "全部硬件" : "All hardware"}</option>
+        ${facets.chip.map((c) => `<option value="${esc(c.slug)}"${c.slug === chipFilter ? " selected" : ""}>${esc(c.label)}</option>`).join("")}
+      </select>
+
+      <select class="lb-select" id="lb-filter-vendor" aria-label="Vendor">
+        <option value="">${zh ? "全部厂商" : "All vendors"}</option>
+        ${facets.vendor.map((v) => `<option value="${esc(v)}"${v === vendorFilter ? " selected" : ""}>${esc(v)}</option>`).join("")}
+      </select>
+
+      ${viewMode === "table" ? `
+        <button type="button"
+                class="lb-group-btn${bestPerChip ? " is-active" : ""}"
+                id="lb-group-toggle"
+                title="${zh ? "切换显示全部部署方案，或每款芯片仅展示最强方案" : "Toggle between all serving recipes or best recipe per hardware"}">
+          ${icon("layers", 13)}
+          <span>${bestPerChip
+            ? (zh ? "每卡最优" : "Best / Chip")
+            : (zh ? "全部方案" : "All Recipes")}</span>
+        </button>
       ` : ""}
 
       <button type="button"
@@ -312,8 +344,8 @@ function renderTable(suiteId, rows, cols, sortKey, sortDir, primary, maxPrimary,
           <tr>
             <th class="col-compare" scope="col" title="${zh ? "勾选对比" : "Select to compare"}"><span class="visually-hidden">Compare</span></th>
             <th class="col-rank" scope="col">#</th>
-            <th class="col-chip" scope="col">${zh ? "推理方案 (芯片 · 框架)" : "Recipe"}</th>
-            <th class="col-vendor" scope="col">${zh ? "厂商" : "Vendor"}</th>
+            <th class="col-recipe" scope="col">${zh ? "部署方案 (引擎 · 精度 · 配置)" : "Serving Recipe"}</th>
+            <th class="col-hw" scope="col">${zh ? "目标硬件" : "Hardware"}</th>
             ${cols.map((c) => `
               <th class="col-metric sortable${c.primary ? " col-primary" : ""}${sortKey === c.key ? " is-sort" : ""}"
                   data-sort-key="${esc(c.key)}"
@@ -325,14 +357,8 @@ function renderTable(suiteId, rows, cols, sortKey, sortDir, primary, maxPrimary,
                 <span class="th-sort-arrow">${sortKey === c.key ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
               </th>
             `).join("")}
-            <th class="col-date sortable hide-mobile${sortKey === "date" ? " is-sort" : ""}"
-                data-sort-key="date" data-sort-dir-default="desc"
-                aria-sort="${sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}"
-                scope="col">
-              <span class="th-label">${zh ? "日期" : "Date"}</span>
-              <span class="th-sort-arrow">${sortKey === "date" ? (sortDir === "asc" ? "↑" : "↓") : ""}</span>
-            </th>
             <th class="col-trust" scope="col" title="${zh ? "±5% 独立复现验证" : "Independent ±5% verification"}">${zh ? "验证" : "Trust"}</th>
+            <th class="col-deploy" scope="col">${zh ? "部署" : "Deploy"}</th>
           </tr>
         </thead>
         <tbody>
@@ -347,11 +373,19 @@ function renderRow(row, cols, sortKey, primary, maxPrimary, rank, openDivision) 
   const runId = row.run_id || row.submission || "";
   const inBasket = basketHas(runId);
   const ver = shortVersion(row.framework_version);
-  const fw = [row.framework, ver].filter(Boolean).join(" ");
-  const subParts = [fw, row.precision].filter(Boolean).join(" · ");
+  const fwName = row.framework || "vLLM";
+  const tp = Number(row.detail?.run_tp || row.chip_count || 1) || 1;
+  const modelName = row.detail?.model_id ? shortModel(row.detail.model_id) : "";
   const rTier = row.runner_tier || "reference";
   const isVerified = row.tier === "verified";
+  const ec = row.detail?.run_extra_config;
+  const tunedCount = ec && typeof ec === "object" ? Object.keys(ec).length : 0;
   const zh = isZh();
+
+  const hwSub = [
+    row.vendor,
+    row.memory_gb ? `${fmtNum(row.memory_gb)}GB` : "",
+  ].filter(Boolean).join(" · ");
 
   return `
     <tr data-run-id="${esc(runId)}"
@@ -365,25 +399,42 @@ function renderRow(row, cols, sortKey, primary, maxPrimary, rank, openDivision) 
         </label>
       </td>
       <td class="col-rank mono tnum${rank <= 3 ? ` is-top-${rank}` : ""}">${rank}</td>
-      <td class="col-chip">
-        <a class="lb-chip-link" href="${chipHref(row)}">
-          <span class="lb-chip-line">
-            <span class="lb-chip-name">${esc(row._chip_label)}</span>
-            ${row.memory_gb ? `<span class="lb-chip-mem mono">${esc(fmtNum(row.memory_gb))}GB</span>` : ""}
-          </span>
-          <span class="lb-chip-sub mono">
-            ${esc(subParts)}
+      <td class="col-recipe">
+        <div class="lb-recipe-cell">
+          <span class="lb-recipe-line">
+            <span class="lb-recipe-engine">${esc(fwName)}</span>
+            ${ver ? `<span class="lb-recipe-ver mono">${esc(ver)}</span>` : ""}
+            ${row.precision ? `<span class="lb-recipe-pill mono">${esc(row.precision)}</span>` : ""}
+            ${tp > 1 ? `<span class="lb-recipe-pill mono">TP${tp}</span>` : ""}
+            ${tunedCount > 0 ? `<span class="lb-tier-tag is-tuned" title="${zh ? "含显式调优参数" : "Includes explicit config overrides"}">+${tunedCount} cfg</span>` : ""}
             ${openDivision && rTier !== "reference" ? `<span class="lb-tier-tag is-${esc(rTier)}">${esc(rTier === "experimental" ? "exp" : "opt")}</span>` : ""}
           </span>
+          <span class="lb-recipe-sub mono">
+            ${modelName ? esc(modelName) : esc(row.implementation_id || "—")}
+            ${row.date ? ` · ${esc(fmtDate(row.date))}` : ""}
+          </span>
+        </div>
+      </td>
+      <td class="col-hw">
+        <a class="lb-chip-link" href="${chipHref(row)}">
+          <span class="lb-hw-name">${esc(row._chip_label)}</span>
+          ${hwSub ? `<span class="lb-hw-sub mono">${esc(hwSub)}</span>` : ""}
         </a>
       </td>
-      <td class="col-vendor">${esc(row.vendor || "—")}</td>
       ${cols.map((c) => renderMetricCell(row, c, sortKey, primary, maxPrimary)).join("")}
-      <td class="col-date mono tnum hide-mobile">${esc(fmtDate(row.date))}</td>
       <td class="col-trust">
         ${isVerified
           ? `<span class="trust-verified" title="${zh ? "已通过 ±5% 独立复现验证" : "Independently verified within ±5%"}">${icon("shieldCheck", 14)}<span>${zh ? "已验证" : "Verified"}</span></span>`
           : `<span class="trust-community" title="${zh ? "CI 已通过，等待独立复现" : "CI validated · community submission"}">—</span>`}
+      </td>
+      <td class="col-deploy">
+        <button type="button"
+                class="lb-deploy-btn"
+                data-open-run="${esc(runId)}"
+                data-open-tab="deploy"
+                title="${zh ? "一键复制安装与部署命令" : "Copy setup & --serve deploy recipe"}">
+          ${icon("terminal", 12)} <span>${zh ? "部署" : "Deploy"}</span>
+        </button>
       </td>
     </tr>
   `;
@@ -494,6 +545,14 @@ function bindInteractions(el) {
       return;
     }
 
+    if (t.closest("#lb-group-toggle")) {
+      ev.preventDefault();
+      location.hash = rebuildHash(suiteId, query, {
+        group: query.group === "chip" ? undefined : "chip",
+      });
+      return;
+    }
+
     const protoBtn = t.closest("#lb-protocol-toggle");
     if (protoBtn) {
       ev.preventDefault();
@@ -578,14 +637,22 @@ function buildFacets(rows) {
   const vendor = new Set();
   const precision = new Set();
   const framework = new Set();
+  const chipMap = new Map();
   for (const r of rows) {
     if (r.vendor) vendor.add(r.vendor);
     if (r.precision) precision.add(r.precision);
     if (r.framework) framework.add(r.framework);
+    if (r._chip_slug && !chipMap.has(r._chip_slug)) {
+      chipMap.set(r._chip_slug, r.chip || r._chip_label || r._chip_slug);
+    }
   }
   const sortedVendor = VENDOR_ORDER.filter((v) => vendor.has(v))
     .concat(Array.from(vendor).filter((v) => !VENDOR_ORDER.includes(v)).sort());
+  const chip = Array.from(chipMap.entries())
+    .map(([slug, label]) => ({ slug, label }))
+    .sort((a, b) => a.label.localeCompare(b.label));
   return {
+    chip,
     vendor: sortedVendor,
     precision: Array.from(precision).sort(),
     framework: Array.from(framework).sort(),

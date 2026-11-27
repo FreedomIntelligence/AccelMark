@@ -294,6 +294,7 @@ def extract_detail(result: dict) -> dict:
         "run_tp":          parallelism.get("tensor_parallel_size"),
         "run_pp":          parallelism.get("pipeline_parallel_size"),
         "run_dp":          parallelism.get("data_parallel_size"),
+        "run_extra_config": task.get("extra_config") or None,
         "acc_score":          accuracy.get("subset_score"),
         "acc_baseline_delta": accuracy.get("baseline_delta"),
         "acc_valid":          accuracy.get("valid"),
@@ -328,6 +329,7 @@ def extract_impl(result: dict) -> dict | None:
     except Exception:
         return None
 
+    runner_dir = RUNNERS_DIR / impl_id
     return {
         "id":           meta.get("id"),
         "platform":     meta.get("platform"),
@@ -339,6 +341,9 @@ def extract_impl(result: dict) -> dict | None:
         "created":      meta.get("created"),
         "supersedes_chain": meta.get("supersedes_chain"),
         "deprecated_by": meta.get("deprecated_by"),
+        "has_requirements": (runner_dir / "requirements.txt").exists(),
+        "has_patches":      (runner_dir / "apply_patches.sh").exists(),
+        "deploy":           meta.get("deploy"),
         "github_url":   f"https://github.com/FreedomIntelligence/AccelMark/tree/main/runners/{impl_id}",
         "runner_url":   f"https://github.com/FreedomIntelligence/AccelMark/blob/main/runners/{impl_id}/runner.py",
     }

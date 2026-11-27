@@ -8,7 +8,7 @@
 <h3 align="center">No single fastest chip — only the best serving recipe for your workload.</h3>
 
 <p align="center">
-  Open, reproducible LLM inference benchmarks across <strong>NVIDIA, AMD, Huawei Ascend, Apple Silicon, Google TPU, Moore Threads &amp; Iluvatar CoreX</strong>.
+  <strong>Verified LLM serving recipes</strong> — pick your hardware &amp; workload on the <a href="https://freedomintelligence.github.io/AccelMark"><strong>Live Recipe Leaderboard</strong></a>, then deploy with one-command isolated setup and <code>--serve</code>. This repository is the open benchmarking &amp; serving infrastructure powering it across <strong>NVIDIA, AMD, Huawei Ascend, Apple Silicon, Google TPU, Moore Threads &amp; Iluvatar CoreX</strong>.
 </p>
 
 <p align="center">
@@ -61,13 +61,30 @@ Vendor datasheets and single-number benchmarks hide the regime reversals that de
 
 ---
 
-## Quick Start (~10 Minutes)
+## Quick Start
 
-> **No SOTA tuning required.** Honest out-of-the-box reference baselines (`Closed` division) on consumer, older, or emerging accelerators are just as valuable as datacenter flagships.
+### Option A · Deploy a Verified Serving Recipe (~2 min)
+
+Find the best verified recipe for your hardware on the [**Live Recipe Leaderboard →**](https://freedomintelligence.github.io/AccelMark/#/rankings), click **Deploy**, or run directly:
 
 ```bash
 git clone https://github.com/FreedomIntelligence/AccelMark.git && cd AccelMark
-pip install -e . && pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
+
+# 1. Create an isolated venv and install pinned engine + serve deps (add --mirror in mainland China)
+bash scripts/setup_env.sh nvidia_vllm_47f5d58e --serve
+source .venv-nvidia_vllm_47f5d58e/bin/activate
+
+# 2. Launch an OpenAI-compatible API server using the exact benchmarked stack
+python run.py --runner nvidia_vllm_47f5d58e --model meta-llama/Llama-3.1-8B-Instruct --serve --port 8000
+```
+
+### Option B · Benchmark & Submit a Recipe (~10 min)
+
+> **No SOTA tuning required.** Honest out-of-the-box reference recipes (`Closed` division) on consumer, older, or emerging accelerators are just as valuable as datacenter flagships.
+
+```bash
+bash scripts/setup_env.sh nvidia_vllm_47f5d58e
+source .venv-nvidia_vllm_47f5d58e/bin/activate
 
 python run.py --init                               # 10s handle setup & pre-flight check (no download)
 python run.py --runner auto --suite suite_F        # ~10 min on 1 GPU (MMLU accuracy gate runs first)

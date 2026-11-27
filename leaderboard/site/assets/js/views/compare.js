@@ -860,26 +860,26 @@ function renderCmpTable(suiteId, cols, chips) {
 }
 
 function renderChipHead(c, meta) {
-  const r = c.suiteRow;
-  let metaLine = `${_i('compare.noSuiteData')} ${esc(meta.letter)}`;
-  if (r) {
-    const fw = r.framework || "";
-    const ver = shortVersion(r.framework_version);
+  const r = c.suiteRow || c.seedRow;
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
+  let recipeTitle = `${_i('compare.noSuiteData')} ${esc(meta.letter)}`;
+  if (c.suiteRow) {
+    const fw = c.suiteRow.framework || "";
+    const ver = shortVersion(c.suiteRow.framework_version);
     const fwLine = ver ? `${fw} ${ver}` : fw;
-    const parts = [fwLine, r.precision].filter(Boolean);
-    metaLine = esc(parts.join(" · "));
+    const parts = [fwLine, c.suiteRow.precision].filter(Boolean);
+    recipeTitle = esc(parts.join(" · "));
   }
-  // The header links to the chip's overview page so users can drill
-  // into every run for that chip.  We use c.seedRow (the row the user
-  // ticked from rankings) rather than c.suiteRow for the slug, so the
-  // link stays stable when switching across suites.
   const href = chipHref(c.seedRow);
+  const rid = c.suiteRow?.run_id || c.rid;
   return `
     <th class="cmp-chip-head" data-vendor="${esc(c.vendor)}" scope="col">
-      <a class="cmp-chip-name" href="${esc(href)}">
-        <span class="vendor-dot"></span>${esc(c.label)}
+      <div class="cmp-chip-name" data-open-run="${esc(rid)}" data-open-tab="deploy" style="cursor:pointer" title="${zh ? "点击查看一键部署命令" : "Click to open Deploy recipe"}">
+        <span class="vendor-dot"></span>${recipeTitle}
+      </div>
+      <a class="cmp-chip-meta" href="${esc(href)}" style="text-decoration:none;display:inline-block;margin-top:2px;">
+        ${zh ? "运行于" : "on"} ${esc(c.label)} →
       </a>
-      <span class="cmp-chip-meta">${metaLine}</span>
     </th>
   `;
 }
@@ -1039,6 +1039,29 @@ function renderPresetComparisons() {
         pick((r) => r.suite === "suite_A" && r.chip === "NVIDIA H20-3e" && r.framework === "SGLang"),
         pick((r) => r.suite === "suite_A" && r.chip === "NVIDIA H20-3e" && r.framework === "vLLM"),
       ].filter(Boolean),
+    },
+    {
+      tag: "Same Chip · Quant",
+      title: zh ? "同卡量化方案对比" : "Same-Chip Quantization Recipes",
+      desc: zh ? "同一张硬件对比 BF16 vs FP8/AWQ 精度门禁与吞吐增益" : "Same silicon across BF16 vs FP8/AWQ with MMLU accuracy gates",
+      suite: "suite_C",
+      runs: (() => {
+        const cRows = rows.filter((r) => r.suite === "suite_C");
+        const byChip = new Map();
+        for (const r of cRows) {
+          if (!byChip.has(r.chip)) byChip.set(r.chip, []);
+          byChip.get(r.chip).push(r);
+        }
+        for (const list of byChip.values()) {
+          const uniq = [];
+          const seenP = new Set();
+          for (const r of list) {
+            if (!seenP.has(r.precision)) { seenP.add(r.precision); uniq.push(r.run_id); }
+          }
+          if (uniq.length >= 2) return uniq.slice(0, 3);
+        }
+        return cRows.slice(0, 2).map((r) => r.run_id);
+      })().filter(Boolean),
     },
     {
       tag: "5 Ecosystems",

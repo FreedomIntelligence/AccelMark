@@ -17,7 +17,7 @@
 // silently falls back to "Charting library failed to load".  Modal
 // itself never crashes the app.
 
-import { rowByRunId, SUITE_META } from "./data.js";
+import { rowByRunId, SUITE_META, SUITE_COLUMNS, formatMetric } from "./data.js";
 import {
   esc, shortVersion, fmtDate, submitterHandle, chipSlug,
   downloadCanvasAsPng, flashButtonLabel, copyToClipboard,
@@ -27,14 +27,17 @@ import {
   DISCUSS_TEMPLATES,
 } from "./cite.js";
 import { downloadResultShareCard } from "./share-card.js";
+import { buildDeployRecipe } from "./deploy-recipe.js";
+import { icon } from "./icons.js";
 
 // ── Module state ──
 let _modalEl = null;
 let _activeCharts = [];
-let _activeTab = "details";
+let _activeTab = "deploy";
 let _lastFocus = null;
 let _currentRow = null;
 let _vizRenderedForRun = null;
+let _deployState = { mode: "serve", mirror: false, model: "", port: 8000 };
 
 // Suite letter -> CSS variable used for accent color binding on the
 // modal shell.  The same tokens are already defined in base.css.
@@ -82,12 +85,14 @@ export function initModal() {
         </div>
         <button class="modal-close" type="button" aria-label="Close">×</button>
       </header>
-      <nav class="modal-tabs" role="tablist" aria-label="Run details">
+      <nav class="modal-tabs" role="tablist" aria-label="Recipe details">
+        <button class="modal-tab" data-tab="deploy"  type="button" role="tab" id="run-modal-tab-deploy"  aria-controls="run-modal-panel-deploy">Deploy</button>
         <button class="modal-tab" data-tab="details" type="button" role="tab" id="run-modal-tab-details" aria-controls="run-modal-panel-details">Details</button>
         <button class="modal-tab" data-tab="viz"     type="button" role="tab" id="run-modal-tab-viz"     aria-controls="run-modal-panel-viz">Visualize</button>
         <button class="modal-tab" data-tab="impl"    type="button" role="tab" id="run-modal-tab-impl"    aria-controls="run-modal-panel-impl">Implementation</button>
       </nav>
       <div class="modal-body">
+        <section class="modal-panel" data-panel="deploy"  role="tabpanel" id="run-modal-panel-deploy"  aria-labelledby="run-modal-tab-deploy"  tabindex="0"></section>
         <section class="modal-panel" data-panel="details" role="tabpanel" id="run-modal-panel-details" aria-labelledby="run-modal-tab-details" tabindex="0"></section>
         <section class="modal-panel" data-panel="viz"     role="tabpanel" id="run-modal-panel-viz"     aria-labelledby="run-modal-tab-viz"     tabindex="0"></section>
         <section class="modal-panel" data-panel="impl"    role="tabpanel" id="run-modal-panel-impl"    aria-labelledby="run-modal-tab-impl"    tabindex="0"></section>
@@ -154,6 +159,41 @@ export function initModal() {
       _scrollToDetailSection(jumpTrigger.dataset.scrollTo);
       return;
     }
+    const depMode = ev.target.closest("[data-dep-mode]");
+    if (depMode && _currentRow) {
+      ev.preventDefault();
+      _deployState.mode = depMode.dataset.depMode;
+      _renderDeploy(_currentRow, _modalEl.querySelector('[data-panel="deploy"]'));
+      return;
+    }
+    const depCopy = ev.target.closest("[data-dep-copy]");
+    if (depCopy) {
+      ev.preventDefault();
+      const pre = depCopy.closest(".dep-step")?.querySelector("pre code");
+      if (pre) {
+        copyToClipboard(pre.textContent || "").then((ok) => {
+          const zh = typeof window._lang === "function" && window._lang() === "cn";
+          flashButtonLabel(depCopy, ok ? (zh ? "已复制" : "Copied!") : "Failed", 1400, ok ? "is-copied" : "is-copy-failed");
+        });
+      }
+      return;
+    }
+  });
+
+  _modalEl.addEventListener("change", (ev) => {
+    if (!_currentRow) return;
+    if (ev.target?.id === "dep-mirror-toggle") {
+      _deployState.mirror = !!ev.target.checked;
+      _renderDeploy(_currentRow, _modalEl.querySelector('[data-panel="deploy"]'));
+    }
+  });
+
+  _modalEl.addEventListener("input", (ev) => {
+    if (!_currentRow) return;
+    if (ev.target?.id === "dep-model-input") {
+      _deployState.model = ev.target.value;
+      _updateDeployCommands(_currentRow);
+    }
   });
 
   // Esc closes from anywhere.
@@ -183,7 +223,7 @@ export function initModal() {
     // when the element is also an anchor with an href.
     if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return;
     ev.preventDefault();
-    openModal(t.dataset.openRun);
+    openModal(t.dataset.openRun, { tab: t.dataset.openTab || "deploy" });
   });
 
   // Keyboard activation for the same `[data-open-run]` triggers.
@@ -204,7 +244,7 @@ export function initModal() {
     // on a focused link still opens in a new tab).
     if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
     ev.preventDefault();
-    openModal(t.dataset.openRun);
+    openModal(t.dataset.openRun, { tab: t.dataset.openTab || "deploy" });
   });
 
   // URL deep-link: `?run=<rid>` in the hash query opens the modal on
@@ -219,13 +259,8 @@ export function initModal() {
     if (rid) {
       // Open in a microtask so the current view has time to render first.
       setTimeout(() => {
-        openModal(rid);
-        // Only honour the tab hint when the modal actually opened — if the
-        // run_id was stale, openModal will have stripped ?run= for us and
-        // poking a tab on a closed modal is just noise.
-        if (_modalEl.classList.contains("open") && (tab === "viz" || tab === "impl")) {
-          _setTab(tab);
-        }
+        const validTab = (tab === "deploy" || tab === "details" || tab === "viz" || tab === "impl") ? tab : "deploy";
+        openModal(rid, { tab: validTab });
       }, 0);
     } else if (_modalEl.classList.contains("open")) {
       closeModal();
@@ -235,7 +270,7 @@ export function initModal() {
   syncFromHash();
 }
 
-export function openModal(runId) {
+export function openModal(runId, opts = {}) {
   if (!_modalEl) initModal();
   const row = rowByRunId(runId);
   if (!row) {
@@ -246,17 +281,24 @@ export function openModal(runId) {
     if (runId) _setHashRunParam(null);
     return;
   }
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
   _currentRow = row;
   _vizRenderedForRun = null;
+  _deployState = { mode: "serve", mirror: zh, model: "", port: 8000 };
   _lastFocus = document.activeElement;
   _fillModal(row);
-  // Default to Details on every open; Viz tab is lazy.
-  _setTab("details");
+  const startTab = (opts.tab === "details" || opts.tab === "viz" || opts.tab === "impl") ? opts.tab : "deploy";
+  _setTab(startTab);
   _modalEl.classList.add("open");
   _modalEl.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
+  const bodyEl = _modalEl.querySelector(".modal-body");
+  if (bodyEl) bodyEl.scrollTop = 0;
+  requestAnimationFrame(() => {
+    if (bodyEl) bodyEl.scrollTop = 0;
+  });
   const closeBtn = _modalEl.querySelector(".modal-close");
-  if (closeBtn) closeBtn.focus();
+  if (closeBtn) closeBtn.focus({ preventScroll: true });
   _setHashRunParam(runId);
 }
 
@@ -323,16 +365,28 @@ function _fillModal(row) {
   );
 
   const titleEl = _modalEl.querySelector(".modal-title");
-  titleEl.textContent =
-    (d.hw_chip || row.chip || "—") +
-    (row.chip_count > 1 ? ` ×${row.chip_count}` : "");
+  const fwTitle = [row.framework || d.sw_framework || "Serving Recipe", shortVersion(row.framework_version)].filter(Boolean).join(" ");
+  const precTitle = row.precision ? ` · ${row.precision}` : "";
+  const tpTitle = (d.run_tp || row.chip_count || 1) > 1 ? ` · TP${d.run_tp || row.chip_count}` : "";
+  titleEl.textContent = `${fwTitle}${precTitle}${tpTitle}`;
 
-  // Drill-in link to the chip-detail page so users can see every run
-  // for this hardware configuration without leaving via the URL bar.
-  // Clicking the link triggers a hashchange which auto-closes the modal
-  // (see syncFromHash in initModal).
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
   const chipLink = _modalEl.querySelector(".modal-chip-link");
+  const hwLabel = (d.hw_chip || row.chip || "—") + (row.chip_count > 1 ? ` ×${row.chip_count}` : "");
   chipLink.setAttribute("href", `#/chip/${chipSlug(row)}`);
+  chipLink.textContent = zh
+    ? `运行于 ${hwLabel} · 查看该硬件全部方案 →`
+    : `on ${hwLabel} · All recipes for this hardware →`;
+
+  // Localize tab labels
+  const tDep = _modalEl.querySelector('[data-tab="deploy"]');
+  const tDet = _modalEl.querySelector('[data-tab="details"]');
+  const tViz = _modalEl.querySelector('[data-tab="viz"]');
+  const tImp = _modalEl.querySelector('[data-tab="impl"]');
+  if (tDep) tDep.textContent = zh ? "一键部署" : "Deploy";
+  if (tDet) tDet.textContent = zh ? "评测详情" : "Details";
+  if (tViz) tViz.textContent = zh ? "性能图表" : "Visualize";
+  if (tImp) tImp.textContent = zh ? "Runner 实现" : "Implementation";
 
   const subEl = _modalEl.querySelector(".modal-subtitle");
   const parts = [];
@@ -343,13 +397,9 @@ function _fillModal(row) {
       `</span>`
     );
   }
-  const fwLine = [row.framework, shortVersion(row.framework_version)].filter(Boolean).join(" ");
-  if (fwLine) parts.push(esc(fwLine));
-  if (row.precision) {
-    const fallback = row.precision_fallback
-      ? ` <span class="modal-warn">(fallback)</span>`
-      : "";
-    parts.push(esc(row.precision) + fallback);
+  if (d.model_id) parts.push(`<span class="mono">${esc(d.model_id.split("/").pop())}</span>`);
+  if (row.precision_fallback) {
+    parts.push(`<span class="modal-warn">(precision fallback)</span>`);
   }
   if (row.date) parts.push(esc(fmtDate(row.date)));
   const pill = _reliabilityPill(row);
@@ -399,11 +449,154 @@ function _fillModal(row) {
   vizTab.style.display  = hasViz ? "" : "none";
   implTab.style.display = row.impl ? "" : "none";
 
-  // Render Details up-front; Viz is lazy in _setTab().
+  // Render Deploy & Details up-front; Viz is lazy in _setTab().
+  _renderDeploy(row,  _modalEl.querySelector('[data-panel="deploy"]'));
   _renderDetails(row, _modalEl.querySelector('[data-panel="details"]'));
   _renderImpl(row,    _modalEl.querySelector('[data-panel="impl"]'));
   // Clear viz panel; it'll be filled on first tab activation.
   _modalEl.querySelector('[data-panel="viz"]').innerHTML = "";
+}
+
+// ── Deploy recipe panel ──
+
+function _renderDeploy(row, panel) {
+  if (!panel) return;
+  const zh = typeof window._lang === "function" && window._lang() === "cn";
+  const recipe = buildDeployRecipe(row, _deployState);
+  const cols = SUITE_COLUMNS[row.suite] || [];
+  const primary = cols.find((c) => c.primary) || cols[0];
+  const primaryDisp = primary ? (formatMetric(row[primary.key], primary) || "—") : "—";
+  const primaryUnit = primary?.unit || "";
+  const slaVal = row.online_max_qps;
+  const slaDisp = slaVal == null ? "—" : (Number(slaVal) === 0 ? (zh ? "未达 SLA" : "SLA fail") : `${Number(slaVal)} QPS`);
+  const d = row.detail || {};
+  const accScore = d.acc_score != null ? `${(Number(d.acc_score) * 100).toFixed(1)}%` : "—";
+  const accPass = d.acc_valid === true;
+  const isVerified = row.tier === "verified";
+
+  const stepLaunchTitle = _deployState.mode === "native"
+    ? (zh ? `直接启动原生 ${recipe.nativeLabel}` : `Launch with ${recipe.nativeLabel}`)
+    : (_deployState.mode === "reproduce"
+      ? (zh ? "复现本条实测基准" : "Reproduce this exact benchmark")
+      : (zh ? "一键拉起 OpenAI 兼容 API 服务" : "Launch OpenAI-compatible API server"));
+
+  panel.innerHTML = `
+    <div class="dep-kpis">
+      <div class="dep-kpi">
+        <span class="dep-kpi-label mono">${esc(primary ? primary.label : "Primary")}</span>
+        <span class="dep-kpi-val mono tnum">${esc(primaryDisp)}${primaryUnit ? ` <small>${esc(primaryUnit)}</small>` : ""}</span>
+      </div>
+      ${slaVal != null ? `
+        <div class="dep-kpi">
+          <span class="dep-kpi-label mono">500ms SLA</span>
+          <span class="dep-kpi-val mono tnum${Number(slaVal) === 0 ? " is-warn" : ""}">${esc(slaDisp)}</span>
+        </div>
+      ` : ""}
+      <div class="dep-kpi">
+        <span class="dep-kpi-label mono">${zh ? "MMLU 精度门禁" : "MMLU Gate"}</span>
+        <span class="dep-kpi-val mono tnum${accPass ? " is-good" : ""}">${esc(accScore)}${accPass ? " ✓" : ""}</span>
+      </div>
+      <div class="dep-kpi">
+        <span class="dep-kpi-label mono">${zh ? "可信状态" : "Verification"}</span>
+        <span class="dep-kpi-val${isVerified ? " is-good" : ""}">${isVerified ? (zh ? "已复现 Verified" : "Verified ±5%") : (zh ? "CI 已通过" : "CI Validated")}</span>
+      </div>
+    </div>
+
+    <div class="dep-env-strip">
+      <span class="dep-env-title mono">${zh ? "实测基线环境" : "TESTED BASELINE"}</span>
+      <div class="dep-env-pills">
+        ${recipe.envSpecs.map((s) => `
+          <span class="dep-env-pill mono"><em>${esc(s.k)}</em> ${esc(s.v)}</span>
+        `).join("")}
+      </div>
+    </div>
+
+    <div class="dep-toolbar">
+      <div class="dep-mode-seg" role="group" aria-label="Deploy mode">
+        <button type="button" class="dep-mode-btn${_deployState.mode === "serve" ? " active" : ""}" data-dep-mode="serve">
+          ${zh ? "AccelMark --serve" : "AccelMark --serve"}
+        </button>
+        <button type="button" class="dep-mode-btn${_deployState.mode === "native" ? " active" : ""}" data-dep-mode="native">
+          ${esc(recipe.nativeLabel)}
+        </button>
+        <button type="button" class="dep-mode-btn${_deployState.mode === "reproduce" ? " active" : ""}" data-dep-mode="reproduce">
+          ${zh ? "复现跑分" : "Reproduce"}
+        </button>
+      </div>
+
+      <label class="dep-mirror-check">
+        <input type="checkbox" id="dep-mirror-toggle"${_deployState.mirror ? " checked" : ""}>
+        <span>${zh ? "国内镜像 (清华 pip + HF)" : "China mirror (pip + HF)"}</span>
+      </label>
+    </div>
+
+    ${_deployState.mode !== "reproduce" ? `
+      <div class="dep-model-row">
+        <label class="dep-model-label mono" for="dep-model-input">${zh ? "部署模型（留空则用本条实测模型）" : "MODEL (LEAVE BLANK FOR BENCHMARK MODEL)"}</label>
+        <input id="dep-model-input"
+               class="dep-model-input mono"
+               type="text"
+               value="${esc(_deployState.model)}"
+               placeholder="${esc(recipe.defaultModel)}">
+      </div>
+    ` : ""}
+
+    <div class="dep-steps">
+      <div class="dep-step">
+        <div class="dep-step-head">
+          <span class="dep-step-num mono">01</span>
+          <span class="dep-step-title">${zh ? "隔离虚拟环境一键安装（不污染系统 Python）" : "Isolated environment setup (safe venv, zero global pollution)"}</span>
+          <button type="button" class="dep-copy-btn" data-dep-copy="setup">${icon("copy", 12)} <span>${zh ? "复制" : "Copy"}</span></button>
+        </div>
+        <pre class="dep-pre"><code id="dep-code-setup">${esc(recipe.setupCmd)}</code></pre>
+      </div>
+
+      ${recipe.configCmd ? `
+        <div class="dep-step">
+          <div class="dep-step-head">
+            <span class="dep-step-num mono">02</span>
+            <span class="dep-step-title">${zh ? "写入该方案已验证的调优参数" : "Write verified tuning config"} <code class="mono">${esc(recipe.configPath)}</code></span>
+            <button type="button" class="dep-copy-btn" data-dep-copy="config">${icon("copy", 12)} <span>${zh ? "复制" : "Copy"}</span></button>
+          </div>
+          <pre class="dep-pre"><code id="dep-code-config">${esc(recipe.configCmd)}</code></pre>
+        </div>
+      ` : ""}
+
+      <div class="dep-step">
+        <div class="dep-step-head">
+          <span class="dep-step-num mono">${recipe.configCmd ? "03" : "02"}</span>
+          <span class="dep-step-title">${esc(stepLaunchTitle)}</span>
+          <button type="button" class="dep-copy-btn" data-dep-copy="launch">${icon("copy", 12)} <span>${zh ? "复制" : "Copy"}</span></button>
+        </div>
+        <pre class="dep-pre"><code id="dep-code-launch">${esc(recipe.launchCmd)}</code></pre>
+      </div>
+
+      ${_deployState.mode !== "reproduce" ? `
+        <div class="dep-step">
+          <div class="dep-step-head">
+            <span class="dep-step-num mono">${recipe.configCmd ? "04" : "03"}</span>
+            <span class="dep-step-title">${zh ? "验证 OpenAI 兼容接口" : "Smoke-test OpenAI endpoint"}</span>
+            <button type="button" class="dep-copy-btn" data-dep-copy="test">${icon("copy", 12)} <span>${zh ? "复制" : "Copy"}</span></button>
+          </div>
+          <pre class="dep-pre"><code id="dep-code-test">${esc(recipe.testCmd)}</code></pre>
+        </div>
+      ` : ""}
+    </div>
+
+    <div class="dep-footnote">
+      ${zh
+        ? `Runner 哈希锁定：<code>${esc(recipe.runnerId)}</code>。切换到「评测详情」可审计完整硬件/驱动/MMLU 原始记录。`
+        : `Pinned to content-hashed runner <code>${esc(recipe.runnerId)}</code>. Switch to <strong>Details</strong> to audit full hardware, driver, and MMLU receipts.`}
+    </div>
+  `;
+}
+
+function _updateDeployCommands(row) {
+  const recipe = buildDeployRecipe(row, _deployState);
+  const launchEl = _modalEl?.querySelector("#dep-code-launch");
+  const testEl = _modalEl?.querySelector("#dep-code-test");
+  if (launchEl) launchEl.textContent = recipe.launchCmd;
+  if (testEl) testEl.textContent = recipe.testCmd;
 }
 
 function _vizHasAnyData(viz) {

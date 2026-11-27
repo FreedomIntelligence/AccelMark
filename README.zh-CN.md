@@ -8,7 +8,7 @@
 <h3 align="center">没有唯一的“最快芯片”——只有最适合你负载的推理方案。</h3>
 
 <p align="center">
-  开放、可复现的多负载 LLM 推理基准排行榜，覆盖 <strong>NVIDIA、AMD、华为昇腾、Apple Silicon、Google TPU、摩尔线程与天数智芯</strong>。
+  <strong>实测验证的 LLM 推理部署方案库</strong>——在 <a href="https://freedomintelligence.github.io/AccelMark"><strong>在线方案榜</strong></a> 按硬件与业务场景找到最优方案，一键隔离装环境并用 <code>--serve</code> 拉起服务。本仓库是驱动它的开放评测与一键服务化基建，覆盖 <strong>NVIDIA、AMD、华为昇腾、Apple Silicon、Google TPU、摩尔线程与天数智芯</strong>。
 </p>
 
 <p align="center">
@@ -61,15 +61,31 @@
 
 ---
 
-## 快速上手（约 10 分钟）
+## 快速上手
+
+### 方式 A · 直接拿走实测最优部署方案（约 2 分钟上线）
+
+在 [**在线部署方案榜 →**](https://freedomintelligence.github.io/AccelMark/#/rankings) 选定你手里的硬件和业务场景，点击任意方案的 **部署（Deploy）** 复制命令，或直接运行：
+
+```bash
+git clone https://github.com/FreedomIntelligence/AccelMark.git && cd AccelMark
+
+# 1. 在独立虚拟环境一键安装已锁定依赖（不污染系统 Python；--mirror 走清华 pip 源）
+bash scripts/setup_env.sh nvidia_vllm_47f5d58e --serve --mirror
+source .venv-nvidia_vllm_47f5d58e/bin/activate
+export HF_ENDPOINT=https://hf-mirror.com
+
+# 2. 用与榜单完全一致的推理栈一键拉起 OpenAI 兼容 API（可换任意 HF 模型）
+python run.py --runner nvidia_vllm_47f5d58e --model meta-llama/Llama-3.1-8B-Instruct --serve --port 8000
+```
+
+### 方式 B · 跑测并向社区贡献新方案（约 10 分钟）
 
 > **无需极限调参。** 消费级显卡、老架构显卡及国产加速卡的诚实默认配置（`Closed` 参考栈）与数据中心旗舰卡同等珍贵。
 
 ```bash
-git clone https://github.com/FreedomIntelligence/AccelMark.git && cd AccelMark
-pip install -e . && pip install -r runners/nvidia_vllm_47f5d58e/requirements.txt
-
-# 中国大陆用户建议开启 HuggingFace 镜像（也可在 configs/models_local.yaml 指定本地权重）
+bash scripts/setup_env.sh nvidia_vllm_47f5d58e --mirror
+source .venv-nvidia_vllm_47f5d58e/bin/activate
 export HF_ENDPOINT=https://hf-mirror.com
 
 python run.py --init                               # 10 秒初始化与环境预检（不下载模型）

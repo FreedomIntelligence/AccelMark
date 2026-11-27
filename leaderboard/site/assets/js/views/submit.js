@@ -8,14 +8,14 @@ import { suiteIcon, icon } from "../icons.js";
 const isZh = () => typeof window._lang === "function" && window._lang() === "cn";
 
 const ECOSYSTEMS = [
-  { id: "nvidia_vllm",   label: "NVIDIA (vLLM)",      alias: "vllm",     req: "runners/nvidia_vllm_47f5d58e/requirements.txt",            note: "Default reference stack for CUDA GPUs (Ampere / Ada / Hopper / Blackwell)." },
-  { id: "nvidia_sglang", label: "NVIDIA (SGLang)",    alias: "sglang",   req: "runners/nvidia_sglang_c43a8309/requirements.txt",          note: "High-throughput RadixAttention serving stack on CUDA GPUs." },
-  { id: "amd",           label: "AMD ROCm",           alias: "rocm",     req: "runners/amd_vllm_rocm_6c18cd8f/requirements.txt",          note: "vLLM-ROCm for Instinct MI210 / MI250X / MI300X / MI325X / Radeon." },
-  { id: "ascend",        label: "Huawei Ascend",      alias: "ascend",   req: "runners/ascend_vllm_ascend_d4aa9fda/requirements.txt",     note: "vllm-ascend on CANN for Ascend 910B / 910C NPUs." },
-  { id: "iluvatar",      label: "Iluvatar CoreX",     alias: "iluvatar", req: "runners/iluvatar_vllm_ixuca_4d3befc9/requirements.txt",    note: "vllm-ixuca for MR-V100 / BI-V150 (Suites A–H supported)." },
-  { id: "moorethreads",  label: "Moore Threads",      alias: "musa",     req: "runners/moorethreads_vllm_musa_6607740b/requirements.txt", note: "vllm-musa for MTT S4000 / S5000 GPUs." },
-  { id: "google",        label: "Google TPU",         alias: "tpu",      req: "runners/google_vllm_tpu_68cc9ffa/requirements.txt",        note: "vllm-tpu (JAX/XLA) on Cloud TPU v5e / v6e." },
-  { id: "apple",         label: "Apple Silicon",      alias: "mlx",      req: "runners/apple_mlx_lm_9546b8b5/requirements.txt",           note: "mlx-lm on macOS M1 / M2 / M3 / M4 unified memory." },
+  { id: "nvidia_vllm",   label: "NVIDIA · vLLM",       alias: "vllm",     runner: "nvidia_vllm_47f5d58e",            note: "Default reference serving recipe for CUDA GPUs (Ampere / Ada / Hopper / Blackwell)." },
+  { id: "nvidia_sglang", label: "NVIDIA · SGLang",     alias: "sglang",   runner: "nvidia_sglang_c43a8309",          note: "High-throughput RadixAttention serving stack on CUDA GPUs." },
+  { id: "amd",           label: "AMD · vLLM-ROCm",     alias: "rocm",     runner: "amd_vllm_rocm_6c18cd8f",          note: "vLLM-ROCm for Instinct MI210 / MI250X / MI300X / MI325X / Radeon." },
+  { id: "ascend",        label: "Ascend · vllm-ascend",alias: "ascend",   runner: "ascend_vllm_ascend_d4aa9fda",     note: "vllm-ascend on CANN for Huawei Ascend 910B / 910C NPUs." },
+  { id: "iluvatar",      label: "Iluvatar · vllm-ixuca",alias: "iluvatar",runner: "iluvatar_vllm_ixuca_4d3befc9",    note: "vllm-ixuca for MR-V100 / BI-V150 (Suites A–H supported)." },
+  { id: "moorethreads",  label: "MTT · vllm-musa",     alias: "musa",     runner: "moorethreads_vllm_musa_6607740b", note: "vllm-musa for Moore Threads S4000 / S5000 GPUs." },
+  { id: "google",        label: "TPU · vllm-tpu",      alias: "tpu",      runner: "google_vllm_tpu_68cc9ffa",        note: "vllm-tpu (JAX/XLA) on Google Cloud TPU v5e / v6e." },
+  { id: "apple",         label: "Apple · mlx-lm",      alias: "mlx",      runner: "apple_mlx_lm_9546b8b5",           note: "mlx-lm on macOS M1 / M2 / M3 / M4 unified memory." },
 ];
 
 const SUITE_TIMES = {
@@ -35,11 +35,12 @@ const ISSUE_ZIP_URL = "https://github.com/FreedomIntelligence/AccelMark/issues/n
 function buildCommands(state) {
   const eco = ECOSYSTEMS.find((e) => e.id === state.eco) || ECOSYSTEMS[0];
   const sInfo = SUITE_TIMES[state.suite] || SUITE_TIMES.suite_F;
+  const mirrorFlag = state.cnMirror ? " --mirror" : "";
   const lines = [
-    "# 1. Clone & install framework + runner deps",
-    "git clone https://github.com/FreedomIntelligence/AccelMark.git",
-    `cd AccelMark && pip install -e .`,
-    `pip install -r ${eco.req}`,
+    "# 1. Clone & install into an isolated venv (never pollutes global Python)",
+    "git clone https://github.com/FreedomIntelligence/AccelMark.git && cd AccelMark",
+    `bash scripts/setup_env.sh ${eco.runner} --serve${mirrorFlag}`,
+    `source .venv-${eco.runner}/bin/activate`,
     "",
   ];
   if (state.cnMirror) {
@@ -50,7 +51,7 @@ function buildCommands(state) {
   lines.push("# 2. Handle setup & 10s pre-flight check (no download)");
   lines.push("python run.py --init");
   lines.push("");
-  lines.push(`# 3. Run ${state.suite} (${sInfo.time}) — MMLU gate runs first`);
+  lines.push(`# 3. Benchmark this serving recipe on ${state.suite} (${sInfo.time}) — MMLU gate runs first`);
   const tpFlag = sInfo.multi ? " --tensor-parallel-size 4" : "";
   lines.push(`python run.py --runner ${eco.alias} --suite ${state.suite}${tpFlag}`);
   lines.push("");
@@ -80,11 +81,11 @@ export function render({ el }) {
 
     el.innerHTML = `
       <header class="page-head-left">
-        <span class="eyebrow">${zh ? "参与贡献" : "Contribute"}</span>
-        <h1>${zh ? "10 分钟提交你的硬件实测" : "Submit a benchmark in ~10 minutes"}</h1>
+        <span class="eyebrow">${zh ? "贡献部署方案" : "Publish a Recipe"}</span>
+        <h1>${zh ? "10 分钟实测并发布一套部署方案" : "Benchmark & publish a serving recipe"}</h1>
         <p class="page-lead">${zh
-          ? "无需极致调优。消费卡、老架构和国产卡的诚实默认配置（Closed Reference）同样宝贵。点选下方配置，直接复制右侧命令开跑。"
-          : "No SOTA tuning required. Honest out-of-the-box reference baselines on consumer, older, or emerging chips are just as valuable. Select your setup and copy the commands."}</p>
+          ? "无需极致调优。无论消费卡、旗舰卡还是国产卡，一套开箱即用、过 MMLU 精度门禁的诚实部署方案就能帮全社区少踩坑。点选左侧组合，直接复制命令。"
+          : "No SOTA tuning required. Honest out-of-the-box serving recipes with MMLU accuracy gates help everyone deploy faster. Pick your stack and copy the isolated commands."}</p>
       </header>
 
       <div class="sub-builder">
